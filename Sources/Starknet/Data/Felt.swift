@@ -4,23 +4,18 @@ import BigInt
 struct Felt {
     private let value: BigUInt
     
-    private static let primeBigUInt = BigUInt(2).power(251) + 17 * BigUInt(2).power(192) + 1
+    static let prime = BigUInt(2).power(251) + 17 * BigUInt(2).power(192) + 1
     
-    static let zero = Felt(fromTruncated: 0)
-    static let one = Felt(fromTruncated: 1)
+    static let zero = Felt(0)!
+    static let one = Felt(1)!
     
     init?(_ value: BigUInt) {
-        guard value < Felt.primeBigUInt else {
+        guard value < Felt.prime else {
            return nil
         }
         
         self.value = value
     }
-    
-    init(fromTruncated value: BigUInt) {
-        self.value = value % Felt.primeBigUInt
-    }
-    
     
     init?(fromHex hex: String) {
         guard hex.hasPrefix("0x") else { return nil }
