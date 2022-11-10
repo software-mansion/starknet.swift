@@ -4,25 +4,30 @@
 import PackageDescription
 
 let package = Package(
-    name: "starknet",
+    name: "Starknet",
+    platforms: [
+        .iOS(SupportedPlatform.IOSVersion.v13),
+        .macOS(SupportedPlatform.MacOSVersion.v12)
+    ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "starknet",
-            targets: ["starknet"]),
+            name: "Starknet",
+            targets: ["Starknet"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "starknet",
-            dependencies: []),
+            name: "Starknet",
+            dependencies: ["BigInt"]),
         .testTarget(
-            name: "starknetTests",
-            dependencies: ["starknet"]),
+            name: "StarknetTests",
+            dependencies: ["Starknet", "BigInt"]),
     ]
 )
