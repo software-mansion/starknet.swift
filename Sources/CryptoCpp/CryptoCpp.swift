@@ -8,7 +8,7 @@ public enum CryptoCppError: Error {
 public class CryptoCpp {
     private static let bufferByteSize = 32
     
-    private class func wrapper(bufferSize: Int, body: (_ buffer: UnsafeMutablePointer<CChar>) -> Int32) throws -> Data {
+    private class func runWithBuffer(ofSize bufferSize: Int, body: (_ buffer: UnsafeMutablePointer<CChar>) -> Int32) throws -> Data {
         let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: bufferSize)
         defer {
             buffer.deallocate()
@@ -27,15 +27,20 @@ public class CryptoCpp {
     }
     
     public static func pedersen(first: Data, second: Data) throws -> Data {
-        return try wrapper(bufferSize: bufferByteSize) { buffer in
+        return try runWithBuffer(ofSize: bufferByteSize) { buffer in
             return Hash(first.toNative(), second.toNative(), buffer)
         }
     }
     
-    
     public class func sign(privateKey: Data, hash: Data, k: Data) throws -> Data {
-        return try wrapper(bufferSize: 2 * bufferByteSize) { buffer in
+        return try runWithBuffer(ofSize: 2 * bufferByteSize) { buffer in
             return Sign(privateKey.toNative(), hash.toNative(), k.toNative(), buffer)
+        }
+    }
+    
+    public class func getPublicKey(privateKey: Data) throws -> Data {
+        return try runWithBuffer(ofSize: bufferByteSize) { buffer in
+            return GetPublicKey(privateKey.toNative(), buffer)
         }
     }
     
@@ -48,23 +53,10 @@ public class CryptoCpp {
         
         return result == 0 ? false : true
     }
-    
-    public class func getPublicKey(privateKey: Data) throws -> Data {
-        return try wrapper(bufferSize: bufferByteSize) { buffer in
-            return GetPublicKey(privateKey.toNative(), buffer)
-        }
-    }
 }
 
 private extension Data {
     func toNative() -> [CChar] {
-        var copy = self
-        copy.padRight(toLength: 32, withPad: 0)
-        
-        return copy.toCCharArray()
-    }
-    
-    func toCCharArray() -> [CChar] {
         return [UInt8](self).map { Int8(bitPattern: $0) }  as [CChar]
     }
     

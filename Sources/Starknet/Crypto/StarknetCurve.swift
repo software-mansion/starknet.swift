@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Bartosz Rybarski on 10/11/2022.
-//
-
 import Foundation
 import CryptoCpp
 import BigInt
@@ -14,18 +7,8 @@ enum StarknetCurveError: Error {
     case verifyError
 }
 
-struct StarknetCurveSignature {
-    let r: Felt
-    let s: Felt
-    
-    func toArray() -> [Felt] {
-        return [r, s]
-    }
-}
-
 public class StarknetCurve {
     private static let curveOrder = BigUInt("800000000000010FFFFFFFFFFFFFFFFB781126DCAE7B2321E66A241ADC64D2F", radix: 16)!
-    private static let bufferByteSize = 32
     
     public class func pedersen(first: Felt, second: Felt) throws -> Felt {
         let result = try CryptoCpp.pedersen(first: first.toData(), second: second.toData())
@@ -69,33 +52,6 @@ public class StarknetCurve {
         
         return try CryptoCpp.verify(publicKey: publicKey.toData(), hash: hash.toData(), r: r.toData(), s: w.toData())
     }
-    
-    
-//    public class func sign(privateKey: Felt, hash: Felt, k: Felt)
-    
-    //    private class func nativeSign(privateKey: [CChar], hash: [CChar], k: [CChar]) throws -> StarknetCurveSignature {
-//        var buffer = UnsafeMutablePointer<CChar>.allocate(capacity: 2 * bufferByteSize)
-//        defer {
-//            buffer.deallocate()
-//        }
-//
-//        let result = Sign(privateKey, hash, k, &buffer)
-//
-//
-//
-//    }
-//
-//    private class func sign(privateKey: Felt, hash: Felt, k: BigInt) {
-//
-//    }
-    
-//    private class func nativeGetPublicKey(for privateKey: Data) -> Data {
-//
-//    }
-//
-//    class func getPublicKey(for privateKey: Felt) -> Felt {
-//
-//    }
 }
 
 fileprivate extension Felt {
