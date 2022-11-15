@@ -1,23 +1,23 @@
 import Foundation
 import BigInt
 
-struct Felt {
-    private let value: BigUInt
+public struct Felt {
+    public let value: BigUInt
     
-    static let prime = BigUInt(2).power(251) + 17 * BigUInt(2).power(192) + 1
+    public static let prime = BigUInt(2).power(251) + 17 * BigUInt(2).power(192) + 1
     
-    static let zero = Felt(0)!
-    static let one = Felt(1)!
+    public static let zero = Felt(0)!
+    public static let one = Felt(1)!
     
-    init?(_ value: BigUInt) {
+    public init?(_ value: BigUInt) {
         guard value < Felt.prime else {
-           return nil
+            return nil
         }
         
         self.value = value
     }
     
-    init?(fromHex hex: String) {
+    public init?(fromHex hex: String) {
         guard hex.hasPrefix("0x") else { return nil }
         
         if let value = BigUInt(hex.dropFirst(2), radix: 16) {
@@ -28,7 +28,7 @@ struct Felt {
         
     }
     
-    func toHex() -> String {
+    public func toHex() -> String {
         return "0x\(String(value, radix: 16))"
     }
 }
@@ -38,11 +38,11 @@ enum FeltDecodingError: Error {
 }
 
 extension Felt: Codable {
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         try self.toHex().encode(to: encoder)
     }
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let string = try String.init(from: decoder)
         
         guard let initialized = Felt(fromHex: string) else {
@@ -54,20 +54,32 @@ extension Felt: Codable {
 }
 
 extension Felt: Equatable {
-    static func == (lhs: Felt, rhs: Felt) -> Bool {
+    public static func == (lhs: Felt, rhs: Felt) -> Bool {
         return lhs.value == rhs.value
     }
 }
 
 extension Felt: Comparable {
-    static func < (lhs: Felt, rhs: Felt) -> Bool {
+    public static func < (lhs: Felt, rhs: Felt) -> Bool {
         return lhs.value < rhs.value
     }
 }
 
 extension Felt: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         return self.toHex()
+    }
+}
+
+extension Felt {
+    public init?(_ data: Data) {
+        let value = BigUInt(data)
+        
+        self.init(value)
+    }
+    
+    public func serialize() -> Data {
+        return value.serialize()
     }
 }
 
