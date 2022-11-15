@@ -25,7 +25,10 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Starknet",
-            dependencies: ["BigInt"]),
+            dependencies: ["BigInt", "CryptoCpp"]),
+        .target(name: "CryptoCpp", dependencies: ["CCryptoCppWrapper"]),
+        .target(name: "CCryptoCppWrapper", dependencies: ["ccryptocpp"]),
+        .binaryTarget(name: "ccryptocpp", path: "Frameworks/ccryptocpp.xcframework"),
         .testTarget(
             name: "StarknetTests",
             dependencies: ["Starknet", "BigInt"]),
