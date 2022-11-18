@@ -1,7 +1,7 @@
 import Foundation
 
-enum BlockId {
-    enum BlockTag: String {
+public enum BlockId {
+    public enum BlockTag: String {
         case latest
         case pending
     }
