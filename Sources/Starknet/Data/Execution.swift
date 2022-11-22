@@ -9,7 +9,7 @@ public struct Call: Codable {
     
     enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
-        case entrypoint
+        case entrypoint = "entry_point_selector"
         case calldata
     }
 }
