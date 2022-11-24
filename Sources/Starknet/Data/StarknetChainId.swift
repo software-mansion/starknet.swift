@@ -1,11 +1,11 @@
 import Foundation
 import BigInt
 
-enum StarknetChainId {
+public enum StarknetChainId {
     case mainnet
     case testnet
     
-    var feltValue: Felt {
+    public var feltValue: Felt {
         switch self {
         case .mainnet:
             return Felt(fromHex: "0x534e5f4d41494e")!

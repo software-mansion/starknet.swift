@@ -25,7 +25,6 @@ public struct Felt {
         } else {
             return nil
         }
-        
     }
     
     public func toHex() -> String {
@@ -33,7 +32,7 @@ public struct Felt {
     }
 }
 
-enum FeltDecodingError: Error {
+public enum FeltDecodingError: Error {
     case invalidStringFormat
 }
 

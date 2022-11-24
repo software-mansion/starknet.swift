@@ -1,15 +1,15 @@
 import Foundation
 
-typealias Calldata = [Felt]
+public typealias StarknetCalldata = [Felt]
 
-struct Call: Codable {
-    let contractAddress: Felt
-    let entrypoint: Felt
-    let calldata: Calldata
+public struct StarknetCall: Codable {
+    public let contractAddress: Felt
+    public let entrypoint: Felt
+    public let calldata: StarknetCalldata
     
     enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
-        case entrypoint
+        case entrypoint = "entry_point_selector"
         case calldata
     }
 }
