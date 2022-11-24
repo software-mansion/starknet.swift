@@ -1,8 +1,8 @@
 import Foundation
 
 struct CallParams: Encodable {
-    let request: Call
-    let blockId: BlockId
+    let request: StarknetCall
+    let blockId: StarknetBlockId
     
     enum CodingKeys: String, CodingKey {
         case request

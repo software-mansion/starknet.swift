@@ -52,7 +52,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         }
     }
     
-    public func callContract(_ call: Call, at blockId: BlockId) async throws -> [Felt] {
+    public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt] {
         let params = CallParams(request: call, blockId: blockId)
         
         let result = try await execute(method: .call, params: params, receive: [Felt].self)

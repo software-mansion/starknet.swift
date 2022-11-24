@@ -18,7 +18,7 @@ final class ProviderTests: XCTestCase {
     func testCall() async throws {
         let provider = makeStarknetProvider()
         
-        let call = Call(
+        let call = StarknetCall(
             contractAddress: Felt(fromHex: "0x27269bd63b8bc1fd67e52c3efafd51e0370831b13aa5c65fbb008aae6f0e18c")!,
             entrypoint: Felt(fromHex: "0x1a6c6a0bdec86cc645c91997d8eea83e87148659e3e61122f72361fd5e94079")!,
             calldata: [])

@@ -1,6 +1,6 @@
 import Foundation
 
-public enum BlockId {
+public enum StarknetBlockId {
     public enum BlockTag: String {
         case latest
         case pending
@@ -11,7 +11,7 @@ public enum BlockId {
     case tag(BlockTag)
 }
 
-extension BlockId: Encodable {
+extension StarknetBlockId: Encodable {
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .hash(let feltValue):

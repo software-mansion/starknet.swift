@@ -11,10 +11,10 @@ public protocol StarknetProviderProtocol {
     ///     - blockId: hash, number, or tag of a block at which the call should be made.
     ///
     /// - Returns: Array of field elements, returned by called contract.
-    func callContract(_ call: Call, at blockId: BlockId) async throws -> [Felt]
+    func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt]
 }
 
-private let defaultBlockId = BlockId.tag(.latest)
+private let defaultBlockId = StarknetBlockId.tag(.latest)
 
 public extension StarknetProviderProtocol {
     /// Call starknet contract at the latest block.
@@ -23,7 +23,7 @@ public extension StarknetProviderProtocol {
     ///     - call: starknet call to be made.
     ///
     /// - Returns: Array of field elements, returned by called contract.
-    func callContract(_ call: Call) async throws -> [Felt] {
+    func callContract(_ call: StarknetCall) async throws -> [Felt] {
         return try await callContract(call, at: defaultBlockId)
     }
 }
