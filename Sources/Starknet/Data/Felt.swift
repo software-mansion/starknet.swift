@@ -25,7 +25,6 @@ public struct Felt {
         } else {
             return nil
         }
-        
     }
     
     public func toHex() -> String {
