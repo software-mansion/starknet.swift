@@ -1,5 +1,6 @@
 import Foundation
 import CCryptoCppWrapper
+import CSecp256K1
 
 public enum CryptoCppError: Error {
     case nativeError
@@ -52,6 +53,12 @@ public class CryptoCpp {
         }
         
         return result == 0 ? false : true
+    }
+    
+    public class func getNonce(privateKey: Data, hash: Data, attempt: UInt32) throws -> Data {
+        return try runWithBuffer(ofSize: bufferByteSize) { buffer in
+            return secp256k1_nonce_function_rfc6979(buffer, [UInt8](hash), [UInt8](privateKey), nil, nil, attempt)
+        }
     }
 }
 

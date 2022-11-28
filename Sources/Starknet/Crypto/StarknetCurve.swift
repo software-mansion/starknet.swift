@@ -1,5 +1,5 @@
 import Foundation
-import CryptoCpp
+import CryptoToolkit
 import BigInt
 
 enum StarknetCurveError: Error {
