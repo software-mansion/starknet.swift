@@ -5,13 +5,14 @@ import BigInt
 enum StarknetCurveError: Error {
     case deserializationError
     case verifyError
+    case unknownError
 }
 
 public class StarknetCurve {
     private static let curveOrder = BigUInt("800000000000010FFFFFFFFFFFFFFFFB781126DCAE7B2321E66A241ADC64D2F", radix: 16)!
     
     public class func pedersen(first: Felt, second: Felt) throws -> Felt {
-        let result = try CryptoCpp.pedersen(first: first.toData(), second: second.toData())
+        let result = try CryptoCpp.pedersen(first: first.serialize(), second: second.serialize())
         
         if let feltResult = result.toFelt() {
             return feltResult
@@ -36,7 +37,7 @@ public class StarknetCurve {
     }
     
     public class func getPublicKey(privateKey: Felt) throws -> Felt {
-        let publicKey = try CryptoCpp.getPublicKey(privateKey: privateKey.toData())
+        let publicKey = try CryptoCpp.getPublicKey(privateKey: privateKey.serialize())
         
         if let publicKeyFelt = publicKey.toFelt() {
             return publicKeyFelt
@@ -50,39 +51,54 @@ public class StarknetCurve {
             throw StarknetCurveError.verifyError
         }
         
-        return try CryptoCpp.verify(publicKey: publicKey.toData(), hash: hash.toData(), r: r.toData(), s: w.toData())
+        return try CryptoCpp.verify(publicKey: publicKey.serialize(), hash: hash.serialize(), r: r.serialize(), s: w.serialize())
     }
-}
-
-fileprivate extension Felt {
-    func toData() -> Data {
-        return self.value.toData()
+    
+    internal class func sign(privateKey: Felt, hash: Felt, k: BigUInt) throws -> StarknetCurveSignature {
+        let signatureData = try CryptoCpp.sign(privateKey: privateKey.serialize(), hash: hash.serialize(), k: k.serialize())
+        
+        guard let r = signatureData.subdata(in: 0..<32).toFelt(),
+              let wInversed = signatureData.subdata(in: 32..<64).toBigUInt().inverse(curveOrder),
+              let s = Felt(wInversed) else {
+            throw StarknetCurveError.deserializationError
+        }
+        
+        return StarknetCurveSignature(r: r, s: s)
     }
-}
-
-fileprivate extension BigUInt {
-    func toData() -> Data {
-        var data = self.serialize()
+    
+    public class func sign(privateKey: Felt, hash: Felt) throws -> StarknetCurveSignature {
+        var lastError: Error? = nil
         
-        data.reverse()
-        data.padRight(toLength: 32)
+        print("PrivateKey len \(privateKey.serialize().count)")
+        print("hash len \(hash.serialize().count)")
+        print("entropy len \(curveOrder.serialize().count)")
         
-        return data
+        
+        
+        for attempt: UInt32 in 0..<3 {
+            let k = try Secp256K1.getRfc6979Nonce(privateKey: privateKey.serialize(), hash: hash.serialize(), entropy: curveOrder.serialize(), attempt: attempt)
+            
+            do {
+                return try sign(privateKey: privateKey, hash: hash, k: k.toBigUInt())
+            } catch let e {
+                lastError = e
+            }
+        }
+        
+        if let lastError = lastError {
+            throw lastError
+        }
+        
+        throw StarknetCurveError.unknownError
     }
 }
 
 fileprivate extension Data {
-    mutating func padRight(toLength length: Int, withPad pad: UInt8 = 0) {
-        let paddingLength = length - self.count
-        
-        if paddingLength > 0 {
-            self.append(contentsOf: [UInt8](repeating: pad, count: paddingLength))
-        }
+    func toFelt() -> Felt? {
+        return Felt(self)
     }
     
-    func toFelt() -> Felt? {
-        var dataCopy = self
-        dataCopy.reverse()
-        return Felt(dataCopy)
+    func toBigUInt() -> BigUInt {
+        return BigUInt(self)
     }
 }

@@ -9,6 +9,34 @@ private let publicKey = Felt(fromHex: "0x7697f8f9a4c3e2b1efd882294462fda2ca9c439
 
 final class StarknetCurveTests: XCTestCase {
     
+    func testSign() throws {
+        let hash = Felt(fromHex: "0x052fc40e34aee86948cd47e1a0096fa67df8410f81421f314a1eb18102251a82")!
+        
+        let signature = try StarknetCurve.sign(privateKey: privateKey, hash: hash)
+        
+        let r = Felt(fromHex: "0x674a535c0b84fbabd8df411908842bb56d40e9c21197e95aafe9433e7807b8c")!
+        let s = Felt(fromHex: "0x5eed1e83d0df6a22f1cd168331ae85a4c3b74022f3065531488ed0aaa5b0b3")!
+
+        XCTAssertEqual(signature.r, r)
+        XCTAssertEqual(signature.s, s)
+        
+        XCTAssertTrue(try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s))
+    }
+    
+    func testSignWithK() throws {
+        let hash = Felt(fromHex: "0x052fc40e34aee86948cd47e1a0096fa67df8410f81421f314a1eb18102251a82")!
+        
+        let signature = try StarknetCurve.sign(privateKey: privateKey, hash: hash, k: Felt(fromHex: "0x6d45bce40ffc4a8cd4cb656048d023a90913e70e589362b41e4334c721cec4b")!.value)
+        
+        let r = Felt(fromHex: "0x76a835cfbccd598b9429f6fce09acace91001abcfa68c36022e42dbdb024385")!
+        let s = Felt(fromHex: "0x198ef0ca145ad0fbd175426788d9a7c84de3764f51bfc0fe0579caca660bfe4")!
+        
+        XCTAssertEqual(signature.r, r)
+        XCTAssertEqual(signature.s, s)
+        
+        XCTAssertTrue(try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s))
+    }
+    
     func testPedersen() throws {
         let maxFelt = Felt(Felt.prime - BigUInt(1))!
         
