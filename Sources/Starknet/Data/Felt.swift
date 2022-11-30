@@ -2,7 +2,7 @@ import Foundation
 import BigInt
 
 public struct Felt {
-    internal let value: BigUInt
+    public let value: BigUInt
     
     public static let prime = BigUInt(2).power(251) + 17 * BigUInt(2).power(192) + 1
     
