@@ -1,6 +1,5 @@
 import Foundation
 import CCryptoCppWrapper
-import CSecp256K1
 
 public class CryptoCpp {
     private static func internalRunWithBufferOf(size: Int, _ body: (UnsafeMutablePointer<CChar>) -> Int32) throws -> Data {

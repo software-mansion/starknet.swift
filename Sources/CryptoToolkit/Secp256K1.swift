@@ -1,6 +1,5 @@
 import Foundation
-import CSecp256K1
-
+import secp256k1_bindings
 
 public class Secp256K1 {
     public static func getRfc6979Nonce(privateKey: Data, hash: Data, entropy: Data, attempt: UInt32) throws -> Data {
