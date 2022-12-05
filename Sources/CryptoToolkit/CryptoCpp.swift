@@ -46,11 +46,13 @@ public class CryptoCpp {
             throw CryptoToolkitError.cryptoCppError
         }
         
-        return result == 0 ? false : true
+        return result == 1
     }
 }
 
 private extension Data {
+    // Note, crypto-cpp accepts and returns bytes in little-endian order.
+    
     func toNative() -> [CChar] {
         let reversed = Data(self.paddedLeftUpTo(32).reversed())
         
