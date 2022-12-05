@@ -17,11 +17,6 @@ internal func runWithBufferOf(size bufferSize: Int, body: (_ buffer: UnsafeMutab
 
 internal let bufferByteSize = 32
 
-public enum CryptoToolkitError: Error {
-    case cryptoCppError
-    case secp256K1Error
-}
-
 internal extension Data {
     func paddedLeftUpTo(_ length: Int) -> Data {
         let paddingLength = length - self.count
