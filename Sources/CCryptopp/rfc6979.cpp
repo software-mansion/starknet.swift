@@ -22,6 +22,7 @@ int generate_rfc6979_k(const unsigned char* privateKey, const unsigned char* sub
     Integer k;
     
     for (int i = 0; i <= attempt; i++) {
+        // Note that, contrary to it's name, it generates k in a deterministic way.
         k = dsaKCalculator.GenerateRandom(privateKeyInt, subgroupGeneratorInt, hashInt);
     }
     
