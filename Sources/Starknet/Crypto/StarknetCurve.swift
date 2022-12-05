@@ -69,14 +69,10 @@ public class StarknetCurve {
     public class func sign(privateKey: Felt, hash: Felt) throws -> StarknetCurveSignature {
         var lastError: Error? = nil
         
-        print("PrivateKey len \(privateKey.serialize().count)")
-        print("hash len \(hash.serialize().count)")
-        print("entropy len \(curveOrder.serialize().count)")
-        
-        
-        
-        for attempt: UInt32 in 0..<3 {
-            let k = try Secp256K1.getRfc6979Nonce(privateKey: privateKey.serialize(), hash: hash.serialize(), entropy: curveOrder.serialize(), attempt: attempt)
+        for attempt: Int32 in 0..<3 {
+            let k = try Rfc6979.getRfc6979Nonce(privateKey: privateKey.serialize(), curveOrder: curveOrder.serialize(), hash: hash.serialize(), attempt: attempt)
+            
+            let uint = k.toBigUInt()
             
             do {
                 return try sign(privateKey: privateKey, hash: hash, k: k.toBigUInt())
