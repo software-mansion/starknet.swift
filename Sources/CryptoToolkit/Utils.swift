@@ -18,7 +18,7 @@ internal func runWithBufferOf(size bufferSize: Int, body: (_ buffer: UnsafeMutab
 internal let bufferByteSize = 32
 
 internal extension Data {
-    func paddedLeftUpTo(_ length: Int) -> Data {
+    func paddingLeft(toLength length: Int) -> Data {
         let paddingLength = length - self.count
         
         if paddingLength > 0 {

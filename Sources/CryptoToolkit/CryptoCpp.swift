@@ -54,7 +54,7 @@ private extension Data {
     // Note, crypto-cpp accepts and returns bytes in little-endian order.
     
     func toNative() -> [CChar] {
-        let reversed = Data(self.paddedLeftUpTo(32).reversed())
+        let reversed = Data(self.paddingLeft(toLength: 32).reversed())
         
         return [UInt8](reversed).map { Int8(bitPattern: $0) } as [CChar]
     }
