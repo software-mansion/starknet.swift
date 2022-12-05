@@ -72,8 +72,6 @@ public class StarknetCurve {
         for attempt: Int32 in 0..<3 {
             let k = try Rfc6979.getRfc6979Nonce(privateKey: privateKey.serialize(), curveOrder: curveOrder.serialize(), hash: hash.serialize(), attempt: attempt)
             
-            let uint = k.toBigUInt()
-            
             do {
                 return try sign(privateKey: privateKey, hash: hash, k: k.toBigUInt())
             } catch let e {
