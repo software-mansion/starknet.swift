@@ -7,7 +7,7 @@ final class ProviderTests: XCTestCase {
     /*
      Temporary test file, until DevnetClient utility is created.
      
-     To run, make sure you're running starknet-devnet on port 5050
+     To run, make sure you're running starknet-devnet on port 5050, with seed 0
      */
     
     func makeStarknetProvider() -> StarknetProviderProtocol {
@@ -19,12 +19,25 @@ final class ProviderTests: XCTestCase {
         let provider = makeStarknetProvider()
         
         let call = StarknetCall(
-            contractAddress: Felt(fromHex: "0x27269bd63b8bc1fd67e52c3efafd51e0370831b13aa5c65fbb008aae6f0e18c")!,
-            entrypoint: Felt(fromHex: "0x1a6c6a0bdec86cc645c91997d8eea83e87148659e3e61122f72361fd5e94079")!,
+            contractAddress: Felt(fromHex: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")!,
+            entrypoint: starknetSelector(from: "getPublicKey"),
             calldata: [])
         
         let result = try await provider.callContract(call)
         
         XCTAssertEqual(result.count, 1)
+    }
+    
+    func testCallWithArguments() async throws {
+        let provider = makeStarknetProvider()
+        
+        let call = StarknetCall(
+            contractAddress: Felt(fromHex: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")!,
+            entrypoint: starknetSelector(from: "supportsInterface"),
+            calldata: [Felt(2138)!])
+        
+        let result = try await provider.callContract(call)
+        
+        XCTAssertEqual(result[0], Felt.zero)
     }
 }
