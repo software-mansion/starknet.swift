@@ -6,6 +6,8 @@
 #import "ecdsa.h"
 #import "pedersen_hash.h"
 
+#import "crypto-rs.h"
+
 #endif
 
 #include <stdio.h>

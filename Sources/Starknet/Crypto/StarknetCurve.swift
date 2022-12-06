@@ -102,16 +102,20 @@ public class StarknetCurve {
     public class func sign(privateKey: Felt, hash: Felt) throws -> StarknetCurveSignature {
         var lastError: Error? = nil
         
-        for attempt: Int32 in 0..<3 {
+        var salt = BigUInt.zero
+        
+        for _: Int32 in 0..<3 {
             // Generate k according to RFC6979, section 3.2. Generated k may not be suitable for signing,
             // so it might have to be calculated again. Probability of this is, however, very low.
-            let k = try Rfc6979.getRfc6979Nonce(privateKey: privateKey.serialize(), curveOrder: curveOrder.serialize(), hash: hash.serialize(), attempt: attempt)
+            let k = try CryptoRs.getRfc6979Nonce(hash: hash.serialize(), privateKey: privateKey.serialize(), seed: salt.serialize())
             
             do {
                 return try sign(privateKey: privateKey, hash: hash, k: k.toBigUInt())
             } catch let e {
                 lastError = e
             }
+            
+            salt += 1
         }
         
         if let lastError = lastError {
