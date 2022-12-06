@@ -9,6 +9,7 @@ public enum StarknetCurveError: Error {
 }
 
 public class StarknetCurve {
+    /// x coordinate of Starknet curve generator.
     public static let curveOrder = BigUInt("800000000000010FFFFFFFFFFFFFFFFB781126DCAE7B2321E66A241ADC64D2F", radix: 16)!
     
     /// Compute pedersen hash on imput values.
