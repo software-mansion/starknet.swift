@@ -11,7 +11,7 @@ public struct Felt {
     
     public init?(_ value: BigUInt) {
         guard value < Felt.prime else {
-           return nil
+            return nil
         }
         
         self.value = value
@@ -67,6 +67,18 @@ extension Felt: Comparable {
 extension Felt: CustomStringConvertible {
     public var description: String {
         return self.toHex()
+    }
+}
+
+extension Felt {
+    public init?(_ data: Data) {
+        let value = BigUInt(data)
+        
+        self.init(value)
+    }
+    
+    public func serialize() -> Data {
+        return value.serialize()
     }
 }
 
