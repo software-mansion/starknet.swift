@@ -12,7 +12,7 @@ public class StarknetCurve {
     /// x coordinate of Starknet curve generator.
     public static let curveOrder = BigUInt("800000000000010FFFFFFFFFFFFFFFFB781126DCAE7B2321E66A241ADC64D2F", radix: 16)!
     
-    /// Compute pedersen hash on imput values.
+    /// Compute pedersen hash on input values.
     ///
     /// - Returns: Pedersen hash of the two values as Felt.
     public class func pedersen(first: Felt, second: Felt) throws -> Felt {
