@@ -2,7 +2,7 @@ import Foundation
 import BigInt
 
 public struct Felt {
-    internal let value: BigUInt
+    public let value: BigUInt
     
     public static let prime = BigUInt(2).power(251) + 17 * BigUInt(2).power(192) + 1
     
@@ -14,7 +14,7 @@ public struct Felt {
     
     public init?(_ value: BigUInt) {
         guard value < Felt.prime else {
-           return nil
+            return nil
         }
         
         self.value = value
@@ -137,7 +137,18 @@ extension Felt: ExpressibleByStringLiteral {
             let bigUInt = BigUInt(value, radix: 10)!
             self.init(bigUInt)!
         }
+        
     }
 }
 
-// TODO: Conform to UnsignedInteger protocol
+extension Felt {
+    public init?(_ data: Data) {
+        let value = BigUInt(data)
+        
+        self.init(value)
+    }
+    
+    public func serialize() -> Data {
+        return value.serialize()
+    }
+}
