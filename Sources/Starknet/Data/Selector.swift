@@ -11,5 +11,5 @@ public func starknetSelector(from name: String) -> Felt {
         return Felt.zero
     }
     
-    return keccak(on: name.bytes)
+    return starknetKeccak(on: name.bytes)
 }
