@@ -65,43 +65,6 @@ final class FeltTests: XCTestCase {
         }
     }
     
-    func testAddition() {
-        let cases = [
-            (Felt(5), Felt(10), Felt(15)),
-            (Felt.max, Felt(1), Felt(0)),
-            (Felt.max, Felt.max, Felt(Felt.prime - 2))
-        ]
-        
-        cases.forEach {
-            XCTAssertEqual($0 + $1, $2)
-        }
-    }
-    
-    func testSubtraction() {
-        let cases = [
-            (Felt(10), Felt(5), Felt(5)),
-            (Felt(10), Felt(10), Felt(0)),
-            (Felt(5), Felt(6), Felt.max),
-            (Felt(Felt.prime - 2)!, Felt.max, Felt.max)
-        ]
-        
-        cases.forEach {
-            XCTAssertEqual($0 - $1, $2)
-        }
-    }
-    
-    func testMultiplication() {
-        let cases = [
-            (Felt(10), Felt(20), Felt(200)),
-            (Felt.max, Felt.zero, Felt.zero),
-            (Felt.max, Felt(5), Felt.max - 4)
-        ]
-        
-        cases.forEach {
-            XCTAssertEqual($0 * $1, $2)
-        }
-    }
-    
     func testExpressibleByStringLiteral() {
         let felt1: Felt = "0x123"
         XCTAssertEqual(felt1, Felt(0x123))

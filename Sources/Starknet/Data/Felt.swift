@@ -55,21 +55,6 @@ extension Felt: Codable {
     }
 }
 
-extension Felt: AdditiveArithmetic {
-    public static func - (lhs: Felt, rhs: Felt) -> Felt {
-        if (rhs.value > lhs.value) {
-            let value = prime - (rhs.value - lhs.value)
-            return Felt(value)!
-        }
-        
-        return Felt(lhs.value - rhs.value)!
-    }
-    
-    public static func + (lhs: Felt, rhs: Felt) -> Felt {
-        return Felt((lhs.value + rhs.value).quotientAndRemainder(dividingBy: prime).remainder)!
-    }
-}
-
 extension Felt: Equatable {
     public static func == (lhs: Felt, rhs: Felt) -> Bool {
         return lhs.value == rhs.value
@@ -95,32 +80,6 @@ extension Felt: ExpressibleByIntegerLiteral {
     }
     
     public typealias IntegerLiteralType = UInt64
-}
-
-extension Felt: Numeric {
-    public static func *= (lhs: inout Felt, rhs: Felt) {
-        lhs = lhs * rhs
-    }
-    
-    public var magnitude: BigUInt {
-        return self.value
-    }
-    
-    public static func * (lhs: Felt, rhs: Felt) -> Felt {
-        let value = lhs.value.multiplied(by: rhs.value).quotientAndRemainder(dividingBy: prime).remainder
-        
-        return Felt(value)!
-    }
-    
-    public typealias Magnitude = BigUInt
-    
-    public init?<T>(exactly source: T) where T : BinaryInteger {
-        let value = BigUInt(exactly: source)
-        
-        guard let value = value else { return nil }
-        
-        self.init(value)
-    }
 }
 
 extension Felt: ExpressibleByStringLiteral {
