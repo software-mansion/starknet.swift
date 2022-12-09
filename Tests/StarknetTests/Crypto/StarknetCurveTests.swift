@@ -92,7 +92,7 @@ final class StarknetCurveTests: XCTestCase {
         ]
         
         try cases.forEach {
-            let result = try StarknetCurve.pedersenOn(elements: $0)
+            let result = try StarknetCurve.pedersenOn($0)
             
             let expectedFelt = Felt(fromHex: $1)!
             

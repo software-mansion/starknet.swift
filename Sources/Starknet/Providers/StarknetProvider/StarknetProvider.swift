@@ -59,4 +59,10 @@ public class StarknetProvider: StarknetProviderProtocol {
         
         return result
     }
+    
+    public func addInvokeTransaction(_ transaction: StarknetInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
+        let result = try await execute(method: .invokeFunction, params: transaction, receive: StarknetInvokeTransactionResponse.self)
+        
+        return result
+    }
 }

@@ -12,6 +12,16 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: Array of field elements, returned by called contract.
     func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt]
+    
+    /// Invoke a function.
+    ///
+    /// Invoke a function in deployed contract.
+    ///
+    /// - Parameters
+    ///     - payload: invoke function payload.
+    ///
+    /// - Returns: transaction hash of invoked transaction.
+    func addInvokeTransaction(_ transaction: StarknetInvokeTransaction) async throws -> StarknetInvokeTransactionResponse
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
