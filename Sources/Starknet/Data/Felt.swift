@@ -88,7 +88,7 @@ extension Felt {
             return nil
         }
         
-        if (!string.allSatisfy(\.isASCII)) {
+        guard string.allSatisfy(\.isASCII) else {
             return nil
         }
         
