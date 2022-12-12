@@ -21,17 +21,30 @@ final class FeltTests: XCTestCase {
         }
     }
     
-    func testTooBigValue() {
+    func testOverAndUnderflow() {
         let bigNumber = BigUInt(2).power(252)
         
-        let felt = Felt(bigNumber)
-        XCTAssertNil(felt)
+        XCTAssertNil(Felt(bigNumber))
+        
+        let negative: Int = -5
+        
+        XCTAssertNil(Felt(negative))
     }
     
     func testFromHexInitializer() {
         FeltTests.cases.forEach {
             XCTAssertEqual(Felt(fromHex: $0), $1)
         }
+    }
+    
+    func testClampingInitializer() {
+        let a: Int = -32
+        
+        XCTAssertEqual(Felt(clamping: a), 0)
+        
+        let b: UInt = 999999
+        
+        XCTAssertEqual(Felt(clamping: b), 999999)
     }
     
     func testFeltComparison() {

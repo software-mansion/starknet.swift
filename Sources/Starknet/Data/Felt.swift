@@ -12,13 +12,22 @@ public struct Felt {
     public static let min = Felt.zero
     public static let max = Felt(Felt.prime - 1)!
     
-    public init?(_ value: BigUInt) {
-        guard value < Felt.prime else {
+    public init?<T>(_ exactly: T) where T: BinaryInteger {
+        let value = BigUInt(exactly: exactly)
+        
+        guard let value = value, value < Felt.prime else {
             return nil
         }
         
         self.value = value
     }
+    
+    public init<T>(clamping: T) where T: BinaryInteger {
+        let value = BigUInt(clamping: clamping)
+        
+        self.value = value < Felt.prime ? value : Felt.prime - 1
+    }
+    
     
     public init?(fromHex hex: String) {
         guard hex.hasPrefix("0x") else { return nil }
