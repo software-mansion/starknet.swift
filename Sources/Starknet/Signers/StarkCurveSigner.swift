@@ -1,9 +1,9 @@
 import Foundation
 
-class StarkCurveSigner: SignerProtocol {
+public class StarkCurveSigner: SignerProtocol {
     private let privateKey: Felt
 
-    private(set) lazy var publicKey: Felt? = getPublicKey()
+    public private(set) lazy var publicKey: Felt? = getPublicKey()
 
     private func getPublicKey() -> Felt? {
         do {
@@ -13,11 +13,11 @@ class StarkCurveSigner: SignerProtocol {
         }
     }
 
-    init(privateKey: Felt) {
+    public init(privateKey: Felt) {
         self.privateKey = privateKey
     }
     
-    func sign(transaction: StarknetTransaction) -> StarknetSignature? {
+    public func sign(transaction: StarknetTransaction) -> StarknetSignature? {
         do {
             return try StarknetCurve.sign(privateKey: privateKey, hash: transaction.hash).toArray()
         } catch {
