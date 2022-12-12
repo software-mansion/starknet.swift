@@ -11,7 +11,7 @@ import XCTest
 
 final class TransactionTests: XCTestCase {
     func testInvokeTransactionEncoding() throws {
-        let invoke = StarknetSequencerInvokeTransaction(senderAddress: Felt(fromHex: "0x123")!, calldata: [Felt(1)!, Felt(2)!], signature: [Felt(1)!, Felt(2)!, Felt(3)!, Felt(4)!, Felt(5)!], maxFee: Felt(2137)!, nonce: Felt(0)!)
+        let invoke = StarknetSequencerInvokeTransaction(senderAddress: "0x123", calldata: [1, 2], signature: [1, 2, 3, 4, 5], maxFee: 213, nonce: 0)
         
         let encoder = JSONEncoder()
         

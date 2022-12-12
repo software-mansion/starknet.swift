@@ -121,33 +121,4 @@ final class FeltTests: XCTestCase {
         
         XCTAssertNil(decodedNonAscii)
     }
-    
-    func testShortStringEncoding() {
-        let encoded = Felt(fromHex: "0x68656c6c6f")!.toShortString()
-        
-        XCTAssertEqual("hello", encoded)
-        
-        let encoded_padding = Felt(fromHex: "0xa68656c6c6f")!.toShortString()
-        
-        XCTAssertEqual(encoded_padding, "\nhello")
-    }
-    
-    
-    func testShortStringDecoding() {
-        let decoded = Felt.fromShortString("hello")
-        
-        XCTAssertEqual(decoded, Felt(fromHex: "0x68656c6c6f")!)
-        
-        let decodedEmptyString = Felt.fromShortString("")
-        
-        XCTAssertEqual(decodedEmptyString, Felt.zero)
-        
-        let decodedTooLong = Felt.fromShortString(String(repeating: "a", count: 32))
-        
-        XCTAssertNil(decodedTooLong)
-        
-        let decodedNonAscii = Felt.fromShortString("hello😀")
-        
-        XCTAssertNil(decodedNonAscii)
-    }
 }
