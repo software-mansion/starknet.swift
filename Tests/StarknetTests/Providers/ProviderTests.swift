@@ -34,7 +34,7 @@ final class ProviderTests: XCTestCase {
         let call = StarknetCall(
             contractAddress: Felt(fromHex: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")!,
             entrypoint: starknetSelector(from: "supportsInterface"),
-            calldata: [Felt(2138)!])
+            calldata: [Felt(2138)])
         
         let result = try await provider.callContract(call)
         
