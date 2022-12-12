@@ -22,7 +22,7 @@ public class StarknetCurve {
     }
     
     private class func pedersen(_ values: [Felt]) throws -> Felt {
-        return try values.reduce(Felt(0)!) { (previous, current) in
+        return try values.reduce(Felt(0)) { (previous, current) in
             return try pedersen(first: previous, second: current)
         }
     }
