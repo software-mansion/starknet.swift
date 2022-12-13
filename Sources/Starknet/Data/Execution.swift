@@ -20,3 +20,24 @@ public struct StarknetCall: Codable {
         case calldata
     }
 }
+
+public struct StarknetExecutionParams {
+    public let nonce: Felt
+    public let maxFee: Felt
+}
+
+func callsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
+    var wholeCalldata: [Felt] = []
+    var callArray: [Felt] = []
+    
+    calls.forEach { call in
+        callArray.append(call.contractAddress)
+        callArray.append(call.entrypoint)
+        callArray.append(Felt(wholeCalldata.count)!)
+        callArray.append(Felt(call.calldata.count)!)
+        
+        wholeCalldata.append(contentsOf: call.calldata)
+    }
+    
+    return [Felt(calls.count)!] + callArray + [Felt(wholeCalldata.count)!] + wholeCalldata
+}

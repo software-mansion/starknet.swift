@@ -1,6 +1,6 @@
 import Foundation
 
-public class StarkCurveSigner: SignerProtocol {
+public class StarkCurveSigner: StarknetSignerProtocol {
     private let privateKey: Felt
 
     public private(set) lazy var publicKey: Felt? = getPublicKey()

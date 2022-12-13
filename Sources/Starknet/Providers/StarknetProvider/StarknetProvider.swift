@@ -60,8 +60,18 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
     
-    public func addInvokeTransaction(_ transaction: StarknetInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
-        let result = try await execute(method: .invokeFunction, params: transaction, receive: StarknetInvokeTransactionResponse.self)
+    public func getNonce(of contract: Felt, at blockId: StarknetBlockId) async throws -> Felt {
+        let params = GetNonceParams(contractAddress: contract, blockId: blockId)
+        
+        let result = try await execute(method: .getNonce, params: params, receive: Felt.self)
+        
+        return result
+    }
+    
+    public func addInvokeTransaction(_ transaction: StarknetSequencerInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
+        let params = AddInvokeTransactionParams(invokeTransaction: transaction)
+        
+        let result = try await execute(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
         
         return result
     }
