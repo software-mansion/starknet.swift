@@ -48,8 +48,4 @@ final class ProviderTests: XCTestCase {
         
         XCTAssertEqual(result, .zero)
     }
-    
-//    func testAddInvokeTransaction() async throws {
-//        let invokeTransaction = StarknetInvokeTransaction(calldata: <#T##StarknetCalldata#>, signature: <#T##StarknetSignature#>, maxFee: <#T##Felt#>, nonce: <#T##Felt#>)
-//    }
 }
