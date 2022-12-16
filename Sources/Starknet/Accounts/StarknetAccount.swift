@@ -16,15 +16,15 @@ class StarknetAccount: StarknetAccountProtocol {
         return StarknetSequencerInvokeTransaction(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce)
     }
     
-    func sign(calls: [StarknetCall], params: StarknetExecutionParams) -> StarknetSequencerInvokeTransaction {
+    func sign(calls: [StarknetCall], params: StarknetExecutionParams) throws -> StarknetSequencerInvokeTransaction {
         let calldata = callsToExecuteCalldata(calls: calls)
         
         let sequencerTransaction = makeSequencerInvokeTransaction(calldata: calldata, signature: [], params: params)
         
-        let hash = TransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)! // TODO: Shouldn't force unwrap here
+        let hash = TransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
         
         let transaction = StarknetInvokeTransaction(sequencerTransaction: sequencerTransaction, hash: hash)
-        let signature = signer.sign(transaction: transaction)! // TODO: Shouldn't force unwrap here
+        let signature = try signer.sign(transaction: transaction)
         
         return makeSequencerInvokeTransaction(calldata: calldata, signature: signature, params: params)
     }
@@ -32,7 +32,7 @@ class StarknetAccount: StarknetAccountProtocol {
     func execute(calls: [StarknetCall], maxFee: Felt) async throws -> StarknetInvokeTransactionResponse {
         let nonce = try await getNonce()
         let signParams = StarknetExecutionParams(nonce: nonce, maxFee: maxFee)
-        let transaction = sign(calls: calls, params: signParams)
+        let transaction = try sign(calls: calls, params: signParams)
         
         let result = try await provider.addInvokeTransaction(transaction)
         

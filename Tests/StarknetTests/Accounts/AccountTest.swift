@@ -21,6 +21,12 @@ final class AccountTests: XCTestCase {
         return StarknetAccount(address: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a", signer: signer, provider: provider)
     }
     
+    func testGetNonce() async throws {
+        let account = makeStarknetAccount()
+        
+        let _ = try await account.getNonce()
+    }
+    
     func testExecute() async throws {
         let account = makeStarknetAccount()
         
@@ -31,9 +37,7 @@ final class AccountTests: XCTestCase {
         ]
         
         let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
-        let result = try await account.execute(call: call, maxFee: "0x1000000000")
-        
-        print(result.transactionHash)
+        let _ = try await account.execute(call: call, maxFee: "0x1000000000")
     }
 }
 
