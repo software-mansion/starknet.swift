@@ -105,11 +105,7 @@ final class StarknetCurveTests: XCTestCase {
         
         XCTAssertEqual(result, publicKey)
         
-        XCTAssertThrowsError(try StarknetCurve.getPublicKey(privateKey: Felt.zero)) { error in
-            print(error)
-        }
-        
-        print("dupa")
+        XCTAssertThrowsError(try StarknetCurve.getPublicKey(privateKey: Felt.zero))
     }
     
     func testVerify() throws {
