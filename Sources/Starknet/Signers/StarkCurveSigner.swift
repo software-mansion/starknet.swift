@@ -3,18 +3,16 @@ import Foundation
 public class StarkCurveSigner: StarknetSignerProtocol {
     private let privateKey: Felt
 
-    public private(set) lazy var publicKey: Felt? = getPublicKey()
+    public let publicKey: Felt
 
-    private func getPublicKey() -> Felt? {
+    public init?(privateKey: Felt) {
+        self.privateKey = privateKey
+        
         do {
-            return try StarknetCurve.getPublicKey(privateKey: self.privateKey)
+            self.publicKey = try StarknetCurve.getPublicKey(privateKey: self.privateKey)
         } catch {
             return nil
         }
-    }
-
-    public init(privateKey: Felt) {
-        self.privateKey = privateKey
     }
     
     public func sign(transaction: StarknetTransaction) throws -> StarknetSignature {

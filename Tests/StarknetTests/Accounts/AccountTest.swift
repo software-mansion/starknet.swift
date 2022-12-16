@@ -16,7 +16,7 @@ final class AccountTests: XCTestCase {
         let url = "http://127.0.0.1:5050/rpc"
         let provider = StarknetProvider(starknetChainId: .testnet, url: url)!
         
-        let signer = StarkCurveSigner(privateKey: "0xe3e70682c2094cac629f6fbed82c07cd")
+        let signer = StarkCurveSigner(privateKey: "0xe3e70682c2094cac629f6fbed82c07cd")!
         
         return StarknetAccount(address: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a", signer: signer, provider: provider)
     }

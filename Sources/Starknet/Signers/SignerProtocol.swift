@@ -2,7 +2,7 @@ import Foundation
 
 public protocol StarknetSignerProtocol {
     /// Public key associated with given signer
-    var publicKey: Felt? { get }
+    var publicKey: Felt { get }
     
     /// Sign transaction
     ///
