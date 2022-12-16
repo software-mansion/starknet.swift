@@ -1,9 +1,9 @@
 import Foundation
 
 public enum StarknetTransactionType: String, Codable {
-    case invoke = "INVOKE"
+    case invoke = "invoke"
     
     public var encodedValue: Felt {
-        return Felt.fromShortString(self.rawValue)!
+        return Felt.fromShortString(self.rawValue.uppercased())!
     }
 }
