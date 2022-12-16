@@ -4,6 +4,7 @@ import BigInt
 
 public enum StarknetCurveError: Error {
     case deserializationError
+    case invalidArgumentError
     case verifyError
     case unknownError
 }
@@ -15,15 +16,15 @@ public class StarknetCurve {
     /// Compute pedersen hash on input values.
     ///
     /// - Returns: Pedersen hash of the two values as Felt.
-    public class func pedersen(first: Felt, second: Felt) throws -> Felt {
-        let result = try CryptoCpp.pedersen(first: first.serialize(), second: second.serialize())
+    public class func pedersen(first: Felt, second: Felt) -> Felt {
+        let result = CryptoCpp.pedersen(first: first.serialize(), second: second.serialize())
         
-        return try result.toFelt()
+        return Felt(result)!
     }
     
-    private class func pedersen(_ values: [Felt]) throws -> Felt {
-        return try values.reduce(Felt(0)) { (previous, current) in
-            return try pedersen(first: previous, second: current)
+    private class func pedersen(_ values: [Felt]) -> Felt {
+        return values.reduce(Felt(0)) { (previous, current) in
+            return pedersen(first: previous, second: current)
         }
     }
     
@@ -34,8 +35,8 @@ public class StarknetCurve {
     /// - Parameters:
     ///     - elements: array of felt values, used as input to Pedersen hash.
     /// - Returns: Pedersen hash on elements array and its length.
-    public class func pedersenOn(_ elements: [Felt]) throws -> Felt {
-        return try pedersen(first: pedersen(elements), second: Felt(BigUInt(elements.count))!)
+    public class func pedersenOn(_ elements: [Felt]) -> Felt {
+        return pedersen(first: pedersen(elements), second: Felt(BigUInt(elements.count))!)
     }
     
     /// Compute pedersen hash on an array of input values passed as a variadic expression.
@@ -45,9 +46,9 @@ public class StarknetCurve {
     /// - Parameters:
     ///     - elements: series of felt values, used as input to Pedersen hash.
     /// - Returns: Pedersen hash on elements array and its length.
-    public class func pedersenOn(_ elements: Felt...) throws -> Felt {
+    public class func pedersenOn(_ elements: Felt...) -> Felt {
         let elementsArray = Array(elements)
-        return try pedersenOn(elementsArray)
+        return pedersenOn(elementsArray)
     }
     
     /// Compute Starknet public key for given private key.
@@ -56,6 +57,10 @@ public class StarknetCurve {
     ///     - privateKey: starknet private key as Felt.
     /// - Returns: Public key as Felt.
     public class func getPublicKey(privateKey: Felt) throws -> Felt {
+        guard privateKey != 0 else {
+            throw StarknetCurveError.invalidArgumentError
+        }
+        
         let publicKey = try CryptoCpp.getPublicKey(privateKey: privateKey.serialize())
         
         return try publicKey.toFelt()
@@ -73,7 +78,7 @@ public class StarknetCurve {
             throw StarknetCurveError.verifyError
         }
         
-        return try CryptoCpp.verify(publicKey: publicKey.serialize(), hash: hash.serialize(), r: r.serialize(), s: w.serialize())
+        return CryptoCpp.verify(publicKey: publicKey.serialize(), hash: hash.serialize(), r: r.serialize(), s: w.serialize())
     }
     
     /// Sign hash with StarknetPrivate key and given k value.

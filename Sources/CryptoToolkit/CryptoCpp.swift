@@ -2,49 +2,39 @@ import Foundation
 import CFrameworkWrapper
 
 public class CryptoCpp {
-    private static func internalRunWithBufferOf(size: Int, _ body: (UnsafeMutablePointer<CChar>) -> Int32) throws -> Data {
-        let (data, returnCode) = try runWithBufferOf(size: size, body: body)
-        
-        guard returnCode == 0 else {
-            throw CryptoToolkitError.cryptoCppError
-        }
-        
-        return data
-    }
-    
-    public static func pedersen(first: Data, second: Data) throws -> Data {
-        let result =  try internalRunWithBufferOf(size: bufferByteSize) { buffer in
+    public static func pedersen(first: Data, second: Data) -> Data {
+        let result = runWithBuffer(resultSize: standardResultSize, expectedReturnCode: 0) { buffer in
             return Hash(first.toNative(), second.toNative(), buffer)
         }
-        
-        return result.fromNative()
+       
+        return result!.fromNative()
     }
     
     public class func sign(privateKey: Data, hash: Data, k: Data) throws -> Data {
-        let result = try internalRunWithBufferOf(size: 2 * bufferByteSize) { buffer in
+        let result = runWithBuffer(resultSize: 2 * standardResultSize, expectedReturnCode: 0) { buffer in
             return Sign(privateKey.toNative(), hash.toNative(), k.toNative(), buffer)
         }
         
-        let first = result.subdata(in: 0..<bufferByteSize)
-        let second = result.subdata(in: bufferByteSize..<(2 * bufferByteSize))
+        guard let result = result else { throw CryptoToolkitError.nativeError }
+        
+        let first = result.subdata(in: 0..<standardResultSize)
+        let second = result.subdata(in: standardResultSize..<(2 * standardResultSize))
         
         return first.fromNative() + second.fromNative()
     }
     
     public class func getPublicKey(privateKey: Data) throws -> Data {
-        let result = try internalRunWithBufferOf(size: bufferByteSize) { buffer in
+        let result = runWithBuffer(resultSize: standardResultSize, expectedReturnCode: 0) { buffer in
             return GetPublicKey(privateKey.toNative(), buffer)
         }
         
+        guard let result = result else { throw CryptoToolkitError.nativeError }
+
         return result.fromNative()
     }
     
-    public class func verify(publicKey: Data, hash: Data, r: Data, s: Data) throws -> Bool {
+    public class func verify(publicKey: Data, hash: Data, r: Data, s: Data) -> Bool {
         let result = Verify(publicKey.toNative(), hash.toNative(), r.toNative(), s.toNative())
-        
-        guard result >= 0 else {
-            throw CryptoToolkitError.cryptoCppError
-        }
         
         return result == 1
     }

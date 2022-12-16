@@ -1,21 +1,27 @@
 import Foundation
 
-internal func runWithBufferOf(size bufferSize: Int, body: (_ buffer: UnsafeMutablePointer<CChar>) -> Int32) throws -> (data: Data, returnCode: Int32) {
-    let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: bufferSize)
+internal func runWithBuffer(resultSize: Int, expectedReturnCode: Int, body: (_ buffer: UnsafeMutablePointer<CChar>) -> Int32) -> Data? {
+    let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: outBufferSize)
     defer {
         buffer.deallocate()
     }
     
     let returnCode = body(buffer)
     
+    guard returnCode == expectedReturnCode else {
+        return nil
+    }
+    
     var output = Data()
-    return buffer.withMemoryRebound(to: UInt8.self, capacity: bufferSize) { (pointer: UnsafeMutablePointer<UInt8>) in
-        output.append(pointer, count: bufferSize)
-        return (output, returnCode)
+    return buffer.withMemoryRebound(to: UInt8.self, capacity: resultSize) { (pointer: UnsafeMutablePointer<UInt8>) in
+        output.append(pointer, count: resultSize)
+        return output
     }
 }
 
-internal let bufferByteSize = 32
+private let outBufferSize = 1024
+internal let standardResultSize = 32
+
 
 internal extension Data {
     func paddingLeft(toLength length: Int) -> Data {

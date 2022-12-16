@@ -72,8 +72,8 @@ final class StarknetCurveTests: XCTestCase {
             ),
         ]
         
-        try cases.forEach {
-            let result = try StarknetCurve.pedersen(first: $0, second: $1)
+        cases.forEach {
+            let result = StarknetCurve.pedersen(first: $0, second: $1)
             print("\($0), \($1), \(result)")
             
             XCTAssertEqual(result, $2)
@@ -91,8 +91,8 @@ final class StarknetCurveTests: XCTestCase {
             )
         ]
         
-        try cases.forEach {
-            let result = try StarknetCurve.pedersenOn($0)
+        cases.forEach {
+            let result = StarknetCurve.pedersenOn($0)
             
             let expectedFelt = $1
             
@@ -104,6 +104,8 @@ final class StarknetCurveTests: XCTestCase {
         let result = try StarknetCurve.getPublicKey(privateKey: privateKey)
         
         XCTAssertEqual(result, publicKey)
+        
+        XCTAssertThrowsError(try StarknetCurve.getPublicKey(privateKey: Felt.zero))
     }
     
     func testVerify() throws {
