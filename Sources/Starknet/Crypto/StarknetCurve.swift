@@ -35,7 +35,7 @@ public class StarknetCurve {
     /// - Parameters:
     ///     - elements: array of felt values, used as input to Pedersen hash.
     /// - Returns: Pedersen hash on elements array and its length.
-    public class func pedersenOn(elements: [Felt]) -> Felt {
+    public class func pedersenOn(_ elements: [Felt]) -> Felt {
         return pedersen(first: pedersen(elements), second: Felt(BigUInt(elements.count))!)
     }
     
@@ -46,9 +46,9 @@ public class StarknetCurve {
     /// - Parameters:
     ///     - elements: series of felt values, used as input to Pedersen hash.
     /// - Returns: Pedersen hash on elements array and its length.
-    public class func pedersenOn(elements: Felt...) -> Felt {
+    public class func pedersenOn(_ elements: Felt...) -> Felt {
         let elementsArray = Array(elements)
-        return pedersenOn(elements: elementsArray)
+        return pedersenOn(elementsArray)
     }
     
     /// Compute Starknet public key for given private key.

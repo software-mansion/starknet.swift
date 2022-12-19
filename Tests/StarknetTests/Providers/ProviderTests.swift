@@ -40,4 +40,12 @@ final class ProviderTests: XCTestCase {
         
         XCTAssertEqual(result[0], Felt.zero)
     }
+    
+    func testGetNonce() async throws {
+        let provider = makeStarknetProvider()
+        
+        let result = try await provider.getNonce(of: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")
+        
+        XCTAssertEqual(result, .zero)
+    }
 }
