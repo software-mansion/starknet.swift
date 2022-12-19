@@ -3,12 +3,12 @@ import CFrameworkWrapper
 
 public class CryptoRs {
     public static func getRfc6979Nonce(hash: Data, privateKey: Data, seed: Data) throws -> Data {
-        let (data, returnCode) = try runWithBufferOf(size: bufferByteSize) { buffer in
+        let data = runWithBuffer(resultSize: standardResultSize, expectedReturnCode: 0) { buffer in
             return generate_k(hash.toNative(), privateKey.toNative(), seed.toNative(), buffer)
         }
-            
-        guard returnCode == 0 else {
-            throw CryptoToolkitError.cryptoRsError
+        
+        guard let data = data else {
+            throw CryptoToolkitError.nativeError
         }
         
         return data
