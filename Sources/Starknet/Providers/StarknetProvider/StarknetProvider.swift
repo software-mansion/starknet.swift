@@ -25,7 +25,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.init(starknetChainId: starknetChainId, url: url)
     }
     
-    private func execute<T, U>(method: JsonRpcMethod, params: T, receive: U.Type) async throws -> U where T: Encodable, U: Decodable {
+    private func makeRequest<T, U>(method: JsonRpcMethod, params: T, receive: U.Type) async throws -> U where T: Encodable, U: Decodable {
         let rpcPayload = JsonRpcPayload(method: method, params: params)
         
         var response: JsonRpcResponse<U>
@@ -55,7 +55,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt] {
         let params = CallParams(request: call, blockId: blockId)
         
-        let result = try await execute(method: .call, params: params, receive: [Felt].self)
+        let result = try await makeRequest(method: .call, params: params, receive: [Felt].self)
         
         return result
     }
@@ -63,7 +63,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     public func getNonce(of contract: Felt, at blockId: StarknetBlockId) async throws -> Felt {
         let params = GetNonceParams(contractAddress: contract, blockId: blockId)
         
-        let result = try await execute(method: .getNonce, params: params, receive: Felt.self)
+        let result = try await makeRequest(method: .getNonce, params: params, receive: Felt.self)
         
         return result
     }
@@ -71,7 +71,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     public func addInvokeTransaction(_ transaction: StarknetSequencerInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
         let params = AddInvokeTransactionParams(invokeTransaction: transaction)
         
-        let result = try await execute(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
+        let result = try await makeRequest(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
         
         return result
     }
