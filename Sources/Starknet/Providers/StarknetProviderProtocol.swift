@@ -58,7 +58,7 @@ public extension StarknetProviderProtocol {
     /// Estimate fee for a transaction in the latest block.
     ///
     /// - Parameters:
-    ///  -  transaction: transaction for wich the fee should be estimated.
+    ///  -  transaction: transaction for which the fee should be estimated.
     /// - Returns: EstimateFeeResponse object
     func estimateFee(for transaction: StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
         return try await estimateFee(for: transaction, at: .tag(.latest))

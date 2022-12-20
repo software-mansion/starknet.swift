@@ -68,10 +68,10 @@ public extension StarknetAccountProtocol {
         return try await execute(calls: [call], maxFee: maxFee)
     }
     
-    /// Execute list of calls
+    /// Execute a call
     ///
     /// - Parameters:
-    ///  - calls: list of calls to be executed.
+    ///  - call: a call to be executed.
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(call: StarknetCall) async throws -> StarknetInvokeTransactionResponse {
