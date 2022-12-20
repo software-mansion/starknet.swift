@@ -39,6 +39,23 @@ class StarknetAccount: StarknetAccountProtocol {
         return result
     }
     
+    func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse {
+        let feeEstimate = try await estimateFee(calls: calls)
+        let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+        
+        return try await execute(calls: calls, maxFee: maxFee)
+    }
+    
+    func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse {
+        let nonce = try await getNonce()
+        let signParams = StarknetExecutionParams(nonce: nonce, maxFee: .zero)
+        let transaction = try sign(calls: calls, params: signParams)
+        
+        let result = try await provider.estimateFee(for: transaction)
+        
+        return result
+    }
+    
     func getNonce() async throws -> Felt {
         let result = try await provider.getNonce(of: address)
         

@@ -23,6 +23,16 @@ public protocol StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(calls: [StarknetCall], maxFee: Felt) async throws -> StarknetInvokeTransactionResponse
     
+    /// Execute list of calls
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be executed.
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse
+    
+    func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse
+    
     /// Get current nonce of the account
     ///
     /// - Returns: current nonce, as felt value.
@@ -51,5 +61,19 @@ public extension StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(call: StarknetCall, maxFee: Felt) async throws -> StarknetInvokeTransactionResponse {
         return try await execute(calls: [call], maxFee: maxFee)
+    }
+    
+    /// Execute list of calls
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be executed.
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func execute(call: StarknetCall) async throws -> StarknetInvokeTransactionResponse {
+        return try await execute(calls: [call])
+    }
+    
+    func estimateFee(call: StarknetCall) async throws -> StarknetEstimateFeeResponse {
+        return try await estimateFee(calls: [call])
     }
 }
