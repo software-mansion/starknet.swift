@@ -44,3 +44,11 @@ struct EstimateFeeParams: Encodable {
         case blockId = "block_id"
     }
 }
+
+struct AddDeployAccountTransactionParams: Encodable {
+    let deployAccountTransaction: StarknetSequencerDeployAccountTransaction
+    
+    enum CodingKeys: String, CodingKey {
+        case deployAccountTransaction = "deploy_account_transaction"
+    }
+}

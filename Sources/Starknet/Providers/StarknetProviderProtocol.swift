@@ -40,6 +40,15 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: transaction hash of invoked transaction.
     func addInvokeTransaction(_ transaction: StarknetSequencerInvokeTransaction) async throws -> StarknetInvokeTransactionResponse
+    
+    /// Deploy account
+    ///
+    /// Deploy prefunded starknet account.
+    ///
+    /// - Parameters:
+    ///  - transaction: deploy account transaction to be executed
+    /// - Returns: transaction hash and contract address of deployed account
+    func addDeployAccountTransaction(_ transaction: StarknetSequencerDeployAccountTransaction) async throws -> StarknetDeployAccountResponse
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
