@@ -22,6 +22,15 @@ public protocol StarknetProviderProtocol {
     /// - Returns: Felt value of contract's current nonce.
     func getNonce(of contract: Felt, at blockId: StarknetBlockId) async throws -> Felt
     
+    
+    /// Estimate fee for a transaction.
+    ///
+    /// - Parameters:
+    ///  -  transaction: transaction for wich the fee should be estimated.
+    ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
+    /// - Returns: EstimateFeeResponse object
+    func estimateFee(for transaction: StarknetSequencerTransaction, at blockId: StarknetBlockId) async throws -> StarknetEstimateFeeResponse
+    
     /// Invoke a function.
     ///
     /// Invoke a function in deployed contract.
@@ -44,6 +53,15 @@ public extension StarknetProviderProtocol {
     /// - Returns: Array of field elements, returned by called contract.
     func callContract(_ call: StarknetCall) async throws -> [Felt] {
         return try await callContract(call, at: defaultBlockId)
+    }
+    
+    /// Estimate fee for a transaction in the latest block.
+    ///
+    /// - Parameters:
+    ///  -  transaction: transaction for wich the fee should be estimated.
+    /// - Returns: EstimateFeeResponse object
+    func estimateFee(for transaction: StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
+        return try await estimateFee(for: transaction, at: .tag(.latest))
     }
     
     /// Get nonce of given starknet contract at latest block.
