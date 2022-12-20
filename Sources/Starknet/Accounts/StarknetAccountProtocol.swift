@@ -13,6 +13,15 @@ public protocol StarknetAccountProtocol {
     /// - Returns: Signed SequencerInvokeTransaction
     func sign(calls: [StarknetCall], params: StarknetExecutionParams) throws -> StarknetSequencerInvokeTransaction
     
+    /// Create and sign deploy account transaction
+    ///
+    /// - Parameters:
+    ///  - classHash: class hash of account to be deployed
+    ///  - calldata: constructor calldata
+    ///  - salt: contract salt
+    ///  - maxFee: max acceptable fee for the transaction
+    /// - Returns: Signed sequencer deploy account transaction
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetSequencerDeployAccountTransaction
     
     /// Execute list of calls
     ///
