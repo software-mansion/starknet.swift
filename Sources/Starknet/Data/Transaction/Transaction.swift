@@ -25,7 +25,7 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
         case nonce
     }
     
-    init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
@@ -63,7 +63,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Codable {
     
     public let hash: Felt
     
-    init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, hash: Felt) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, hash: Felt) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
@@ -72,7 +72,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Codable {
         self.hash = hash
     }
     
-    init(sequencerTransaction: StarknetSequencerInvokeTransaction, hash: Felt) {
+    public init(sequencerTransaction: StarknetSequencerInvokeTransaction, hash: Felt) {
         self.init(
             senderAddress: sequencerTransaction.senderAddress,
             calldata: sequencerTransaction.calldata,
@@ -107,6 +107,122 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Codable {
     }
 }
 
+public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransaction {
+    public let type: StarknetTransactionType = .deployAccount
+    
+    public let version: Felt = .zero
+    
+    public let signature: StarknetSignature
+    
+    public let maxFee: Felt
+    
+    public let nonce: Felt
+    
+    public let contractAddressSalt: Felt
+    
+    public let constructorCalldata: StarknetCalldata
+    
+    public let classHash: Felt
+    
+    public init(signature: StarknetSignature, maxFee: Felt, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt) {
+        self.signature = signature
+        self.maxFee = maxFee
+        self.nonce = nonce
+        self.contractAddressSalt = contractAddressSalt
+        self.constructorCalldata = constructorCalldata
+        self.classHash = classHash
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
+        self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
+        self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
+        self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
+        self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        
+        try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case version
+        case signature
+        case maxFee = "max_fee"
+        case nonce
+        case contractAddressSalt = "contract_address_salt"
+        case constructorCalldata = "constructor_calldata"
+        case classHash = "class_hash"
+    }
+}
+
+public struct StarknetDeployAccountTransaction: StarknetTransaction {
+    public let type: StarknetTransactionType = .deployAccount
+    
+    public let version: Felt = .zero
+    
+    public let signature: StarknetSignature
+    
+    public let maxFee: Felt
+    
+    public let nonce: Felt
+    
+    public let contractAddressSalt: Felt
+    
+    public let constructorCalldata: StarknetCalldata
+    
+    public let classHash: Felt
+    
+    public let hash: Felt
+    
+    public init(signature: StarknetSignature, maxFee: Felt, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, hash: Felt) {
+        self.signature = signature
+        self.maxFee = maxFee
+        self.nonce = nonce
+        self.contractAddressSalt = contractAddressSalt
+        self.constructorCalldata = constructorCalldata
+        self.classHash = classHash
+        self.hash = hash
+    }
+    
+    public init(sequencerTransaction: StarknetSequencerDeployAccountTransaction, hash: Felt) {
+        self.init(
+            signature: sequencerTransaction.signature,
+            maxFee: sequencerTransaction.maxFee,
+            nonce: sequencerTransaction.nonce,
+            contractAddressSalt: sequencerTransaction.contractAddressSalt,
+            constructorCalldata: sequencerTransaction.constructorCalldata,
+            classHash: sequencerTransaction.classHash,
+            hash: hash
+        )
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
+        self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
+        self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
+        self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
+        self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.hash = try container.decode(Felt.self, forKey: .hash)
+        
+        try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case version
+        case signature
+        case maxFee = "max_fee"
+        case nonce
+        case contractAddressSalt = "contract_address_salt"
+        case constructorCalldata = "constructor_calldata"
+        case classHash = "class_hash"
+        case hash
+    }
+}
 
 public enum StarknetTransactionDecodingError: Error {
     case invalidVersion
