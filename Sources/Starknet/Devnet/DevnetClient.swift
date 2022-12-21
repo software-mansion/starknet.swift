@@ -2,7 +2,7 @@ import Foundation
 
 class DevnetClient{
     private var host = "0.0.0.0"
-    private var port = 5051
+    private var port = 5050
     private var seed = 1053545547
     
     private var isDevnetRunning = false
