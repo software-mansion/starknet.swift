@@ -78,6 +78,14 @@ public class StarknetAccount: StarknetAccountProtocol {
         return result
     }
     
+    public func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetEstimateFeeResponse {
+        let signedTransaction = try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, maxFee: .zero)
+        
+        let result = try await provider.estimateFee(for: signedTransaction)
+        
+        return result
+    }
+    
     public func getNonce() async throws -> Felt {
         let result = try await provider.getNonce(of: address)
         

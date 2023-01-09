@@ -47,6 +47,15 @@ public protocol StarknetAccountProtocol {
     /// - Returns: struct containing fee estimate
     func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse
     
+    /// Estimate fee for a deploy account transaction
+    ///
+    /// - Parameters:
+    ///  - classHash: class hash of account to be deployed
+    ///  - calldata: constructor calldata
+    ///  - salt: contract salt
+    /// - Returns: struct containing fee estimate
+    func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetEstimateFeeResponse
+    
     /// Get current nonce of the account
     ///
     /// - Returns: current nonce, as felt value.
