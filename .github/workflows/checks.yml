@@ -1,0 +1,26 @@
+name: Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_and_lint:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache/Restore Mint packages
+        id: mint-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          restore-keys: ${{ runner.os }}-mint-
+      - name: Install package manager "Mint"
+        run: |
+          brew upgrade mint || brew install mint || true
+      - name: Install command line tool (if not yet cached)
+        if: steps.mint-cache.outputs.cache-hit != 'true'
+        run: mint bootstrap
+      - name: Run SwiftFormat lint
+        run: mint run swiftformat --lint .
