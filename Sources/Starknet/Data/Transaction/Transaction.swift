@@ -110,7 +110,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Codable {
 public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransaction {
     public let type: StarknetTransactionType = .deployAccount
     
-    public let version: Felt = .zero
+    public let version: Felt = .one
     
     public let signature: StarknetSignature
     
@@ -160,7 +160,7 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
 public struct StarknetDeployAccountTransaction: StarknetTransaction {
     public let type: StarknetTransactionType = .deployAccount
     
-    public let version: Felt = .zero
+    public let version: Felt = .one
     
     public let signature: StarknetSignature
     
