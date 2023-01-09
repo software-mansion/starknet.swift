@@ -27,3 +27,20 @@ struct AddInvokeTransactionParams: Encodable {
         case invokeTransaction = "invoke_transaction"
     }
 }
+
+struct EstimateFeeParams: Encodable {
+    let request: StarknetSequencerTransaction
+    let blockId: StarknetBlockId
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(request, forKey: .request)
+        try container.encode(blockId, forKey: .blockId)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case request
+        case blockId = "block_id"
+    }
+}

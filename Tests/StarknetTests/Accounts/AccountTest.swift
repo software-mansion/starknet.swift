@@ -32,12 +32,34 @@ final class AccountTests: XCTestCase {
         
         let calldata: [Felt] = [
             "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
-            0,
-            1000000000
+            1000,
+            0
         ]
         
         let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
-        let _ = try await account.execute(call: call, maxFee: "0x1000000000")
+        
+        let _ = try await account.execute(call: call)
+    }
+    
+    func testExecuteMultipleCalls() async throws {
+        let account = makeStarknetAccount()
+        
+        let calldata1: [Felt] = [
+            "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
+            1000,
+            0
+        ]
+        
+        let calldata2: [Felt] = [
+            "0x7447084f620ba316a42c72ca5b8eefb3fe9a05ca5fe6430c65a69ecc4349b3b",
+            1000,
+            0
+        ]
+        
+        let call1 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
+        let call2 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
+        
+        let _ = try await account.execute(calls: [call1, call2])
     }
 }
 
