@@ -41,7 +41,7 @@ jobs:
 
       - name: Run devnet # Temporary solution until we have the DevnetClient working
         run: |
-          starknet-devnet --seed 0x0
+          starknet-devnet --seed 0
 
       - name: Build project
         run: |
