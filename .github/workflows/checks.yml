@@ -29,10 +29,10 @@ jobs:
       # - name: Run SwiftFormat lint
       #   run: mint run swiftformat --lint .
 
-      # - name: Set up Python 3.9.12
-      #   uses: actions/setup-python@v2
-      #   with:
-      #     python-version: 3.9.12
+      - name: Set up Python 3.9.12
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.12
 
       - name: Install devnet
         run: |
