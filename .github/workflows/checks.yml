@@ -41,7 +41,9 @@ jobs:
 
       - name: Run devnet # Temporary solution until we have the DevnetClient working
         run: |
-          starknet-devnet --seed 0
+          starknet-devnet --seed 0 &
+        env:
+          PORT: 5050
 
       - name: Build project
         run: |
