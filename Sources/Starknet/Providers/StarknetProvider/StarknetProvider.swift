@@ -83,4 +83,12 @@ public class StarknetProvider: StarknetProviderProtocol {
         
         return result
     }
+    
+    public func addDeployAccountTransaction(_ transaction: StarknetSequencerDeployAccountTransaction) async throws -> StarknetDeployAccountResponse {
+        let params = AddDeployAccountTransactionParams(deployAccountTransaction: transaction)
+        
+        let result = try await makeRequest(method: .deployAccount, params: params, receive: StarknetDeployAccountResponse.self)
+        
+        return result
+    }
 }
