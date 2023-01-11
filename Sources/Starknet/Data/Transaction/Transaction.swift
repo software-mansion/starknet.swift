@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, Codable {
+public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
     
     public let version: Felt = Felt.one
@@ -46,7 +46,7 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
     }
 }
 
-public struct StarknetInvokeTransaction: StarknetTransaction, Codable {
+public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
     
     public let version: Felt = Felt.one
@@ -107,7 +107,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Codable {
     }
 }
 
-public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransaction {
+public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .deployAccount
     
     public let version: Felt = .one
@@ -157,7 +157,7 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
     }
 }
 
-public struct StarknetDeployAccountTransaction: StarknetTransaction {
+public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
     public let type: StarknetTransactionType = .deployAccount
     
     public let version: Felt = .one

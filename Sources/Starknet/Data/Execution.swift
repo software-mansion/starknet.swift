@@ -3,7 +3,7 @@ import Foundation
 public typealias StarknetCalldata = [Felt]
 public typealias StarknetSignature = [Felt]
 
-public struct StarknetCall: Codable {
+public struct StarknetCall: Codable, Equatable {
     public let contractAddress: Felt
     public let entrypoint: Felt
     public let calldata: StarknetCalldata
