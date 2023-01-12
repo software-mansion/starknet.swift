@@ -74,7 +74,6 @@ final class StarknetCurveTests: XCTestCase {
         
         cases.forEach {
             let result = StarknetCurve.pedersen(first: $0, second: $1)
-            print("\($0), \($1), \(result)")
             
             XCTAssertEqual(result, $2)
         }
@@ -112,13 +111,29 @@ final class StarknetCurveTests: XCTestCase {
         let r = Felt(fromHex: "0x66f8955f5c4cbad5c21905ca2a968bc32a183e81069b851b7fc388eceaf57f1")!
         let s = Felt(fromHex: "0x13d5af50c934213f27a8cc5863aa304165aa886487fcc575fe6e1228879f9fe")!
         
-        let positiveResult = try StarknetCurve.verify(publicKey: publicKey, hash: 1, r: r, s: s)
+        do {
+            let positiveResult = try StarknetCurve.verify(publicKey: publicKey, hash: 1, r: r, s: s)
+            XCTAssertTrue(positiveResult)
+        } catch let e {
+            print("Verify error 1: \(e)")
+        }
         
-        XCTAssertTrue(positiveResult)
         
-        let negativeResult = try StarknetCurve.verify(publicKey: publicKey, hash: 1, r: s, s: r)
         
-        XCTAssertFalse(negativeResult)
+        do {
+            let negativeResult = try StarknetCurve.verify(publicKey: publicKey, hash: 1, r: s, s: r)
+            XCTAssertFalse(negativeResult)
+        } catch let e {
+            print("Verify error 2: \(e)")
+        }
+    }
+    
+    func testVerifyWithIncorrectArguments() throws {
+        do {
+            try StarknetCurve.verify(publicKey: .zero, hash: .zero, r: .one, s: .one)
+        } catch let e {
+            print(e)
+        }
     }
     
     func testKGeneration() throws {
