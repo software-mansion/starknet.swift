@@ -32,7 +32,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         
         let sequencerTransaction = makeSequencerInvokeTransaction(calldata: calldata, signature: [], params: params)
         
-        let hash = TransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
+        let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
         
         let transaction = StarknetInvokeTransaction(sequencerTransaction: sequencerTransaction, hash: hash)
         let signature = try signer.sign(transaction: transaction)
@@ -43,7 +43,7 @@ public class StarknetAccount: StarknetAccountProtocol {
     public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetSequencerDeployAccountTransaction {
         let sequencerTransaction = makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, maxFee: maxFee, signature: [])
         
-        let hash = TransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
+        let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
         let transaction = StarknetDeployAccountTransaction(sequencerTransaction: sequencerTransaction, hash: hash)
         
         let signature = try signer.sign(transaction: transaction)

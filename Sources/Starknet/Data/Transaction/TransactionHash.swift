@@ -1,6 +1,6 @@
 import Foundation
 
-class TransactionHashCalculator {
+public class StarknetTransactionHashCalculator {
     private class func computeHashCommon(
         transactionType: StarknetTransactionType,
         version: Felt,
@@ -23,7 +23,7 @@ class TransactionHashCalculator {
         )
     }
     
-    class func computeHash(of transaction: StarknetSequencerInvokeTransaction, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetSequencerInvokeTransaction, chainId: StarknetChainId) -> Felt {
         return computeHashCommon(
             transactionType: transaction.type,
             version: transaction.version,
@@ -36,7 +36,7 @@ class TransactionHashCalculator {
         )
     }
     
-    class func computeHash(of transaction: StarknetSequencerDeployAccountTransaction, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetSequencerDeployAccountTransaction, chainId: StarknetChainId) -> Felt {
         let contractAddress = ContractAddressCalculator.calculateAddressFrom(
             classHash: transaction.classHash,
             calldata: transaction.constructorCalldata,
