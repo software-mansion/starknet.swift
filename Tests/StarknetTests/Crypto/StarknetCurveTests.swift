@@ -118,8 +118,6 @@ final class StarknetCurveTests: XCTestCase {
             print("Verify error 1: \(e)")
         }
         
-        
-        
         do {
             let negativeResult = try StarknetCurve.verify(publicKey: publicKey, hash: 1, r: s, s: r)
             XCTAssertFalse(negativeResult)
