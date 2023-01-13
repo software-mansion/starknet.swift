@@ -37,6 +37,7 @@ public class CryptoCpp {
         let result = Verify(publicKey.toNative(), hash.toNative(), r.toNative(), s.toNative())
         
         print("Verify result: \(result)")
+        print(Thread.current)
         
         return result == 1
     }
