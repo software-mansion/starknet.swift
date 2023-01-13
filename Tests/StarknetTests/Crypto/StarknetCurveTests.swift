@@ -26,15 +26,9 @@ final class StarknetCurveTests: XCTestCase {
         
         let verifyResult = try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s)
         
-        
-        print(Thread.current)
-        print("Before assert")
+//        print(Thread.current)
+//        print("Before assert")
         print("Verify result in sign: \(verifyResult)")
-        
-        do {
-            sleep(3)
-        }
-        
         
         XCTAssertTrue(verifyResult)
     }
@@ -51,14 +45,14 @@ final class StarknetCurveTests: XCTestCase {
         XCTAssertEqual(signature.s, s)
         
         let verifyResult = try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s)
-        
-        print(Thread.current)
-        print("Before assert")
-        print("Verify result in signWithK: \(verifyResult)")
-        
-        do {
-            sleep(3)
-        }
+//
+//        print(Thread.current)
+//        print("Before assert")
+//        print("Verify result in signWithK: \(verifyResult)")
+//
+//        do {
+//            sleep(3)
+//        }
         
         XCTAssertTrue(verifyResult)
     }
