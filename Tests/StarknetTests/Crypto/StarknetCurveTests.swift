@@ -29,6 +29,7 @@ final class StarknetCurveTests: XCTestCase {
         
         print(Thread.current)
         print("Before assert")
+        print("Verify result in sign: \(verifyResult)")
         
         do {
             sleep(3)
@@ -53,6 +54,7 @@ final class StarknetCurveTests: XCTestCase {
         
         print(Thread.current)
         print("Before assert")
+        print("Verify result in signWithK: \(verifyResult)")
         
         do {
             sleep(3)
