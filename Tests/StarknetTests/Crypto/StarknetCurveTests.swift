@@ -24,7 +24,9 @@ final class StarknetCurveTests: XCTestCase {
         XCTAssertEqual(signature.r, r)
         XCTAssertEqual(signature.s, s)
         
-        XCTAssertTrue(try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s))
+        let verifyResult = try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s)
+        
+        XCTAssertTrue(verifyResult)
     }
     
     func testSignWithK() throws {
@@ -38,7 +40,8 @@ final class StarknetCurveTests: XCTestCase {
         XCTAssertEqual(signature.r, r)
         XCTAssertEqual(signature.s, s)
         
-        XCTAssertTrue(try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s))
+        let verifyResult = try StarknetCurve.verify(publicKey: publicKey, hash: hash, r: signature.r, s: signature.s)
+        XCTAssertTrue(verifyResult)
     }
     
     func testPedersen() throws {
