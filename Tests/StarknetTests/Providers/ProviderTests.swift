@@ -46,4 +46,12 @@ final class ProviderTests: XCTestCase {
         
         let _ = try await provider.getNonce(of: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")
     }
+    
+    func testGetClassHash() async throws {
+        let provider = makeStarknetProvider()
+        
+        let classHash = try await provider.getClassHashAt(erc20Address)
+        
+        print(classHash)
+    }
 }

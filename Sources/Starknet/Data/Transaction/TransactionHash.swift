@@ -37,7 +37,7 @@ public class StarknetTransactionHashCalculator {
     }
     
     public class func computeHash(of transaction: StarknetSequencerDeployAccountTransaction, chainId: StarknetChainId) -> Felt {
-        let contractAddress = ContractAddressCalculator.calculateAddressFrom(
+        let contractAddress = StarknetContractAddressCalculator.calculateFrom(
             classHash: transaction.classHash,
             calldata: transaction.constructorCalldata,
             salt: transaction.contractAddressSalt

@@ -52,3 +52,13 @@ struct AddDeployAccountTransactionParams: Encodable {
         case deployAccountTransaction = "deploy_account_transaction"
     }
 }
+
+struct GetClassHashAtParams: Encodable {
+    let contractAddress: Felt
+    let blockId: StarknetBlockId
+    
+    enum CodingKeys: String, CodingKey {
+        case contractAddress = "contract_address"
+        case blockId = "block_id"
+    }
+}
