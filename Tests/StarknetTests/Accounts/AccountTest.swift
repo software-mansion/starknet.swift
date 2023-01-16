@@ -70,7 +70,7 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
         let fee = estimatedFeeToMaxFee(feeEstimate.overallFee)
         
-        let prefundCall = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: [newAccountAddress, fee, 0])
+        let prefundCall = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: [newAccountAddress] + fee.toUInt256())
         
         try await account.execute(call: prefundCall)
         

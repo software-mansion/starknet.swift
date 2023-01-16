@@ -153,6 +153,14 @@ extension Felt {
     }
 }
 
+extension Felt {
+    public func toUInt256() -> [Felt] {
+        let (high, low) = self.value.quotientAndRemainder(dividingBy: BigUInt(2).power(128))
+        
+        return [Felt(low)!, Felt(high)!]
+    }
+}
+
 private extension String {
     func components(withMaxLength length: Int) -> [String] {
         return stride(from: 0, to: self.count, by: length).map {
