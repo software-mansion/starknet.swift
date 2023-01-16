@@ -40,6 +40,14 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: transaction hash of invoked transaction.
     func addInvokeTransaction(_ transaction: StarknetSequencerInvokeTransaction) async throws -> StarknetInvokeTransactionResponse
+    
+    /// Get the contract class hash for the contract deployed at the given address.
+    ///
+    /// - Parameters:
+    ///  - address: address of the contract whose address will be returned
+    ///  - blockId: id of the requested block
+    /// - Returns: Class hash of the given contract
+    func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) async throws -> Felt
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
@@ -72,5 +80,14 @@ public extension StarknetProviderProtocol {
     /// - Returns: Felt value of contract's current nonce.
     func getNonce(of contract: Felt) async throws -> Felt {
         return try await getNonce(of: contract, at: defaultBlockId)
+    }
+    
+    /// Get the contract class hash for the contract deployed at the given address.
+    ///
+    /// - Parameters:
+    ///  - address: address of the contract whose address will be returned
+    /// - Returns: Class hash of the given contract
+    func getClassHashAt(_ address: Felt) async throws -> Felt {
+        return try await getClassHashAt(address, at: .tag(.latest))
     }
 }

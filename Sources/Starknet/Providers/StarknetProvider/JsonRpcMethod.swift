@@ -5,4 +5,5 @@ enum JsonRpcMethod: String, Encodable {
     case getNonce = "starknet_getNonce"
     case invokeFunction = "starknet_addInvokeTransaction"
     case estimateFee = "starknet_estimateFee"
+    case getClassHashAt = "starknet_getClassHashAt"
 }

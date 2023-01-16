@@ -83,4 +83,12 @@ public class StarknetProvider: StarknetProviderProtocol {
         
         return result
     }
+    
+    public func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) async throws -> Felt {
+        let params = GetClassHashAtParams(contractAddress: address, blockId: blockId)
+        
+        let result = try await makeRequest(method: .getClassHashAt, params: params, receive: Felt.self)
+        
+        return result
+    }
 }
