@@ -44,3 +44,13 @@ struct EstimateFeeParams: Encodable {
         case blockId = "block_id"
     }
 }
+
+struct GetClassHashAtParams: Encodable {
+    let contractAddress: Felt
+    let blockId: StarknetBlockId
+    
+    enum CodingKeys: String, CodingKey {
+        case contractAddress = "contract_address"
+        case blockId = "block_id"
+    }
+}
