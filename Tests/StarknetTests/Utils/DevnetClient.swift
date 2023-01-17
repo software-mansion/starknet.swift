@@ -1,8 +1,37 @@
 import Foundation
 
+import Starknet
+
+protocol DevnetClientProtocol {
+    var gatewayUrl: String { get }
+    var feederGatewayUrl: String { get }
+    var rpcUrl: String { get }
+    
+    func start()
+    func close()
+    
+    func prefundAccount(address: Felt)
+    func deployAccount(name: String)
+    func readAccountDetails(accountName: String)
+}
+
+enum DevnetClientError: Error {
+    case invalidTestPlatform
+}
+
+// Due to DevnetClient being albe to run only on a macos, this
+// factory method will throw, when ran on any other platform.
+func makeDevnetClient() throws -> DevnetClientProtocol {
+#if os(macOS)
+    return DevnetClient()
+#endif
+    
+    throw DevnetClientError.invalidTestPlatform
+}
+
 #if os(macOS)
 
-class DevnetClient{
+class DevnetClient: DevnetClientProtocol {
     private var host = "0.0.0.0"
     private var port = 5050
     private var seed = 1053545547

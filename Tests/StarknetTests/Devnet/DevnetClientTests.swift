@@ -3,7 +3,7 @@ import XCTest
 
 final class devnetClientTests: XCTestCase {
     func testExample() async throws {
-        let test = DevnetClient()
+        let test = try makeDevnetClient()
         test.start()
         //test.prefundAccount(accountAddress: "0x0172d1a003a779c48e66a1b9e591094105d9c48ebc335c44e92faa9197e495cb")
         test.deployAccount(name: "test1234")
