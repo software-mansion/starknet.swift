@@ -34,6 +34,8 @@ public class CryptoCpp {
     }
     
     public class func verify(publicKey: Data, hash: Data, r: Data, s: Data) -> Bool {
+        print("Current thread \(Thread.current)")
+        
         let result = Verify(publicKey.toNative(), hash.toNative(), r.toNative(), s.toNative())
         
         print("Verify result on swift side: \(result)")
