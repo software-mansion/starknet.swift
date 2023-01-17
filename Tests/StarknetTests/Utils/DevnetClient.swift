@@ -12,7 +12,14 @@ protocol DevnetClientProtocol {
     
     func prefundAccount(address: Felt)
     func deployAccount(name: String)
-    func readAccountDetails(accountName: String)
+    func readAccountDetails(accountName: String) -> AccountDetails
+}
+
+struct AccountDetails {
+    var private_key: Felt
+    var public_key: Felt
+    var address: Felt
+    var salt: Felt
 }
 
 enum DevnetClientError: Error {
@@ -45,13 +52,6 @@ class DevnetClient: DevnetClientProtocol {
     var gatewayUrl: String
     var feederGatewayUrl: String
     var rpcUrl: String
-    
-    struct AccountDetails{
-        var private_key: Felt
-        var public_key: Felt
-        var address: Felt
-        var salt: Felt
-    }
     
     struct TransactionResult {
         var address: Felt
