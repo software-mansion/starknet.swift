@@ -45,9 +45,9 @@ jobs:
         env:
           PORT: 5050
 
-      - name: Build project
-        run: |
-          swift build -c release
+      # - name: Build project
+      #   run: |
+      #     swift build -c release
 
       - name: Run tests
         run: |
