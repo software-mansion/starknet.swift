@@ -13,6 +13,15 @@ public protocol StarknetAccountProtocol {
     /// - Returns: Signed SequencerInvokeTransaction
     func sign(calls: [StarknetCall], params: StarknetExecutionParams) throws -> StarknetSequencerInvokeTransaction
     
+    /// Create and sign deploy account transaction
+    ///
+    /// - Parameters:
+    ///  - classHash: class hash of account to be deployed
+    ///  - calldata: constructor calldata
+    ///  - salt: contract salt
+    ///  - maxFee: max acceptable fee for the transaction
+    /// - Returns: Signed sequencer deploy account transaction
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetSequencerDeployAccountTransaction
     
     /// Execute list of calls
     ///
@@ -37,6 +46,15 @@ public protocol StarknetAccountProtocol {
     ///  - calls: list of calls, for which the fee should be estimated.
     /// - Returns: struct containing fee estimate
     func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse
+    
+    /// Estimate fee for a deploy account transaction
+    ///
+    /// - Parameters:
+    ///  - classHash: class hash of account to be deployed
+    ///  - calldata: constructor calldata
+    ///  - salt: contract salt
+    /// - Returns: struct containing fee estimate
+    func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetEstimateFeeResponse
     
     /// Get current nonce of the account
     ///
