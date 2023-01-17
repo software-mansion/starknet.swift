@@ -16,7 +16,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         return StarknetSequencerInvokeTransaction(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce)
     }
     
-    private func makeSequencerDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, maxFee: Felt, signature: [Felt]) -> StarknetSequencerDeployAccountTransaction {
+    private func makeSequencerDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, maxFee: Felt, signature: StarknetSignature) -> StarknetSequencerDeployAccountTransaction {
         return StarknetSequencerDeployAccountTransaction(
             signature: signature,
             maxFee: maxFee,
