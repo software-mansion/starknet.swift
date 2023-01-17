@@ -1,5 +1,7 @@
 import Foundation
 
+#if os(macOS)
+
 class DevnetClient{
     private var host = "0.0.0.0"
     private var port = 5050
@@ -200,3 +202,5 @@ class DevnetClient{
     }
     
 }
+
+#endif
