@@ -24,6 +24,11 @@ public struct StarknetCall: Codable, Equatable {
 public struct StarknetExecutionParams {
     public let nonce: Felt
     public let maxFee: Felt
+    
+    public init(nonce: Felt, maxFee: Felt) {
+        self.nonce = nonce
+        self.maxFee = maxFee
+    }
 }
 
 func callsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
