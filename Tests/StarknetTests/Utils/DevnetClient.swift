@@ -11,15 +11,51 @@ protocol DevnetClientProtocol {
     func close()
     
     func prefundAccount(address: Felt)
-    func deployAccount(name: String)
+    func deployAccount(name: String) -> DeployAccountResult
+    func deployContract(contractPath: String) -> TransactionResult
+    func declareContract(contractPath: String) -> TransactionResult
     func readAccountDetails(accountName: String) -> AccountDetails
 }
 
-struct AccountDetails {
-    var private_key: Felt
-    var public_key: Felt
+struct AccountDetails: Codable{
+    var privateKey: Felt
+    var publicKey: Felt
     var address: Felt
     var salt: Felt
+    
+    enum CodingKeys: String, CodingKey {
+        case privateKey = "private_key"
+        case publicKey = "public_key"
+        case address
+        case salt
+    }
+    
+    init(privateKey: Felt, publicKey: Felt, address: Felt, salt: Felt) {
+        self.privateKey = privateKey
+        self.publicKey = publicKey
+        self.address = address
+        self.salt = salt
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.privateKey = try container.decode(Felt.self, forKey: .privateKey)
+        self.publicKey = try container.decode(Felt.self, forKey: .publicKey)
+        self.address = try container.decode(Felt.self, forKey: .address)
+        self.salt = try container.decode(Felt.self, forKey: .salt)
+        //try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
+    }
+}
+
+struct TransactionResult {
+    var address: Felt
+    var hash: Felt
+}
+
+struct DeployAccountResult{
+    var details: AccountDetails
+    var txHash: Felt
 }
 
 enum DevnetClientError: Error {
@@ -39,33 +75,24 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
 #if os(macOS)
 
 class DevnetClient: DevnetClientProtocol {
-    private var host = "0.0.0.0"
-    private var port = 5050
-    private var seed = 1053545547
+    private let host: String
+    private let port: Int
+    private let seed: Int
     // Paths still arent working properly, for now I'm using absolute paths
-    private var accountDirectory = "/Users/jakub/test"
-    private var baseUrl: String
+    private let accountDirectory = "/Users/jakub/test"
+    private let baseUrl: String
    
     private var isDevnetRunning = false
     private var devnetProcess: Process!
     
-    var gatewayUrl: String
-    var feederGatewayUrl: String
-    var rpcUrl: String
+    let gatewayUrl: String
+    let feederGatewayUrl: String
+    let rpcUrl: String
     
-    struct TransactionResult {
-        var address: Felt
-        var hash: Felt
-    }
-    
-    struct DeployAccountResult{
-        var details: AccountDetails
-        var txHash: Felt
-    }
-    
-    
-    
-    init() {
+    init(_host: String = "0.0.0.0", _port: Int = 5050, _seed: Int = 1053545547) {
+        host = _host
+        port = _port
+        seed = _seed
         baseUrl = "http://\(host):\(port)"
         gatewayUrl = "\(baseUrl)/gateway"
         feederGatewayUrl = "\(baseUrl)/feeder_gateway"
@@ -84,7 +111,7 @@ class DevnetClient: DevnetClientProtocol {
             "pkill -f starknet-devnet",
             arguments]
         
-        task.launchPath = "/bin/zsh"
+        task.launchPath = "/bin/sh"
         task.launch()
         task.waitUntilExit()
         
@@ -104,11 +131,13 @@ class DevnetClient: DevnetClientProtocol {
             command,
             arguments]
         
-        devnetProcess.launchPath = "/bin/zsh"
+        devnetProcess.launchPath = "/bin/sh"
         devnetProcess.standardInput = nil
         devnetProcess.launch()
         
         isDevnetRunning = true
+        
+        // TODO: clear accountDirectory folder
     }
     
     public func close(){
@@ -124,15 +153,15 @@ class DevnetClient: DevnetClientProtocol {
     }
     
     // needs finishing
-    public func prefundAccount(accountAddress: Felt) {
-        let url = URL(string: "https://httpbin.org/post?address=\(accountAddress)&amount=5000000000000000")
+    public func prefundAccount(address: Felt) {
+        let url = URL(string: "http://127.0.0.1:5050/mint")
         guard let requestUrl = url else { fatalError() }
         // Prepare URL Request Object
         var request = URLRequest(url: requestUrl)
         request.httpMethod = "POST"
          
         // HTTP Request Parameters which will be sent in HTTP Request Body
-        let postString = "{\"address\":\"\(accountAddress.toHex())\",\"amount\": 5000000000000000}"
+        let postString = "{\"address\":\"\(address.toHex())\",\"amount\": 5000000000000000}"
         // Set HTTP Request Body
         request.httpBody = postString.data(using: String.Encoding.utf8);
         // Perform HTTP Request
@@ -152,7 +181,7 @@ class DevnetClient: DevnetClientProtocol {
         task.resume()
     }
     
-    public func deployAccount(name: String) {
+    public func deployAccount(name: String) -> DeployAccountResult{
         let params = [
             "--account_dir",
             accountDirectory,
@@ -166,12 +195,67 @@ class DevnetClient: DevnetClientProtocol {
                 command: "new_account",
                 args: params.joined(separator: " "))
         
-        //TODO prefundAccount
-        let _ = runStarknetCli(
+        let details = readAccountDetails(accountName: name)
+        //prefundAccount(address: account.address)
+        
+        let result = runStarknetCli(
                         name: "Account deployment",
                         command: "deploy_account",
                         args: params.joined(separator: " "))
+        
+        let array = result.components(separatedBy: CharacterSet.newlines)
+        let tx = getTransactionResult(lines: array, offset: 3)
+        
+        return DeployAccountResult(details: details, txHash: tx.hash)
     }
+    
+    public func deployContract(contractPath: String) -> TransactionResult {
+        let classHash = declareContract(contractPath: contractPath).hash
+        
+        let params = [
+            "--class_hash",
+            classHash.toHex(),
+            "--account_dir",
+            accountDirectory,
+            "--wallet",
+            "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
+            "--max_fee",
+            "0"]
+        
+        let result = runStarknetCli(
+            name: "Contract deployment",
+            command: "deploy",
+            args: params.joined(separator: " "))
+
+        let array = result.components(separatedBy: CharacterSet.newlines)
+        let tx = getTransactionResult(lines: array)
+
+        //TODO assertTxPassed
+        //assertTxPassed(tx.hash)
+        return tx
+    }
+    
+    public func declareContract(contractPath: String) -> TransactionResult {
+        let params = [
+            "--contract",
+            contractPath,
+            "--account_dir",
+            accountDirectory,
+            "--wallet",
+            "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount"]
+        let result = runStarknetCli(
+            name: "Contract declare",
+            command: "declare",
+            args: params.joined(separator: " "))
+
+        let array = result.components(separatedBy: CharacterSet.newlines)
+        let tx = getTransactionResult(lines: array, offset: 2)
+
+        //TODO assertTxPassed
+        //assertTxPassed(tx.hash)
+        return tx
+    }
+
     
     private func runStarknetCli(name: String, command: String, args: String) -> String {
         let process = Process()
@@ -185,7 +269,7 @@ class DevnetClient: DevnetClientProtocol {
             "-c",
             "/Users/jakub/.asdf/shims/starknet \(command) \(args) --gateway_url \(gatewayUrl) --feeder_gateway_url \(feederGatewayUrl) --network alpha-goerli"]
         
-        process.launchPath = "/bin/zsh"
+        process.launchPath = "/bin/sh"
         process.standardInput = nil
         process.launch()
         process.waitUntilExit()
@@ -194,40 +278,40 @@ class DevnetClient: DevnetClientProtocol {
         let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
         
         let output = String(decoding: outputData, as: UTF8.self)
-        let error = String(decoding: errorData, as: UTF8.self)
+        let _ = String(decoding: errorData, as: UTF8.self)
         
         return output
     }
-    
+    typealias AccountDetailsResponse = [String: [String: AccountDetails]]
     
     public func readAccountDetails(accountName: String) -> AccountDetails {
-        var result = AccountDetails(private_key:0, public_key:0, address:0, salt:0)
+        let result = AccountDetails(privateKey:0, publicKey:0, address:0, salt:0)
         let filename = "\(accountDirectory)/starknet_open_zeppelin_accounts.json"
-        print(filename)
+        
         do {
             let contents = try String(contentsOfFile: filename)
             if let data = contents.data(using: .utf8) {
-                do {
-                    let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any]
-                        //return json
-                    if let accounts = json!["alpha-goerli"] {
-                        let dict = accounts as? [String: Any]
-                        if let wantedAccount = dict![accountName] {
-                            let dict2 = wantedAccount as? [String : Any]
-                            result.address = Felt(fromHex: dict2?["address"] as! String) ?? "0x0"
-                            result.private_key = Felt(fromHex: dict2?["private_key"] as! String) ?? "0x0"
-                            result.salt = Felt(fromHex: dict2?["salt"] as! String) ?? "0x0"
-                            result.public_key = Felt(fromHex: dict2?["public_key"] as! String) ?? "0x0"
-                        }
-                    }
-                } catch {
-                    print("Something went wrong")
+                if let response = try? JSONDecoder().decode(AccountDetailsResponse.self, from: data) {
+                    return (response["alpha-goerli"]?[accountName])!
                 }
-            }        } catch {
-            //TODO error handling
+            }
+            
+        } catch {
         }
         
         return result
+    }
+    
+ 
+    private func getValueFromLine(line: String, index: Int = 1) -> String {
+        let split = line.components(separatedBy: ": ")
+        return split[index]
+    }
+    
+    private func getTransactionResult(lines: Array<String>, offset: Int = 1) -> TransactionResult {
+        let address = Felt(fromHex: getValueFromLine(line: lines[offset])) ?? 0
+        let hash = Felt(fromHex: getValueFromLine(line: lines[offset + 1])) ?? 0
+        return TransactionResult(address: address, hash: hash)
     }
     
 }
