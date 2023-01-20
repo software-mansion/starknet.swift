@@ -3,7 +3,7 @@ import Foundation
 public typealias StarknetCalldata = [Felt]
 public typealias StarknetSignature = [Felt]
 
-public struct StarknetCall: Codable {
+public struct StarknetCall: Codable, Equatable {
     public let contractAddress: Felt
     public let entrypoint: Felt
     public let calldata: StarknetCalldata
@@ -24,6 +24,11 @@ public struct StarknetCall: Codable {
 public struct StarknetExecutionParams {
     public let nonce: Felt
     public let maxFee: Felt
+    
+    public init(nonce: Felt, maxFee: Felt) {
+        self.nonce = nonce
+        self.maxFee = maxFee
+    }
 }
 
 func callsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
