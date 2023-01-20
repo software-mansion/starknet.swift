@@ -8,50 +8,42 @@
 import SwiftUI
 import Starknet
 
+
 struct ContentView: View {
-    @State var balance = ""
-    @State var mintAmount = ""
+    @EnvironmentObject var accountsStore: AccountsStore
     
-    let provider = StarknetProvider(starknetChainId: .testnet, url: "http://localhost:5050/rpc")
+    @State var transferAmount = ""
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("My address")
-                    .font(.largeTitle)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Text("0x123456789")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            Picker("What is your account?", selection: $accountsStore.currentAccountIndex) {
+                ForEach(accountsStore.accounts.indices, id: \.self) {
+                    Text(accountsStore.accounts[$0].address.toHex().prefix(8) + "...")
+                }
             }
-            .frame(maxWidth: .infinity)
+            .pickerStyle(SegmentedPickerStyle())
             
             VStack(alignment: .leading, spacing: 10) {
                 Text("Balance")
                     .font(.largeTitle)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                TextField("Fetching balance...", text: $balance)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .disabled(true)
-                
-                Button("Refetch") {
-                    
-                }
+                Text(String(accountsStore.balance, radix: 10))
             }
             .frame(maxWidth: .infinity)
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("Mint tokens")
+                Text("Transfer tokens")
                     .font(.largeTitle)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                TextField("Amount", text: $mintAmount)
+                TextField("Amount...", text: $transferAmount)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Button("Mint") {
-                    
+                Button("Send") {
+                    accountsStore.transferTokens(amountString: transferAmount)
                 }
+                .disabled(accountsStore.loading)
             }
             .frame(maxWidth: .infinity)
             

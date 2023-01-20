@@ -10,9 +10,15 @@ import Starknet
 
 @main
 struct StarknetDemoApp: App {
+    @StateObject var accountsStore = AccountsStore()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(accountsStore)
+                .task {
+                    await accountsStore.fetchBalance()
+                }
         }
     }
 }
