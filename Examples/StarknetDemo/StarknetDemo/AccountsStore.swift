@@ -25,7 +25,7 @@ func makeAccount(provider: StarknetProviderProtocol, privateKey: Felt, address: 
 
 class AccountsStore: ObservableObject {
     let accounts: [StarknetAccountProtocol]
-    let provider: StarknetProvider
+    let provider: StarknetProviderProtocol
     
     @Published var currentAccountIndex = 0 {
         didSet {
@@ -78,14 +78,10 @@ class AccountsStore: ObservableObject {
         do {
             let result = try await provider.callContract(call)
             
-            print("Result \(result), \(result[0].value.toFelt()!), \(result[1].value << 128)")
-            
             let balanceValue = result[0].value + result[1].value << 128
             
             DispatchQueue.main.async {
                 self.accountBalances[accountIndex] = balanceValue
-                
-                print("Difference: \(BigInt(self.accountBalances[1]) - BigInt(self.accountBalances[0]))")
             }
         } catch let error {
             print("Fetching balance failed with error: \(error)")
@@ -104,8 +100,6 @@ class AccountsStore: ObservableObject {
         }
         
         let (high, low) = amount.quotientAndRemainder(dividingBy: BigUInt(2).power(128))
-        
-        print("low: \(low.toFelt()!), high: \(high.toFelt()!)")
         
         let recipientAccoutnIndex = accounts.count - 1 - currentAccountIndex
         let recipientAddress = accounts[recipientAccoutnIndex].address
