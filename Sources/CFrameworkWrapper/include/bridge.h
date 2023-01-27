@@ -3,8 +3,9 @@
 
 #ifdef __OBJC__
 
-#import "ecdsa.h"
-#import "pedersen_hash.h"
+//#import "ecdsa.h"
+#import <libcrypto_c_exports/pedersen_hash.h>
+#import <libcrypto_c_exports/ecdsa.h>
 
 #import "crypto-rs.h"
 
