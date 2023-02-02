@@ -9,14 +9,13 @@ final class FeeEstimateTests: XCTestCase {
             (1000, 0, 1000),
             (Felt(Felt.max.value - 100)!, 0.1, Felt.max),
             (0, 0.5, 0),
-            (2000, 1, 4000)
+            (2000, 1, 4000),
         ]
-        
+
         cases.forEach {
             let estimated = estimatedFeeToMaxFee($0, overhead: $1)
-            
+
             XCTAssertEqual(estimated, $2)
         }
-        
     }
 }

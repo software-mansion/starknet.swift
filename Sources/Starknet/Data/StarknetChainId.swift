@@ -1,11 +1,11 @@
-import Foundation
 import BigInt
+import Foundation
 
 public enum StarknetChainId {
     case mainnet
     case testnet
     case testnet2
-    
+
     public var feltValue: Felt {
         switch self {
         case .mainnet:
