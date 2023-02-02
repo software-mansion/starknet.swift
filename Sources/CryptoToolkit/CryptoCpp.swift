@@ -34,7 +34,9 @@ public class CryptoCpp {
     }
     
     public class func verify(publicKey: Data, hash: Data, r: Data, s: Data) -> Bool {
-        let result = Verify(publicKey.toNative(), hash.toNative(), r.toNative(), s.toNative())
+        let result = runWithoutBuffer() {
+            return Verify(publicKey.toNative(), hash.toNative(), r.toNative(), s.toNative())
+        }
         
         return result == 1
     }
