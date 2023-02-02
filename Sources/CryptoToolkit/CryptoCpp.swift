@@ -38,6 +38,8 @@ public class CryptoCpp {
             return Verify(publicKey.toNative(), hash.toNative(), r.toNative(), s.toNative())
         }
         
+        print("Verify result (swift): \(result)")
+        
         return result == 1
     }
     
@@ -48,6 +50,7 @@ public class CryptoCpp {
         
         switch result {
         case .success(let returnValue):
+            print("Verify async result (swift): \(result)")
             return returnValue == 1
         default:
             return false
