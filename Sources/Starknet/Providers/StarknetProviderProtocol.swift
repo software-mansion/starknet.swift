@@ -3,7 +3,7 @@ import Foundation
 /// Provider used to interact with the StakNet blockchain.
 public protocol StarknetProviderProtocol {
     var starknetChainId: StarknetChainId { get }
-
+    
     /// Call starknet contract.
     ///
     /// - Parameters
@@ -12,7 +12,7 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: Array of field elements, returned by called contract.
     func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt]
-
+    
     /// Get nonce of given starknet contract
     ///
     /// - Parameters
@@ -21,7 +21,8 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: Felt value of contract's current nonce.
     func getNonce(of contract: Felt, at blockId: StarknetBlockId) async throws -> Felt
-
+    
+    
     /// Estimate fee for a transaction.
     ///
     /// - Parameters:
@@ -29,7 +30,7 @@ public protocol StarknetProviderProtocol {
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: EstimateFeeResponse object
     func estimateFee(for transaction: StarknetSequencerTransaction, at blockId: StarknetBlockId) async throws -> StarknetEstimateFeeResponse
-
+    
     /// Invoke a function.
     ///
     /// Invoke a function in deployed contract.
@@ -39,7 +40,7 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: transaction hash of invoked transaction.
     func addInvokeTransaction(_ transaction: StarknetSequencerInvokeTransaction) async throws -> StarknetInvokeTransactionResponse
-
+    
     /// Deploy account
     ///
     /// Deploy prefunded starknet account.
@@ -48,7 +49,7 @@ public protocol StarknetProviderProtocol {
     ///  - transaction: deploy account transaction to be executed
     /// - Returns: transaction hash and contract address of deployed account
     func addDeployAccountTransaction(_ transaction: StarknetSequencerDeployAccountTransaction) async throws -> StarknetDeployAccountResponse
-
+    
     /// Get the contract class hash for the contract deployed at the given address.
     ///
     /// - Parameters:
@@ -70,7 +71,7 @@ public extension StarknetProviderProtocol {
     func callContract(_ call: StarknetCall) async throws -> [Felt] {
         return try await callContract(call, at: defaultBlockId)
     }
-
+    
     /// Estimate fee for a transaction in the latest block.
     ///
     /// - Parameters:
@@ -79,7 +80,7 @@ public extension StarknetProviderProtocol {
     func estimateFee(for transaction: StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
         return try await estimateFee(for: transaction, at: .tag(.latest))
     }
-
+    
     /// Get nonce of given starknet contract at latest block.
     ///
     /// - Parameters
@@ -89,7 +90,7 @@ public extension StarknetProviderProtocol {
     func getNonce(of contract: Felt) async throws -> Felt {
         return try await getNonce(of: contract, at: defaultBlockId)
     }
-
+    
     /// Get the contract class hash for the contract deployed at the given address.
     ///
     /// - Parameters:

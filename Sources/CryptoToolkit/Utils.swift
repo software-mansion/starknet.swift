@@ -5,13 +5,13 @@ internal func runWithBuffer(resultSize: Int, expectedReturnCode: Int, body: (_ b
     defer {
         buffer.deallocate()
     }
-
+    
     let returnCode = body(buffer)
-
+    
     guard returnCode == expectedReturnCode else {
         return nil
     }
-
+    
     var output = Data()
     return buffer.withMemoryRebound(to: UInt8.self, capacity: resultSize) { (pointer: UnsafeMutablePointer<UInt8>) in
         output.append(pointer, count: resultSize)
@@ -22,14 +22,15 @@ internal func runWithBuffer(resultSize: Int, expectedReturnCode: Int, body: (_ b
 private let outBufferSize = 1024
 internal let standardResultSize = 32
 
+
 internal extension Data {
     func paddingLeft(toLength length: Int) -> Data {
-        let paddingLength = length - count
-
+        let paddingLength = length - self.count
+        
         if paddingLength > 0 {
             return Data(repeating: 0, count: paddingLength) + self
         }
-
+        
         return self
     }
 }
