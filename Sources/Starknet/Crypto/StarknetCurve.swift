@@ -81,14 +81,6 @@ public class StarknetCurve {
         return CryptoCpp.verify(publicKey: publicKey.serialize(), hash: hash.serialize(), r: r.serialize(), s: w.serialize())
     }
     
-    public class func verifyAsync(publicKey: Felt, hash: Felt, r: Felt, s: Felt) async throws -> Bool {
-        guard let w = s.value.inverse(curveOrder) else {
-            throw StarknetCurveError.verifyError
-        }
-        
-        return await CryptoCpp.verifyAsync(publicKey: publicKey.serialize(), hash: hash.serialize(), r: r.serialize(), s: w.serialize())
-    }
-    
     /// Sign hash with StarknetPrivate key and given k value.
     ///
     /// This method is internal, as using bad k parameter is very dangerous and may lead to exposing the private key.

@@ -19,12 +19,6 @@ internal func runWithBuffer(resultSize: Int, expectedReturnCode: Int, body: (_ b
     }
 }
 
-internal func runWithoutBuffer(_ body: () -> Int32) -> Int32 {
-    let returnCode = body()
-    
-    return returnCode
-}
-
 private let outBufferSize = 1024
 internal let standardResultSize = 32
 

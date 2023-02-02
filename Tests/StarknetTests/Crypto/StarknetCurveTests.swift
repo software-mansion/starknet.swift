@@ -121,19 +121,6 @@ final class StarknetCurveTests: XCTestCase {
         XCTAssertFalse(negativeResult)
     }
     
-    func testVerifyAsync() async throws {
-        let r = Felt(fromHex: "0x66f8955f5c4cbad5c21905ca2a968bc32a183e81069b851b7fc388eceaf57f1")!
-        let s = Felt(fromHex: "0x13d5af50c934213f27a8cc5863aa304165aa886487fcc575fe6e1228879f9fe")!
-        
-        let positiveResult = try await StarknetCurve.verifyAsync(publicKey: publicKey, hash: 1, r: r, s: s)
-        
-        XCTAssertTrue(positiveResult)
-        
-        let negativeResult = try await StarknetCurve.verifyAsync(publicKey: publicKey, hash: 1, r: s, s: r)
-        
-        XCTAssertFalse(negativeResult)
-    }
-    
     func testKGeneration() throws {
         let cases: [(Felt, Felt, Felt, String)] = [
             ("0x010b559a3b4dc1b7137d90521cb413b397ff07963214d128a92d65aec7182f68",
