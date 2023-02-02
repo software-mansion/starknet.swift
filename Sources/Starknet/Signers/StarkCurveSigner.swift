@@ -7,14 +7,14 @@ public class StarkCurveSigner: StarknetSignerProtocol {
 
     public init?(privateKey: Felt) {
         self.privateKey = privateKey
-        
+
         do {
-            self.publicKey = try StarknetCurve.getPublicKey(privateKey: self.privateKey)
+            publicKey = try StarknetCurve.getPublicKey(privateKey: self.privateKey)
         } catch {
             return nil
         }
     }
-    
+
     public func sign(transaction: StarknetTransaction) throws -> StarknetSignature {
         return try StarknetCurve.sign(privateKey: privateKey, hash: transaction.hash).toArray()
     }

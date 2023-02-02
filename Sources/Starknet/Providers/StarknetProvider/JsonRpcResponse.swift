@@ -8,10 +8,10 @@ struct JsonRpcError: Decodable {
 struct JsonRpcResponse<T: Decodable>: Decodable {
     let id: Int
     let jsonRpc: String
-    
+
     let result: T?
     let error: JsonRpcError?
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case jsonRpc = "jsonrpc"
