@@ -40,6 +40,19 @@ public class CryptoCpp {
         
         return result == 1
     }
+    
+    public class func verifyAsync(publicKey: Data, hash: Data, r: Data, s: Data) async -> Bool {
+        let result = await Task {
+            return Verify(publicKey.toNative(), hash.toNative(), r.toNative(), s.toNative())
+        }.result
+        
+        switch result {
+        case .success(let returnValue):
+            return returnValue == 1
+        default:
+            return false
+        }
+    }
 }
 
 private extension Data {
