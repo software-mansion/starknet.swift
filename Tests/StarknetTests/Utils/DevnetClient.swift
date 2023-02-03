@@ -17,10 +17,10 @@ protocol DevnetClientProtocol {
 }
 
 struct AccountDetails: Codable{
-    var privateKey: Felt
-    var publicKey: Felt
-    var address: Felt
-    var salt: Felt
+    let privateKey: Felt
+    let publicKey: Felt
+    let address: Felt
+    let salt: Felt
     
     enum CodingKeys: String, CodingKey {
         case privateKey = "private_key"
@@ -47,13 +47,13 @@ struct AccountDetails: Codable{
 }
 
 struct TransactionResult {
-    var address: Felt
-    var hash: Felt
+    let address: Felt
+    let hash: Felt
 }
 
 struct DeployAccountResult{
-    var details: AccountDetails
-    var txHash: Felt
+    let details: AccountDetails
+    let txHash: Felt
 }
 
 enum DevnetClientError: Error {
