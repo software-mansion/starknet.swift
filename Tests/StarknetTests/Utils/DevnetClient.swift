@@ -6,14 +6,14 @@ protocol DevnetClientProtocol {
     var feederGatewayUrl: String { get }
     var rpcUrl: String { get }
     
-    func start()
+    func start() async throws
     func close()
     
-    func prefundAccount(address: Felt)
-    func deployAccount(name: String) -> DeployAccountResult
-    func deployContract(contractPath: String) -> TransactionResult
-    func declareContract(contractPath: String) -> TransactionResult
-    func readAccountDetails(accountName: String) -> AccountDetails
+    func prefundAccount(address: Felt) throws
+    func deployAccount(name: String) throws -> DeployAccountResult
+    func deployContract(contractPath: String) throws -> TransactionResult
+    func declareContract(contractPath: String) throws -> TransactionResult
+    func readAccountDetails(accountName: String) throws -> AccountDetails
 }
 
 struct AccountDetails: Codable{
@@ -58,6 +58,10 @@ struct DeployAccountResult{
 
 enum DevnetClientError: Error {
     case invalidTestPlatform
+    case devnetEnvironmentVariableNotSet
+    case devnetProcessError
+    case portInUse
+    case devnetProcessNotRunning
 }
 
 // Due to DevnetClient being albe to run only on a macos, this
@@ -65,9 +69,9 @@ enum DevnetClientError: Error {
 func makeDevnetClient() throws -> DevnetClientProtocol {
 #if os(macOS)
     return DevnetClient()
-#endif
-    
+#else
     throw DevnetClientError.invalidTestPlatform
+#endif
 }
 
 #if os(macOS)
@@ -80,17 +84,17 @@ class DevnetClient: DevnetClientProtocol {
     private let accountDirectory: URL
     private let baseUrl: String
    
-    private var isDevnetRunning = false
     private var devnetProcess: Process!
     
     let gatewayUrl: String
     let feederGatewayUrl: String
     let rpcUrl: String
     
-    init(_host: String = "0.0.0.0", _port: Int = 5050, _seed: Int = 1053545547) {
-        host = _host
-        port = _port
-        seed = _seed
+    init(host: String = "0.0.0.0", port: Int = 5050, seed: Int = 1053545547) {
+        self.host = host
+        self.port = port
+        self.seed = seed
+
         baseUrl = "http://\(host):\(port)"
         gatewayUrl = "\(baseUrl)/gateway"
         feederGatewayUrl = "\(baseUrl)/feeder_gateway"
@@ -99,32 +103,34 @@ class DevnetClient: DevnetClientProtocol {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentsDirectory = paths[0]
         let docURL = URL(string: documentsDirectory)!
+
         accountDirectory = docURL.appendingPathComponent("devnet/test")
     }
-    
-    public func start(){
-        
+
+    public func start() async throws {
         let arguments = "--host \(host) --port \(port) --seed \(seed)"
-        
+
         // This kills any zombie devnet processes left over from previous
         // test runs, if any.
         let task = Process()
         task.arguments = [
             "-c",
             "pkill -f starknet-devnet",
-            arguments]
-        
+        ]
+
         task.launchPath = "/bin/sh"
         task.launch()
         task.waitUntilExit()
         
         // For some reason PATH used for executing shell commands in swift differs from
         // PATH in the system. Currently DEVNET_PATH must be set locally.
-        let command = "\(ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "")/starknet-devnet"
-        
+        guard let command = ProcessInfo.processInfo.environment["DEVNET_PATH"] else {
+            throw DevnetClientError.devnetEnvironmentVariableNotSet
+        }
+
         devnetProcess = Process()
         let pipe = Pipe()
-            
+
         devnetProcess.standardOutput = pipe
         devnetProcess.standardError = pipe
         devnetProcess.arguments = [
@@ -132,13 +138,25 @@ class DevnetClient: DevnetClientProtocol {
             "-c",
             command,
             arguments]
-        
+
         devnetProcess.launchPath = "/bin/sh"
         devnetProcess.standardInput = nil
         devnetProcess.launch()
-        
-        isDevnetRunning = true
-        
+
+        try await Task.sleep(nanoseconds: 3 * UInt64(Double(NSEC_PER_SEC)))
+
+        guard devnetProcess.isRunning else {
+            throw DevnetClientError.devnetProcessError
+        }
+
+        guard let output = String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) else {
+            throw DevnetClientError.devnetProcessError
+        }
+
+        if output.contains("Connection in use") {
+            throw DevnetClientError.portInUse
+        }
+
         if !FileManager.default.fileExists(atPath: accountDirectory.absoluteString) {
             do {
                 try FileManager.default.createDirectory(atPath: accountDirectory.absoluteString, withIntermediateDirectories: true, attributes: nil)
@@ -155,19 +173,19 @@ class DevnetClient: DevnetClientProtocol {
     }
     
     public func close(){
-        if(!isDevnetRunning){
+        guard devnetProcess.isRunning else {
             return
         }
-        
+
         devnetProcess.terminate()
-        
         // Wait for the process to be terminated
         devnetProcess.waitUntilExit()
-        isDevnetRunning = false
     }
     
     // needs finishing
-    public func prefundAccount(address: Felt) {
+    public func prefundAccount(address: Felt) throws {
+        try guardDevnetIsRunning()
+
         let url = URL(string: "http://127.0.0.1:5050/mint")
         /*let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
             (header: "Content-Type", value: "application/json"),
@@ -200,7 +218,9 @@ class DevnetClient: DevnetClientProtocol {
         task.resume()
     }
     
-    public func deployAccount(name: String) -> DeployAccountResult{
+    public func deployAccount(name: String) throws -> DeployAccountResult {
+        try guardDevnetIsRunning()
+
         let params = [
             "--account_dir",
             accountDirectory.absoluteString,
@@ -228,8 +248,10 @@ class DevnetClient: DevnetClientProtocol {
         return DeployAccountResult(details: details, txHash: tx.hash)
     }
     
-    public func deployContract(contractPath: String) -> TransactionResult {
-        let classHash = declareContract(contractPath: contractPath).hash
+    public func deployContract(contractPath: String) throws -> TransactionResult {
+        try guardDevnetIsRunning()
+
+        let classHash = try declareContract(contractPath: contractPath).hash
         
         let params = [
             "--class_hash",
@@ -254,7 +276,9 @@ class DevnetClient: DevnetClientProtocol {
         return tx
     }
     
-    public func declareContract(contractPath: String) -> TransactionResult {
+    public func declareContract(contractPath: String) throws -> TransactionResult {
+        try guardDevnetIsRunning()
+
         let params = [
             "--contract",
             contractPath,
@@ -332,7 +356,13 @@ class DevnetClient: DevnetClientProtocol {
         let hash = Felt(fromHex: getValueFromLine(line: lines[offset + 1])) ?? 0
         return TransactionResult(address: address, hash: hash)
     }
-    
+
+    private func guardDevnetIsRunning() throws {
+        guard devnetProcess.isRunning else {
+            throw DevnetClientError.devnetProcessNotRunning
+        }
+    }
+
 }
 
 #endif
