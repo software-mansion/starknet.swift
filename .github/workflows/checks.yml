@@ -2,11 +2,11 @@ name: Checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: "*"
 
 jobs:
   test_and_lint:
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
 
