@@ -1,5 +1,4 @@
 import Foundation
-
 import Starknet
 
 protocol DevnetClientProtocol {
@@ -44,7 +43,6 @@ struct AccountDetails: Codable{
         self.publicKey = try container.decode(Felt.self, forKey: .publicKey)
         self.address = try container.decode(Felt.self, forKey: .address)
         self.salt = try container.decode(Felt.self, forKey: .salt)
-        //try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
     }
 }
 
@@ -79,7 +77,7 @@ class DevnetClient: DevnetClientProtocol {
     private let port: Int
     private let seed: Int
     // Paths still arent working properly, for now I'm using absolute paths
-    private let accountDirectory = "/Users/jakub/test"
+    private let accountDirectory: URL
     private let baseUrl: String
    
     private var isDevnetRunning = false
@@ -97,6 +95,11 @@ class DevnetClient: DevnetClientProtocol {
         gatewayUrl = "\(baseUrl)/gateway"
         feederGatewayUrl = "\(baseUrl)/feeder_gateway"
         rpcUrl = "\(baseUrl)/rpc"
+        
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        let documentsDirectory = paths[0]
+        let docURL = URL(string: documentsDirectory)!
+        accountDirectory = docURL.appendingPathComponent("devnet/test")
     }
     
     public func start(){
@@ -116,9 +119,8 @@ class DevnetClient: DevnetClientProtocol {
         task.waitUntilExit()
         
         // For some reason PATH used for executing shell commands in swift differs from
-        // PATH in the system. Currently full path to the program is needed
-        let command = "/Users/jakub/.asdf/shims/starknet-devnet"
-        //let command = "starknet-devnet"
+        // PATH in the system. Currently DEVNET_PATH must be set locally.
+        let command = "\(ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "")/starknet-devnet"
         
         devnetProcess = Process()
         let pipe = Pipe()
@@ -137,7 +139,19 @@ class DevnetClient: DevnetClientProtocol {
         
         isDevnetRunning = true
         
-        // TODO: clear accountDirectory folder
+        if !FileManager.default.fileExists(atPath: accountDirectory.absoluteString) {
+            do {
+                try FileManager.default.createDirectory(atPath: accountDirectory.absoluteString, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print(error.localizedDescription);
+            }
+        }
+        
+        let fileManager = FileManager.default
+        guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else { return }
+        for filePath in filePaths {
+            try? fileManager.removeItem(at: filePath)
+        }
     }
     
     public func close(){
@@ -155,6 +169,11 @@ class DevnetClient: DevnetClientProtocol {
     // needs finishing
     public func prefundAccount(address: Felt) {
         let url = URL(string: "http://127.0.0.1:5050/mint")
+        /*let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
+            (header: "Content-Type", value: "application/json"),
+            (header: "Accept", value: "application/json")
+        ])*/
+        
         guard let requestUrl = url else { fatalError() }
         // Prepare URL Request Object
         var request = URLRequest(url: requestUrl)
@@ -184,7 +203,7 @@ class DevnetClient: DevnetClientProtocol {
     public func deployAccount(name: String) -> DeployAccountResult{
         let params = [
             "--account_dir",
-            accountDirectory,
+            accountDirectory.absoluteString,
             "--account",
             name,
             "--wallet",
@@ -216,7 +235,7 @@ class DevnetClient: DevnetClientProtocol {
             "--class_hash",
             classHash.toHex(),
             "--account_dir",
-            accountDirectory,
+            accountDirectory.absoluteString,
             "--wallet",
             "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
             "--max_fee",
@@ -240,7 +259,7 @@ class DevnetClient: DevnetClientProtocol {
             "--contract",
             contractPath,
             "--account_dir",
-            accountDirectory,
+            accountDirectory.absoluteString,
             "--wallet",
             "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount"]
         let result = runStarknetCli(
@@ -267,7 +286,7 @@ class DevnetClient: DevnetClientProtocol {
         process.arguments = [
             "-l",
             "-c",
-            "/Users/jakub/.asdf/shims/starknet \(command) \(args) --gateway_url \(gatewayUrl) --feeder_gateway_url \(feederGatewayUrl) --network alpha-goerli"]
+            "\(ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "")/starknet \(command) \(args) --gateway_url \(gatewayUrl) --feeder_gateway_url \(feederGatewayUrl) --network alpha-goerli"]
         
         process.launchPath = "/bin/sh"
         process.standardInput = nil
