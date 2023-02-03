@@ -5,13 +5,13 @@
 //  Created by Bartosz Rybarski on 10/01/2023.
 //
 
-import SwiftUI
 import Starknet
+import SwiftUI
 
 @main
 struct StarknetDemoApp: App {
     @StateObject var accountsStore = AccountsStore()
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
