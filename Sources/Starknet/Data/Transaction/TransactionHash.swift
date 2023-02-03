@@ -11,7 +11,7 @@ public class StarknetTransactionHashCalculator {
         chainId: StarknetChainId,
         nonce: Felt
     ) -> Felt {
-        return StarknetCurve.pedersenOn(
+        StarknetCurve.pedersenOn(
             transactionType.encodedValue,
             version,
             contractAddress,
@@ -22,9 +22,9 @@ public class StarknetTransactionHashCalculator {
             nonce
         )
     }
-    
+
     public class func computeHash(of transaction: StarknetSequencerInvokeTransaction, chainId: StarknetChainId) -> Felt {
-        return computeHashCommon(
+        computeHashCommon(
             transactionType: transaction.type,
             version: transaction.version,
             contractAddress: transaction.senderAddress,
@@ -35,16 +35,16 @@ public class StarknetTransactionHashCalculator {
             nonce: transaction.nonce
         )
     }
-    
+
     public class func computeHash(of transaction: StarknetSequencerDeployAccountTransaction, chainId: StarknetChainId) -> Felt {
         let contractAddress = StarknetContractAddressCalculator.calculateFrom(
             classHash: transaction.classHash,
             calldata: transaction.constructorCalldata,
             salt: transaction.contractAddressSalt
         )
-        
+
         let calldata = [transaction.classHash, transaction.contractAddressSalt] + transaction.constructorCalldata
-        
+
         return computeHashCommon(
             transactionType: transaction.type,
             version: transaction.version,
