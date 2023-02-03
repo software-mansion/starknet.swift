@@ -18,9 +18,20 @@ jobs:
           key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
           restore-keys: ${{ runner.os }}-mint-
 
-      - name: Install package manager "Mint"
+      - name: Check if Mint is installed
+        id: mint-installed
+        run: brew list | grep mint
+        continue-on-error: true
+
+      - name: Upgrade package manager "Mint"
+        if: steps.mint-installed.outcome == 'success'
         run: |
-          brew upgrade mint || brew install mint || true
+          brew upgrade mint
+
+      - name: Install package manager "Mint"
+        if: steps.mint-installed.outcome != 'success'
+        run: |
+          brew install mint
 
       - name: Install command line tool (if not yet cached)
         if: steps.mint-cache.outputs.cache-hit != 'true'
