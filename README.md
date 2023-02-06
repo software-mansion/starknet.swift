@@ -1,6 +1,24 @@
+![alt text](logo.png)
+
 # starknet.swift
 StarkNet SDK for Swift and Objective-C
 
+### Installation
+
+#### XCode
+In XCode, go to your project, then select `Package Dependencies` tab. Click the + button, and in the window that just appeared search for `starknet.swift` package or paste the following url directly: `https://github.com/software-mansion/starknet.swift`. Select package and install it.
+
+#### Swift Package Manager
+
+Just add the package to the dependencies array in your `Package.swift` file:
+```Swift
+dependencies: [
+  ...
+  .package(url: "https://github.com/software-mansion/starknet.swift.git", from: "0.1.0")
+]
+
+Then add `starknet.swift` to the dependencies array of every target you want to use the package in.
+```
 ### Demo app
 In the `Examples` folder you can find a demo ios application.
 
