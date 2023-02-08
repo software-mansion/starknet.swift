@@ -54,16 +54,12 @@ struct PrefundPayload: Codable {
     let amount: UInt64
 }
 
-struct TransactionStatusResponse: Codable {
-    let status: String // Once TransactionReceipts are added, replace with transaction status enum.
-}
-
 enum DevnetClientError: Error {
     case invalidTestPlatform
-    case devnetEnvironmentVariableNotSet
-    case devnetProcessError
-    case portInUse
-    case devnetProcessNotRunning
+    case environmentVariablesNotSet
+    case devnetError
+    case portAlreadyInUse
+    case devnetNotRunning
     case timeout
     case transactionRejected
     case deserializationError

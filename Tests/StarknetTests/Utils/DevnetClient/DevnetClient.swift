@@ -67,7 +67,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             guard let devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"],
                   let starknetPath = ProcessInfo.processInfo.environment["STARKNET_PATH"]
             else {
-                throw DevnetClientError.devnetEnvironmentVariableNotSet
+                throw DevnetClientError.environmentVariablesNotSet
             }
 
             self.devnetPath = devnetPath
@@ -114,15 +114,15 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             try await sleep(seconds: 3)
 
             guard devnetProcess.isRunning else {
-                throw DevnetClientError.devnetProcessError
+                throw DevnetClientError.devnetError
             }
 
             guard let output = String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) else {
-                throw DevnetClientError.devnetProcessError
+                throw DevnetClientError.devnetError
             }
 
             if output.contains("Connection in use") {
-                throw DevnetClientError.portInUse
+                throw DevnetClientError.portAlreadyInUse
             }
 
             if !FileManager.default.fileExists(atPath: accountDirectory.absoluteString) {
@@ -165,13 +165,13 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             let (_, response) = try await URLSession.shared.data(for: request)
 
             guard let response = response as? HTTPURLResponse else {
-                throw DevnetClientError.devnetProcessError
+                throw DevnetClientError.devnetError
             }
 
             guard response.statusCode == 200 else {
                 print("Print request failed with status code: \(response.statusCode)")
 
-                throw DevnetClientError.devnetProcessError
+                throw DevnetClientError.devnetError
             }
         }
 
@@ -283,7 +283,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
 
                 print("Devnet cli error: \(error)")
 
-                throw DevnetClientError.devnetProcessError
+                throw DevnetClientError.devnetError
             }
 
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
@@ -324,7 +324,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
 
         private func guardDevnetIsRunning() throws {
             guard devnetProcess.isRunning else {
-                throw DevnetClientError.devnetProcessNotRunning
+                throw DevnetClientError.devnetNotRunning
             }
         }
 
