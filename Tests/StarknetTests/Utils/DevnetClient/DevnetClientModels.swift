@@ -63,4 +63,5 @@ enum DevnetClientError: Error {
     case timeout
     case transactionRejected
     case deserializationError
+    case missingResourceFile
 }

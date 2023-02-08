@@ -17,4 +17,8 @@ final class devnetClientTests: XCTestCase {
         let _ = try await client.deployAccount(name: "Account1")
         let _ = try await client.deployAccount()
     }
+
+    func testDeclareDeploy() async throws {
+        let _ = try await client.deployContract(contractName: "balance")
+    }
 }

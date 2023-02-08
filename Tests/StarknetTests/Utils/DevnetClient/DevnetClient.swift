@@ -12,8 +12,8 @@ protocol DevnetClientProtocol {
 
     func prefundAccount(address: Felt) async throws
     func deployAccount(name: String) async throws -> DeployAccountResult
-    func deployContract(contractPath: String) async throws -> TransactionResult
-    func declareContract(contractPath: String) async throws -> TransactionResult
+    func deployContract(contractName: String) async throws -> TransactionResult
+    func declareContract(contractName: String) async throws -> Felt
     func readAccountDetails(accountName: String) async throws -> AccountDetails
 
     func assertTransactionPassed(transactionHash: Felt) async throws
@@ -54,7 +54,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
         let feederGatewayUrl: String
         let rpcUrl: String
 
-        init(host: String = "0.0.0.0", port: Int = 5051, seed: Int = 1_053_545_547) throws {
+        init(host: String = "0.0.0.0", port: Int = 5050, seed: Int = 1_053_545_547) throws {
             self.host = host
             self.port = port
             self.seed = seed
@@ -73,11 +73,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             self.devnetPath = devnetPath
             self.starknetPath = starknetPath
 
-            let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-            let documentsDirectory = paths[0]
-            let docURL = URL(string: documentsDirectory)!
-
-            accountDirectory = docURL.appendingPathComponent("devnet/test")
+            accountDirectory = URL(string: "/tmp/starknet-swift/devnet")!
         }
 
         public func start() async throws {
@@ -125,19 +121,22 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
                 throw DevnetClientError.portAlreadyInUse
             }
 
-            if !FileManager.default.fileExists(atPath: accountDirectory.absoluteString) {
-                do {
-                    try FileManager.default.createDirectory(atPath: accountDirectory.absoluteString, withIntermediateDirectories: true, attributes: nil)
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
+//            if !FileManager.default.fileExists(atPath: accountDirectory.absoluteString) {
+//                do {
+//                    try FileManager.default.createDirectory(atPath: accountDirectory.absoluteString, withIntermediateDirectories: true, attributes: nil)
+//                } catch {
+//                    print(error.localizedDescription)
+//                }
+//            }
 
             let fileManager = FileManager.default
             guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else { return }
             for filePath in filePaths {
                 try? fileManager.removeItem(at: filePath)
             }
+
+            // Initialize new accounts file
+            let _ = try await deployAccount(name: "__default__")
         }
 
         public func close() {
@@ -208,10 +207,10 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             return DeployAccountResult(details: details, txHash: transactionResult.hash)
         }
 
-        public func deployContract(contractPath: String) async throws -> TransactionResult {
+        public func deployContract(contractName: String) async throws -> TransactionResult {
             try guardDevnetIsRunning()
 
-            let classHash = try await declareContract(contractPath: contractPath).hash
+            let classHash = try await declareContract(contractName: contractName)
 
             let params = [
                 "--class_hash",
@@ -236,8 +235,12 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             return transactionResult
         }
 
-        public func declareContract(contractPath: String) async throws -> TransactionResult {
+        public func declareContract(contractName: String) async throws -> Felt {
             try guardDevnetIsRunning()
+
+            guard let contractPath = Bundle.module.path(forResource: contractName, ofType: "json") else {
+                throw DevnetClientError.missingResourceFile
+            }
 
             let params = [
                 "--contract",
@@ -247,16 +250,17 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
                 "--wallet",
                 "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
             ]
+
             let result = try runStarknetCli(
                 command: "declare",
                 args: params.joined(separator: " ")
             )
 
             let array = result.components(separatedBy: CharacterSet.newlines)
-            let transactionResult = getTransactionResult(lines: array, offset: 2)
 
-            try await assertTransactionPassed(transactionHash: transactionResult.hash)
-            return transactionResult
+            let classHash = getValueFromLine(line: array[2])
+
+            return Felt(fromHex: classHash)!
         }
 
         private func runStarknetCli(command: String, args: String) throws -> String {
@@ -348,6 +352,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
                 case "ACCEPTED_ON_L2", "ACCEPTED_ON_L1":
                     return
                 case "REJECTED":
+                    print(response)
                     throw DevnetClientError.transactionRejected
                 default:
                     attempts -= 1
