@@ -1,13 +1,13 @@
 //
 //  DevnetClientModels.swift
-//  
+//
 //
 //  Created by Bartosz Rybarski on 08/02/2023.
 //
 
+import BigInt
 import Foundation
 import Starknet
-import BigInt
 
 struct AccountDetails: Codable {
     let privateKey: Felt
@@ -68,4 +68,3 @@ enum DevnetClientError: Error {
     case transactionRejected
     case deserializationError
 }
-
