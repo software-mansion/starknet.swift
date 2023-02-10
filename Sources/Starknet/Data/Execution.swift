@@ -31,7 +31,7 @@ public struct StarknetExecutionParams {
     }
 }
 
-func callsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
+public func starknetCallsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
     var wholeCalldata: [Felt] = []
     var callArray: [Felt] = []
 
