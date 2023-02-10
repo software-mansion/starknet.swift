@@ -68,7 +68,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "starknet-devnet"
             starknetPath = ProcessInfo.processInfo.environment["STARKNET_PATH"] ?? "starknet"
 
-            accountDirectory = URL(string: "/tmp/starknet-swift/devnet")!
+            let tmpPath = ProcessInfo.processInfo.environment["TMPDIR"] ?? "/tmp/starknet-swift"
+            accountDirectory = URL(string: tmpPath)!
 
             print("Devnet path: \(devnetPath)")
             print("Starknet path: \(starknetPath)")
