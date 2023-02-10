@@ -37,7 +37,7 @@ let package = Package(
             name: "StarknetTests",
             dependencies: ["Starknet", "BigInt"],
             resources: [
-                .copy("Resources/Compiled/balance.json"),
+                .process("Resources"),
             ]
         ),
     ]

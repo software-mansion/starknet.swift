@@ -50,6 +50,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Compile resource contracts
+        run: |
+          chmod +x ./Tests/StarknetTests/Resources/compileContracts.sh
+          ./Tests/StarknetTests/Resources/compileContracts.sh
+
       - name: Run tests
         run: |
           swift test --disable-sandbox
