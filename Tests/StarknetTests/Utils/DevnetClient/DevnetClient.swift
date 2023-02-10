@@ -110,10 +110,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             try await sleep(seconds: 3)
 
-            if let outputBytes = try pipe.fileHandleForReading.readToEnd(), let outputString = String(data: outputBytes, encoding: .utf8) {
-                print("Output bytes: \(outputString)")
-            }
-
             guard devnetProcess.isRunning else {
                 throw DevnetClientError.devnetError
             }
@@ -121,6 +117,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             guard let output = String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) else {
                 throw DevnetClientError.devnetError
             }
+
+            print("Output string: \(output)")
 
             if output.contains("Connection in use") {
                 throw DevnetClientError.portAlreadyInUse
