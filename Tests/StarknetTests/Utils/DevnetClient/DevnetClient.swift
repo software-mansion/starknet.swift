@@ -118,10 +118,12 @@ func makeDevnetClient() -> DevnetClientProtocol {
             print("Output string: \(output)")
 
             if output.contains("Connection in use") {
+                print("Port already in use")
                 throw DevnetClientError.portAlreadyInUse
             }
 
             guard devnetProcess.isRunning else {
+                print("Devnet process not running")
                 throw DevnetClientError.devnetError
             }
 
@@ -138,7 +140,9 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = devnetProcess
 
             // Initialize new accounts file
+            print("Before deploy account")
             let _ = try await deployAccount(name: "__default__")
+            print("After deploy account")
         }
 
         public func close() {
