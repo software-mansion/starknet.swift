@@ -110,6 +110,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             try await sleep(seconds: 3)
 
+            if let outputBytes = try pipe.fileHandleForReading.readToEnd(), let outputString = String(data: outputBytes, encoding: .utf8) {
+                print("Output bytes: \(outputString)")
+            }
+
             guard devnetProcess.isRunning else {
                 throw DevnetClientError.devnetError
             }
