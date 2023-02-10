@@ -198,23 +198,33 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
             ]
 
+            print("Before first cli call")
+
             let _ = try runStarknetCli(
                 command: "new_account",
                 args: params.joined(separator: " ")
             )
 
+            print("After first cli call")
+
             let details = readAccountDetails(accountName: name)
+            print("Before prefund")
             try await prefundAccount(address: details.address)
+            print("After prefund, before second cli")
 
             let result = try runStarknetCli(
                 command: "deploy_account",
                 args: params.joined(separator: " ")
             )
 
+            print("After second cli")
+
             let array = result.components(separatedBy: CharacterSet.newlines)
             let transactionResult = getTransactionResult(lines: array, offset: 3)
 
             try await assertTransactionPassed(transactionHash: transactionResult.hash)
+
+            print("After assert tx passed")
 
             return DeployAccountResult(details: details, txHash: transactionResult.hash)
         }
@@ -286,6 +296,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private func runStarknetCli(command: String, args: String) throws -> String {
             let process = Process()
 
+            print("Starting starknet cli process")
+
             let outputPipe = Pipe()
             let errorPipe = Pipe()
             process.standardOutput = outputPipe
@@ -300,6 +312,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.standardInput = nil
             process.launch()
             process.waitUntilExit()
+
+            print("Ending starknet cli process")
 
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
