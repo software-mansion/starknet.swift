@@ -57,6 +57,6 @@ jobs:
 
       - name: Run tests
         run: |
-          export DEVNET_PATH="$(where starknet-devnet | head -1)"
-          export STARKNET_PATH="$(where starknet | head -1)"
+          export DEVNET_PATH="$(which starknet-devnet)"
+          export STARKNET_PATH="$(which starknet)"
           swift test --disable-sandbox
