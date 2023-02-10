@@ -110,10 +110,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             try await sleep(seconds: 3)
 
-            guard devnetProcess.isRunning else {
-                throw DevnetClientError.devnetError
-            }
-
             guard let output = String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) else {
                 throw DevnetClientError.devnetError
             }
@@ -124,8 +120,16 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 throw DevnetClientError.portAlreadyInUse
             }
 
+            guard devnetProcess.isRunning else {
+                throw DevnetClientError.devnetError
+            }
+
             let fileManager = FileManager.default
-            guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else { return }
+            guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else {
+                print("Could not get contents of accounts directory")
+                throw DevnetClientError.devnetError
+            }
+
             for filePath in filePaths {
                 try? fileManager.removeItem(at: filePath)
             }
