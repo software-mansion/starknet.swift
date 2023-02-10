@@ -10,6 +10,8 @@ protocol DevnetClientProtocol {
     func start() async throws
     func close()
 
+    func isRunning() -> Bool
+
     func prefundAccount(address: Felt) async throws
     func deployAccount(name: String) async throws -> DeployAccountResult
     func deployContract(contractName: String) async throws -> TransactionResult
@@ -27,9 +29,9 @@ extension DevnetClientProtocol {
 
 // Due to DevnetClient being albe to run only on a macos, this
 // factory method will throw, when ran on any other platform.
-func makeDevnetClient() throws -> DevnetClientProtocol {
+func makeDevnetClient() -> DevnetClientProtocol {
     #if os(macOS)
-        return try DevnetClient()
+        return DevnetClient()
     #else
         throw DevnetClientError.invalidTestPlatform
     #endif
@@ -41,11 +43,10 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
         private let host: String
         private let port: Int
         private let seed: Int
-        // Paths still arent working properly, for now I'm using absolute paths
         private let accountDirectory: URL
         private let baseUrl: String
 
-        private var devnetProcess: Process!
+        private var devnetProcess: Process?
 
         private let devnetPath: String
         private let starknetPath: String
@@ -54,7 +55,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
         let feederGatewayUrl: String
         let rpcUrl: String
 
-        init(host: String = "0.0.0.0", port: Int = 5050, seed: Int = 1_053_545_547) throws {
+        init(host: String = "0.0.0.0", port: Int = 5050, seed: Int = 1_053_545_547) {
             self.host = host
             self.port = port
             self.seed = seed
@@ -64,20 +65,18 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             feederGatewayUrl = "\(baseUrl)/feeder_gateway"
             rpcUrl = "\(baseUrl)/rpc"
 
-            guard let devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"],
-                  let starknetPath = ProcessInfo.processInfo.environment["STARKNET_PATH"]
-            else {
-                throw DevnetClientError.environmentVariablesNotSet
-            }
-
-            self.devnetPath = devnetPath
-            self.starknetPath = starknetPath
+            devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "starknet-devnet"
+            starknetPath = ProcessInfo.processInfo.environment["STARKNET_PATH"] ?? "starknet"
 
             accountDirectory = URL(string: "/tmp/starknet-swift/devnet")!
         }
 
         public func start() async throws {
             let arguments = "--host \(host) --port \(port) --seed \(seed)"
+
+            guard !self.devnetPath.isEmpty, !self.starknetPath.isEmpty else {
+                throw DevnetClientError.environmentVariablesNotSet
+            }
 
             // This kills any zombie devnet processes left over from previous
             // test runs, if any.
@@ -91,7 +90,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             task.launch()
             task.waitUntilExit()
 
-            devnetProcess = Process()
+            let devnetProcess = Process()
             let pipe = Pipe()
 
             devnetProcess.standardOutput = pipe
@@ -99,8 +98,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             devnetProcess.arguments = [
                 "-l",
                 "-c",
-                devnetPath,
-                arguments,
+                "\(devnetPath) \(arguments)",
             ]
 
             devnetProcess.launchPath = "/bin/sh"
@@ -121,31 +119,31 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
                 throw DevnetClientError.portAlreadyInUse
             }
 
-//            if !FileManager.default.fileExists(atPath: accountDirectory.absoluteString) {
-//                do {
-//                    try FileManager.default.createDirectory(atPath: accountDirectory.absoluteString, withIntermediateDirectories: true, attributes: nil)
-//                } catch {
-//                    print(error.localizedDescription)
-//                }
-//            }
-
             let fileManager = FileManager.default
             guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else { return }
             for filePath in filePaths {
                 try? fileManager.removeItem(at: filePath)
             }
 
+            self.devnetProcess = devnetProcess
+
             // Initialize new accounts file
             let _ = try await deployAccount(name: "__default__")
         }
 
         public func close() {
-            guard devnetProcess.isRunning else {
+            guard devnetProcess != nil else {
                 return
             }
 
-            devnetProcess.terminate()
-            devnetProcess.waitUntilExit()
+            guard devnetProcess!.isRunning else {
+                return
+            }
+
+            devnetProcess!.terminate()
+            devnetProcess!.waitUntilExit()
+
+            self.devnetProcess = nil
         }
 
         public func prefundAccount(address: Felt) async throws {
@@ -263,6 +261,14 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
             return Felt(fromHex: classHash)!
         }
 
+        public func isRunning() -> Bool {
+            if let devnetProcess, devnetProcess.isRunning {
+                return true
+            }
+
+            return false
+        }
+
         private func runStarknetCli(command: String, args: String) throws -> String {
             let process = Process()
 
@@ -327,7 +333,7 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
         }
 
         private func guardDevnetIsRunning() throws {
-            guard devnetProcess.isRunning else {
+            guard isRunning() else {
                 throw DevnetClientError.devnetNotRunning
             }
         }
@@ -352,7 +358,6 @@ func makeDevnetClient() throws -> DevnetClientProtocol {
                 case "ACCEPTED_ON_L2", "ACCEPTED_ON_L1":
                     return
                 case "REJECTED":
-                    print(response)
                     throw DevnetClientError.transactionRejected
                 default:
                     attempts -= 1

@@ -50,12 +50,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run devnet # Temporary solution until we have the DevnetClient working
-        run: |
-          starknet-devnet --seed 0 &
-        env:
-          PORT: 5050
-
       - name: Run tests
         run: |
-          swift test
+          swift test --disable-sandbox
