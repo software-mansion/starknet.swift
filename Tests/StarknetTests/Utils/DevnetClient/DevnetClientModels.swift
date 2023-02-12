@@ -64,4 +64,5 @@ enum DevnetClientError: Error {
     case transactionRejected
     case deserializationError
     case missingResourceFile
+    case accountNotFound
 }

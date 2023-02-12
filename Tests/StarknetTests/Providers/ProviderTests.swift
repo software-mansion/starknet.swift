@@ -12,21 +12,16 @@ final class ProviderTests: XCTestCase {
     var provider: StarknetProviderProtocol!
 
     override class func setUp() {
-        print("Before class set up")
         super.setUp()
         devnetClient = makeDevnetClient()
-        print("After class set up")
     }
 
     override class func tearDown() {
-        print("Before class tear down")
         super.tearDown()
         devnetClient.close()
-        print("After class tear down")
     }
 
     override func setUp() async throws {
-        print("Before local set up")
         try await super.setUp()
 
         if !Self.devnetClient.isRunning() {
@@ -34,7 +29,6 @@ final class ProviderTests: XCTestCase {
         }
 
         provider = makeStarknetProvider(url: Self.devnetClient.rpcUrl)
-        print("After local set up")
     }
 
     func makeStarknetProvider(url: String) -> StarknetProviderProtocol {

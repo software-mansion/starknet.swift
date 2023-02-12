@@ -16,7 +16,7 @@ protocol DevnetClientProtocol {
     func deployAccount(name: String) async throws -> DeployAccountResult
     func deployContract(contractName: String) async throws -> TransactionResult
     func declareContract(contractName: String) async throws -> Felt
-    func readAccountDetails(accountName: String) async throws -> AccountDetails
+    func readAccountDetails(accountName: String) throws -> AccountDetails
 
     func assertTransactionPassed(transactionHash: Felt) async throws
 }
@@ -70,9 +70,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             let tmpPath = ProcessInfo.processInfo.environment["TMPDIR"] ?? "/tmp/starknet-swift"
             accountDirectory = URL(string: tmpPath)!
-
-            print("Devnet path: \(devnetPath)")
-            print("Starknet path: \(starknetPath)")
         }
 
         public func start() async throws {
@@ -115,21 +112,16 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 throw DevnetClientError.devnetError
             }
 
-            print("Output string: \(output)")
-
             if output.contains("Connection in use") {
-                print("Port already in use")
                 throw DevnetClientError.portAlreadyInUse
             }
 
             guard devnetProcess.isRunning else {
-                print("Devnet process not running")
                 throw DevnetClientError.devnetError
             }
 
             let fileManager = FileManager.default
             guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else {
-                print("Could not get contents of accounts directory")
                 throw DevnetClientError.devnetError
             }
 
@@ -140,9 +132,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = devnetProcess
 
             // Initialize new accounts file
-            print("Before deploy account")
             let _ = try await deployAccount(name: "__default__")
-            print("After deploy account")
         }
 
         public func close() {
@@ -175,23 +165,13 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             var response: URLResponse?
 
-            do {
-                (_, response) = try await URLSession.shared.data(for: request)
-
-            } catch let e {
-                print("Error when making prefund call: \(e)")
-                throw e
-            }
+            (_, response) = try await URLSession.shared.data(for: request)
 
             guard let response = response as? HTTPURLResponse else {
-                print("No response for prefund account")
-
                 throw DevnetClientError.devnetError
             }
 
             guard response.statusCode == 200 else {
-                print("Print request failed with status code: \(response.statusCode)")
-
                 throw DevnetClientError.devnetError
             }
         }
@@ -208,33 +188,23 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
             ]
 
-            print("Before first cli call")
-
             let _ = try runStarknetCli(
                 command: "new_account",
                 args: params.joined(separator: " ")
             )
 
-            print("After first cli call")
-
-            let details = readAccountDetails(accountName: name)
-            print("Before prefund")
+            let details = try readAccountDetails(accountName: name)
             try await prefundAccount(address: details.address)
-            print("After prefund, before second cli")
 
             let result = try runStarknetCli(
                 command: "deploy_account",
                 args: params.joined(separator: " ")
             )
 
-            print("After second cli")
-
             let array = result.components(separatedBy: CharacterSet.newlines)
             let transactionResult = getTransactionResult(lines: array, offset: 3)
 
             try await assertTransactionPassed(transactionHash: transactionResult.hash)
-
-            print("After assert tx passed")
 
             return DeployAccountResult(details: details, txHash: transactionResult.hash)
         }
@@ -306,8 +276,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private func runStarknetCli(command: String, args: String) throws -> String {
             let process = Process()
 
-            print("Starting starknet cli process")
-
             let outputPipe = Pipe()
             let errorPipe = Pipe()
             process.standardOutput = outputPipe
@@ -323,13 +291,9 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.launch()
             process.waitUntilExit()
 
-            print("Ending starknet cli process")
-
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let error = String(decoding: errorData, as: UTF8.self)
-
-                print("Devnet cli error: \(error)")
 
                 throw DevnetClientError.devnetError
             }
@@ -342,21 +306,20 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         typealias AccountDetailsResponse = [String: [String: AccountDetails]]
 
-        public func readAccountDetails(accountName: String) -> AccountDetails {
+        public func readAccountDetails(accountName: String) throws -> AccountDetails {
             let result = AccountDetails(privateKey: 0, publicKey: 0, address: 0, salt: 0)
             let filename = "\(accountDirectory)/starknet_open_zeppelin_accounts.json"
 
-            do {
-                let contents = try String(contentsOfFile: filename)
-                if let data = contents.data(using: .utf8) {
-                    if let response = try? JSONDecoder().decode(AccountDetailsResponse.self, from: data) {
-                        return (response["alpha-goerli"]?[accountName])!
-                    }
-                }
+            let contents = try String(contentsOfFile: filename)
 
-            } catch {}
+            if let data = contents.data(using: .utf8),
+               let response = try? JSONDecoder().decode(AccountDetailsResponse.self, from: data),
+               let account = response["alpha-goerli"]?[accountName]
+            {
+                return account
+            }
 
-            return result
+            throw DevnetClientError.accountNotFound
         }
 
         private func getValueFromLine(line: String, index: Int = 1) -> String {
