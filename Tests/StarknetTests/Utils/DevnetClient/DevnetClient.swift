@@ -173,9 +173,19 @@ func makeDevnetClient() -> DevnetClientProtocol {
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
 
-            let (_, response) = try await URLSession.shared.data(for: request)
+            var response: URLResponse?
+
+            do {
+                (_, response) = try await URLSession.shared.data(for: request)
+
+            } catch let e {
+                print("Error when making prefund call: \(e)")
+                throw e
+            }
 
             guard let response = response as? HTTPURLResponse else {
+                print("No response for prefund account")
+
                 throw DevnetClientError.devnetError
             }
 
