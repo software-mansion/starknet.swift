@@ -9,9 +9,10 @@ public protocol StarknetAccountProtocol {
     /// - Parameters:
     ///  - calls: list of calls to be signed.
     ///  - params: additional params for a given transaction
+    ///  - forFeeEstimation: Flag indicating whether different version of transaction should be used, to estmate fee
     ///
     /// - Returns: Signed SequencerInvokeTransaction
-    func sign(calls: [StarknetCall], params: StarknetExecutionParams) throws -> StarknetSequencerInvokeTransaction
+    func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction
 
     /// Create and sign deploy account transaction
     ///
@@ -20,8 +21,9 @@ public protocol StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     ///  - maxFee: max acceptable fee for the transaction
+    ///  - forFeeEstimation: Flag indicating whether different version of transaction should be used, to estmate fee
     /// - Returns: Signed sequencer deploy account transaction
-    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetSequencerDeployAccountTransaction
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction
 
     /// Execute list of calls
     ///
@@ -70,8 +72,8 @@ public extension StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///
     /// - Returns: Signed SequencerInvokeTransaction
-    func sign(call: StarknetCall, params: StarknetExecutionParams) throws -> StarknetSequencerInvokeTransaction {
-        try sign(calls: [call], params: params)
+    func sign(call: StarknetCall, params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction {
+        try sign(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
     }
 
     /// Execute a call

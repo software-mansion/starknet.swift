@@ -75,7 +75,7 @@ final class AccountTests: XCTestCase {
 
         sleep(2) // TODO: Replace with waiting for transaction when it's completed
 
-        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, maxFee: fee)
+        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, maxFee: fee, forFeeEstimation: false)
         try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
         sleep(2) // TODO: Replace with waiting for transaction when it's completed
