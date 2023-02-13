@@ -9,7 +9,7 @@ public protocol StarknetAccountProtocol {
     /// - Parameters:
     ///  - calls: list of calls to be signed.
     ///  - params: additional params for a given transaction
-    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; sush transaction can only be used for fee estimation
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed SequencerInvokeTransaction
     func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction
@@ -21,7 +21,7 @@ public protocol StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     ///  - maxFee: max acceptable fee for the transaction
-    ///  - forFeeEstimation: Flag indicating whether different version of transaction should be used, to estmate fee
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed sequencer deploy account transaction
     func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction
 
@@ -83,6 +83,7 @@ public extension StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     ///  - maxFee: max acceptable fee for the transaction
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed sequencer deploy account transaction
     func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt, forFeeEstimation _: Bool) throws -> StarknetSequencerDeployAccountTransaction {
         try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, maxFee: maxFee, forFeeEstimation: false)
