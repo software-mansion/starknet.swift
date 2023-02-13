@@ -94,7 +94,7 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
         let fee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
-        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, maxFee: fee)
+        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, maxFee: fee, forFeeEstimation: false)
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
         try await Self.devnetClient.assertTransactionPassed(transactionHash: response.transactionHash)
