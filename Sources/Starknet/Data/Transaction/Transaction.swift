@@ -3,7 +3,7 @@ import Foundation
 public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt = .one
+    public let version: Felt
 
     public let senderAddress: Felt
 
@@ -25,12 +25,13 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
         case nonce
     }
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, version: Felt) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
         self.maxFee = maxFee
         self.nonce = nonce
+        self.version = version
     }
 
     public init(from decoder: Decoder) throws {
@@ -41,6 +42,7 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.version = try container.decode(Felt.self, forKey: .version)
 
         try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
     }
@@ -49,7 +51,7 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
 public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt = .one
+    public let version: Felt
 
     public let senderAddress: Felt
 
@@ -63,12 +65,13 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
 
     public let hash: Felt
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, hash: Felt) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, version: Felt, hash: Felt) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
         self.maxFee = maxFee
         self.nonce = nonce
+        self.version = version
         self.hash = hash
     }
 
@@ -79,6 +82,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
             signature: sequencerTransaction.signature,
             maxFee: sequencerTransaction.maxFee,
             nonce: sequencerTransaction.nonce,
+            version: sequencerTransaction.version,
             hash: hash
         )
     }
@@ -101,6 +105,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.version = try container.decode(Felt.self, forKey: .version)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 
         try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
@@ -110,7 +115,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
 public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .deployAccount
 
-    public let version: Felt = .one
+    public let version: Felt
 
     public let signature: StarknetSignature
 
@@ -124,13 +129,14 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
 
     public let classHash: Felt
 
-    public init(signature: StarknetSignature, maxFee: Felt, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt) {
+    public init(signature: StarknetSignature, maxFee: Felt, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, version: Felt) {
         self.signature = signature
         self.maxFee = maxFee
         self.nonce = nonce
         self.contractAddressSalt = contractAddressSalt
         self.constructorCalldata = constructorCalldata
         self.classHash = classHash
+        self.version = version
     }
 
     public init(from decoder: Decoder) throws {
@@ -141,6 +147,7 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
         self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
         self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.version = try container.decode(Felt.self, forKey: .version)
 
         try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
     }
@@ -160,7 +167,7 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
 public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
     public let type: StarknetTransactionType = .deployAccount
 
-    public let version: Felt = .one
+    public let version: Felt
 
     public let signature: StarknetSignature
 
@@ -176,13 +183,14 @@ public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
 
     public let hash: Felt
 
-    public init(signature: StarknetSignature, maxFee: Felt, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, hash: Felt) {
+    public init(signature: StarknetSignature, maxFee: Felt, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, version: Felt, hash: Felt) {
         self.signature = signature
         self.maxFee = maxFee
         self.nonce = nonce
         self.contractAddressSalt = contractAddressSalt
         self.constructorCalldata = constructorCalldata
         self.classHash = classHash
+        self.version = version
         self.hash = hash
     }
 
@@ -194,6 +202,7 @@ public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
             contractAddressSalt: sequencerTransaction.contractAddressSalt,
             constructorCalldata: sequencerTransaction.constructorCalldata,
             classHash: sequencerTransaction.classHash,
+            version: sequencerTransaction.version,
             hash: hash
         )
     }
@@ -206,6 +215,7 @@ public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
         self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
         self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.version = try container.decode(Felt.self, forKey: .version)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 
         try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
@@ -234,14 +244,9 @@ public enum StarknetTransactionDecodingError: Error {
 internal extension StarknetSequencerTransaction {
     func verifyTransactionIdentifiers<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
         let type = try container.decode(StarknetTransactionType.self, forKey: T(stringValue: "type")!)
-        let version = try container.decode(Felt.self, forKey: T(stringValue: "version")!)
 
         guard type == self.type else {
             throw StarknetTransactionDecodingError.invalidType
-        }
-
-        guard version == self.version else {
-            throw StarknetTransactionDecodingError.invalidVersion
         }
     }
 }
