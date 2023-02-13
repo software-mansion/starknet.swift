@@ -9,7 +9,7 @@ public protocol StarknetAccountProtocol {
     /// - Parameters:
     ///  - calls: list of calls to be signed.
     ///  - params: additional params for a given transaction
-    ///  - forFeeEstimation: Flag indicating whether different version of transaction should be used, to estmate fee
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; sush transaction can only be used for fee estimation
     ///
     /// - Returns: Signed SequencerInvokeTransaction
     func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction
