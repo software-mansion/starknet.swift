@@ -3,7 +3,10 @@ import Foundation
 
 public class StarknetAccount: StarknetAccountProtocol {
     private let version = Felt.one
-    private let estimateVersion = Felt(BigUInt(2).power(128).advanced(by: BigInt(1)))!
+
+    private var estimateVersion: Felt {
+        Felt(BigUInt(2).power(128).advanced(by: BigInt(version.value)))!
+    }
 
     public let address: Felt
 
