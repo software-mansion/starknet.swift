@@ -37,7 +37,7 @@ public class StarknetAccount: StarknetAccountProtocol {
 
     public func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction {
         let version = forFeeEstimation ? estimateVersion : version
-        let calldata = callsToExecuteCalldata(calls: calls)
+        let calldata = starknetCallsToExecuteCalldata(calls: calls)
 
         let sequencerTransaction = makeSequencerInvokeTransaction(calldata: calldata, signature: [], params: params, version: version)
 
