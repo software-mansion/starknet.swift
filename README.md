@@ -49,7 +49,7 @@ commands:
 export DEVNET_PATH="$(which starknet-devnet)"
 export STARKNET_PATH="$(which starknet)"
 ```
-This assumes you already have installed `starknet-devnet` and `cairo-lang` python packages.
+This assumes you already have installed [`starknet-devnet`](https://github.com/Shard-Labs/starknet-devnet) and [`cairo-lang`](https://www.cairo-lang.org/docs/quickstart.html) python packages.
 
 #### Binary dependencies
 This project depends on two binary frameworks.
