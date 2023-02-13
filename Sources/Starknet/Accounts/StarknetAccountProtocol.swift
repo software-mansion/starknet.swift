@@ -85,7 +85,7 @@ public extension StarknetAccountProtocol {
     ///  - maxFee: max acceptable fee for the transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed sequencer deploy account transaction
-    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt, forFeeEstimation _: Bool) throws -> StarknetSequencerDeployAccountTransaction {
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetSequencerDeployAccountTransaction {
         try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, maxFee: maxFee, forFeeEstimation: false)
     }
 
