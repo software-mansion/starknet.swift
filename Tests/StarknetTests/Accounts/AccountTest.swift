@@ -11,16 +11,35 @@ final class AccountTests: XCTestCase {
      To run, make sure you're running starknet-devnet on port 5050, with seed 0
      */
 
+    static var devnetClient: DevnetClientProtocol!
+
     var provider: StarknetProviderProtocol!
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
 
-    override func setUp() {
-        let url = "http://127.0.0.1:5050/rpc"
+    override func setUp() async throws {
+        try await super.setUp()
 
-        provider = StarknetProvider(starknetChainId: .testnet, url: url)!
-        signer = StarkCurveSigner(privateKey: "0xe3e70682c2094cac629f6fbed82c07cd")!
-        account = StarknetAccount(address: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a", signer: signer, provider: provider)
+        if !Self.devnetClient.isRunning() {
+            try await Self.devnetClient.start()
+        }
+
+        provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
+        signer = StarkCurveSigner(privateKey: "0x5421eb02ce8a5a972addcd89daefd93c")!
+        account = StarknetAccount(address: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8", signer: signer, provider: provider)
+    }
+
+    override class func setUp() {
+        super.setUp()
+        devnetClient = makeDevnetClient()
+    }
+
+    override class func tearDown() {
+        super.tearDown()
+
+        if let devnetClient = Self.devnetClient {
+            devnetClient.close()
+        }
     }
 
     func testGetNonce() async throws {
@@ -29,25 +48,27 @@ final class AccountTests: XCTestCase {
 
     func testExecute() async throws {
         let calldata: [Felt] = [
-            "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
+            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
             1000,
             0,
         ]
 
         let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let _ = try await account.execute(call: call)
+        let result = try await account.execute(call: call)
+
+        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
     }
 
     func testExecuteMultipleCalls() async throws {
         let calldata1: [Felt] = [
-            "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
+            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
             1000,
             0,
         ]
 
         let calldata2: [Felt] = [
-            "0x7447084f620ba316a42c72ca5b8eefb3fe9a05ca5fe6430c65a69ecc4349b3b",
+            "0x2000c94da25e3772c290db227f1f57358c65d3bdda517dcd3dcbdbb04141900",
             1000,
             0,
         ]
@@ -55,7 +76,9 @@ final class AccountTests: XCTestCase {
         let call1 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
         let call2 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
-        let _ = try await account.execute(calls: [call1, call2])
+        let result = try await account.execute(calls: [call1, call2])
+
+        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
     }
 
     func testDeployAccount() async throws {
@@ -66,19 +89,15 @@ final class AccountTests: XCTestCase {
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
         let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider)
 
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
+
         let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
         let fee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
-        let prefundCall = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: [newAccountAddress] + fee.toUInt256())
+        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, maxFee: fee, forFeeEstimation: false)
+        let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
-        try await account.execute(call: prefundCall)
-
-        sleep(2) // TODO: Replace with waiting for transaction when it's completed
-
-        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, maxFee: fee)
-        try await provider.addDeployAccountTransaction(deployAccountTransaction)
-
-        sleep(2) // TODO: Replace with waiting for transaction when it's completed
+        try await Self.devnetClient.assertTransactionPassed(transactionHash: response.transactionHash)
 
         let nonce = try await newAccount.getNonce()
 

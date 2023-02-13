@@ -4,7 +4,7 @@ import XCTest
 
 final class TransactionTests: XCTestCase {
     func testInvokeTransactionEncoding() throws {
-        let invoke = StarknetSequencerInvokeTransaction(senderAddress: "0x123", calldata: [1, 2], signature: [1, 2], maxFee: "0x859", nonce: 0)
+        let invoke = StarknetSequencerInvokeTransaction(senderAddress: "0x123", calldata: [1, 2], signature: [1, 2], maxFee: "0x859", nonce: 0, version: .one)
 
         let encoder = JSONEncoder()
 
@@ -40,11 +40,5 @@ final class TransactionTests: XCTestCase {
         """.data(using: .utf8)!
 
         XCTAssertThrowsError(try decoder.decode(StarknetSequencerInvokeTransaction.self, from: json2))
-
-        let json3 = """
-        {"sender_address":"0x123","calldata":["0x1","0x2"],"max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"INVOKE","version":"0x0"}
-        """.data(using: .utf8)!
-
-        XCTAssertThrowsError(try decoder.decode(StarknetSequencerInvokeTransaction.self, from: json3))
     }
 }
