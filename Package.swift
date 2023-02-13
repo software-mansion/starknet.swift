@@ -35,7 +35,10 @@ let package = Package(
         .binaryTarget(name: "CryptoRs", path: "Frameworks/CryptoRs.xcframework"),
         .testTarget(
             name: "StarknetTests",
-            dependencies: ["Starknet", "BigInt"]
+            dependencies: ["Starknet", "BigInt"],
+            resources: [
+                .process("Resources"),
+            ]
         ),
     ]
 )

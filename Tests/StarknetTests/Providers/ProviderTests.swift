@@ -8,31 +8,54 @@ final class ProviderTests: XCTestCase {
 
      To run, make sure you're running starknet-devnet on port 5050, with seed 0
      */
+    static var devnetClient: DevnetClientProtocol!
+    var provider: StarknetProviderProtocol!
 
-    func makeStarknetProvider() -> StarknetProviderProtocol {
-        let url = "http://127.0.0.1:5050/rpc"
-        return StarknetProvider(starknetChainId: .testnet, url: url)!
+    override class func setUp() {
+        super.setUp()
+        devnetClient = makeDevnetClient()
+    }
+
+    override class func tearDown() {
+        super.tearDown()
+        devnetClient.close()
+    }
+
+    override func setUp() async throws {
+        try await super.setUp()
+
+        if !Self.devnetClient.isRunning() {
+            try await Self.devnetClient.start()
+        }
+
+        provider = makeStarknetProvider(url: Self.devnetClient.rpcUrl)
+    }
+
+    func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
+        StarknetProvider(starknetChainId: .testnet, url: url)!
     }
 
     func testCall() async throws {
-        let provider = makeStarknetProvider()
-
         let call = StarknetCall(
-            contractAddress: Felt(fromHex: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")!,
+            contractAddress: Felt(fromHex: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8")!,
             entrypoint: starknetSelector(from: "getPublicKey"),
             calldata: []
         )
 
-        let result = try await provider.callContract(call)
+        do {
+            let result = try await provider.callContract(call)
 
-        XCTAssertEqual(result.count, 1)
+            XCTAssertEqual(result.count, 1)
+            XCTAssertEqual(result[0], Felt("0x738e76d6a8c3c66d9c9468276871dc6456b915ea2433a2a3bcd08ee15c39868"))
+        } catch let e {
+            print(e)
+            throw e
+        }
     }
 
     func testCallWithArguments() async throws {
-        let provider = makeStarknetProvider()
-
         let call = StarknetCall(
-            contractAddress: Felt(fromHex: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")!,
+            contractAddress: Felt(fromHex: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8")!,
             entrypoint: starknetSelector(from: "supportsInterface"),
             calldata: [Felt(2138)]
         )
@@ -43,14 +66,10 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetNonce() async throws {
-        let provider = makeStarknetProvider()
-
-        let _ = try await provider.getNonce(of: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a")
+        let _ = try await provider.getNonce(of: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8")
     }
 
     func testGetClassHash() async throws {
-        let provider = makeStarknetProvider()
-
         let classHash = try await provider.getClassHashAt(erc20Address)
 
         print(classHash)
