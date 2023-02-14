@@ -29,3 +29,13 @@ public struct StarknetDeployAccountResponse: Decodable, Equatable {
         case contractAddress = "contract_address"
     }
 }
+
+public struct StarknetBlockHashAndNumber: Decodable, Equatable {
+    public let blockHash: Felt
+    public let blockNumber: Int
+
+    enum CodingKeys: String, CodingKey {
+        case blockHash = "block_hash"
+        case blockNumber = "block_number"
+    }
+}

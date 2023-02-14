@@ -62,3 +62,6 @@ struct GetClassHashAtParams: Encodable {
         case blockId = "block_id"
     }
 }
+
+struct GetBlockNumberParams: Encodable {
+}

@@ -99,4 +99,20 @@ public class StarknetProvider: StarknetProviderProtocol {
 
         return result
     }
+    
+    public func getBlockNumber() async throws -> Int {
+        let params = GetBlockNumberParams()
+        
+        let result = try await makeRequest(method: .getBlockNumber, params: params, receive: Int.self)
+        
+        return result
+    }
+    
+    public func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber {
+        let params = GetBlockNumberParams()
+        
+        let result = try await makeRequest(method: .getBlockHashAndNumber, params: params, receive: StarknetBlockHashAndNumber.self)
+        
+        return result
+    }
 }

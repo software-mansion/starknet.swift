@@ -7,4 +7,6 @@ enum JsonRpcMethod: String, Encodable {
     case deployAccount = "starknet_addDeployAccountTransaction"
     case estimateFee = "starknet_estimateFee"
     case getClassHashAt = "starknet_getClassHashAt"
+    case getBlockNumber = "starknet_blockNumber"
+    case getBlockHashAndNumber = "starknet_blockHashAndNumber"
 }

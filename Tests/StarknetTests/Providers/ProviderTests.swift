@@ -74,4 +74,16 @@ final class ProviderTests: XCTestCase {
 
         print(classHash)
     }
+    
+    func testGetBlockNumber() async throws {
+        let blockNumber = try await provider.getBlockNumber()
+
+        print(blockNumber)
+    }
+    
+    func testGetBlockHashAndNumber() async throws {
+        let result = try await provider.getBlockHashAndNumber()
+
+        print(result)
+    }
 }
