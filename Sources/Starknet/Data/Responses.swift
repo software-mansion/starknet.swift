@@ -32,7 +32,7 @@ public struct StarknetDeployAccountResponse: Decodable, Equatable {
 
 public struct StarknetBlockHashAndNumber: Decodable, Equatable {
     public let blockHash: Felt
-    public let blockNumber: Int
+    public let blockNumber: UInt64
 
     enum CodingKeys: String, CodingKey {
         case blockHash = "block_hash"

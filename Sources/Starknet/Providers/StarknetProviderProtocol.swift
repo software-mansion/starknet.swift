@@ -60,7 +60,7 @@ public protocol StarknetProviderProtocol {
     /// Get the most recent accepted block number.
     ///
     /// - Returns: Number of the most recent accepted block
-    func getBlockNumber() async throws -> Int
+    func getBlockNumber() async throws -> UInt64
 
     /// Get the most recent accepted block hash and number.
     ///

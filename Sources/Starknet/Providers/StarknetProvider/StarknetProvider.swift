@@ -25,7 +25,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.init(starknetChainId: starknetChainId, url: url)
     }
 
-    private func makeRequest<U>(method: JsonRpcMethod, params: some Encodable, receive _: U.Type) async throws -> U where U: Decodable {
+    private func makeRequest<U>(method: JsonRpcMethod, params: some Encodable = EmptyEncodable(), receive _: U.Type) async throws -> U where U: Decodable {
         let rpcPayload = JsonRpcPayload(method: method, params: params)
 
         var response: JsonRpcResponse<U>
@@ -100,18 +100,14 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func getBlockNumber() async throws -> Int {
-        let params = GetBlockNumberParams()
-
-        let result = try await makeRequest(method: .getBlockNumber, params: params, receive: Int.self)
+    public func getBlockNumber() async throws -> UInt64 {
+        let result = try await makeRequest(method: .getBlockNumber, receive: UInt64.self)
 
         return result
     }
 
     public func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber {
-        let params = GetBlockNumberParams()
-
-        let result = try await makeRequest(method: .getBlockHashAndNumber, params: params, receive: StarknetBlockHashAndNumber.self)
+        let result = try await makeRequest(method: .getBlockHashAndNumber, receive: StarknetBlockHashAndNumber.self)
 
         return result
     }

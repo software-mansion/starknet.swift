@@ -63,4 +63,4 @@ struct GetClassHashAtParams: Encodable {
     }
 }
 
-struct GetBlockNumberParams: Encodable {}
+struct EmptyEncodable: Encodable {}
