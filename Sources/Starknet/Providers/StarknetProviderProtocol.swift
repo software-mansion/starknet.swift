@@ -56,6 +56,16 @@ public protocol StarknetProviderProtocol {
     ///  - blockId: id of the requested block
     /// - Returns: Class hash of the given contract
     func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) async throws -> Felt
+
+    /// Get the most recent accepted block number.
+    ///
+    /// - Returns: Number of the most recent accepted block
+    func getBlockNumber() async throws -> UInt64
+
+    /// Get the most recent accepted block hash and number.
+    ///
+    /// - Returns: Block hash and block number  of the most recent accepted block
+    func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
