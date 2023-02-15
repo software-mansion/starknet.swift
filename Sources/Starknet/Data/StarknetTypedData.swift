@@ -8,13 +8,54 @@
 import BigInt
 import Foundation
 
-enum TypedDataError: Error {
+enum StarknetTypedDataError: Error {
     case decodingError
     case dependencyNotDefined(String)
     case invalidShortString
     case encodingError
 }
 
+/// Sign message for off-chain usage. Follows standard proposed [here](https://github.com/argentlabs/argent-x/discussions/14)
+///
+/// ```swift
+/// let typedDataString = """
+/// {
+///     "types": {
+///         "StarkNetDomain": [
+///             {"name": "name", "type": "felt"},
+///             {"name": "version", "type": "felt"},
+///             {"name": "chainId", "type": "felt"},
+///         ],
+///         "Person": [
+///             {"name": "name", "type": "felt"},
+///             {"name": "wallet", "type": "felt"},
+///         ],
+///         "Mail": [
+///             {"name": "from", "type": "Person"},
+///             {"name": "to", "type": "Person"},
+///             {"name": "contents", "type": "felt"},
+///         ],
+///     },
+///     "primaryType": "Mail",
+///     "domain": {"name": "StarkNet Mail", "version": "1", "chainId": 1},
+///     "message": {
+///         "from": {
+///             "name": "Cow",
+///             "wallet": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+///         },
+///         "to": {
+///             "name": "Bob",
+///             "wallet": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+///         },
+///         "contents": "Hello, Bob!",
+///     },
+/// }
+/// """
+///
+/// let typedData = try JSONDecoder.decode(StarknetTypedData.self, from: typedDataString.data(using: .utf8)!)
+///
+/// let messageHash = try typedData.getMessageHash(accountAddress: "0x1234")
+/// ```
 public struct StarknetTypedData: Codable {
     public let types: [String: [TypeDeclaration]]
     public let primaryType: String
@@ -71,7 +112,7 @@ public struct StarknetTypedData: Codable {
 
     private func encode(dependency: String) throws -> String {
         guard let params = types[dependency] else {
-            throw TypedDataError.dependencyNotDefined(dependency)
+            throw StarknetTypedDataError.dependencyNotDefined(dependency)
         }
 
         let encodedParams = params.map {
@@ -126,19 +167,19 @@ public struct StarknetTypedData: Codable {
             return (typeName, try unwrapFelt(from: element))
         }
 
-        throw TypedDataError.decodingError
+        throw StarknetTypedDataError.decodingError
     }
 
     private func encode(data: [String: Element], forType typeName: String) throws -> [Felt] {
         var values: [Felt] = []
 
         guard let types = types[typeName] else {
-            throw TypedDataError.encodingError
+            throw StarknetTypedDataError.encodingError
         }
 
         try types.forEach { param in
             guard let element = data[param.name] else {
-                throw TypedDataError.encodingError
+                throw StarknetTypedDataError.encodingError
             }
 
             let (_, encodedValue) = try encode(element: element, forType: param.type)
@@ -162,11 +203,11 @@ public struct StarknetTypedData: Codable {
 
     public func getStructHash(typeName: String, data: String) throws -> Felt {
         guard let data = data.data(using: .utf8) else {
-            throw TypedDataError.decodingError
+            throw StarknetTypedDataError.decodingError
         }
 
         guard let dataDecoded = try? JSONDecoder().decode([String: Element].self, from: data) else {
-            throw TypedDataError.decodingError
+            throw StarknetTypedDataError.decodingError
         }
 
         return try getStructHash(typeName: typeName, data: dataDecoded)
@@ -221,7 +262,7 @@ public extension StarknetTypedData {
                     self = .string(string)
                 }
             } else {
-                throw TypedDataError.decodingError
+                throw StarknetTypedDataError.decodingError
             }
         }
 
@@ -243,7 +284,7 @@ public extension StarknetTypedData {
 private extension StarknetTypedData {
     func unwrapArray(from element: Element) throws -> [Element] {
         guard case let .array(array) = element else {
-            throw TypedDataError.decodingError
+            throw StarknetTypedDataError.decodingError
         }
 
         return array
@@ -251,7 +292,7 @@ private extension StarknetTypedData {
 
     func unwrapObject(from element: Element) throws -> [String: Element] {
         guard case let .object(object) = element else {
-            throw TypedDataError.decodingError
+            throw StarknetTypedDataError.decodingError
         }
 
         return object
@@ -263,11 +304,11 @@ private extension StarknetTypedData {
             return felt
         case let .string(string):
             guard let felt = Felt.fromShortString(string) else {
-                throw TypedDataError.decodingError
+                throw StarknetTypedDataError.decodingError
             }
             return felt
         default:
-            throw TypedDataError.decodingError
+            throw StarknetTypedDataError.decodingError
         }
     }
 }
