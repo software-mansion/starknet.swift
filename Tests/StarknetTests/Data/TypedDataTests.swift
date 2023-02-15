@@ -37,7 +37,7 @@ final class TypedDataTests: XCTestCase {
 
     func testMissingDependency() {
         let typedData = TypedData(
-            types: ["house": [TypedDataType(name: "fridge", type: "ice cream")]],
+            types: ["house": [TypedData.TypeDeclaration(name: "fridge", type: "ice cream")]],
             primaryType: "felt",
             domain: "{}",
             message: "{}"

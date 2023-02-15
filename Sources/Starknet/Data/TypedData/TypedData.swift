@@ -8,21 +8,6 @@
 import BigInt
 import Foundation
 
-public struct TypedDataType: Codable {
-    public let name: String
-    public let type: String
-
-    public init(name: String, type: String) {
-        self.name = name
-        self.type = type
-    }
-
-    public enum CodingKeys: String, CodingKey {
-        case name
-        case type
-    }
-}
-
 enum TypedDataError: Error {
     case decodingError
     case dependencyNotDefined(String)
@@ -30,59 +15,13 @@ enum TypedDataError: Error {
     case encodingError
 }
 
-public enum TDElement: Codable {
-    case object([String: TDElement])
-    case array([TDElement])
-    case string(String)
-    case felt(Felt)
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        if let object = try? container.decode([String: TDElement].self) {
-            self = .object(object)
-        } else if let array = try? container.decode([TDElement].self) {
-            self = .array(array)
-        } else if let felt = try? container.decode(Felt.self) {
-            self = .felt(felt)
-        } else if let uint = try? container.decode(UInt64.self),
-                  let felt = Felt(uint)
-        {
-            self = .felt(felt)
-        } else if let string = try? container.decode(String.self) {
-            if let uint = BigUInt(string),
-               let felt = Felt(uint)
-            {
-                self = .felt(felt)
-            } else {
-                self = .string(string)
-            }
-        } else {
-            throw TypedDataError.decodingError
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        switch self {
-        case let .string(string):
-            try string.encode(to: encoder)
-        case let .felt(felt):
-            try felt.encode(to: encoder)
-        case let .object(object):
-            try object.encode(to: encoder)
-        case let .array(array):
-            try array.encode(to: encoder)
-        }
-    }
-}
-
 public struct TypedData: Codable {
-    public let types: [String: [TypedDataType]]
+    public let types: [String: [TypeDeclaration]]
     public let primaryType: String
-    public let domain: [String: TDElement]
-    public let message: [String: TDElement]
+    public let domain: [String: Element]
+    public let message: [String: Element]
 
-    private init?(types: [String: [TypedDataType]], primaryType: String, domain: [String: TDElement], message: [String: TDElement]) {
+    private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: [String: Element], message: [String: Element]) {
         if types.keys.contains("felt") || types.keys.contains("felt*") {
             return nil
         }
@@ -93,13 +32,13 @@ public struct TypedData: Codable {
         self.message = message
     }
 
-    public init?(types: [String: [TypedDataType]], primaryType: String, domain: String, message _: String) {
+    public init?(types: [String: [TypeDeclaration]], primaryType: String, domain: String, message _: String) {
         guard let domainData = domain.data(using: .utf8), let messageData = domain.data(using: .utf8) else {
             return nil
         }
 
-        guard let domain = try? JSONDecoder().decode([String: TDElement].self, from: domainData),
-              let message = try? JSONDecoder().decode([String: TDElement].self, from: messageData)
+        guard let domain = try? JSONDecoder().decode([String: Element].self, from: domainData),
+              let message = try? JSONDecoder().decode([String: Element].self, from: messageData)
         else {
             return nil
         }
@@ -150,37 +89,7 @@ public struct TypedData: Codable {
         }.joined()
     }
 
-    private func unwrapArray(from element: TDElement) throws -> [TDElement] {
-        guard case let .array(array) = element else {
-            throw TypedDataError.decodingError
-        }
-
-        return array
-    }
-
-    private func unwrapObject(from element: TDElement) throws -> [String: TDElement] {
-        guard case let .object(object) = element else {
-            throw TypedDataError.decodingError
-        }
-
-        return object
-    }
-
-    private func unwrapFelt(from element: TDElement) throws -> Felt {
-        switch element {
-        case let .felt(felt):
-            return felt
-        case let .string(string):
-            guard let felt = Felt.fromShortString(string) else {
-                throw TypedDataError.decodingError
-            }
-            return felt
-        default:
-            throw TypedDataError.decodingError
-        }
-    }
-
-    private func encode(element: TDElement, forType typeName: String) throws -> (String, Felt) {
+    private func encode(element: Element, forType typeName: String) throws -> (String, Felt) {
         if types.keys.contains(typeName) {
             let object = try unwrapObject(from: element)
 
@@ -220,7 +129,7 @@ public struct TypedData: Codable {
         throw TypedDataError.decodingError
     }
 
-    private func encode(data: [String: TDElement], forType typeName: String) throws -> [Felt] {
+    private func encode(data: [String: Element], forType typeName: String) throws -> [Felt] {
         var values: [Felt] = []
 
         guard let types = types[typeName] else {
@@ -236,8 +145,6 @@ public struct TypedData: Codable {
             values.append(encodedValue)
         }
 
-        print(values)
-
         return values
     }
 
@@ -245,7 +152,7 @@ public struct TypedData: Codable {
         starknetSelector(from: try encode(type: typeName))
     }
 
-    public func getStructHash(typeName: String, data: [String: TDElement]) throws -> Felt {
+    public func getStructHash(typeName: String, data: [String: Element]) throws -> Felt {
         let encodedData = try encode(data: data, forType: typeName)
 
         print("Type hash: \(try getTypeHash(typeName: typeName))")
@@ -258,7 +165,7 @@ public struct TypedData: Codable {
             throw TypedDataError.decodingError
         }
 
-        guard let dataDecoded = try? JSONDecoder().decode([String: TDElement].self, from: data) else {
+        guard let dataDecoded = try? JSONDecoder().decode([String: Element].self, from: data) else {
             throw TypedDataError.decodingError
         }
 
@@ -272,6 +179,96 @@ public struct TypedData: Codable {
             accountAddress,
             try getStructHash(typeName: primaryType, data: message)
         )
+    }
+}
+
+public extension TypedData {
+    struct TypeDeclaration: Codable {
+        public let name: String
+        public let type: String
+
+        public init(name: String, type: String) {
+            self.name = name
+            self.type = type
+        }
+    }
+
+    enum Element: Codable {
+        case object([String: Element])
+        case array([Element])
+        case string(String)
+        case felt(Felt)
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+
+            if let object = try? container.decode([String: Element].self) {
+                self = .object(object)
+            } else if let array = try? container.decode([Element].self) {
+                self = .array(array)
+            } else if let felt = try? container.decode(Felt.self) {
+                self = .felt(felt)
+            } else if let uint = try? container.decode(UInt64.self),
+                      let felt = Felt(uint)
+            {
+                self = .felt(felt)
+            } else if let string = try? container.decode(String.self) {
+                if let uint = BigUInt(string),
+                   let felt = Felt(uint)
+                {
+                    self = .felt(felt)
+                } else {
+                    self = .string(string)
+                }
+            } else {
+                throw TypedDataError.decodingError
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            switch self {
+            case let .string(string):
+                try string.encode(to: encoder)
+            case let .felt(felt):
+                try felt.encode(to: encoder)
+            case let .object(object):
+                try object.encode(to: encoder)
+            case let .array(array):
+                try array.encode(to: encoder)
+            }
+        }
+    }
+}
+
+private extension TypedData {
+    func unwrapArray(from element: Element) throws -> [Element] {
+        guard case let .array(array) = element else {
+            throw TypedDataError.decodingError
+        }
+
+        return array
+    }
+
+    func unwrapObject(from element: Element) throws -> [String: Element] {
+        guard case let .object(object) = element else {
+            throw TypedDataError.decodingError
+        }
+
+        return object
+    }
+
+    func unwrapFelt(from element: Element) throws -> Felt {
+        switch element {
+        case let .felt(felt):
+            return felt
+        case let .string(string):
+            guard let felt = Felt.fromShortString(string) else {
+                throw TypedDataError.decodingError
+            }
+            return felt
+        default:
+            throw TypedDataError.decodingError
+        }
     }
 }
 
