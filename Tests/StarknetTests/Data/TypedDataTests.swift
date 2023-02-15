@@ -14,30 +14,19 @@ final class TypedDataTests: XCTestCase {
     static let tdString = loadTypedDataFromFile(name: "typed_data_long_string_example")!
     static let tdStructArr = loadTypedDataFromFile(name: "typed_data_struct_array_example")!
 
-    static func loadTypedDataFromFile(name: String) -> TypedData? {
-        guard let url = Bundle.module.url(forResource: name, withExtension: "json"),
-              let contents = try? String(contentsOf: url),
-              let contentsData = contents.data(using: .utf8)
-        else {
-            return nil
-        }
-
-        return try? JSONDecoder().decode(TypedData.self, from: contentsData)
-    }
-
     func testInvalidTypes() {
         XCTAssertNil(
-            TypedData(types: ["felt": []], primaryType: "felt", domain: "{}", message: "{\"felt\": 1}")
+            StarknetTypedData(types: ["felt": []], primaryType: "felt", domain: "{}", message: "{\"felt\": 1}")
         )
 
         XCTAssertNil(
-            TypedData(types: ["felt*": []], primaryType: "felt*", domain: "{}", message: "{\"felt*\": 1}")
+            StarknetTypedData(types: ["felt*": []], primaryType: "felt*", domain: "{}", message: "{\"felt*\": 1}")
         )
     }
 
     func testMissingDependency() {
-        let typedData = TypedData(
-            types: ["house": [TypedData.TypeDeclaration(name: "fridge", type: "ice cream")]],
+        let typedData = StarknetTypedData(
+            types: ["house": [StarknetTypedData.TypeDeclaration(name: "fridge", type: "ice cream")]],
             primaryType: "felt",
             domain: "{}",
             message: "{}"
@@ -49,7 +38,7 @@ final class TypedDataTests: XCTestCase {
     }
 
     func testTypeHashCalculation() throws {
-        let cases: [(TypedData, String, Felt)] = [
+        let cases: [(StarknetTypedData, String, Felt)] = [
             (Self.td, "StarkNetDomain", "0x1bfc207425a47a5dfa1a50a4f5241203f50624ca5fdf5e18755765416b8e288"),
             (Self.td, "Person", "0x2896dbe4b96a67110f454c01e5336edc5bbc3635537efd690f122f4809cc855"),
             (Self.td, "Mail", "0x13d89452df9512bf750f539ba3001b945576243288137ddb6c788457d4b2f79"),
@@ -68,7 +57,7 @@ final class TypedDataTests: XCTestCase {
     }
 
     func testStructHashCalculation() throws {
-        let cases: [(TypedData, String, String, Felt)] = [
+        let cases: [(StarknetTypedData, String, String, Felt)] = [
             (
                 Self.td,
                 "StarkNetDomain",
@@ -106,7 +95,7 @@ final class TypedDataTests: XCTestCase {
     }
 
     func testMessageHashCalculation() throws {
-        let cases: [(TypedData, Felt, Felt)] = [
+        let cases: [(StarknetTypedData, Felt, Felt)] = [
             (
                 Self.td,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",

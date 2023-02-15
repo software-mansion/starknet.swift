@@ -15,7 +15,7 @@ enum TypedDataError: Error {
     case encodingError
 }
 
-public struct TypedData: Codable {
+public struct StarknetTypedData: Codable {
     public let types: [String: [TypeDeclaration]]
     public let primaryType: String
     public let domain: [String: Element]
@@ -182,7 +182,7 @@ public struct TypedData: Codable {
     }
 }
 
-public extension TypedData {
+public extension StarknetTypedData {
     struct TypeDeclaration: Codable {
         public let name: String
         public let type: String
@@ -240,7 +240,7 @@ public extension TypedData {
     }
 }
 
-private extension TypedData {
+private extension StarknetTypedData {
     func unwrapArray(from element: Element) throws -> [Element] {
         guard case let .array(array) = element else {
             throw TypedDataError.decodingError

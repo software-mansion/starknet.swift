@@ -11,4 +11,12 @@ public protocol StarknetSignerProtocol {
     ///
     /// - Returns: Starknet signature of given transaction
     func sign(transaction: StarknetTransaction) throws -> StarknetSignature
+
+    /// Sign TypedData object.
+    ///
+    /// - Parameters:
+    ///  - typedData: TypedData instance to sign
+    ///  - accountAddress: address to be used for calculating message hash.
+    /// - Returns: Starknet signature for message hash of a given TypedData.
+    func sign(typedData: StarknetTypedData, accountAddress: Felt) throws -> StarknetSignature
 }

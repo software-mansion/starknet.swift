@@ -103,4 +103,22 @@ final class AccountTests: XCTestCase {
 
         XCTAssertEqual(nonce, Felt.one)
     }
+
+    func testSignTypedData() async throws {
+        do {
+            let typedData = loadTypedDataFromFile(name: "typed_data_struct_array_example")!
+
+            let signature = try account.sign(typedData: typedData)
+            XCTAssertTrue(signature.count > 0)
+
+            let successResult = try await account.verify(signature: signature, for: typedData)
+            XCTAssertTrue(successResult)
+
+            let failResult = try await account.verify(signature: [.one, .one], for: typedData)
+            XCTAssertFalse(failResult)
+        } catch let e {
+            print(e)
+            throw e
+        }
+    }
 }

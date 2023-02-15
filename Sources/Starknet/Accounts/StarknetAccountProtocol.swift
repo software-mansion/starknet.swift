@@ -25,6 +25,21 @@ public protocol StarknetAccountProtocol {
     /// - Returns: Signed sequencer deploy account transaction
     func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction
 
+    /// Sign TypedData for off-chain usage with this account's privateKey.
+    ///
+    /// - Parameters:
+    ///  - typedData: a TypedData object to sign
+    /// - Returns: a signature for provided TypedData object.
+    func sign(typedData: StarknetTypedData) throws -> StarknetSignature
+
+    /// Verify a signature of TypedData on Starknet.
+    ///
+    /// - Parameters:
+    ///  - signature: a signature of typedData
+    ///  - typedData: a TypedData instance which signature will be verified
+    /// - Returns: Boolean indicating whether the signature is valid.
+    func verify(signature: StarknetSignature, for typedData: StarknetTypedData) async throws -> Bool
+
     /// Execute list of calls
     ///
     /// - Parameters:
