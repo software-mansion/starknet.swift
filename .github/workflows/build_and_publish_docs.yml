@@ -13,9 +13,9 @@ permissions:
 
 jobs:
   build-and-publish-docs:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    # environment:
+    #   name: github-pages
+    #   url: ${{ steps.deployment.outputs.page_url }}
     runs-on: macos-12
     steps:
       - name: Checkout
@@ -33,11 +33,18 @@ jobs:
             --output-path docs;
           echo "<script>window.location.href += \"/documentation/starknet.swift\"</script>" > docs/index.html;
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: "docs"
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v1
+      #   with:
+      #     path: "docs"
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+      # - name: Deploy to GitHub Pages
+      #   id: deployment
+      #   uses: actions/deploy-pages@v1
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6
+        with:
+          folder: docs
+          branch: gh-pages
+          single-commit: true
