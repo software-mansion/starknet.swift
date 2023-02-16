@@ -8,7 +8,7 @@
 import BigInt
 import Foundation
 
-enum StarknetTypedDataError: Error {
+public enum StarknetTypedDataError: Error {
     case decodingError
     case dependencyNotDefined(String)
     case invalidShortString
@@ -130,11 +130,11 @@ public struct StarknetTypedData: Codable {
         }.joined()
     }
 
-    private func encode(element: Element, forType typeName: String) throws -> (String, Felt) {
+    private func encode(element: Element, forType typeName: String) throws -> Felt {
         if types.keys.contains(typeName) {
             let object = try unwrapObject(from: element)
 
-            return (typeName, try getStructHash(typeName: typeName, data: object))
+            return try getStructHash(typeName: typeName, data: object)
         }
 
         if types.keys.contains(typeName.strippingPointer()) {
@@ -148,7 +148,7 @@ public struct StarknetTypedData: Codable {
 
             let hash = StarknetCurve.pedersenOn(hashes)
 
-            return (typeName, hash)
+            return hash
         }
 
         if typeName == "felt*" {
@@ -160,11 +160,11 @@ public struct StarknetTypedData: Codable {
 
             let hash = StarknetCurve.pedersenOn(hashes)
 
-            return (typeName, hash)
+            return hash
         }
 
         if typeName == "felt" {
-            return (typeName, try unwrapFelt(from: element))
+            return try unwrapFelt(from: element)
         }
 
         throw StarknetTypedDataError.decodingError
@@ -182,8 +182,8 @@ public struct StarknetTypedData: Codable {
                 throw StarknetTypedDataError.encodingError
             }
 
-            let (_, encodedValue) = try encode(element: element, forType: param.type)
-            values.append(encodedValue)
+            let encodedElement = try encode(element: element, forType: param.type)
+            values.append(encodedElement)
         }
 
         return values
@@ -195,8 +195,6 @@ public struct StarknetTypedData: Codable {
 
     public func getStructHash(typeName: String, data: [String: Element]) throws -> Felt {
         let encodedData = try encode(data: data, forType: typeName)
-
-        print("Type hash: \(try getTypeHash(typeName: typeName))")
 
         return StarknetCurve.pedersenOn([try getTypeHash(typeName: typeName)] + encodedData)
     }
