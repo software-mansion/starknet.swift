@@ -31,7 +31,7 @@ jobs:
             transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/Starknet.doccarchive \
             --hosting-base-path starknet.swift \
             --output-path docs;
-          echo "<script>window.location.href += \"/documentation/starknet.swift\"</script>" > docs/index.html;
+          echo "<script>window.location.href += \"/documentation/starknet\"</script>" > docs/index.html;
 
       # - name: Upload artifact
       #   uses: actions/upload-pages-artifact@v1
