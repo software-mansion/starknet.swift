@@ -18,4 +18,10 @@ public class StarkCurveSigner: StarknetSignerProtocol {
     public func sign(transaction: StarknetTransaction) throws -> StarknetSignature {
         try StarknetCurve.sign(privateKey: privateKey, hash: transaction.hash).toArray()
     }
+
+    public func sign(typedData: StarknetTypedData, accountAddress: Felt) throws -> StarknetSignature {
+        let messageHash = try typedData.getMessageHash(accountAddress: accountAddress)
+
+        return try StarknetCurve.sign(privateKey: privateKey, hash: messageHash).toArray()
+    }
 }

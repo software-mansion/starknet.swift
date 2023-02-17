@@ -1,6 +1,10 @@
 import BigInt
 import Foundation
 
+public enum StarknetAccountError: Error {
+    case invalidResponse
+}
+
 public class StarknetAccount: StarknetAccountProtocol {
     private let version = Felt.one
 
@@ -94,6 +98,40 @@ public class StarknetAccount: StarknetAccountProtocol {
         let result = try await provider.estimateFee(for: signedTransaction)
 
         return result
+    }
+
+    public func sign(typedData: StarknetTypedData) throws -> StarknetSignature {
+        try signer.sign(typedData: typedData, accountAddress: address)
+    }
+
+    public func verify(signature: StarknetSignature, for typedData: StarknetTypedData) async throws -> Bool {
+        let messageHash = try typedData.getMessageHash(accountAddress: address)
+
+        let calldata = [messageHash, Felt(signature.count)!] + signature
+        let call = StarknetCall(
+            contractAddress: address,
+            entrypoint: starknetSelector(from: "isValidSignature"),
+            calldata: calldata
+        )
+
+        do {
+            let result = try await provider.callContract(call)
+
+            guard result.count == 1 else {
+                throw StarknetAccountError.invalidResponse
+            }
+
+            return result[0] > 0
+        } catch let StarknetProviderError.jsonRpcError(code, errorMessage) {
+            // isValidSignature contract method throws an error, when the signature is incorrect,
+            // so we catch it here.
+            if errorMessage.contains("Signature"), errorMessage.contains("is invalid") {
+                return false
+            }
+
+            throw StarknetProviderError.jsonRpcError(code, errorMessage)
+        }
+        // And we want to rethrow all other errors.
     }
 
     public func getNonce() async throws -> Felt {
