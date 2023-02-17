@@ -56,7 +56,7 @@ public enum StarknetTypedDataError: Error {
 ///
 /// let messageHash = try typedData.getMessageHash(accountAddress: "0x1234")
 /// ```
-public struct StarknetTypedData: Codable {
+public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let types: [String: [TypeDeclaration]]
     public let primaryType: String
     public let domain: [String: Element]
@@ -222,7 +222,7 @@ public struct StarknetTypedData: Codable {
 }
 
 public extension StarknetTypedData {
-    struct TypeDeclaration: Codable {
+    struct TypeDeclaration: Codable, Equatable, Hashable {
         public let name: String
         public let type: String
 
@@ -232,7 +232,7 @@ public extension StarknetTypedData {
         }
     }
 
-    enum Element: Codable {
+    enum Element: Codable, Hashable, Equatable {
         case object([String: Element])
         case array([Element])
         case string(String)

@@ -33,7 +33,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
     #if os(macOS)
         return DevnetClient()
     #else
-        throw DevnetClientError.invalidTestPlatform
+        fatalError("Invalid test Platform")
     #endif
 }
 

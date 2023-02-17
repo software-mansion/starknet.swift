@@ -75,6 +75,8 @@ extension Felt: Comparable {
     }
 }
 
+extension Felt: Hashable {}
+
 extension Felt: CustomStringConvertible {
     public var description: String {
         self.toHex()
