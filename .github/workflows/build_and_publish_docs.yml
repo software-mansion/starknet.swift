@@ -1,21 +1,15 @@
 name: Build and publish docs
 
 on:
-  pull_request: # For testing only
-    branches: "*"
-
-  # push:
-  #   tags:
-  #     - "*"
+  push:
+    tags:
+      - "*"
 
 permissions:
   contents: write
 
 jobs:
   build-and-publish-docs:
-    # environment:
-    #   name: github-pages
-    #   url: ${{ steps.deployment.outputs.page_url }}
     runs-on: macos-12
     steps:
       - name: Checkout
@@ -32,15 +26,6 @@ jobs:
             --hosting-base-path starknet.swift \
             --output-path docs;
           echo "<script>window.location.href += \"/documentation/starknet\"</script>" > docs/index.html;
-
-      # - name: Upload artifact
-      #   uses: actions/upload-pages-artifact@v1
-      #   with:
-      #     path: "docs"
-
-      # - name: Deploy to GitHub Pages
-      #   id: deployment
-      #   uses: actions/deploy-pages@v1
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6
