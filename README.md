@@ -19,6 +19,10 @@ dependencies: [
 
 Then add `starknet.swift` to the dependencies array of every target you want to use the package in.
 ```
+
+## Documentation
+You can find the documentation of the project [here](https://docs.swmansion.com/starknet.swift/documentation/starknet/).
+
 ## Demo app
 In the `Examples` folder you can find a demo ios application.
 
