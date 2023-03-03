@@ -67,10 +67,10 @@ struct Filter: Encodable {
     let fromBlockId: StarknetBlockId
     let toBlockId: StarknetBlockId
     let address: Felt
-    let keys: Array<Felt>
+    let keys: [Felt]
     let chunkSize: UInt64
     let continuationToken: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case fromBlockId = "from_block"
         case toBlockId = "to_block"
