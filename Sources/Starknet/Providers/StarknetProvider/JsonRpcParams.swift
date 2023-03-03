@@ -63,4 +63,26 @@ struct GetClassHashAtParams: Encodable {
     }
 }
 
+struct Filter: Encodable {
+    let fromBlockId: StarknetBlockId
+    let toBlockId: StarknetBlockId
+    let address: Felt
+    let keys: Array<Felt>
+    let chunkSize: UInt64
+    let continuationToken: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case fromBlockId = "from_block"
+        case toBlockId = "to_block"
+        case chunkSize = "chunk_size"
+        case continuationToken = "continuation_token"
+        case keys
+        case address
+    }
+}
+
+struct GetEventsPayload: Encodable {
+    let filter: Filter
+}
+
 struct EmptyParams: Encodable {}

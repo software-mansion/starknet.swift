@@ -39,3 +39,31 @@ public struct StarknetBlockHashAndNumber: Decodable, Equatable {
         case blockNumber = "block_number"
     }
 }
+
+public struct GetEventsResponse : Decodable, Equatable {
+    public let continuationToken : String
+    public let events : Array<EmittedEvent>
+    
+    enum CodingKeys: String, CodingKey {
+        case continuationToken = "continuation_token"
+        case events
+    }
+}
+
+public struct EmittedEvent: Decodable, Equatable{
+     let address: Felt
+     let keys: Array<Felt>
+     let data: Array<Felt>
+     let blockHash: Felt
+     let blockNumber: UInt64
+     let transactionHash: Felt
+     
+     enum CodingKeys: String, CodingKey {
+         case blockHash = "block_hash"
+         case blockNumber = "block_number"
+         case transactionHash = "transaction_hash"
+         case address = "from_address"
+         case keys
+         case data
+     }
+ }
