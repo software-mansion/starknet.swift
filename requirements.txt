@@ -1,2 +1,2 @@
-starknet-devnet==0.4.3
+starknet-devnet==0.4.6
 cairo-lang==0.10.3
