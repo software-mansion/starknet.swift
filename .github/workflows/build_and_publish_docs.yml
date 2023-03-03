@@ -1,0 +1,35 @@
+name: Build and publish docs
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish-docs:
+    runs-on: macos-12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build docs
+        run: |
+          xcodebuild docbuild \
+            -scheme Starknet \
+            -derivedDataPath /tmp/docbuild \
+            -destination 'generic/platform=iOS';
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/Starknet.doccarchive \
+            --hosting-base-path starknet.swift \
+            --output-path docs;
+          echo "<script>window.location.href += \"/documentation/starknet\"</script>" > docs/index.html;
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6
+        with:
+          folder: docs
+          branch: gh-pages
+          single-commit: true
