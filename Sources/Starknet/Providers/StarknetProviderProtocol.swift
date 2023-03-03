@@ -66,10 +66,10 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: Block hash and block number  of the most recent accepted block
     func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber
-    
+
     /// Get all event objects matching the conditions in the provided filter
     ///
-    ///- Parameters:
+    /// - Parameters:
     ///  - fromBlockId: id of the requested block
     ///  - toBlockId: id of the requested block
     ///  - address: address of the contract that emitted events
@@ -77,7 +77,7 @@ public protocol StarknetProviderProtocol {
     ///  - chunkSize: chunk size
     ///  - continuationToken: a pointer to the last element of the delivered page, use this token in a subsequent query to obtain the next page
     /// - Returns: events matching the conditions in the provided filter and continuation token
-    func getEvents(from fromBlockId: StarknetBlockId, to toBlockId: StarknetBlockId, address: Felt, keys: Array<Felt>, chunkSize: UInt64, continuationToken: String?) async throws -> GetEventsResponse
+    func getEvents(from fromBlockId: StarknetBlockId, to toBlockId: StarknetBlockId, address: Felt, keys: [Felt], chunkSize: UInt64, continuationToken: String?) async throws -> GetEventsResponse
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
@@ -120,18 +120,16 @@ public extension StarknetProviderProtocol {
     func getClassHashAt(_ address: Felt) async throws -> Felt {
         try await getClassHashAt(address, at: .tag(.latest))
     }
-    
+
     /// Get all event objects matching the conditions in the provided filter
     ///
-    ///- Parameters:
+    /// - Parameters:
     ///  - address: address of the contract that emitted events
     ///  - keys: the values used to filter the events
     ///  - chunkSize: chunk size
     ///  - continuationToken: a pointer to the last element of the delivered page, use this token in a subsequent query to obtain the next page
     /// - Returns: events matching the conditions in the provided filter and continuation token
-    
-    func getEvents(address: Felt, keys: Array<Felt>, chunkSize: UInt64, continuationToken: String? = nil) async throws -> GetEventsResponse {
+    func getEvents(address: Felt, keys: [Felt], chunkSize: UInt64, continuationToken: String? = nil) async throws -> GetEventsResponse {
         try await getEvents(from: .tag(.latest), to: .tag(.latest), address: address, keys: keys, chunkSize: chunkSize, continuationToken: continuationToken)
     }
-    
 }

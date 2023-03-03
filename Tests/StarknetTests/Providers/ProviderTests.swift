@@ -86,7 +86,7 @@ final class ProviderTests: XCTestCase {
 
         print(result)
     }
-    
+
     func testGetEvents() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_events")
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events")
@@ -94,7 +94,7 @@ final class ProviderTests: XCTestCase {
         let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider)
         let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
         let _ = try await account.execute(call: call)
-        
+
         let result = try await provider.getEvents(address: contract.address, keys: ["0x03db3da4221c078e78bd987e54e1cc24570d89a7002cefa33e548d6c72c73f9d"], chunkSize: 100)
 
         print(result)
