@@ -112,7 +112,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func getEvents(filter: Filter) async throws -> StarknetGetEventsResponse {
+    public func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse {
         let params = GetEventsPayload(filter: filter)
 
         let result = try await makeRequest(method: .getEvents, params: params, receive: StarknetGetEventsResponse.self)

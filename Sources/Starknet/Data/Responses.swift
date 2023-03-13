@@ -49,21 +49,3 @@ public struct StarknetGetEventsResponse: Decodable, Equatable {
         case events
     }
 }
-
-public struct StarknetEmittedEvent: Decodable, Equatable {
-    public let address: Felt
-    public let keys: [Felt]
-    public let data: [Felt]
-    public let blockHash: Felt
-    public let blockNumber: UInt64
-    public let transactionHash: Felt
-
-    enum CodingKeys: String, CodingKey {
-        case blockHash = "block_hash"
-        case blockNumber = "block_number"
-        case transactionHash = "transaction_hash"
-        case address = "from_address"
-        case keys
-        case data
-    }
-}

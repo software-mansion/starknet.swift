@@ -72,7 +72,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - filter : the conditions used to filter the returned events
     /// - Returns: events matching the conditions in the provided filter and continuation token
-    func getEvents(filter: Filter) async throws -> StarknetGetEventsResponse
+    func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
