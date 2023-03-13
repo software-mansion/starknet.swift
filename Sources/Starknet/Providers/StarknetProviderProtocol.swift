@@ -70,14 +70,9 @@ public protocol StarknetProviderProtocol {
     /// Get all event objects matching the conditions in the provided filter
     ///
     /// - Parameters:
-    ///  - fromBlockId: id of the requested block
-    ///  - toBlockId: id of the requested block
-    ///  - address: address of the contract that emitted events
-    ///  - keys: the values used to filter the events
-    ///  - chunkSize: chunk size
-    ///  - continuationToken: a pointer to the last element of the delivered page, use this token in a subsequent query to obtain the next page
+    ///  - filter : the conditions used to filter the returned events
     /// - Returns: events matching the conditions in the provided filter and continuation token
-    func getEvents(from fromBlockId: StarknetBlockId, to toBlockId: StarknetBlockId, address: Felt, keys: [Felt], chunkSize: UInt64, continuationToken: String?) async throws -> GetEventsResponse
+    func getEvents(filter: Filter) async throws -> StarknetGetEventsResponse
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
@@ -119,17 +114,5 @@ public extension StarknetProviderProtocol {
     /// - Returns: Class hash of the given contract
     func getClassHashAt(_ address: Felt) async throws -> Felt {
         try await getClassHashAt(address, at: .tag(.latest))
-    }
-
-    /// Get all event objects matching the conditions in the provided filter
-    ///
-    /// - Parameters:
-    ///  - address: address of the contract that emitted events
-    ///  - keys: the values used to filter the events
-    ///  - chunkSize: chunk size
-    ///  - continuationToken: a pointer to the last element of the delivered page, use this token in a subsequent query to obtain the next page
-    /// - Returns: events matching the conditions in the provided filter and continuation token
-    func getEvents(address: Felt, keys: [Felt], chunkSize: UInt64, continuationToken: String? = nil) async throws -> GetEventsResponse {
-        try await getEvents(from: .tag(.latest), to: .tag(.latest), address: address, keys: keys, chunkSize: chunkSize, continuationToken: continuationToken)
     }
 }

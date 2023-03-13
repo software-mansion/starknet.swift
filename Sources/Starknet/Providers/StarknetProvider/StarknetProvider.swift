@@ -112,10 +112,10 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func getEvents(from fromBlockId: StarknetBlockId, to toBlockId: StarknetBlockId, address: Felt, keys: [Felt], chunkSize: UInt64, continuationToken: String?) async throws -> GetEventsResponse {
-        let params = Filter(fromBlockId: fromBlockId, toBlockId: toBlockId, address: address, keys: keys, chunkSize: chunkSize, continuationToken: continuationToken)
+    public func getEvents(filter: Filter) async throws -> StarknetGetEventsResponse {
+        let params = GetEventsPayload(filter: filter)
 
-        let result = try await makeRequest(method: .getEvents, params: GetEventsPayload(filter: params), receive: GetEventsResponse.self)
+        let result = try await makeRequest(method: .getEvents, params: params, receive: StarknetGetEventsResponse.self)
 
         return result
     }
