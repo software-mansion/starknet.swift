@@ -68,10 +68,10 @@ public protocol StarknetProviderProtocol {
     func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber
 }
 
-private let defaultBlockId = StarknetBlockId.tag(.latest)
+private let defaultBlockId = StarknetBlockId.tag(.pending)
 
 public extension StarknetProviderProtocol {
-    /// Call starknet contract at the latest block.
+    /// Call starknet contract in the pending block.
     ///
     /// - Parameters
     ///     - call: starknet call to be made.
@@ -81,16 +81,16 @@ public extension StarknetProviderProtocol {
         try await callContract(call, at: defaultBlockId)
     }
 
-    /// Estimate fee for a transaction in the latest block.
+    /// Estimate fee for a transaction in the pending block.
     ///
     /// - Parameters:
     ///  -  transaction: transaction for which the fee should be estimated.
     /// - Returns: EstimateFeeResponse object
     func estimateFee(for transaction: StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
-        try await estimateFee(for: transaction, at: .tag(.latest))
+        try await estimateFee(for: transaction, at: defaultBlockId)
     }
 
-    /// Get nonce of given starknet contract at latest block.
+    /// Get nonce of given starknet contract in the pending block.
     ///
     /// - Parameters
     ///     - contract: address of a contract, for which the nonce should be returned.
@@ -106,6 +106,6 @@ public extension StarknetProviderProtocol {
     ///  - address: address of the contract whose address will be returned
     /// - Returns: Class hash of the given contract
     func getClassHashAt(_ address: Felt) async throws -> Felt {
-        try await getClassHashAt(address, at: .tag(.latest))
+        try await getClassHashAt(address, at: defaultBlockId)
     }
 }
