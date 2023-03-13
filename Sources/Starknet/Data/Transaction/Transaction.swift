@@ -3,8 +3,6 @@ import Foundation
 public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt
-
     public let senderAddress: Felt
 
     public let calldata: StarknetCalldata
@@ -14,6 +12,8 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
     public let maxFee: Felt
 
     public let nonce: Felt
+
+    public let version: Felt
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -51,8 +51,6 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
 public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt
-
     public let senderAddress: Felt
 
     public let calldata: StarknetCalldata
@@ -62,6 +60,8 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
     public let maxFee: Felt
 
     public let nonce: Felt
+
+    public let version: Felt
 
     public let hash: Felt
 
@@ -95,7 +95,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
         case signature
         case maxFee = "max_fee"
         case nonce
-        case hash
+        case hash = "transaction_hash"
     }
 
     public init(from decoder: Decoder) throws {
@@ -111,6 +111,64 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
         try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
     }
 }
+
+public struct StarknetInvokeTransactionV0: StarknetTransaction, Equatable {
+    public let type: StarknetTransactionType = .invoke
+
+    public let contractAddress: Felt
+
+    public let entrypointSelector: Felt
+
+    public let calldata: StarknetCalldata
+
+    public let signature: StarknetSignature
+
+    public let maxFee: Felt
+
+    public let nonce: Felt
+
+    public let version: Felt
+
+    public let hash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case version
+        case contractAddress = "contract_address"
+        case entrypointSelector = "entry_point_selector"
+        case calldata
+        case signature
+        case maxFee = "max_fee"
+        case nonce
+        case hash = "transaction_hash"
+    }
+
+    public init(contractAddress: Felt, entrypointSelector: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, version: Felt, hash: Felt) {
+        self.contractAddress = contractAddress
+        self.entrypointSelector = entrypointSelector
+        self.calldata = calldata
+        self.signature = signature
+        self.maxFee = maxFee
+        self.nonce = nonce
+        self.version = version
+        self.hash = hash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.contractAddress = try container.decode(Felt.self, forKey: .contractAddress)
+        self.entrypointSelector = try container.decode(Felt.self, forKey: .entrypointSelector)
+        self.calldata = try container.decode(StarknetCalldata.self, forKey: .calldata)
+        self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
+        self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
+        self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.version = try container.decode(Felt.self, forKey: .version)
+        self.hash = try container.decode(Felt.self, forKey: .hash)
+
+        try verifyTransactionIdentifiers(container: container, codingKeysType: Self.CodingKeys)
+    }
+}
+
 
 public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .deployAccount
@@ -230,7 +288,144 @@ public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
         case contractAddressSalt = "contract_address_salt"
         case constructorCalldata = "constructor_calldata"
         case classHash = "class_hash"
-        case hash
+        case hash = "transaction_hash"
+    }
+}
+
+public struct StarknetL1HandlerTransaction: StarknetTransaction {
+    public let type: StarknetTransactionType = .l1Handler
+
+    public let version: Felt
+
+    public let nonce: Felt
+
+    public let contractAddress: Felt
+
+    public let entrypointSelector: Felt
+
+    public let calldata: [Felt]
+
+    public let hash: Felt
+
+    public init(version: Felt, nonce: Felt, contractAddress: Felt, entrypointSelector: Felt, calldata: [Felt], hash: Felt) {
+        self.version = version
+        self.nonce = nonce
+        self.contractAddress = contractAddress
+        self.entrypointSelector = entrypointSelector
+        self.calldata = calldata
+        self.hash = hash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.version = try container.decode(Felt.self, forKey: .version)
+        self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.contractAddress = try container.decode(Felt.self, forKey: .contractAddress)
+        self.entrypointSelector = try container.decode(Felt.self, forKey: .entrypointSelector)
+        self.calldata = try container.decode([Felt].self, forKey: .calldata)
+        self.hash = try container.decode(Felt.self, forKey: .hash)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case version
+        case nonce
+        case hash = "transaction_hash"
+        case contractAddress = "contract_address"
+        case entrypointSelector = "entry_point_selector"
+        case calldata
+    }
+}
+
+public struct StarknetDeclareTransaction: StarknetTransaction {
+    public let type: StarknetTransactionType = .declare
+
+    public let maxFee: Felt
+
+    public let version: Felt
+
+    public let signature: [Felt]
+
+    public let nonce: Felt
+
+    public let classHash: Felt
+
+    public let address: Felt
+
+    public let hash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case maxFee = "max_fee"
+        case version
+        case signature
+        case nonce
+        case classHash = "class_hash"
+        case address = "sender_address"
+        case hash = "transaction_hash"
+    }
+
+    public init(maxFee: Felt, version: Felt, signature: [Felt], nonce: Felt, classHash: Felt, address: Felt, hash: Felt) {
+        self.maxFee = maxFee
+        self.version = version
+        self.signature = signature
+        self.nonce = nonce
+        self.classHash = classHash
+        self.address = address
+        self.hash = hash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
+        self.version = try container.decode(Felt.self, forKey: .version)
+        self.signature = try container.decode([Felt].self, forKey: .signature)
+        self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.address = try container.decode(Felt.self, forKey: .address)
+        self.hash = try container.decode(Felt.self, forKey: .hash)
+
+        try verifyTransactionIdentifiers(container: container, codingKeysType: Self.CodingKeys)
+    }
+}
+
+public struct StarknetDeployTransaction: StarknetTransaction {
+    public let type: StarknetTransactionType = .deploy
+
+    public let version: Felt
+
+    public let contractAddressSalt: Felt
+
+    public let constructorCalldata: [Felt]
+
+    public let classHash: Felt
+
+    public let hash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case version
+        case contractAddressSalt = "contract_address_salt"
+        case constructorCalldata = "constructor_calldata"
+        case classHash = "class_hash"
+        case hash = "transaction_hash"
+    }
+
+    public init(version: Felt, contractAddressSalt: Felt, constructorCalldata: [Felt], classHash: Felt, hash: Felt) {
+        self.version = version
+        self.contractAddressSalt = contractAddressSalt
+        self.constructorCalldata = constructorCalldata
+        self.classHash = classHash
+        self.hash = hash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.version = try container.decode(Felt.self, forKey: .version)
+        self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
+        self.constructorCalldata = try container.decode([Felt].self, forKey: .constructorCalldata)
+        self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.hash = try container.decode(Felt.self, forKey: .hash)
     }
 }
 

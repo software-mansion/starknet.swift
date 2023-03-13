@@ -29,7 +29,7 @@ struct AddInvokeTransactionParams: Encodable {
 }
 
 struct EstimateFeeParams: Encodable {
-    let request: StarknetSequencerTransaction
+    let request: any StarknetSequencerTransaction
     let blockId: StarknetBlockId
 
     func encode(to encoder: Encoder) throws {
