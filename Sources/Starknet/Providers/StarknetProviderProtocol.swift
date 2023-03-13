@@ -66,6 +66,13 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: Block hash and block number  of the most recent accepted block
     func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber
+
+    /// Get all event objects matching the conditions in the provided filter
+    ///
+    /// - Parameters:
+    ///  - filter : the conditions used to filter the returned events
+    /// - Returns: events matching the conditions in the provided filter and continuation token
+    func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.pending)

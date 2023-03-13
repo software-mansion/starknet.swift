@@ -73,7 +73,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
         }
 
         public func start() async throws {
-            let arguments = "--host \(host) --port \(port) --seed \(seed)"
+            let arguments = "--host \(host) --port \(port) --seed \(seed) --disable-rpc-request-validation"
 
             guard !self.devnetPath.isEmpty, !self.starknetPath.isEmpty else {
                 throw DevnetClientError.environmentVariablesNotSet

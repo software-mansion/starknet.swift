@@ -39,3 +39,13 @@ public struct StarknetBlockHashAndNumber: Decodable, Equatable {
         case blockNumber = "block_number"
     }
 }
+
+public struct StarknetGetEventsResponse: Decodable, Equatable {
+    public let continuationToken: String
+    public let events: [StarknetEmittedEvent]
+
+    enum CodingKeys: String, CodingKey {
+        case continuationToken = "continuation_token"
+        case events
+    }
+}

@@ -63,4 +63,8 @@ struct GetClassHashAtParams: Encodable {
     }
 }
 
+struct GetEventsPayload: Encodable {
+    let filter: StarknetGetEventsFilter
+}
+
 struct EmptyParams: Encodable {}
