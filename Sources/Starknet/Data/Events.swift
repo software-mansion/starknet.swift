@@ -1,16 +1,14 @@
 import Foundation
 
-private let defaultBlockId = StarknetBlockId.tag(.pending)
-
 public struct StarknetGetEventsFilter: Encodable {
-    let fromBlockId: StarknetBlockId?
-    let toBlockId: StarknetBlockId?
-    let address: Felt?
-    let keys: [Felt]?
-    let chunkSize: UInt64
-    let continuationToken: String?
+    public let fromBlockId: StarknetBlockId?
+    public let toBlockId: StarknetBlockId?
+    public let address: Felt?
+    public let keys: [Felt]?
+    public let chunkSize: UInt64
+    public let continuationToken: String?
 
-    init(fromBlockId: StarknetBlockId? = defaultBlockId, toBlockId: StarknetBlockId? = defaultBlockId, address: Felt? = nil, keys: [Felt]? = nil, chunkSize: UInt64 = 50, continuationToken: String? = nil) {
+    public init(fromBlockId: StarknetBlockId? = StarknetBlockId.tag(.pending), toBlockId: StarknetBlockId? = StarknetBlockId.tag(.pending), address: Felt? = nil, keys: [Felt]? = nil, chunkSize: UInt64 = 50, continuationToken: String? = nil) {
         self.fromBlockId = fromBlockId
         self.toBlockId = toBlockId
         self.address = address
