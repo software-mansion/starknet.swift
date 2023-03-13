@@ -28,7 +28,7 @@ public protocol StarknetProviderProtocol {
     ///  -  transaction: transaction for wich the fee should be estimated.
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: EstimateFeeResponse object
-    func estimateFee(for transaction: StarknetSequencerTransaction, at blockId: StarknetBlockId) async throws -> StarknetEstimateFeeResponse
+    func estimateFee(for transaction: any StarknetSequencerTransaction, at blockId: StarknetBlockId) async throws -> StarknetEstimateFeeResponse
 
     /// Invoke a function.
     ///
@@ -93,7 +93,7 @@ public extension StarknetProviderProtocol {
     /// - Parameters:
     ///  -  transaction: transaction for which the fee should be estimated.
     /// - Returns: EstimateFeeResponse object
-    func estimateFee(for transaction: StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
+    func estimateFee(for transaction: any StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
         try await estimateFee(for: transaction, at: defaultBlockId)
     }
 

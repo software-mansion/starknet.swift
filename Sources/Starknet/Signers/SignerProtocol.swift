@@ -10,7 +10,7 @@ public protocol StarknetSignerProtocol {
     ///  - transaction: transaction to be signed
     ///
     /// - Returns: Starknet signature of given transaction
-    func sign(transaction: StarknetTransaction) throws -> StarknetSignature
+    func sign(transaction: any StarknetTransaction) throws -> StarknetSignature
 
     /// Sign TypedData object.
     ///
