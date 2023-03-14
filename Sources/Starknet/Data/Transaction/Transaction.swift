@@ -1,6 +1,5 @@
 import Foundation
 
-
 public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
 

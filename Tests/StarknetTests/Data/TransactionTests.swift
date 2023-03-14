@@ -26,7 +26,6 @@ let l1HandlerTransaction = """
 {"contract_address":"0x123","calldata":["0x1","0x2"],"entry_point_selector":"0x123","nonce":"0x123","type":"L1_HANDLER","version":"0x0","transaction_hash":"0x111"}
 """
 
-
 final class TransactionTests: XCTestCase {
     func testInvokeTransactionEncoding() throws {
         let invoke = StarknetSequencerInvokeTransaction(senderAddress: "0x123", calldata: [1, 2], signature: [1, 2], maxFee: "0x859", nonce: 0, version: .one)
@@ -58,7 +57,7 @@ final class TransactionTests: XCTestCase {
             (declareTransactionV1, .declare, 1),
             (deployTransaction, .deploy, 0),
             (deployAccountTransaction, .deployAccount, 1),
-            (l1HandlerTransaction, .l1Handler, 0)
+            (l1HandlerTransaction, .l1Handler, 0),
         ]
 
         try cases.forEach { (string: String, type: StarknetTransactionType, version: Felt) in
@@ -66,7 +65,7 @@ final class TransactionTests: XCTestCase {
 
             let decoder = JSONDecoder()
 
-            var result: TransactionWrapper? = nil
+            var result: TransactionWrapper?
 
             XCTAssertNoThrow(result = try decoder.decode(TransactionWrapper.self, from: data))
             XCTAssertTrue(result?.transaction.type == type && result?.transaction.version == version)

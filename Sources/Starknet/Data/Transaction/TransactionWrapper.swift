@@ -16,17 +16,17 @@ enum TransactionWrapper: Decodable {
 
     public var transaction: any StarknetTransaction {
         switch self {
-        case .invoke(let tx):
+        case let .invoke(tx):
             return tx
-        case .invokeV0(let tx):
+        case let .invokeV0(tx):
             return tx
-        case .deployAccount(let tx):
+        case let .deployAccount(tx):
             return tx
-        case .deploy(let tx):
+        case let .deploy(tx):
             return tx
-        case .declare(let tx):
+        case let .declare(tx):
             return tx
-        case .l1Handler(let tx):
+        case let .l1Handler(tx):
             return tx
         }
     }
