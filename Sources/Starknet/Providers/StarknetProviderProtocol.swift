@@ -66,6 +66,21 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: Block hash and block number  of the most recent accepted block
     func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber
+
+    /// Get the details and status of a submitted transaction
+    ///
+    /// - Parameters:
+    ///  - hash: The hash of the requested transaction
+    /// - Returns: Transaction found with provided hash
+    func getTransactionBy(hash: Felt) async throws -> StarknetTransaction
+
+    /// Get the details and status of a submitted transaction
+    ///
+    /// - Parameters:
+    ///  - blockId: id of block from which the transaction should be returned.
+    ///  - index: index of transaction in the block
+    /// - Returns: Transaction found with provided blockId and index.
+    func getTransactionBy(blockId: StarknetBlockId, index: UInt64) async throws -> StarknetTransaction
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
