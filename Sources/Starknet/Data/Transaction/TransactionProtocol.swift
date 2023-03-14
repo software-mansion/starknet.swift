@@ -6,6 +6,4 @@ public protocol StarknetSequencerTransaction: Codable, Hashable, Equatable {
 
 public protocol StarknetTransaction: StarknetSequencerTransaction {
     var hash: Felt { get }
-
 }
-
