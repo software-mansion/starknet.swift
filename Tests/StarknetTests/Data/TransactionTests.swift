@@ -52,21 +52,24 @@ final class TransactionTests: XCTestCase {
     }
 
     func testTransactionWrapperDecoding() throws {
-        let cases: [(String, StarknetTransaction.Type)] = [
-            (invokeTransaction, StarknetInvokeTransaction.self),
-            (invokeTransactionV0, StarknetInvokeTransactionV0.self),
-            (declareTransactionV1, StarknetDeclareTransaction.self),
-            (deployTransaction, StarknetDeployTransaction.self),
-            (deployAccountTransaction, StarknetDeployAccountTransaction.self),
-            (l1HandlerTransaction, StarknetL1HandlerTransaction.self)
+        let cases: [(String, StarknetTransactionType, Felt)] = [
+            (invokeTransaction, .invoke, 1),
+            (invokeTransactionV0, .invoke, 0),
+            (declareTransactionV1, .declare, 1),
+            (deployTransaction, .deploy, 0),
+            (deployAccountTransaction, .deployAccount, 1),
+            (l1HandlerTransaction, .l1Handler, 0)
         ]
 
-        try cases.forEach { (string: String, type: StarknetTransaction.Type) in
+        try cases.forEach { (string: String, type: StarknetTransactionType, version: Felt) in
             let data = string.data(using: .utf8)!
 
             let decoder = JSONDecoder()
 
-            XCTAssertNoThrow(try decoder.decode(TransactionWrapper.self, from: data))
+            var result: TransactionWrapper? = nil
+
+            XCTAssertNoThrow(result = try decoder.decode(TransactionWrapper.self, from: data))
+            XCTAssertTrue(result?.transaction.type == type && result?.transaction.version == version)
         }
     }
 
