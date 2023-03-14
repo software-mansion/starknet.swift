@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
+public struct StarknetInvokeTransaction: StarknetTransaction {
     public let type: StarknetTransactionType = .invoke
 
     public let senderAddress: Felt
@@ -64,7 +64,7 @@ public struct StarknetInvokeTransaction: StarknetTransaction, Equatable {
     }
 }
 
-public struct StarknetInvokeTransactionV0: StarknetTransaction, Equatable {
+public struct StarknetInvokeTransactionV0: StarknetTransaction {
     public let type: StarknetTransactionType = .invoke
 
     public let contractAddress: Felt
@@ -121,7 +121,7 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction, Equatable {
     }
 }
 
-public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
+public struct StarknetDeployAccountTransaction: StarknetTransaction {
     public let type: StarknetTransactionType = .deployAccount
 
     public let version: Felt
@@ -191,7 +191,7 @@ public struct StarknetDeployAccountTransaction: StarknetTransaction, Equatable {
     }
 }
 
-public struct StarknetL1HandlerTransaction: StarknetTransaction, Equatable {
+public struct StarknetL1HandlerTransaction: StarknetTransaction {
     public let type: StarknetTransactionType = .l1Handler
 
     public let version: Felt
