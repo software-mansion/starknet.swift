@@ -100,4 +100,21 @@ final class ProviderTests: XCTestCase {
 
         print(result)
     }
+
+    func testGetTransactionByBlockIdAndHash() async throws {
+        let result = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0)
+
+        print(result)
+    }
+
+    func testGetTransactionByHash() async throws {
+        let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0)
+
+        let _ = try await provider.getTransactionBy(hash: previousResult.hash)
+
+        do {
+            let _ = try await provider.getTransactionBy(hash: "0x123")
+            XCTFail("Fetching transaction with nonexistent hash should fail")
+        } catch {}
+    }
 }

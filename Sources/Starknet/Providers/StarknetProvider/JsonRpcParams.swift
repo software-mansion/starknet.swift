@@ -67,4 +67,22 @@ struct GetEventsPayload: Encodable {
     let filter: StarknetGetEventsFilter
 }
 
+struct GetTransactionByHashParams: Encodable {
+    let hash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case hash = "transaction_hash"
+    }
+}
+
+struct GetTransactionByBlockIdAndIndex: Encodable {
+    let blockId: StarknetBlockId
+    let index: UInt64
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+        case index
+    }
+}
+
 struct EmptyParams: Encodable {}
