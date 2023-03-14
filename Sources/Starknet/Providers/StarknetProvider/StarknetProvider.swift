@@ -120,7 +120,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func getTransactionBy(hash: Felt) async throws -> StarknetTransaction {
+    public func getTransactionBy(hash: Felt) async throws -> any StarknetTransaction {
         let params = GetTransactionByHashParams(hash: hash)
 
         let result = try await makeRequest(method: .getTransactionByHash, params: params, receive: TransactionWrapper.self)
@@ -128,7 +128,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result.transaction
     }
 
-    public func getTransactionBy(blockId: StarknetBlockId, index: UInt64) async throws -> StarknetTransaction {
+    public func getTransactionBy(blockId: StarknetBlockId, index: UInt64) async throws -> any StarknetTransaction {
         let params = GetTransactionByBlockIdAndIndex(blockId: blockId, index: index)
 
         let result = try await makeRequest(method: .getTransactionByBlockIdAndIndex, params: params, receive: TransactionWrapper.self)
