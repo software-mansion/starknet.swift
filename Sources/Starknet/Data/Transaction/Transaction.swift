@@ -202,7 +202,7 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
 
     public let entrypointSelector: Felt
 
-    public let calldata: [Felt]
+    public let calldata: StarknetCalldata
 
     public let hash: Felt
 
@@ -243,7 +243,7 @@ public struct StarknetDeclareTransaction: StarknetTransaction {
 
     public let version: Felt
 
-    public let signature: [Felt]
+    public let signature: StarknetSignature
 
     public let nonce: Felt
 
@@ -295,7 +295,7 @@ public struct StarknetDeployTransaction: StarknetTransaction {
 
     public let contractAddressSalt: Felt
 
-    public let constructorCalldata: [Felt]
+    public let constructorCalldata: StarknetCalldata
 
     public let classHash: Felt
 
