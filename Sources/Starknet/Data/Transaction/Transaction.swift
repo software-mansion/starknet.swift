@@ -249,7 +249,7 @@ public struct StarknetDeclareTransaction: StarknetTransaction {
 
     public let classHash: Felt
 
-    public let address: Felt
+    public let senderAddress: Felt
 
     public let hash: Felt
 
@@ -260,17 +260,17 @@ public struct StarknetDeclareTransaction: StarknetTransaction {
         case signature
         case nonce
         case classHash = "class_hash"
-        case address = "sender_address"
+        case senderAddress = "sender_address"
         case hash = "transaction_hash"
     }
 
-    public init(maxFee: Felt, version: Felt, signature: [Felt], nonce: Felt, classHash: Felt, address: Felt, hash: Felt) {
+    public init(maxFee: Felt, version: Felt, signature: [Felt], nonce: Felt, classHash: Felt, senderAddress: Felt, hash: Felt) {
         self.maxFee = maxFee
         self.version = version
         self.signature = signature
         self.nonce = nonce
         self.classHash = classHash
-        self.address = address
+        self.senderAddress = senderAddress
         self.hash = hash
     }
 
@@ -281,7 +281,7 @@ public struct StarknetDeclareTransaction: StarknetTransaction {
         self.signature = try container.decode([Felt].self, forKey: .signature)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
-        self.address = try container.decode(Felt.self, forKey: .address)
+        self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 
         try verifyTransactionIdentifiers(container: container, codingKeysType: Self.CodingKeys)
