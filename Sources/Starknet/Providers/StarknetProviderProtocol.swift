@@ -73,6 +73,13 @@ public protocol StarknetProviderProtocol {
     ///  - filter : the conditions used to filter the returned events
     /// - Returns: events matching the conditions in the provided filter and continuation token
     func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse
+    
+    /// Get all event objects matching the conditions in the provided filter
+    ///
+    /// - Parameters:
+    ///  - txHash : the hash of the requested transaction
+    /// - Returns: receipt of a transaction identified by given hash
+    func getTransactionReceipt(txHash: Felt) async throws -> StarknetTransactionReceipt
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.latest)
