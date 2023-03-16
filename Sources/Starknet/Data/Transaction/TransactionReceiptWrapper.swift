@@ -30,7 +30,7 @@ enum TransactionReceiptWrapper: Decodable {
         let container = try decoder.container(keyedBy: Keys.self)
         let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
 
-        switch (type) {
+        switch type {
         case .invoke:
             self = .invoke(try StarknetCommonTransactionReceipt(from: decoder))
         case .declare:
