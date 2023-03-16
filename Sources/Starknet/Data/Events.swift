@@ -44,3 +44,15 @@ public struct StarknetEmittedEvent: Decodable, Equatable {
         case data
     }
 }
+
+public struct StarknetEvent: Decodable, Equatable {
+    public let address: Felt
+    public let keys: [Felt]
+    public let data: [Felt]
+
+    enum CodingKeys: String, CodingKey {
+        case address = "from_address"
+        case keys
+        case data
+    }
+}
