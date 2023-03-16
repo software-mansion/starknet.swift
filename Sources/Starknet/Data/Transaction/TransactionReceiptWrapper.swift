@@ -27,20 +27,19 @@ enum TransactionReceiptWrapper: Decodable {
     }
 
     public init(from decoder: Decoder) throws {
-
         let container = try decoder.container(keyedBy: Keys.self)
         let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
 
         switch (type) {
-        case (.invoke):
+        case .invoke:
             self = .invoke(try StarknetCommonTransactionReceipt(from: decoder))
-        case (.declare):
+        case .declare:
             self = .declare(try StarknetCommonTransactionReceipt(from: decoder))
-        case (.deploy):
+        case .deploy:
             self = .deploy(try StarknetDeployTransactionReceipt(from: decoder))
-        case (.deployAccount):
+        case .deployAccount:
             self = .deployAccount(try StarknetDeployTransactionReceipt(from: decoder))
-        case (.l1Handler):
+        case .l1Handler:
             self = .l1Handler(try StarknetCommonTransactionReceipt(from: decoder))
         }
     }
