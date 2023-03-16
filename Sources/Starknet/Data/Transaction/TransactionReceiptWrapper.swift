@@ -2,45 +2,31 @@ import Foundation
 
 enum TransactionReceiptWrapper: Decodable {
     fileprivate enum Keys: String, CodingKey {
-        case type
+        case blockHash = "block_hash"
     }
 
-    case invoke(StarknetCommonTransactionReceipt)
-    case deployAccount(StarknetDeployTransactionReceipt)
-    case deploy(StarknetDeployTransactionReceipt)
-    case declare(StarknetCommonTransactionReceipt)
-    case l1Handler(StarknetCommonTransactionReceipt)
+    case common(StarknetCommonTransactionReceipt)
+    case pending(StarknetPendingTransactionReceipt)
 
     public var transactionReceipt: any StarknetTransactionReceipt {
         switch self {
-        case let .invoke(tx):
+        case let .common(tx):
             return tx
-        case let .deployAccount(tx):
-            return tx
-        case let .deploy(tx):
-            return tx
-        case let .declare(tx):
-            return tx
-        case let .l1Handler(tx):
+        case let .pending(tx):
             return tx
         }
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
-        let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
 
-        switch type {
-        case .invoke:
-            self = .invoke(try StarknetCommonTransactionReceipt(from: decoder))
-        case .declare:
-            self = .declare(try StarknetCommonTransactionReceipt(from: decoder))
-        case .deploy:
-            self = .deploy(try StarknetDeployTransactionReceipt(from: decoder))
-        case .deployAccount:
-            self = .deployAccount(try StarknetDeployTransactionReceipt(from: decoder))
-        case .l1Handler:
-            self = .l1Handler(try StarknetCommonTransactionReceipt(from: decoder))
+        // Pending transaction won't have the block_hash value
+        do{
+            let _ = try container.decode(Felt.self, forKey: Keys.blockHash)
+            self = .common(try StarknetCommonTransactionReceipt(from: decoder))
+        }
+        catch{
+            self = .pending(try StarknetPendingTransactionReceipt(from: decoder))
         }
     }
 }
