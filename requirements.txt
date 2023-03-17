@@ -1,2 +1,4 @@
+typeguard~=2.13.3
+Web3~=5.31.1
 starknet-devnet==0.4.6
 cairo-lang==0.10.3
