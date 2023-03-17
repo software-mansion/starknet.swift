@@ -47,7 +47,7 @@ public class StarknetAccount: StarknetAccountProtocol {
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
 
-        let transaction = StarknetInvokeTransaction(sequencerTransaction: sequencerTransaction, hash: hash)
+        let transaction = StarknetInvokeTransactionV1(sequencerTransaction: sequencerTransaction, hash: hash)
         let signature = try signer.sign(transaction: transaction)
 
         return makeSequencerInvokeTransaction(calldata: calldata, signature: signature, params: params, version: version)

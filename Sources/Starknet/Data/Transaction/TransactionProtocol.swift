@@ -1,5 +1,5 @@
 
-public protocol StarknetSequencerTransaction: Codable {
+public protocol StarknetSequencerTransaction: Codable, Hashable, Equatable {
     var type: StarknetTransactionType { get }
     var version: Felt { get }
 }

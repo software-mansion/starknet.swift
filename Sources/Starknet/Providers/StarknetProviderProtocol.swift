@@ -28,7 +28,7 @@ public protocol StarknetProviderProtocol {
     ///  -  transaction: transaction for wich the fee should be estimated.
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: EstimateFeeResponse object
-    func estimateFee(for transaction: StarknetSequencerTransaction, at blockId: StarknetBlockId) async throws -> StarknetEstimateFeeResponse
+    func estimateFee(for transaction: any StarknetSequencerTransaction, at blockId: StarknetBlockId) async throws -> StarknetEstimateFeeResponse
 
     /// Invoke a function.
     ///
@@ -73,6 +73,21 @@ public protocol StarknetProviderProtocol {
     ///  - filter : the conditions used to filter the returned events
     /// - Returns: events matching the conditions in the provided filter and continuation token
     func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse
+
+    /// Get the details and status of a submitted transaction
+    ///
+    /// - Parameters:
+    ///  - hash: The hash of the requested transaction
+    /// - Returns: Transaction found with provided hash
+    func getTransactionBy(hash: Felt) async throws -> any StarknetTransaction
+
+    /// Get the details and status of a submitted transaction
+    ///
+    /// - Parameters:
+    ///  - blockId: id of block from which the transaction should be returned.
+    ///  - index: index of transaction in the block
+    /// - Returns: Transaction found with provided blockId and index.
+    func getTransactionBy(blockId: StarknetBlockId, index: UInt64) async throws -> any StarknetTransaction
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.pending)
@@ -93,7 +108,7 @@ public extension StarknetProviderProtocol {
     /// - Parameters:
     ///  -  transaction: transaction for which the fee should be estimated.
     /// - Returns: EstimateFeeResponse object
-    func estimateFee(for transaction: StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
+    func estimateFee(for transaction: any StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
         try await estimateFee(for: transaction, at: defaultBlockId)
     }
 

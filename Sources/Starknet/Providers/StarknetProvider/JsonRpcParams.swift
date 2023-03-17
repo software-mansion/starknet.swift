@@ -29,7 +29,7 @@ struct AddInvokeTransactionParams: Encodable {
 }
 
 struct EstimateFeeParams: Encodable {
-    let request: StarknetSequencerTransaction
+    let request: any StarknetSequencerTransaction
     let blockId: StarknetBlockId
 
     func encode(to encoder: Encoder) throws {
@@ -65,6 +65,24 @@ struct GetClassHashAtParams: Encodable {
 
 struct GetEventsPayload: Encodable {
     let filter: StarknetGetEventsFilter
+}
+
+struct GetTransactionByHashParams: Encodable {
+    let hash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case hash = "transaction_hash"
+    }
+}
+
+struct GetTransactionByBlockIdAndIndex: Encodable {
+    let blockId: StarknetBlockId
+    let index: UInt64
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+        case index
+    }
 }
 
 struct EmptyParams: Encodable {}
