@@ -112,6 +112,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 throw DevnetClientError.devnetError
             }
 
+            print(output)
+
             if output.contains("Connection in use") {
                 throw DevnetClientError.portAlreadyInUse
             }
