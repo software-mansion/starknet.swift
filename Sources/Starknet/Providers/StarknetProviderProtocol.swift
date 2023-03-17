@@ -75,7 +75,7 @@ public protocol StarknetProviderProtocol {
     func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse
 }
 
-private let defaultBlockId = StarknetBlockId.tag(.pending)
+private let defaultBlockId = StarknetBlockId.tag(.latest)
 
 public extension StarknetProviderProtocol {
     /// Call starknet contract in the pending block.
