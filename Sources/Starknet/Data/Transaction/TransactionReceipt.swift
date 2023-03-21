@@ -42,4 +42,10 @@ public struct StarknetPendingTransactionReceipt: StarknetTransactionReceipt, Dec
     }
 }
 
-public protocol StarknetTransactionReceipt: Decodable {}
+public protocol StarknetTransactionReceipt: Decodable {
+    var transactionHash: Felt { get }
+    var actualFee: Felt { get }
+    var messagesSent: [MessageToL1] { get }
+    var events: [StarknetEvent] { get }
+    var contractAddress: Felt? { get }
+}
