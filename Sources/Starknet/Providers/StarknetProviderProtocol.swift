@@ -94,7 +94,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - txHash : the hash of the requested transaction
     /// - Returns: receipt of a transaction identified by given hash
-    func getTransactionReceipt(txHash: Felt) async throws -> StarknetTransactionReceipt
+    func getTransactionReceiptBy(txHash: Felt) async throws -> StarknetTransactionReceipt
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.pending)
