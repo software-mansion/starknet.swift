@@ -126,8 +126,8 @@ final class ProviderTests: XCTestCase {
         let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
         let invoke = try await account.execute(call: call)
 
-        let resAccDeploy = try await provider.getTransactionReceiptBy(txHash: acc.txHash)
-        let resInvoke = try await provider.getTransactionReceiptBy(txHash: invoke.transactionHash)
+        let resAccDeploy = try await provider.getTransactionReceiptBy(hash: acc.txHash)
+        let resInvoke = try await provider.getTransactionReceiptBy(hash: invoke.transactionHash)
 
         print(resAccDeploy)
         print(resInvoke)
