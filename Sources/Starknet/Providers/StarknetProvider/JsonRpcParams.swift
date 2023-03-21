@@ -85,4 +85,12 @@ struct GetTransactionByBlockIdAndIndex: Encodable {
     }
 }
 
+struct GetTransactionReceiptPayload: Encodable {
+    let transactionHash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case transactionHash = "transaction_hash"
+    }
+}
+
 struct EmptyParams: Encodable {}

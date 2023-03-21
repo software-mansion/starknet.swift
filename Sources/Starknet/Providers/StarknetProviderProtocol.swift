@@ -88,6 +88,13 @@ public protocol StarknetProviderProtocol {
     ///  - index: index of transaction in the block
     /// - Returns: Transaction found with provided blockId and index.
     func getTransactionBy(blockId: StarknetBlockId, index: UInt64) async throws -> any StarknetTransaction
+
+    /// Get all event objects matching the conditions in the provided filter
+    ///
+    /// - Parameters:
+    ///  - txHash : the hash of the requested transaction
+    /// - Returns: receipt of a transaction identified by given hash
+    func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceipt
 }
 
 private let defaultBlockId = StarknetBlockId.tag(.pending)

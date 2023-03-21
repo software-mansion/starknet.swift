@@ -117,4 +117,19 @@ final class ProviderTests: XCTestCase {
             XCTFail("Fetching transaction with nonexistent hash should fail")
         } catch {}
     }
+
+    func testGetTransactionReceipt() async throws {
+        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_receipt")
+        let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events")
+        let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
+        let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider)
+        let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
+        let invoke = try await account.execute(call: call)
+
+        let resAccDeploy = try await provider.getTransactionReceiptBy(hash: acc.txHash)
+        let resInvoke = try await provider.getTransactionReceiptBy(hash: invoke.transactionHash)
+
+        print(resAccDeploy)
+        print(resInvoke)
+    }
 }
