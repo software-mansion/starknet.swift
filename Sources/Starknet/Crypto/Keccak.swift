@@ -11,3 +11,10 @@ public func starknetKeccak(on bytes: [UInt8]) -> Felt {
 
     return Felt(masked)!
 }
+
+public func keccak(on bytes: [UInt8]) -> BigUInt {
+    let hashed = bytes.sha3(.keccak256)
+    let data = Data(hashed)
+
+    return BigUInt(data)
+}
