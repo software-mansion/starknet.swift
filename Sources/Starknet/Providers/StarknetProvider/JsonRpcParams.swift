@@ -29,13 +29,24 @@ struct AddInvokeTransactionParams: Encodable {
 }
 
 struct EstimateFeeParams: Encodable {
-    let request: any StarknetSequencerTransaction
+    let request: [any StarknetSequencerTransaction]
     let blockId: StarknetBlockId
+
+    // Walkaround to allow encoding polymorphic array
+    struct WrappedSequencerTransaction: Encodable {
+        let transaction: any StarknetSequencerTransaction
+
+        func encode(to encoder: Encoder) throws {
+            try transaction.encode(to: encoder)
+        }
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(request, forKey: .request)
+        let wrappedRequest = request.map { WrappedSequencerTransaction(transaction: $0) }
+
+        try container.encode(wrappedRequest, forKey: .request)
         try container.encode(blockId, forKey: .blockId)
     }
 

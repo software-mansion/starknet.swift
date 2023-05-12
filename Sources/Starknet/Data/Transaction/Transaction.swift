@@ -226,7 +226,7 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
     }
 }
 
-public struct StarknetDeclareTransaction: StarknetTransaction {
+public struct StarknetDeclareTransactionLegacy: StarknetTransaction {
     public let type: StarknetTransactionType = .declare
 
     public let maxFee: Felt
@@ -271,6 +271,63 @@ public struct StarknetDeclareTransaction: StarknetTransaction {
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
+        self.hash = try container.decode(Felt.self, forKey: .hash)
+
+        try verifyTransactionIdentifiers(container: container, codingKeysType: Self.CodingKeys)
+    }
+}
+
+public struct StarknetDeclareTransactionV2: StarknetTransaction {
+    public let type: StarknetTransactionType = .declare
+
+    public let maxFee: Felt
+
+    public let version: Felt // Not setting version here, as both v0 and v1 have this same structure
+
+    public let signature: StarknetSignature
+
+    public let nonce: Felt
+
+    public let classHash: Felt
+
+    public let compiledClassHash: Felt
+
+    public let senderAddress: Felt
+
+    public let hash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case maxFee = "max_fee"
+        case version
+        case signature
+        case nonce
+        case classHash = "class_hash"
+        case compiledClassHash = "compiled_class_hash"
+        case senderAddress = "sender_address"
+        case hash = "transaction_hash"
+    }
+
+    public init(maxFee: Felt, version: Felt, signature: StarknetSignature, nonce: Felt, classHash: Felt, compiledClassHash: Felt, senderAddress: Felt, hash: Felt) {
+        self.maxFee = maxFee
+        self.version = version
+        self.signature = signature
+        self.nonce = nonce
+        self.classHash = classHash
+        self.compiledClassHash = compiledClassHash
+        self.senderAddress = senderAddress
+        self.hash = hash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
+        self.version = try container.decode(Felt.self, forKey: .version)
+        self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
+        self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.compiledClassHash = try container.decode(Felt.self, forKey: .compiledClassHash)
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 

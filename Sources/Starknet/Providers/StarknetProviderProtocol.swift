@@ -25,10 +25,10 @@ public protocol StarknetProviderProtocol {
     /// Estimate fee for a transaction.
     ///
     /// - Parameters:
-    ///  -  transaction: transaction for wich the fee should be estimated.
+    ///  - transactions: list of transactions for which the fees should be estimated.
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
-    /// - Returns: EstimateFeeResponse object
-    func estimateFee(for transaction: any StarknetSequencerTransaction, at blockId: StarknetBlockId) async throws -> StarknetEstimateFeeResponse
+    /// - Returns: Array of fee estimates
+    func estimateFee(for transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate]
 
     /// Invoke a function.
     ///
@@ -110,13 +110,13 @@ public extension StarknetProviderProtocol {
         try await callContract(call, at: defaultBlockId)
     }
 
-    /// Estimate fee for a transaction in the pending block.
+    /// Estimate fee for a list of transactions in the pending block.
     ///
     /// - Parameters:
-    ///  -  transaction: transaction for which the fee should be estimated.
-    /// - Returns: EstimateFeeResponse object
-    func estimateFee(for transaction: any StarknetSequencerTransaction) async throws -> StarknetEstimateFeeResponse {
-        try await estimateFee(for: transaction, at: defaultBlockId)
+    ///  -  transactions: transactions for which the fees should be estimated.
+    /// - Returns: Array of fee estimates
+    func estimateFee(for transactions: [any StarknetSequencerTransaction]) async throws -> [StarknetFeeEstimate] {
+        try await estimateFee(for: transactions, at: defaultBlockId)
     }
 
     /// Get nonce of given starknet contract in the pending block.

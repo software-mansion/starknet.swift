@@ -82,22 +82,22 @@ public class StarknetAccount: StarknetAccountProtocol {
         return try await execute(calls: calls, maxFee: maxFee)
     }
 
-    public func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse {
+    public func estimateFee(calls: [StarknetCall]) async throws -> StarknetFeeEstimate {
         let nonce = try await getNonce()
         let signParams = StarknetExecutionParams(nonce: nonce, maxFee: .zero)
         let transaction = try sign(calls: calls, params: signParams, forFeeEstimation: true)
 
-        let result = try await provider.estimateFee(for: transaction)
+        let result = try await provider.estimateFee(for: [transaction])
 
-        return result
+        return result[0]
     }
 
-    public func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetEstimateFeeResponse {
+    public func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetFeeEstimate {
         let signedTransaction = try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, maxFee: .zero, forFeeEstimation: true)
 
-        let result = try await provider.estimateFee(for: signedTransaction)
+        let result = try await provider.estimateFee(for: [signedTransaction])
 
-        return result
+        return result[0]
     }
 
     public func sign(typedData: StarknetTypedData) throws -> StarknetSignature {

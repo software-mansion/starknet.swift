@@ -8,7 +8,7 @@ public struct StarknetInvokeTransactionResponse: Decodable, Equatable {
     }
 }
 
-public struct StarknetEstimateFeeResponse: Decodable, Equatable {
+public struct StarknetFeeEstimate: Decodable, Equatable {
     public let gasConsumed: Felt
     public let gasPrice: Felt
     public let overallFee: Felt
@@ -41,7 +41,7 @@ public struct StarknetBlockHashAndNumber: Decodable, Equatable {
 }
 
 public struct StarknetGetEventsResponse: Decodable, Equatable {
-    public let continuationToken: String
+    public let continuationToken: String?
     public let events: [StarknetEmittedEvent]
 
     enum CodingKeys: String, CodingKey {

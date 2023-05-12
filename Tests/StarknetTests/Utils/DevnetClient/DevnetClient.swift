@@ -14,8 +14,8 @@ protocol DevnetClientProtocol {
 
     func prefundAccount(address: Felt) async throws
     func deployAccount(name: String) async throws -> DeployAccountResult
-    func deployContract(contractName: String) async throws -> TransactionResult
-    func declareContract(contractName: String) async throws -> Felt
+    func deployContract(contractName: String, deprecated: Bool) async throws -> TransactionResult
+    func declareContract(contractName: String, deprecated: Bool) async throws -> Felt
     func readAccountDetails(accountName: String) throws -> AccountDetails
 
     func assertTransactionPassed(transactionHash: Felt) async throws
@@ -24,6 +24,14 @@ protocol DevnetClientProtocol {
 extension DevnetClientProtocol {
     func deployAccount() async throws -> DeployAccountResult {
         try await deployAccount(name: UUID().uuidString)
+    }
+
+    func deployContract(contractName: String) async throws -> TransactionResult {
+        try await deployContract(contractName: contractName, deprecated: false)
+    }
+
+    func declareContract(contractName: String) async throws -> Felt {
+        try await declareContract(contractName: contractName, deprecated: false)
     }
 }
 
@@ -209,10 +217,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return DeployAccountResult(details: details, txHash: transactionResult.hash)
         }
 
-        public func deployContract(contractName: String) async throws -> TransactionResult {
+        public func deployContract(contractName: String, deprecated: Bool) async throws -> TransactionResult {
             try guardDevnetIsRunning()
 
-            let classHash = try await declareContract(contractName: contractName)
+            let classHash = try await declareContract(contractName: contractName, deprecated: deprecated)
 
             let params = [
                 "--class_hash",
@@ -221,8 +229,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 accountDirectory.absoluteString,
                 "--wallet",
                 "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
-                "--max_fee",
-                "0",
             ]
 
             let result = try runStarknetCli(
@@ -237,14 +243,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return transactionResult
         }
 
-        public func declareContract(contractName: String) async throws -> Felt {
+        public func declareContract(contractName: String, deprecated: Bool) async throws -> Felt {
             try guardDevnetIsRunning()
 
             guard let contractPath = Bundle.module.path(forResource: contractName, ofType: "json") else {
                 throw DevnetClientError.missingResourceFile
             }
 
-            let params = [
+            var params = [
                 "--contract",
                 contractPath,
                 "--account_dir",
@@ -252,6 +258,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "--wallet",
                 "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
             ]
+
+            if deprecated {
+                params.append("--deprecated")
+            }
 
             let result = try runStarknetCli(
                 command: "declare",
@@ -327,7 +337,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return split[index]
         }
 
-        private func getTransactionResult(lines: [String], offset: Int = 1) -> TransactionResult {
+        private func getTransactionResult(lines: [String], offset: Int = 2) -> TransactionResult {
             let address = Felt(fromHex: getValueFromLine(line: lines[offset])) ?? 0
             let hash = Felt(fromHex: getValueFromLine(line: lines[offset + 1])) ?? 0
             return TransactionResult(address: address, hash: hash)

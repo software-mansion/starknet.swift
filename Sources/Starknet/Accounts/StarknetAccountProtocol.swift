@@ -62,7 +62,7 @@ public protocol StarknetAccountProtocol {
     /// - Parameters:
     ///  - calls: list of calls, for which the fee should be estimated.
     /// - Returns: struct containing fee estimate
-    func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse
+    func estimateFee(calls: [StarknetCall]) async throws -> StarknetFeeEstimate
 
     /// Estimate fee for a deploy account transaction
     ///
@@ -71,7 +71,7 @@ public protocol StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     /// - Returns: struct containing fee estimate
-    func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetEstimateFeeResponse
+    func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetFeeEstimate
 
     /// Get current nonce of the account
     ///
@@ -141,7 +141,7 @@ public extension StarknetAccountProtocol {
     /// - Parameters:
     ///  - call: a call for which the fee should be estimated.
     /// - Returns: struct containing fee estimate
-    func estimateFee(call: StarknetCall) async throws -> StarknetEstimateFeeResponse {
+    func estimateFee(call: StarknetCall) async throws -> StarknetFeeEstimate {
         try await estimateFee(calls: [call])
     }
 }
