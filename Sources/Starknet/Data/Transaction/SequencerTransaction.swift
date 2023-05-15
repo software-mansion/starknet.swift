@@ -44,7 +44,7 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
         self.version = try container.decode(Felt.self, forKey: .version)
 
-        try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
+        try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
     }
 }
 
@@ -85,7 +85,7 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
         self.version = try container.decode(Felt.self, forKey: .version)
 
-        try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
+        try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
     }
 
     enum CodingKeys: String, CodingKey {
