@@ -65,21 +65,29 @@ public class StarknetAccount: StarknetAccountProtocol {
         return makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params, version: version)
     }
 
-    public func execute(calls: [StarknetCall], maxFee: Felt) async throws -> StarknetInvokeTransactionResponse {
-        let nonce = try await getNonce()
+    public func execute(calls: [StarknetCall], params: StarknetOptionalExecutionParams) async throws -> StarknetInvokeTransactionResponse {
+        var nonce: Felt
+        var maxFee: Felt
+
+        if let paramsNonce = params.nonce {
+            nonce = paramsNonce
+        } else {
+            nonce = try await getNonce()
+        }
+
+        if let paramsMaxFee = params.maxFee {
+            maxFee = paramsMaxFee
+        } else {
+            let feeEstimate = try await estimateFee(calls: calls, nonce: nonce)
+            maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+        }
+
         let signParams = StarknetExecutionParams(nonce: nonce, maxFee: maxFee)
         let transaction = try sign(calls: calls, params: signParams, forFeeEstimation: false)
 
         let result = try await provider.addInvokeTransaction(transaction)
 
         return result
-    }
-
-    public func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse {
-        let feeEstimate = try await estimateFee(calls: calls)
-        let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
-
-        return try await execute(calls: calls, maxFee: maxFee)
     }
 
     public func estimateFee(calls: [StarknetCall], nonce: Felt) async throws -> StarknetFeeEstimate {

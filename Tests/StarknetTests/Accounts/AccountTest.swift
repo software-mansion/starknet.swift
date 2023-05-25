@@ -60,6 +60,26 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
     }
 
+    func testExecuteCustomParams() async throws {
+        let calldata: [Felt] = [
+            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
+            1000,
+            0,
+        ]
+
+        let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+
+        let nonce = try await account.getNonce()
+        let feeEstimate = try await account.estimateFee(call: call, nonce: nonce)
+        let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+
+        let params = StarknetOptionalExecutionParams(nonce: nonce, maxFee: maxFee)
+
+        let result = try await account.execute(call: call, params: params)
+
+        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
+    }
+
     func testExecuteMultipleCalls() async throws {
         let calldata1: [Felt] = [
             "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",

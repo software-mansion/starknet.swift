@@ -44,10 +44,10 @@ public protocol StarknetAccountProtocol {
     ///
     /// - Parameters:
     ///  - calls: list of calls to be executed.
-    ///  - maxFee: maximal fee that can be paid for the transaction
+    ///  - params: additional params for a given transaction
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func execute(calls: [StarknetCall], maxFee: Felt) async throws -> StarknetInvokeTransactionResponse
+    func execute(calls: [StarknetCall], params: StarknetOptionalExecutionParams) async throws -> StarknetInvokeTransactionResponse
 
     /// Execute list of calls
     ///
@@ -115,15 +115,25 @@ public extension StarknetAccountProtocol {
         try sign(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
     }
 
+    /// Execute list of calls
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be executed.
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse {
+        try await execute(calls: calls, params: StarknetOptionalExecutionParams())
+    }
+
     /// Execute a call
     ///
     /// - Parameters:
     ///  - call: a call to be executed.
-    ///  - maxFee: maximal fee that can be paid for the transaction
+    ///  - params: additional params for a given transaction
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func execute(call: StarknetCall, maxFee: Felt) async throws -> StarknetInvokeTransactionResponse {
-        try await execute(calls: [call], maxFee: maxFee)
+    func execute(call: StarknetCall, params: StarknetOptionalExecutionParams) async throws -> StarknetInvokeTransactionResponse {
+        try await execute(calls: [call], params: params)
     }
 
     /// Execute a call
