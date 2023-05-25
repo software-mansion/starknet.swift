@@ -232,7 +232,7 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
     }
 }
 
-public struct StarknetDeclareTransactionLegacy: StarknetTransaction {
+public struct StarknetDeclareTransactionV1: StarknetTransaction {
     public let type: StarknetTransactionType = .declare
 
     public let maxFee: Felt
