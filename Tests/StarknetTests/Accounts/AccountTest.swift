@@ -91,17 +91,22 @@ final class AccountTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
-        let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
-        let fee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+        let nonce = (try? await newAccount.getNonce()) ?? .zero
 
-        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, maxFee: fee, forFeeEstimation: false)
+        let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
+        let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+
+        let params = StarknetExecutionParams(nonce: nonce, maxFee: maxFee)
+
+        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
+
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
         try await Self.devnetClient.assertTransactionPassed(transactionHash: response.transactionHash)
 
-        let nonce = try await newAccount.getNonce()
+        let newNonce = try await newAccount.getNonce()
 
-        XCTAssertEqual(nonce, Felt.one)
+        XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
     }
 
     func testSignTypedData() async throws {

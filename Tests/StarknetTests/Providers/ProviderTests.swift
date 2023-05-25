@@ -128,8 +128,27 @@ final class ProviderTests: XCTestCase {
 
         let resAccDeploy = try await provider.getTransactionReceiptBy(hash: acc.txHash)
         let resInvoke = try await provider.getTransactionReceiptBy(hash: invoke.transactionHash)
+    }
 
-        print(resAccDeploy)
-        print(resInvoke)
+    func testEstimateFee() async throws {
+        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_estimate_fee")
+        let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
+        let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
+        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider)
+
+        let nonce = try await account.getNonce()
+
+        let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+        let call2 = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
+
+        let params1 = StarknetExecutionParams(nonce: nonce, maxFee: 0)
+        let tx1 = try account.sign(calls: [call], params: params1, forFeeEstimation: true)
+
+        let params2 = StarknetExecutionParams(nonce: Felt(nonce.value + 1)!, maxFee: 0)
+        let tx2 = try account.sign(calls: [call, call2], params: params2, forFeeEstimation: true)
+
+        let fees = try await provider.estimateFee(for: [tx1, tx2])
+
+        XCTAssertEqual(fees.count, 2)
     }
 }
