@@ -31,6 +31,16 @@ public struct StarknetExecutionParams {
     }
 }
 
+public struct StarknetOptionalExecutionParams {
+    public let nonce: Felt?
+    public let maxFee: Felt?
+
+    public init(nonce: Felt? = nil, maxFee: Felt? = nil) {
+        self.nonce = nonce
+        self.maxFee = maxFee
+    }
+}
+
 public func starknetCallsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
     var wholeCalldata: [Felt] = []
     var callArray: [Felt] = []
