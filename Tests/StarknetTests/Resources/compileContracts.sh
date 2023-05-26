@@ -6,9 +6,9 @@ mkdir -p "Compiled"
 while IFS= read -r -d '' file; do
   name="$(basename -- "$file" .cairo)"
   if [[ $name == *"account"* ]]; then
-    starknet-compile "$file" --account_contract --output "Compiled/$name.json" --abi "Compiled/${name}Abi.json"
+    starknet-compile-deprecated "$file" --account_contract --output "Compiled/$name.json" --abi "Compiled/${name}Abi.json"
   else
-    starknet-compile "$file" --output "Compiled/$name.json" --abi "Compiled/${name}Abi.json"
+    starknet-compile-deprecated "$file" --output "Compiled/$name.json" --abi "Compiled/${name}Abi.json"
   fi
 done < <(find Contracts -name "*.cairo" -type f -print0)
 

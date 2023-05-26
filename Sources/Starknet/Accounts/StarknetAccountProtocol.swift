@@ -20,10 +20,10 @@ public protocol StarknetAccountProtocol {
     ///  - classHash: class hash of account to be deployed
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
-    ///  - maxFee: max acceptable fee for the transaction
+    ///  - params: additional params for a given transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed sequencer deploy account transaction
-    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction
 
     /// Sign TypedData for off-chain usage with this account's privateKey.
     ///
@@ -62,7 +62,7 @@ public protocol StarknetAccountProtocol {
     /// - Parameters:
     ///  - calls: list of calls, for which the fee should be estimated.
     /// - Returns: struct containing fee estimate
-    func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse
+    func estimateFee(calls: [StarknetCall], nonce: Felt) async throws -> StarknetFeeEstimate
 
     /// Estimate fee for a deploy account transaction
     ///
@@ -71,7 +71,7 @@ public protocol StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     /// - Returns: struct containing fee estimate
-    func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetEstimateFeeResponse
+    func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate
 
     /// Get current nonce of the account
     ///
@@ -100,8 +100,8 @@ public extension StarknetAccountProtocol {
     ///  - maxFee: max acceptable fee for the transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed sequencer deploy account transaction
-    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetSequencerDeployAccountTransaction {
-        try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, maxFee: maxFee, forFeeEstimation: false)
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams) throws -> StarknetSequencerDeployAccountTransaction {
+        try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: false)
     }
 
     /// Sign a call.
@@ -136,12 +136,32 @@ public extension StarknetAccountProtocol {
         try await execute(calls: [call])
     }
 
+    /// Estimate fee for a list of calls
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls, for which the fee should be estimated.
+    /// - Returns: struct containing fee estimate
+    func estimateFee(calls: [StarknetCall]) async throws -> StarknetFeeEstimate {
+        let nonce = try await getNonce()
+        return try await estimateFee(calls: calls, nonce: nonce)
+    }
+
+    /// Estimate fee for a call
+    ///
+    /// - Parameters:
+    ///  - call: a call for which the fee should be estimated.
+    ///  - nonce: a nonce to be used in a transaction
+    /// - Returns: struct containing fee estimate
+    func estimateFee(call: StarknetCall, nonce: Felt) async throws -> StarknetFeeEstimate {
+        try await estimateFee(calls: [call], nonce: nonce)
+    }
+
     /// Estimate fee for a call
     ///
     /// - Parameters:
     ///  - call: a call for which the fee should be estimated.
     /// - Returns: struct containing fee estimate
-    func estimateFee(call: StarknetCall) async throws -> StarknetEstimateFeeResponse {
+    func estimateFee(call: StarknetCall) async throws -> StarknetFeeEstimate {
         try await estimateFee(calls: [call])
     }
 }

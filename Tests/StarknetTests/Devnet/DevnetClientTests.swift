@@ -19,6 +19,6 @@ final class devnetClientTests: XCTestCase {
     }
 
     func testDeclareDeploy() async throws {
-        let _ = try await client.deployContract(contractName: "balance")
+        let _ = try await client.deployContract(contractName: "balance", deprecated: true)
     }
 }

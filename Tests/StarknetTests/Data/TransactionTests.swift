@@ -14,6 +14,10 @@ let declareTransactionV1 = """
 {"class_hash":"0x123","sender_address":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"DECLARE","version":"0x1","transaction_hash":"0x111"}
 """
 
+let declareTransactionV2 = """
+{"class_hash":"0x123","compiled_class_hash":"0x123","sender_address":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"DECLARE","version":"0x2","transaction_hash":"0x111"}
+"""
+
 let deployTransaction = """
 {"class_hash":"0x123","constructor_calldata":["0x1","0x2"],"contract_address_salt":"0x123","type":"DEPLOY","version":"0x0","transaction_hash":"0x111"}
 """
@@ -55,6 +59,7 @@ final class TransactionTests: XCTestCase {
             (invokeTransaction, .invoke, 1),
             (invokeTransactionV0, .invoke, 0),
             (declareTransactionV1, .declare, 1),
+            (declareTransactionV2, .declare, 2),
             (deployTransaction, .deploy, 0),
             (deployAccountTransaction, .deployAccount, 1),
             (l1HandlerTransaction, .l1Handler, 0),

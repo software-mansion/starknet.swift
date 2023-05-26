@@ -27,11 +27,11 @@ public class StarknetAccount: StarknetAccountProtocol {
         StarknetSequencerInvokeTransaction(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce, version: version)
     }
 
-    private func makeSequencerDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, maxFee: Felt, signature: StarknetSignature, version: Felt) -> StarknetSequencerDeployAccountTransaction {
+    private func makeSequencerDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, version: Felt) -> StarknetSequencerDeployAccountTransaction {
         StarknetSequencerDeployAccountTransaction(
             signature: signature,
-            maxFee: maxFee,
-            nonce: .zero,
+            maxFee: params.maxFee,
+            nonce: params.nonce,
             contractAddressSalt: salt,
             constructorCalldata: calldata,
             classHash: classHash,
@@ -53,16 +53,16 @@ public class StarknetAccount: StarknetAccountProtocol {
         return makeSequencerInvokeTransaction(calldata: calldata, signature: signature, params: params, version: version)
     }
 
-    public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction {
+    public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction {
         let version = forFeeEstimation ? estimateVersion : version
-        let sequencerTransaction = makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, maxFee: maxFee, signature: [], version: version)
+        let sequencerTransaction = makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, version: version)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
         let transaction = StarknetDeployAccountTransaction(sequencerTransaction: sequencerTransaction, hash: hash)
 
         let signature = try signer.sign(transaction: transaction)
 
-        return makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, maxFee: maxFee, signature: signature, version: version)
+        return makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params, version: version)
     }
 
     public func execute(calls: [StarknetCall], maxFee: Felt) async throws -> StarknetInvokeTransactionResponse {
@@ -82,22 +82,18 @@ public class StarknetAccount: StarknetAccountProtocol {
         return try await execute(calls: calls, maxFee: maxFee)
     }
 
-    public func estimateFee(calls: [StarknetCall]) async throws -> StarknetEstimateFeeResponse {
-        let nonce = try await getNonce()
+    public func estimateFee(calls: [StarknetCall], nonce: Felt) async throws -> StarknetFeeEstimate {
         let signParams = StarknetExecutionParams(nonce: nonce, maxFee: .zero)
         let transaction = try sign(calls: calls, params: signParams, forFeeEstimation: true)
 
-        let result = try await provider.estimateFee(for: transaction)
-
-        return result
+        return try await provider.estimateFee(for: transaction)
     }
 
-    public func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt) async throws -> StarknetEstimateFeeResponse {
-        let signedTransaction = try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, maxFee: .zero, forFeeEstimation: true)
+    public func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate {
+        let params = StarknetExecutionParams(nonce: nonce, maxFee: 0)
+        let signedTransaction = try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
 
-        let result = try await provider.estimateFee(for: signedTransaction)
-
-        return result
+        return try await provider.estimateFee(for: signedTransaction)
     }
 
     public func sign(typedData: StarknetTypedData) throws -> StarknetSignature {

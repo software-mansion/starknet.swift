@@ -57,7 +57,8 @@ public struct StarknetInvokeTransactionV1: StarknetTransaction {
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 
-        try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
+        try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
+        try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 }
 
@@ -112,7 +113,8 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 
-        try verifyTransactionIdentifiers(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 }
 
@@ -167,7 +169,8 @@ public struct StarknetDeployAccountTransaction: StarknetTransaction {
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 
-        try verifyTransactionIdentifiers(container: container, codingKeysType: CodingKeys.self)
+        try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
+        try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -213,6 +216,9 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
         self.entrypointSelector = try container.decode(Felt.self, forKey: .entrypointSelector)
         self.calldata = try container.decode(StarknetCalldata.self, forKey: .calldata)
         self.hash = try container.decode(Felt.self, forKey: .hash)
+
+        try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
+        try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -226,7 +232,7 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
     }
 }
 
-public struct StarknetDeclareTransaction: StarknetTransaction {
+public struct StarknetDeclareTransactionV1: StarknetTransaction {
     public let type: StarknetTransactionType = .declare
 
     public let maxFee: Felt
@@ -274,7 +280,63 @@ public struct StarknetDeclareTransaction: StarknetTransaction {
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
         self.hash = try container.decode(Felt.self, forKey: .hash)
 
-        try verifyTransactionIdentifiers(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
+    }
+}
+
+public struct StarknetDeclareTransactionV2: StarknetTransaction {
+    public let type: StarknetTransactionType = .declare
+
+    public let maxFee: Felt
+
+    public let version: Felt = 2
+
+    public let signature: StarknetSignature
+
+    public let nonce: Felt
+
+    public let classHash: Felt
+
+    public let compiledClassHash: Felt
+
+    public let senderAddress: Felt
+
+    public let hash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case maxFee = "max_fee"
+        case version
+        case signature
+        case nonce
+        case classHash = "class_hash"
+        case compiledClassHash = "compiled_class_hash"
+        case senderAddress = "sender_address"
+        case hash = "transaction_hash"
+    }
+
+    public init(maxFee: Felt, signature: StarknetSignature, nonce: Felt, classHash: Felt, compiledClassHash: Felt, senderAddress: Felt, hash: Felt) {
+        self.maxFee = maxFee
+        self.signature = signature
+        self.nonce = nonce
+        self.classHash = classHash
+        self.compiledClassHash = compiledClassHash
+        self.senderAddress = senderAddress
+        self.hash = hash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
+        self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
+        self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.compiledClassHash = try container.decode(Felt.self, forKey: .compiledClassHash)
+        self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
+        self.hash = try container.decode(Felt.self, forKey: .hash)
+
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
     }
 }
 
@@ -313,6 +375,9 @@ public struct StarknetDeployTransaction: StarknetTransaction {
         self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
         self.hash = try container.decode(Felt.self, forKey: .hash)
+
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
     }
 }
 
@@ -324,11 +389,19 @@ public enum StarknetTransactionDecodingError: Error {
 // Default deserializer doesn't check if the fields with default values match what is deserialized.
 // It's an extension that resolves this.
 internal extension StarknetSequencerTransaction {
-    func verifyTransactionIdentifiers<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
+    func verifyTransactionType<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
         let type = try container.decode(StarknetTransactionType.self, forKey: T(stringValue: "type")!)
 
         guard type == self.type else {
             throw StarknetTransactionDecodingError.invalidType
+        }
+    }
+
+    func verifyTransactionVersion<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
+        let version = try container.decode(Felt.self, forKey: T(stringValue: "version")!)
+
+        guard version == self.version else {
+            throw StarknetTransactionDecodingError.invalidVersion
         }
     }
 }
