@@ -37,7 +37,6 @@ struct WrappedSequencerTransaction: Encodable {
     }
 }
 
-
 struct EstimateFeeParams: Encodable {
     let request: [any StarknetSequencerTransaction]
     let blockId: StarknetBlockId

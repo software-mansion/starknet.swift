@@ -115,21 +115,24 @@ enum StarknetTransactionTraceWrapper: Decodable {
 
         if let validateInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .validateInvocation),
            let executeInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .executeInvocation),
-           let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation) {
+           let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation)
+        {
             self = .invoke(StarknetInvokeTransactionTrace(
                 validateInvocation: validateInvocation,
                 executeInvocation: executeInvocation,
                 feeTransferInvocation: feeTransferInvocation
             ))
         } else if let validateInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .validateInvocation),
-                  let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation) {
+                  let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation)
+        {
             self = .declare(StarknetDeclareTransactionTrace(
                 validateInvocation: validateInvocation,
                 feeTransferInvocation: feeTransferInvocation
             ))
         } else if let validateInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .validateInvocation),
                   let constructorInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .constructorInvocation),
-                  let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation) {
+                  let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation)
+        {
             self = .deployAccount(StarknetDeployAccountTransactionTrace(
                 validateInvocation: validateInvocation,
                 constructorInvocation: constructorInvocation,

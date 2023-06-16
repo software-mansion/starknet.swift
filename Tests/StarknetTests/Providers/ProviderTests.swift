@@ -163,14 +163,14 @@ final class ProviderTests: XCTestCase {
             let nonce = try await account.getNonce()
 
             let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
-            let params = StarknetExecutionParams(nonce: nonce, maxFee: 1000000000000)
+            let params = StarknetExecutionParams(nonce: nonce, maxFee: 1_000_000_000_000)
 
             let tx = try account.sign(calls: [call], params: params, forFeeEstimation: true)
 
             let simulation = try await provider.simulateTransactions([tx], at: .tag(.latest), simulationFlags: [.skipValidate])
 
             print(simulation)
-        } catch let error {
+        } catch {
             print(error)
 
             throw error
