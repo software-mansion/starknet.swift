@@ -9,6 +9,7 @@ final class ProviderTests: XCTestCase {
      To run, make sure you're running starknet-devnet on port 5050, with seed 0
      */
     static var devnetClient: DevnetClientProtocol!
+
     var provider: StarknetProviderProtocol!
 
     override class func setUp() {
@@ -150,5 +151,29 @@ final class ProviderTests: XCTestCase {
         let fees = try await provider.estimateFee(for: [tx1, tx2])
 
         XCTAssertEqual(fees.count, 2)
+    }
+
+    func testSimulateTransactions() async throws {
+        do {
+            let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_simulate_transactions")
+            let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
+            let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
+            let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider)
+
+            let nonce = try await account.getNonce()
+
+            let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+            let params = StarknetExecutionParams(nonce: nonce, maxFee: 1000000000000)
+
+            let tx = try account.sign(calls: [call], params: params, forFeeEstimation: true)
+
+            let simulation = try await provider.simulateTransactions([tx], at: .tag(.latest), simulationFlags: [.skipValidate])
+
+            print(simulation)
+        } catch let error {
+            print(error)
+
+            throw error
+        }
     }
 }
