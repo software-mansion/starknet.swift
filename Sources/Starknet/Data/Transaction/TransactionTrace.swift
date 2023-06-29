@@ -11,6 +11,11 @@ public enum StarknetCallType: String, Decodable {
     case libraryCall = "LIBRARY_CALL"
 }
 
+public enum StarknetSimulationFlag: String, Codable {
+    case skipValidate = "SKIP_VALIDATE"
+    case skipExecute = "SKIP_EXECUTE"
+}
+
 public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let contractAddress: Felt
     public let entrypoint: Felt
@@ -100,7 +105,7 @@ enum StarknetTransactionTraceWrapper: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
 
-        // Invocations can be null, so if let = try? syntax won't work here.
+        // Invocations can be null, so `if let = try?` syntax won't work here.
         do {
             let validateInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .validateInvocation)
             let executeInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .executeInvocation)
@@ -159,9 +164,4 @@ public struct StarknetSimulatedTransaction: Decodable {
         transactionTrace = try container.decode(StarknetTransactionTraceWrapper.self, forKey: .transactionTrace).transactionTrace
         feeEstimation = try container.decode(StarknetFeeEstimate.self, forKey: .feeEstimation)
     }
-}
-
-public enum StarknetSimulationFlag: String, Codable {
-    case skipValidate = "SKIP_VALIDATE"
-    case skipExecute = "SKIP_EXECUTE"
 }

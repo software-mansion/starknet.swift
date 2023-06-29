@@ -28,7 +28,7 @@ struct AddInvokeTransactionParams: Encodable {
     }
 }
 
-// Walkaround to allow encoding polymorphic array
+// Workaround to allow encoding polymorphic array
 struct WrappedSequencerTransaction: Encodable {
     let transaction: any StarknetSequencerTransaction
 
