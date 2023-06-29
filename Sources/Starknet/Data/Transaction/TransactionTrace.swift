@@ -15,21 +15,21 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let contractAddress: Felt
     public let entrypoint: Felt
     public let calldata: StarknetCalldata
-    public let callerAddress: Felt
-    public let codeAddress: Felt
-    public let entryPointType: StarknetEntryPointType
-    public let callType: StarknetCallType
-    public let result: [Felt]
-    public let calls: [StarknetFunctionInvocation]
-    public let events: [StarknetEventContent]
-    public let messages: [MessageToL1]
+    public let callerAddress: Felt?
+    public let classHash: Felt?
+    public let entryPointType: StarknetEntryPointType?
+    public let callType: StarknetCallType?
+    public let result: [Felt]?
+    public let calls: [StarknetFunctionInvocation]?
+    public let events: [StarknetEventContent]?
+    public let messages: [MessageToL1]?
 
     private enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
-        case entrypoint
+        case entrypoint = "entry_point_selector"
         case calldata
         case callerAddress = "caller_address"
-        case codeAddress = "code_address"
+        case classHash = "class_hash"
         case entryPointType = "entry_point_type"
         case callType = "call_type"
         case result
@@ -49,16 +49,6 @@ public struct StarknetInvokeTransactionTrace: StarknetTransactionTrace {
     private enum CodingKeys: String, CodingKey {
         case validateInvocation = "validate_invocation"
         case executeInvocation = "execute_invocation"
-        case feeTransferInvocation = "fee_transfer_invocation"
-    }
-}
-
-public struct StarknetDeclareTransactionTrace: StarknetTransactionTrace {
-    public let validateInvocation: StarknetFunctionInvocation?
-    public let feeTransferInvocation: StarknetFunctionInvocation?
-
-    private enum CodingKeys: String, CodingKey {
-        case validateInvocation = "validate_invocation"
         case feeTransferInvocation = "fee_transfer_invocation"
     }
 }
@@ -93,15 +83,12 @@ enum StarknetTransactionTraceWrapper: Decodable {
     }
 
     case invoke(StarknetInvokeTransactionTrace)
-    case declare(StarknetDeclareTransactionTrace)
     case deployAccount(StarknetDeployAccountTransactionTrace)
     case l1Handler(StarknetL1HandlerTransactionTrace)
 
     public var transactionTrace: any StarknetTransactionTrace {
         switch self {
         case let .invoke(txTrace):
-            return txTrace
-        case let .declare(txTrace):
             return txTrace
         case let .deployAccount(txTrace):
             return txTrace
@@ -113,43 +100,47 @@ enum StarknetTransactionTraceWrapper: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
 
-        if let validateInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .validateInvocation),
-           let executeInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .executeInvocation),
-           let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation)
-        {
+        // Invocations can be null, so if let = try? syntax won't work here.
+        do {
+            let validateInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .validateInvocation)
+            let executeInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .executeInvocation)
+            let feeTransferInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .feeTransferInvocation)
+
             self = .invoke(StarknetInvokeTransactionTrace(
                 validateInvocation: validateInvocation,
                 executeInvocation: executeInvocation,
                 feeTransferInvocation: feeTransferInvocation
             ))
-        } else if let validateInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .validateInvocation),
-                  let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation)
-        {
-            self = .declare(StarknetDeclareTransactionTrace(
-                validateInvocation: validateInvocation,
-                feeTransferInvocation: feeTransferInvocation
-            ))
-        } else if let validateInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .validateInvocation),
-                  let constructorInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .constructorInvocation),
-                  let feeTransferInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .feeTransferInvocation)
-        {
+            return
+        } catch {}
+
+        do {
+            let validateInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .validateInvocation)
+            let constructorInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .constructorInvocation)
+            let feeTransferInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .feeTransferInvocation)
+
             self = .deployAccount(StarknetDeployAccountTransactionTrace(
                 validateInvocation: validateInvocation,
                 constructorInvocation: constructorInvocation,
                 feeTransferInvocation: feeTransferInvocation
             ))
-        } else if let functionInvocation = try container.decodeIfPresent(StarknetFunctionInvocation.self, forKey: .functionInvocation) {
+            return
+        } catch {}
+
+        do {
+            let functionInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .functionInvocation)
+
             self = .l1Handler(StarknetL1HandlerTransactionTrace(
                 functionInvocation: functionInvocation
             ))
-        } else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: container.codingPath,
-                    debugDescription: "Invalid transaction trace wrapper"
-                )
-            )
-        }
+            return
+        } catch {}
+
+        throw DecodingError.dataCorrupted(
+            DecodingError.Context(
+                codingPath: container.codingPath,
+                debugDescription: "Invalid transaction trace"
+            ))
     }
 }
 
