@@ -96,13 +96,12 @@ public protocol StarknetProviderProtocol {
     /// - Returns: receipt of a transaction identified by given hash
     func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceipt
 
-    /// Simulate a given transaction on the requested state, and generate the execution trace
+    /// Simulate running a given list of transactions, and generate the execution trace
     ///
     /// - Parameters:
     ///  - transactions: list of transactions to simulate
-    ///  - blockId: at which block to run the simulation
-    ///  - skipValidatte: a flag whether signature validation should be bypassed
-    ///  - skipValidatte: a flag whether signature validation should be bypassed
+    ///  - blockId: block used to run the simulation
+    ///  - simulationFlags: a set of simulation flags
     func simulateTransactions(_ transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction]
 }
 
@@ -165,5 +164,14 @@ public extension StarknetProviderProtocol {
     /// - Returns: Class hash of the given contract
     func getClassHashAt(_ address: Felt) async throws -> Felt {
         try await getClassHashAt(address, at: defaultBlockId)
+    }
+
+    /// Simulate running a given list of transactions in the latest block, and generate the execution trace
+    ///
+    /// - Parameters:
+    ///  - transactions: list of transactions to simulate
+    ///  - simulationFlags: a set of simulation flags
+    func simulateTransactions(_ transactions: [any StarknetSequencerTransaction], simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
+        try await simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
 }
