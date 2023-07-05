@@ -59,6 +59,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private let devnetPath: String
         private let starknetPath: String
 
+        private var deployedContracts: [String: TransactionResult] = [:]
+
         let gatewayUrl: String
         let feederGatewayUrl: String
         let rpcUrl: String
@@ -219,6 +221,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func deployContract(contractName: String, deprecated: Bool) async throws -> TransactionResult {
             try guardDevnetIsRunning()
+
+            if let transactionResult = deployedContracts["contractName"] {
+                return transactionResult
+            }
 
             let classHash = try await declareContract(contractName: contractName, deprecated: deprecated)
 

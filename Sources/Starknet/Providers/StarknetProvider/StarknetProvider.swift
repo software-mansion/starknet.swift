@@ -142,4 +142,12 @@ public class StarknetProvider: StarknetProviderProtocol {
 
         return result.transactionReceipt
     }
+
+    public func simulateTransactions(_ transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
+        let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
+
+        let result = try await makeRequest(method: .simulateTransaction, params: params, receive: [StarknetSimulatedTransaction].self)
+
+        return result
+    }
 }

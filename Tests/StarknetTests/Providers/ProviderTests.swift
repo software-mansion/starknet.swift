@@ -9,6 +9,7 @@ final class ProviderTests: XCTestCase {
      To run, make sure you're running starknet-devnet on port 5050, with seed 0
      */
     static var devnetClient: DevnetClientProtocol!
+
     var provider: StarknetProviderProtocol!
 
     override class func setUp() {
@@ -150,5 +151,61 @@ final class ProviderTests: XCTestCase {
         let fees = try await provider.estimateFee(for: [tx1, tx2])
 
         XCTAssertEqual(fees.count, 2)
+    }
+
+    func testSimulateTransactions() async throws {
+        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_simulate_transactions")
+        let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
+        let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
+        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider)
+
+        let nonce = try await account.getNonce()
+
+        let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+        let params = StarknetExecutionParams(nonce: nonce, maxFee: 1_000_000_000_000)
+
+        let invokeTx = try account.sign(calls: [call], params: params, forFeeEstimation: true)
+
+        let accountClassHash = try await provider.getClassHashAt(account.address)
+        let newSigner = StarkCurveSigner(privateKey: 1234)!
+        let newPublicKey = newSigner.publicKey
+        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider)
+
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
+
+        let newAccountParams = StarknetExecutionParams(nonce: 0, maxFee: 0)
+        let deployAccountTx = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: true)
+
+        let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.latest), simulationFlags: [])
+
+        XCTAssertEqual(simulations.count, 2)
+        XCTAssertTrue(simulations[0].transactionTrace is StarknetInvokeTransactionTrace)
+        XCTAssertTrue(simulations[1].transactionTrace is StarknetDeployAccountTransactionTrace)
+
+        let invokeWithoutSignature = StarknetSequencerInvokeTransaction(
+            senderAddress: invokeTx.senderAddress,
+            calldata: invokeTx.calldata,
+            signature: [],
+            maxFee: invokeTx.maxFee,
+            nonce: invokeTx.nonce,
+            version: invokeTx.version
+        )
+
+        let deployAccountWithoutSignature = StarknetSequencerDeployAccountTransaction(
+            signature: [],
+            maxFee: deployAccountTx.maxFee,
+            nonce: deployAccountTx.nonce,
+            contractAddressSalt: deployAccountTx.contractAddressSalt,
+            constructorCalldata: deployAccountTx.constructorCalldata,
+            classHash: deployAccountTx.classHash,
+            version: deployAccountTx.version
+        )
+
+        let simulations2 = try await provider.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.latest), simulationFlags: [.skipValidate])
+
+        XCTAssertEqual(simulations2.count, 2)
+        XCTAssertTrue(simulations2[0].transactionTrace is StarknetInvokeTransactionTrace)
+        XCTAssertTrue(simulations2[1].transactionTrace is StarknetDeployAccountTransactionTrace)
     }
 }
