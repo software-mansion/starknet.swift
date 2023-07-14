@@ -5,8 +5,14 @@ public enum StarknetAccountError: Error {
     case invalidResponse
 }
 
+public enum CairoVersion: String, Encodable {
+    case zero
+    case one
+}
+
 public class StarknetAccount: StarknetAccountProtocol {
     private let version = Felt.one
+    private let cairoVersion: CairoVersion
 
     private var estimateVersion: Felt {
         Felt(BigUInt(2).power(128).advanced(by: BigInt(version.value)))!
@@ -17,10 +23,11 @@ public class StarknetAccount: StarknetAccountProtocol {
     private let signer: StarknetSignerProtocol
     private let provider: StarknetProviderProtocol
 
-    public init(address: Felt, signer: StarknetSignerProtocol, provider: StarknetProviderProtocol) {
+    public init(address: Felt, signer: StarknetSignerProtocol, provider: StarknetProviderProtocol, cairoVersion: CairoVersion) {
         self.address = address
         self.signer = signer
         self.provider = provider
+        self.cairoVersion = cairoVersion
     }
 
     private func makeSequencerInvokeTransaction(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, version: Felt) -> StarknetSequencerInvokeTransaction {
@@ -41,7 +48,7 @@ public class StarknetAccount: StarknetAccountProtocol {
 
     public func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction {
         let version = forFeeEstimation ? estimateVersion : version
-        let calldata = starknetCallsToExecuteCalldata(calls: calls)
+        let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
 
         let sequencerTransaction = makeSequencerInvokeTransaction(calldata: calldata, signature: [], params: params, version: version)
 
