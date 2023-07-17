@@ -30,6 +30,15 @@ public protocol StarknetProviderProtocol {
     /// - Returns: Array of fee estimates
     func estimateFee(for transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate]
 
+    /// Estimate the L2 fee of a message sent on L1
+    ///
+    /// - Parameters:
+    ///  - message: the message's parameters
+    ///  - senderAddress: the L1 address of the sender
+    ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
+    /// - Returns: the fee estimation
+    func estimateMessageFee(_ message: StarknetCall, senderAddress: Felt, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate
+
     /// Invoke a function.
     ///
     /// Invoke a function in deployed contract.
@@ -145,6 +154,16 @@ public extension StarknetProviderProtocol {
     /// - Returns: Fee estimate
     func estimateFee(for transaction: any StarknetSequencerTransaction) async throws -> StarknetFeeEstimate {
         try await estimateFee(for: transaction, at: defaultBlockId)
+    }
+
+    /// Estimate the L2 fee of a message sent on L1
+    ///
+    /// - Parameters:
+    ///  - message: the message's parameters
+    ///  - senderAddress: the L1 address of the sender
+    /// - Returns: the fee estimation
+    func estimateMessageFee(_ message: StarknetCall, senderAddress: Felt) async throws -> StarknetFeeEstimate {
+        try await estimateMessageFee(message, senderAddress: senderAddress, at: defaultBlockId)
     }
 
     /// Get nonce of given starknet contract in the pending block.

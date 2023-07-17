@@ -56,6 +56,18 @@ struct EstimateFeeParams: Encodable {
     }
 }
 
+struct EstimateMessageFeeParams: Encodable {
+    let message: StarknetCall
+    let senderAddress: Felt
+    let blockId: StarknetBlockId
+
+    enum CodingKeys: String, CodingKey {
+        case message
+        case senderAddress = "sender_address"
+        case blockId = "block_id"
+    }
+}
+
 struct AddDeployAccountTransactionParams: Encodable {
     let deployAccountTransaction: StarknetSequencerDeployAccountTransaction
 
