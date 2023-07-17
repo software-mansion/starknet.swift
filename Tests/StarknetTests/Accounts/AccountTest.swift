@@ -111,7 +111,7 @@ final class AccountTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
-        let nonce = (try? await newAccount.getNonce()) ?? .zero
+        let nonce = await (try? newAccount.getNonce()) ?? .zero
 
         let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
         let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)

@@ -23,9 +23,9 @@ enum TransactionReceiptWrapper: Decodable {
         // Pending transaction won't have the block_hash value
         do {
             let _ = try container.decode(Felt.self, forKey: Keys.blockHash)
-            self = .common(try StarknetCommonTransactionReceipt(from: decoder))
+            self = try .common(StarknetCommonTransactionReceipt(from: decoder))
         } catch {
-            self = .pending(try StarknetPendingTransactionReceipt(from: decoder))
+            self = try .pending(StarknetPendingTransactionReceipt(from: decoder))
         }
     }
 }

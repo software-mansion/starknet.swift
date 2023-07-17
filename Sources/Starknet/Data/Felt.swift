@@ -148,7 +148,7 @@ public extension Felt {
         let pairs = hexString.components(withMaxLength: 2)
 
         return pairs.map {
-            return "\(UnicodeScalar(Int($0, radix: 16)!)!)"
+            "\(UnicodeScalar(Int($0, radix: 16)!)!)"
         }.joined()
     }
 }

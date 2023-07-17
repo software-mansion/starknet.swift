@@ -190,13 +190,13 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     public func getTypeHash(typeName: String) throws -> Felt {
-        starknetSelector(from: try encode(type: typeName))
+        try starknetSelector(from: encode(type: typeName))
     }
 
     public func getStructHash(typeName: String, data: [String: Element]) throws -> Felt {
         let encodedData = try encode(data: data, forType: typeName)
 
-        return StarknetCurve.pedersenOn([try getTypeHash(typeName: typeName)] + encodedData)
+        return try StarknetCurve.pedersenOn([getTypeHash(typeName: typeName)] + encodedData)
     }
 
     public func getStructHash(typeName: String, data: String) throws -> Felt {
@@ -212,11 +212,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
-        StarknetCurve.pedersenOn(
+        try StarknetCurve.pedersenOn(
             Felt.fromShortString("StarkNet Message")!,
-            try getStructHash(typeName: "StarkNetDomain", data: domain),
+            getStructHash(typeName: "StarkNetDomain", data: domain),
             accountAddress,
-            try getStructHash(typeName: primaryType, data: message)
+            getStructHash(typeName: primaryType, data: message)
         )
     }
 }
