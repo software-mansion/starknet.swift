@@ -92,7 +92,7 @@ final class ProviderTests: XCTestCase {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_events")
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events", deprecated: true)
         let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
-        let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider)
+        let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider, cairoVersion: .zero)
         let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
         let _ = try await account.execute(call: call)
 
@@ -123,7 +123,7 @@ final class ProviderTests: XCTestCase {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_receipt")
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events", deprecated: true)
         let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
-        let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider)
+        let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider, cairoVersion: .zero)
         let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
         let invoke = try await account.execute(call: call)
 
@@ -135,7 +135,7 @@ final class ProviderTests: XCTestCase {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_estimate_fee")
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
         let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
-        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider)
+        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider, cairoVersion: .zero)
 
         let nonce = try await account.getNonce()
 
@@ -157,7 +157,7 @@ final class ProviderTests: XCTestCase {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_simulate_transactions")
         let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
-        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider)
+        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider, cairoVersion: .zero)
 
         let nonce = try await account.getNonce()
 
@@ -170,7 +170,7 @@ final class ProviderTests: XCTestCase {
         let newSigner = StarkCurveSigner(privateKey: 1234)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
-        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 

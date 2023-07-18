@@ -41,7 +41,16 @@ public struct StarknetOptionalExecutionParams {
     }
 }
 
-public func starknetCallsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
+public func starknetCallsToExecuteCalldata(calls: [StarknetCall], cairoVersion: CairoVersion) -> [Felt] {
+    switch cairoVersion {
+    case .zero:
+        return starknetCallsToExecuteCalldataCairo0(calls: calls)
+    case .one:
+        return starknetCallsToExecuteCalldataCairo1(calls: calls)
+    }
+}
+
+private func starknetCallsToExecuteCalldataCairo0(calls: [StarknetCall]) -> [Felt] {
     var wholeCalldata: [Felt] = []
     var callArray: [Felt] = []
 
@@ -55,4 +64,19 @@ public func starknetCallsToExecuteCalldata(calls: [StarknetCall]) -> [Felt] {
     }
 
     return [Felt(calls.count)!] + callArray + [Felt(wholeCalldata.count)!] + wholeCalldata
+}
+
+private func starknetCallsToExecuteCalldataCairo1(calls: [StarknetCall]) -> [Felt] {
+    var callArray: [Felt] = []
+
+    callArray.append(Felt(calls.count)!)
+
+    calls.forEach { call in
+        callArray.append(call.contractAddress)
+        callArray.append(call.entrypoint)
+        callArray.append(Felt(call.calldata.count)!)
+        callArray.append(contentsOf: call.calldata)
+    }
+
+    return callArray
 }

@@ -41,19 +41,19 @@ enum TransactionWrapper: Decodable {
 
         switch (type, version) {
         case (.invoke, .one):
-            self = .invoke(try StarknetInvokeTransactionV1(from: decoder))
+            self = try .invoke(StarknetInvokeTransactionV1(from: decoder))
         case (.invoke, .zero):
-            self = .invokeV0(try StarknetInvokeTransactionV0(from: decoder))
+            self = try .invokeV0(StarknetInvokeTransactionV0(from: decoder))
         case (.declare, .one), (.declare, .zero):
-            self = .declareV1(try StarknetDeclareTransactionV1(from: decoder))
+            self = try .declareV1(StarknetDeclareTransactionV1(from: decoder))
         case (.declare, 2):
-            self = .declareV2(try StarknetDeclareTransactionV2(from: decoder))
+            self = try .declareV2(StarknetDeclareTransactionV2(from: decoder))
         case (.deploy, .zero):
-            self = .deploy(try StarknetDeployTransaction(from: decoder))
+            self = try .deploy(StarknetDeployTransaction(from: decoder))
         case (.deployAccount, .one):
-            self = .deployAccount(try StarknetDeployAccountTransaction(from: decoder))
+            self = try .deployAccount(StarknetDeployAccountTransaction(from: decoder))
         case (.l1Handler, .zero):
-            self = .l1Handler(try StarknetL1HandlerTransaction(from: decoder))
+            self = try .l1Handler(StarknetL1HandlerTransaction(from: decoder))
         default:
             throw DecodingError.dataCorruptedError(forKey: Keys.version, in: container, debugDescription: "Invalid transaction version (\(version) for transaction type (\(type))")
         }
