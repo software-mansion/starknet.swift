@@ -60,8 +60,8 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func estimateMessageFee(_ message: StarknetCall, senderAddress: Felt, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
-        let params = EstimateMessageFeeParams(message: message, senderAddress: senderAddress, blockId: blockId)
+    public func estimateMessageFee(_ message: MessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
+        let params = EstimateMessageFeeParams(message: message, blockId: blockId)
 
         let result = try await makeRequest(method: .estimateMessageFee, params: params, receive: StarknetFeeEstimate.self)
 
