@@ -12,6 +12,14 @@ public protocol StarknetSignerProtocol {
     /// - Returns: Starknet signature of given transaction
     func sign(transaction: any StarknetTransaction) throws -> StarknetSignature
 
+    /// Sign transaction hash
+    ///
+    /// - Parameters:
+    ///  - transactionHash: hash of the transaction to be signed
+    ///
+    /// - Returns: Starknet signature of transaction with a given hash
+    func sign(transactionHash: Felt) throws -> StarknetSignature
+
     /// Sign TypedData object.
     ///
     /// - Parameters:
