@@ -111,7 +111,7 @@ final class ProviderTests: XCTestCase {
     func testGetTransactionByHash() async throws {
         let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0)
 
-        let _ = try await provider.getTransactionBy(hash: previousResult.hash)
+        let _ = try await provider.getTransactionBy(hash: previousResult.hash!)
 
         do {
             let _ = try await provider.getTransactionBy(hash: "0x123")

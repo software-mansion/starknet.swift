@@ -16,7 +16,7 @@ public class StarkCurveSigner: StarknetSignerProtocol {
     }
 
     public func sign(transaction: any StarknetTransaction) throws -> StarknetSignature {
-        try self.sign(transactionHash: transaction.hash)
+        try self.sign(transactionHash: transaction.hash!)
     }
     
     public func sign(transactionHash: Felt) throws -> StarknetSignature {
