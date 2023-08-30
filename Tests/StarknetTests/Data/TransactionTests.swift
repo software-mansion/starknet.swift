@@ -2,12 +2,16 @@ import XCTest
 
 @testable import Starknet
 
-let invokeTransaction = """
+let invokeTransactionV1 = """
 {"sender_address":"0x123","calldata":["0x1","0x2"],"max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"INVOKE","version":"0x1","transaction_hash":"0x111"}
 """
 
 let invokeTransactionV0 = """
-{"contract_address":"0x123","calldata":["0x1","0x2"],"entry_point_selector":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"INVOKE","version":"0x0","transaction_hash":"0x111"}
+{"contract_address":"0x123","calldata":["0x1","0x2"],"entry_point_selector":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"type":"INVOKE","version":"0x0","transaction_hash":"0x111"}
+"""
+
+let declareTransactinoV0 = """
+{"class_hash":"0x123","sender_address":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"type":"DECLARE","version":"0x0","transaction_hash":"0x111"}
 """
 
 let declareTransactionV1 = """
@@ -58,6 +62,7 @@ final class TransactionTests: XCTestCase {
         let cases: [(String, StarknetTransactionType, Felt)] = [
             (invokeTransaction, .invoke, 1),
             (invokeTransactionV0, .invoke, 0),
+            (declareTransactinoV0, .declare, 0),
             (declareTransactionV1, .declare, 1),
             (declareTransactionV2, .declare, 2),
             (deployTransaction, .deploy, 0),

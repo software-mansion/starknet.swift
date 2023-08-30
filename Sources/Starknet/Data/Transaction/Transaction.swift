@@ -232,6 +232,53 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
     }
 }
 
+public struct StarknetDeclareTransactionV0: StarknetTransaction {
+    public let type: StarknetTransactionType = .declare
+
+    public let maxFee: Felt
+
+    public let version: Felt
+
+    public let signature: StarknetSignature
+
+    public let classHash: Felt
+
+    public let senderAddress: Felt
+
+    public let hash: Felt?
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case maxFee = "max_fee"
+        case version
+        case signature
+        case classHash = "class_hash"
+        case senderAddress = "sender_address"
+        case hash = "transaction_hash"
+    }
+
+    public init(maxFee: Felt, version: Felt, signature: StarknetSignature, classHash: Felt, senderAddress: Felt, hash: Felt? = nil) {
+        self.maxFee = maxFee
+        self.version = version
+        self.signature = signature
+        self.classHash = classHash
+        self.senderAddress = senderAddress
+        self.hash = hash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
+        self.version = try container.decode(Felt.self, forKey: .version)
+        self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
+        self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
+    }
+}
+
 public struct StarknetDeclareTransactionV1: StarknetTransaction {
     public let type: StarknetTransactionType = .declare
 

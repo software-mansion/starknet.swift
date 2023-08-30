@@ -11,6 +11,7 @@ enum TransactionWrapper: Decodable {
     case invokeV0(StarknetInvokeTransactionV0)
     case deployAccount(StarknetDeployAccountTransaction)
     case deploy(StarknetDeployTransaction)
+    case declareV0(StarknetDeclareTransactionV0)
     case declareV1(StarknetDeclareTransactionV1)
     case declareV2(StarknetDeclareTransactionV2)
     case l1Handler(StarknetL1HandlerTransaction)
@@ -24,6 +25,8 @@ enum TransactionWrapper: Decodable {
         case let .deployAccount(tx):
             return tx
         case let .deploy(tx):
+            return tx
+        case let .declareV0(tx):
             return tx
         case let .declareV1(tx):
             return tx
@@ -44,7 +47,9 @@ enum TransactionWrapper: Decodable {
             self = try .invoke(StarknetInvokeTransactionV1(from: decoder))
         case (.invoke, .zero):
             self = try .invokeV0(StarknetInvokeTransactionV0(from: decoder))
-        case (.declare, .one), (.declare, .zero):
+        case (.declare, .zero):
+            self = try .declareV0(StarknetDeclareTransactionV0(from: decoder))
+        case (.declare, .one):
             self = try .declareV1(StarknetDeclareTransactionV1(from: decoder))
         case (.declare, 2):
             self = try .declareV2(StarknetDeclareTransactionV2(from: decoder))
