@@ -2,7 +2,7 @@ import BigInt
 import Foundation
 
 // Sending requests with invoke v0 transaction is not supported starting starknet 0.11
-private let invokeVersion : Felt = .one
+private let invokeVersion: Felt = .one
 
 public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
