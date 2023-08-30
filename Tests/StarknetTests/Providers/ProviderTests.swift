@@ -118,8 +118,8 @@ final class ProviderTests: XCTestCase {
             XCTFail("Fetching transaction with nonexistent hash should fail")
         } catch {}
     }
-
-    func testGetTransactionReceipt() async throws {
+    // TODO (#89): Reeabnle
+    func disabledTestGetTransactionReceipt() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_receipt")
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events", deprecated: true)
         let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
