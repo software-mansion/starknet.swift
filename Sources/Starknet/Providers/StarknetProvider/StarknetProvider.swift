@@ -108,13 +108,15 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 
     public func getBlockNumber() async throws -> UInt64 {
-        let result = try await makeRequest(method: .getBlockNumber, receive: UInt64.self)
+        let params: [String] = []
+        let result = try await makeRequest(method: .getBlockNumber, params: params, receive: UInt64.self)
 
         return result
     }
 
     public func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber {
-        let result = try await makeRequest(method: .getBlockHashAndNumber, receive: StarknetBlockHashAndNumber.self)
+        let params: [String] = []
+        let result = try await makeRequest(method: .getBlockHashAndNumber, params: params, receive: StarknetBlockHashAndNumber.self)
 
         return result
     }
