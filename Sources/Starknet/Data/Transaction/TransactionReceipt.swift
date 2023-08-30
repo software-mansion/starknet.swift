@@ -31,10 +31,6 @@ public struct StarknetCommonTransactionReceipt: StarknetTransactionReceipt, Deco
         case events
     }
 
-    enum AnotherCodingKeys: String, CodingKey {
-        case revertReason = "revert_error"
-    }
-
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.transactionHash = try container.decode(Felt.self, forKey: .transactionHash)

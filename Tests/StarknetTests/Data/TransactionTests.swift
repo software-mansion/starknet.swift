@@ -93,6 +93,8 @@ final class TransactionTests: XCTestCase {
         {"sender_address":"0x123","calldata":["0x1","0x2"],"max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"DEPLOY","version":"0x1"}
         """.data(using: .utf8)!
 
+        XCTAssertNoThrow(try decoder.decode(StarknetSequencerInvokeTransaction.self, from: json))
+
         XCTAssertThrowsError(try decoder.decode(StarknetSequencerInvokeTransaction.self, from: json2))
     }
 }

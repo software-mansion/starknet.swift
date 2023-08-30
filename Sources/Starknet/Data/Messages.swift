@@ -24,4 +24,11 @@ public struct MessageFromL1: Codable, Equatable {
         case entryPointSelector = "entry_point_selector"
         case payload
     }
+
+    public init(fromAddress: Felt, toAddress: Felt, entryPointSelector: Felt, payload: [Felt]) {
+        self.fromAddress = fromAddress
+        self.toAddress = toAddress
+        self.entryPointSelector = entryPointSelector
+        self.payload = payload
+    }
 }
