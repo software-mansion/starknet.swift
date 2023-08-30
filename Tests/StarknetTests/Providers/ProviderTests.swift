@@ -188,8 +188,7 @@ final class ProviderTests: XCTestCase {
             calldata: invokeTx.calldata,
             signature: [],
             maxFee: invokeTx.maxFee,
-            nonce: invokeTx.nonce,
-            version: invokeTx.version
+            nonce: invokeTx.nonce
         )
 
         let deployAccountWithoutSignature = StarknetSequencerDeployAccountTransaction(

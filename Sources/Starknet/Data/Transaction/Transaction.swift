@@ -77,8 +77,6 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
 
     public let maxFee: Felt
 
-    public let nonce: Felt 
-
     public let hash: Felt?
 
     enum CodingKeys: String, CodingKey {
@@ -89,17 +87,15 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
         case calldata
         case signature
         case maxFee = "max_fee"
-        case nonce
         case hash = "transaction_hash"
     }
 
-    public init(contractAddress: Felt, entrypointSelector: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt = .zero, hash: Felt? = nil) {
+    public init(contractAddress: Felt, entrypointSelector: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce _: Felt = .zero, hash: Felt? = nil) {
         self.contractAddress = contractAddress
         self.entrypointSelector = entrypointSelector
         self.calldata = calldata
         self.signature = signature
         self.maxFee = maxFee
-        self.nonce = nonce
         self.hash = hash
     }
 
@@ -110,7 +106,6 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
         self.calldata = try container.decode(StarknetCalldata.self, forKey: .calldata)
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
-        self.nonce = try container.decodeIfPresent(Felt.self, forKey: .nonce) ?? 0
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
 
         try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
@@ -284,7 +279,7 @@ public struct StarknetDeclareTransactionV1: StarknetTransaction {
 
     public let maxFee: Felt
 
-    public let version: Felt // Not setting version here, as both v0 and v1 have this same structure
+    public let version: Felt
 
     public let signature: StarknetSignature
 

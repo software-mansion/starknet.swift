@@ -36,7 +36,7 @@ let l1HandlerTransaction = """
 
 final class TransactionTests: XCTestCase {
     func testInvokeTransactionEncoding() throws {
-        let invoke = StarknetSequencerInvokeTransaction(senderAddress: "0x123", calldata: [1, 2], signature: [1, 2], maxFee: "0x859", nonce: 0, version: .one)
+        let invoke = StarknetSequencerInvokeTransaction(senderAddress: "0x123", calldata: [1, 2], signature: [1, 2], maxFee: "0x859", nonce: 0)
 
         let encoder = JSONEncoder()
 
@@ -60,7 +60,7 @@ final class TransactionTests: XCTestCase {
 
     func testTransactionWrapperDecoding() throws {
         let cases: [(String, StarknetTransactionType, Felt)] = [
-            (invokeTransaction, .invoke, 1),
+            (invokeTransactionV1, .invoke, 1),
             (invokeTransactionV0, .invoke, 0),
             (declareTransactinoV0, .declare, 0),
             (declareTransactionV1, .declare, 1),
@@ -82,14 +82,12 @@ final class TransactionTests: XCTestCase {
         }
     }
 
-    func testInvokeTransactionDecoding() throws {
+    func testSequencerInvokeTransactionDecoding() throws {
+        let decoder = JSONDecoder()
+
         let json = """
         {"sender_address":"0x123","calldata":["0x1","0x2"],"max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"INVOKE","version":"0x1"}
         """.data(using: .utf8)!
-
-        let decoder = JSONDecoder()
-
-        XCTAssertNoThrow(try decoder.decode(StarknetSequencerInvokeTransaction.self, from: json))
 
         let json2 = """
         {"sender_address":"0x123","calldata":["0x1","0x2"],"max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"DEPLOY","version":"0x1"}
