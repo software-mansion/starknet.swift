@@ -30,21 +30,6 @@ public struct StarknetCommonTransactionReceipt: StarknetTransactionReceipt, Deco
         case type
         case events
     }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.transactionHash = try container.decode(Felt.self, forKey: .transactionHash)
-        self.actualFee = try container.decode(Felt.self, forKey: .actualFee)
-        self.blockHash = try container.decode(Felt.self, forKey: .blockHash)
-        self.blockNumber = try container.decode(UInt64.self, forKey: .blockNumber)
-        self.messagesSent = try container.decode([MessageToL1].self, forKey: .messagesSent)
-        self.contractAddress = try container.decodeIfPresent(Felt.self, forKey: .contractAddress)
-        self.executionStatus = try container.decode(StarknetTransactionExecutionStatus.self, forKey: .executionStatus)
-        self.finalityStatus = try container.decode(StarknetTransactionFinalityStatus.self, forKey: .finalityStatus)
-        self.type = try container.decode(StarknetTransactionReceiptType.self, forKey: .type)
-        self.events = try container.decode([StarknetEvent].self, forKey: .events)
-        self.revertReason = try container.decodeIfPresent(String.self, forKey: .revertReason)
-    }
 }
 
 public struct StarknetPendingTransactionReceipt: StarknetTransactionReceipt, Decodable {
@@ -72,18 +57,6 @@ public struct StarknetPendingTransactionReceipt: StarknetTransactionReceipt, Dec
         case revertReason = "revert_reason"
         case type
         case events
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.transactionHash = try container.decode(Felt.self, forKey: .transactionHash)
-        self.actualFee = try container.decode(Felt.self, forKey: .actualFee)
-        self.messagesSent = try container.decode([MessageToL1].self, forKey: .messagesSent)
-        self.contractAddress = try container.decodeIfPresent(Felt.self, forKey: .contractAddress)
-        self.executionStatus = try container.decode(StarknetTransactionExecutionStatus.self, forKey: .executionStatus)
-        self.finalityStatus = try container.decode(StarknetTransactionFinalityStatus.self, forKey: .finalityStatus)
-        self.events = try container.decode([StarknetEvent].self, forKey: .events)
-        self.revertReason = try container.decodeIfPresent(String.self, forKey: .revertReason)
     }
 }
 
