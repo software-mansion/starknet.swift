@@ -119,7 +119,7 @@ final class ProviderTests: XCTestCase {
         } catch {}
     }
 
-    // TODO: (#89): Reeabnle
+    // TODO: (#89): Re-eanable
     func disabledTestGetTransactionReceipt() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_receipt")
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events", deprecated: true)
