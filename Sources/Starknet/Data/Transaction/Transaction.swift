@@ -55,7 +55,7 @@ public struct StarknetInvokeTransactionV1: StarknetTransaction {
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
@@ -106,7 +106,7 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
         self.calldata = try container.decode(StarknetCalldata.self, forKey: .calldata)
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
@@ -162,7 +162,7 @@ public struct StarknetDeployAccountTransaction: StarknetTransaction {
         self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
         self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
@@ -210,7 +210,7 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
         self.contractAddress = try container.decode(Felt.self, forKey: .contractAddress)
         self.entrypointSelector = try container.decode(Felt.self, forKey: .entrypointSelector)
         self.calldata = try container.decode(StarknetCalldata.self, forKey: .calldata)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
@@ -266,7 +266,7 @@ public struct StarknetDeclareTransactionV0: StarknetTransaction {
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
         try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
@@ -317,7 +317,7 @@ public struct StarknetDeclareTransactionV1: StarknetTransaction {
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
         try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
@@ -373,7 +373,7 @@ public struct StarknetDeclareTransactionV2: StarknetTransaction {
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
         self.compiledClassHash = try container.decode(Felt.self, forKey: .compiledClassHash)
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
         try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
@@ -414,7 +414,7 @@ public struct StarknetDeployTransaction: StarknetTransaction {
         self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
         self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
-        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash) ?? nil
+        self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
         try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)

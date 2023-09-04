@@ -60,7 +60,8 @@ final class TransactionReceiptTests: XCTestCase {
         var receiptWrapper: TransactionReceiptWrapper?
         XCTAssertNoThrow(receiptWrapper = try decoder.decode(TransactionReceiptWrapper.self, from: json))
 
-        let receipt = receiptWrapper?.transactionReceipt ?? nil
+        let receipt = receiptWrapper?.transactionReceipt
+
         XCTAssertNotNil(receipt)
         XCTAssertEqual(receipt!.events.count, 2)
         XCTAssertNil(receipt!.revertReason)
@@ -88,7 +89,7 @@ final class TransactionReceiptTests: XCTestCase {
         var receiptWrapper: TransactionReceiptWrapper?
         XCTAssertNoThrow(receiptWrapper = try decoder.decode(TransactionReceiptWrapper.self, from: json))
 
-        let receipt = receiptWrapper?.transactionReceipt ?? nil
+        let receipt = receiptWrapper?.transactionReceipt
 
         XCTAssertNotNil(receipt)
         XCTAssertNotNil(receipt!.revertReason)
@@ -125,22 +126,16 @@ final class TransactionReceiptTests: XCTestCase {
 
         var pendingReceiptWrapper: TransactionReceiptWrapper?
         XCTAssertNoThrow(pendingReceiptWrapper = try decoder.decode(TransactionReceiptWrapper.self, from: pendingReceiptJson))
-        var pendingReceipt = pendingReceiptWrapper?.transactionReceipt
+        let pendingReceipt = pendingReceiptWrapper?.transactionReceipt
 
-        pendingReceipt = pendingReceipt as? StarknetPendingTransactionReceipt ?? nil
-        XCTAssertNotNil(pendingReceipt)
-
-        pendingReceipt = pendingReceipt as? StarknetCommonTransactionReceipt ?? nil
-        XCTAssertNil(pendingReceipt)
+        XCTAssertTrue(pendingReceipt is StarknetPendingTransactionReceipt)
+        XCTAssertFalse(pendingReceipt is StarknetCommonTransactionReceipt)
 
         var commonReceiptWrapper: TransactionReceiptWrapper?
         XCTAssertNoThrow(commonReceiptWrapper = try decoder.decode(TransactionReceiptWrapper.self, from: commonReceiptJson))
-        var commonReceipt = commonReceiptWrapper?.transactionReceipt
+        let commonReceipt = commonReceiptWrapper?.transactionReceipt
 
-        commonReceipt = commonReceipt as? StarknetCommonTransactionReceipt ?? nil
-        XCTAssertNotNil(commonReceipt)
-
-        commonReceipt = commonReceipt as? StarknetPendingTransactionReceipt ?? nil
-        XCTAssertNil(commonReceipt)
+        XCTAssertTrue(commonReceipt is StarknetCommonTransactionReceipt)
+        XCTAssertFalse(commonReceipt is StarknetPendingTransactionReceipt)
     }
 }
