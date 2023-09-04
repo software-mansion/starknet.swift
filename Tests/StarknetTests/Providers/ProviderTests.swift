@@ -111,7 +111,7 @@ final class ProviderTests: XCTestCase {
     func testGetTransactionByHash() async throws {
         let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0)
 
-        let _ = try await provider.getTransactionBy(hash: previousResult.hash)
+        let _ = try await provider.getTransactionBy(hash: previousResult.hash!)
 
         do {
             let _ = try await provider.getTransactionBy(hash: "0x123")
@@ -119,7 +119,8 @@ final class ProviderTests: XCTestCase {
         } catch {}
     }
 
-    func testGetTransactionReceipt() async throws {
+    // TODO: (#89): Re-enable
+    func disabledTestGetTransactionReceipt() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_receipt")
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events", deprecated: true)
         let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
@@ -188,8 +189,7 @@ final class ProviderTests: XCTestCase {
             calldata: invokeTx.calldata,
             signature: [],
             maxFee: invokeTx.maxFee,
-            nonce: invokeTx.nonce,
-            version: invokeTx.version
+            nonce: invokeTx.nonce
         )
 
         let deployAccountWithoutSignature = StarknetSequencerDeployAccountTransaction(

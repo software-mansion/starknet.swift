@@ -30,8 +30,8 @@ public class StarknetAccount: StarknetAccountProtocol {
         self.cairoVersion = cairoVersion
     }
 
-    private func makeSequencerInvokeTransaction(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, version: Felt) -> StarknetSequencerInvokeTransaction {
-        StarknetSequencerInvokeTransaction(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce, version: version)
+    private func makeSequencerInvokeTransaction(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, forFeeEstimation: Bool = false) -> StarknetSequencerInvokeTransaction {
+        StarknetSequencerInvokeTransaction(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
     }
 
     private func makeSequencerDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, version: Felt) -> StarknetSequencerDeployAccountTransaction {
@@ -47,17 +47,15 @@ public class StarknetAccount: StarknetAccountProtocol {
     }
 
     public func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction {
-        let version = forFeeEstimation ? estimateVersion : version
         let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
 
-        let sequencerTransaction = makeSequencerInvokeTransaction(calldata: calldata, signature: [], params: params, version: version)
+        let sequencerTransaction = makeSequencerInvokeTransaction(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
 
-        let transaction = StarknetInvokeTransactionV1(sequencerTransaction: sequencerTransaction, hash: hash)
-        let signature = try signer.sign(transaction: transaction)
+        let signature = try signer.sign(transactionHash: hash)
 
-        return makeSequencerInvokeTransaction(calldata: calldata, signature: signature, params: params, version: version)
+        return makeSequencerInvokeTransaction(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
     public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction {
@@ -65,9 +63,8 @@ public class StarknetAccount: StarknetAccountProtocol {
         let sequencerTransaction = makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, version: version)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
-        let transaction = StarknetDeployAccountTransaction(sequencerTransaction: sequencerTransaction, hash: hash)
 
-        let signature = try signer.sign(transaction: transaction)
+        let signature = try signer.sign(transactionHash: hash)
 
         return makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params, version: version)
     }

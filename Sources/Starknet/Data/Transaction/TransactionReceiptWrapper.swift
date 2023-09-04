@@ -3,6 +3,7 @@ import Foundation
 enum TransactionReceiptWrapper: Decodable {
     fileprivate enum Keys: String, CodingKey {
         case blockHash = "block_hash"
+        case blockNumber = "block_number"
     }
 
     case common(StarknetCommonTransactionReceipt)
@@ -20,12 +21,15 @@ enum TransactionReceiptWrapper: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
 
-        // Pending transaction won't have the block_hash value
-        do {
-            let _ = try container.decode(Felt.self, forKey: Keys.blockHash)
-            self = try .common(StarknetCommonTransactionReceipt(from: decoder))
-        } catch {
+        let blockHash = try container.decodeIfPresent(Felt.self, forKey: Keys.blockHash)
+        let blockNumber = try container.decodeIfPresent(Felt.self, forKey: Keys.blockHash)
+
+        let isPending = blockHash == nil || blockNumber == nil
+
+        if isPending {
             self = try .pending(StarknetPendingTransactionReceipt(from: decoder))
+        } else {
+            self = try .common(StarknetCommonTransactionReceipt(from: decoder))
         }
     }
 }

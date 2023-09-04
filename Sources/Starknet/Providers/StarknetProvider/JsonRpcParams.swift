@@ -1,5 +1,9 @@
 import Foundation
 
+typealias EmptySequence = [String]
+
+struct EmptyParams: Encodable {}
+
 struct CallParams: Encodable {
     let request: StarknetCall
     let blockId: StarknetBlockId
@@ -56,14 +60,12 @@ struct EstimateFeeParams: Encodable {
     }
 }
 
-struct EstimateMessageFeeParams: Encodable {
-    let message: StarknetCall
-    let senderAddress: Felt
+public struct EstimateMessageFeeParams: Encodable {
+    let message: MessageFromL1
     let blockId: StarknetBlockId
 
     enum CodingKeys: String, CodingKey {
         case message
-        case senderAddress = "sender_address"
         case blockId = "block_id"
     }
 }
@@ -137,5 +139,3 @@ struct SimulateTransactionsParams: Encodable {
         case simulationFlags = "simulation_flags"
     }
 }
-
-struct EmptyParams: Encodable {}
