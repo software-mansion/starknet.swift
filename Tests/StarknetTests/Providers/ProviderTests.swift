@@ -154,8 +154,7 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(fees.count, 2)
     }
 
-    // TODO: (#89): Re-enable
-    func disabledTestSimulateTransactions() async throws {
+    func testSimulateTransactions() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_simulate_transactions")
         let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
         let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
