@@ -13,7 +13,7 @@ public enum StarknetCallType: String, Decodable {
 
 public enum StarknetSimulationFlag: String, Codable {
     case skipValidate = "SKIP_VALIDATE"
-    case skipExecute = "SKIP_EXECUTE"
+    case skipFeeCharge = "SKIP_FEE_CHARGE"
 }
 
 public struct StarknetFunctionInvocation: Decodable, Equatable {
