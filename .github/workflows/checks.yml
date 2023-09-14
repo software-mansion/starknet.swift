@@ -40,23 +40,39 @@ jobs:
       - name: Run SwiftFormat lint
         run: mint run swiftformat --lint .
 
-      - name: Set up Python 3.9.12
-        uses: actions/setup-python@v2
+      # TODO: Replace with installing release when release is avaiable
+      - name: Clone starknet-devnet-rs
+        run: |
+          git clone https://github.com/0xSpaceShard/starknet-devnet-rs.git starknet-devnet-rs
+          pushd starknet-devnet-rs
+          git checkout 7586b55d221e9010809a6e61b7e28e53fc9ff5c2
+          popd
+
+      - name: Cache devnet build
+        uses: actions/cache@v3
         with:
-          python-version: 3.9.12
+          path: starknet-devnet-rs/target/release
+          key: ${{ runner.os }}-starknet-devnet-rs-target-release-${{ hashFiles('starknet-devnet-rs/Cargo.lock') }}
 
-      - name: Install devnet
+      - name: Build devnet
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [[ ! -d "${{ github.workspace }}/starknet-devnet-rs/target/release" ]]; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            cargo build --release 
+          else
+            echo "Found existing starknet-devnet-rs build, skipping compilation."
+          fi
 
-      - name: Compile resource contracts
+      - name: Install scarb
         run: |
-          chmod +x ./Tests/StarknetTests/Resources/compileContracts.sh
-          ./Tests/StarknetTests/Resources/compileContracts.sh
+          curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 0.6.0
+      - name: Install sncast
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.4.1
 
       - name: Run tests
         run: |
-          export DEVNET_PATH="$(which starknet-devnet)"
-          export STARKNET_PATH="$(which starknet)"
+          export DEVNET_PATH="${{ github.workspace }}/starknet-devnet-rs/target/release"
+          export SCARB_PATH=$(which scarb)
+          export SNCAST_PAT="$(which sncast)"
           swift test --disable-sandbox
