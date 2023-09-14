@@ -70,10 +70,12 @@ jobs:
       - name: Install scarb 0.6.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 0.6.0
+          echo "SCARB_PATH=$(which scarb)" >> "$GITHUB_ENV"
 
       - name: Install sncast 0.4.1
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.4.1
+          echo "SNCAST_PATH=$(which sncast)" >> "$GITHUB_ENV"
 
       - name: Run tests
         run: |
