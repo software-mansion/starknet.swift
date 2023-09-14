@@ -213,8 +213,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 try? fileManager.removeItem(at: filePath)
             }
 
+            //  Recreating proper file structure requried by scarb
             let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
-
             let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
             let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
             let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
@@ -451,10 +451,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.standardOutput = outputPipe
             process.standardError = errorPipe
 
-            process.currentDirectoryPath = contractsPath!
 
             // TODO: migrate to URLs everywhere - path fields are marked as deprecated
             process.launchPath = snCastPath
+            process.currentDirectoryPath = contractsPath!
             process.arguments = [
                 "--json",
 //                "--path-to-scarb-toml",
@@ -479,7 +479,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.launch()
             process.waitUntilExit()
 
-            let command = "\(process.launchPath!) \(process.arguments!.joined(separator: " "))"
+//            let command = "\(process.launchPath!) \(process.arguments!.joined(separator: " "))"
 //             print(command)
 
             guard process.terminationStatus == 0 else {
@@ -502,19 +502,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             // Try parsing the trimmed output as JSON
             let outputDataTrimmed = output.data(using: .utf8)!
-//            let jsonResult = try JSONSerialization.jsonObject(with: outputData, options: .allowFragments)
-
-//
-//            guard let outputDict = jsonResult as? [String: Any] else {
-//                throw SnCastError.snCastError("Invalid json.")
-//            }
-//            if outputDict["error"] != nil {
-//                let errorMsg = outputDict["error"] as! String
-//                throw SnCastError.snCastError(errorMsg)
-//            }
             let result = try JSONDecoder().decode(SnCastResponseWrapper.self, from: outputDataTrimmed)
 
-//            return outputDict
             return result.response
         }
 
