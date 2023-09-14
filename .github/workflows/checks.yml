@@ -58,7 +58,7 @@ jobs:
 
       - name: Build devnet
         run: |
-          if [[ ! -d "$DEVNET_BUILD_PATH" ]]; then
+          if [[ ! -d ${{ github.workspace }}/starknet-devnet-rs/target/release ]]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
             pushd ${{ github.workspace }}/starknet-devnet-rs
             cargo build --release 
@@ -77,7 +77,7 @@ jobs:
 
       - name: Run tests
         run: |
-          export DEVNET_PATH="$DEVNET_BUILD_PATH"
-          export SCARB_PATH=$(which scarb)
+          export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
+          export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
           swift test --disable-sandbox
