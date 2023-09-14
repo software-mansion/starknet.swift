@@ -58,7 +58,9 @@ jobs:
         run: |
           if [[ ! -d "${{ github.workspace }}/starknet-devnet-rs/target/release" ]]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            pushd {{ github.workspace }}/starknet-devnet-rs
             cargo build --release 
+            popd
           else
             echo "Found existing starknet-devnet-rs build, skipping compilation."
           fi
