@@ -1,4 +1,8 @@
+import BigInt
 import Foundation
+
+// Sending requests with invoke v0 transaction is not supported starting starknet 0.11
+private let invokeVersion: Felt = .one
 
 public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, Equatable {
     public let type: StarknetTransactionType = .invoke
@@ -25,13 +29,17 @@ public struct StarknetSequencerInvokeTransaction: StarknetSequencerTransaction, 
         case nonce
     }
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, version: Felt) {
+    private static func estimateVersion(_ version: Felt) -> Felt {
+        Felt(BigUInt(2).power(128).advanced(by: BigInt(version.value)))!
+    }
+
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, forFeeEstimation: Bool = false) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
         self.maxFee = maxFee
         self.nonce = nonce
-        self.version = version
+        self.version = forFeeEstimation ? StarknetSequencerInvokeTransaction.estimateVersion(invokeVersion) : invokeVersion
     }
 
     public init(from decoder: Decoder) throws {
@@ -97,5 +105,25 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
         case contractAddressSalt = "contract_address_salt"
         case constructorCalldata = "constructor_calldata"
         case classHash = "class_hash"
+    }
+}
+
+// Default deserializer doesn't check if the fields with default values match what is deserialized.
+// It's an extension that resolves this.
+internal extension StarknetSequencerTransaction {
+    func verifyTransactionType<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
+        let type = try container.decode(StarknetTransactionType.self, forKey: T(stringValue: "type")!)
+
+        guard type == self.type else {
+            throw StarknetTransactionDecodingError.invalidType
+        }
+    }
+
+    func verifyTransactionVersion<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
+        let version = try container.decode(Felt.self, forKey: T(stringValue: "version")!)
+
+        guard version == self.version else {
+            throw StarknetTransactionDecodingError.invalidVersion
+        }
     }
 }

@@ -13,6 +13,10 @@ public struct StarknetCommonTransactionReceipt: StarknetTransactionReceipt, Deco
     public let events: [StarknetEvent]
     public let contractAddress: Felt?
 
+    public var isSuccessful: Bool {
+        executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
+    }
+
     enum CodingKeys: String, CodingKey {
         case transactionHash = "transaction_hash"
         case actualFee = "actual_fee"
@@ -39,6 +43,10 @@ public struct StarknetPendingTransactionReceipt: StarknetTransactionReceipt, Dec
     public let revertReason: String?
     public let contractAddress: Felt?
 
+    public var isSuccessful: Bool {
+        executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
+    }
+
     enum CodingKeys: String, CodingKey {
         case transactionHash = "transaction_hash"
         case actualFee = "actual_fee"
@@ -58,4 +66,9 @@ public protocol StarknetTransactionReceipt: Decodable {
     var messagesSent: [MessageToL1] { get }
     var events: [StarknetEvent] { get }
     var contractAddress: Felt? { get }
+    var finalityStatus: StarknetTransactionFinalityStatus { get }
+    var executionStatus: StarknetTransactionExecutionStatus { get }
+    var revertReason: String? { get }
+
+    var isSuccessful: Bool { get }
 }

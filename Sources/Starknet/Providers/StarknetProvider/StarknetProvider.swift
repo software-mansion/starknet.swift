@@ -108,13 +108,15 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 
     public func getBlockNumber() async throws -> UInt64 {
-        let result = try await makeRequest(method: .getBlockNumber, receive: UInt64.self)
+        let params = EmptySequence()
+        let result = try await makeRequest(method: .getBlockNumber, params: params, receive: UInt64.self)
 
         return result
     }
 
     public func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber {
-        let result = try await makeRequest(method: .getBlockHashAndNumber, receive: StarknetBlockHashAndNumber.self)
+        let params = EmptySequence()
+        let result = try await makeRequest(method: .getBlockHashAndNumber, params: params, receive: StarknetBlockHashAndNumber.self)
 
         return result
     }
@@ -154,7 +156,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     public func simulateTransactions(_ transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
-        let result = try await makeRequest(method: .simulateTransaction, params: params, receive: [StarknetSimulatedTransaction].self)
+        let result = try await makeRequest(method: .simulateTransactions, params: params, receive: [StarknetSimulatedTransaction].self)
 
         return result
     }

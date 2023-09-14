@@ -1,7 +1,7 @@
 import BigInt
 import Foundation
 
-public struct Felt {
+public struct Felt: CustomDebugStringConvertible {
     public let value: BigUInt
 
     public static let prime = BigUInt(2).power(251) + 17 * BigUInt(2).power(192) + 1
@@ -40,6 +40,10 @@ public struct Felt {
 
     public func toHex() -> String {
         "0x\(String(value, radix: 16))"
+    }
+
+    public var debugDescription: String {
+        "Felt: \(self.toHex())"
     }
 }
 

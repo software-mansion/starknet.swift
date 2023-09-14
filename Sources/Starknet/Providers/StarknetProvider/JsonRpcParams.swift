@@ -1,5 +1,9 @@
 import Foundation
 
+typealias EmptySequence = [String]
+
+struct EmptyParams: Encodable {}
+
 struct CallParams: Encodable {
     let request: StarknetCall
     let blockId: StarknetBlockId
@@ -135,5 +139,3 @@ struct SimulateTransactionsParams: Encodable {
         case simulationFlags = "simulation_flags"
     }
 }
-
-struct EmptyParams: Encodable {}
