@@ -67,10 +67,11 @@ jobs:
             echo "Found existing starknet-devnet-rs build, skipping compilation."
           fi
 
-      - name: Install scarb
+      - name: Install scarb 0.6.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 0.6.0
-      - name: Install sncast
+
+      - name: Install sncast 0.4.1
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.4.1
 
