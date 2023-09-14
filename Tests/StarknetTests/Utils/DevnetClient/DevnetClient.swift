@@ -451,7 +451,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.standardOutput = outputPipe
             process.standardError = errorPipe
 
-
             // TODO: migrate to URLs everywhere - path fields are marked as deprecated
             process.launchPath = snCastPath
             process.currentDirectoryPath = contractsPath!
