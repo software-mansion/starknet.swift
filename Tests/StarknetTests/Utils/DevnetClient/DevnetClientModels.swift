@@ -63,7 +63,7 @@ struct PrefundPayload: Codable {
 
 // Simplified receipt for RPC 0.3 and 0.4, only use it for checking whether transaction was successful
 struct DevnetReceipt: Decodable {
-    let status: StarknetTransactionStatus?
+    let status: DeprecatedStarknetTransactionStatus?
     let executionStatus: StarknetTransactionExecutionStatus?
     let finalityStatus: StarknetTransactionFinalityStatus?
 
@@ -85,7 +85,7 @@ struct DevnetReceipt: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        self.status = try container.decodeIfPresent(StarknetTransactionStatus.self, forKey: .status) ?? nil
+        self.status = try container.decodeIfPresent(DeprecatedStarknetTransactionStatus.self, forKey: .status) ?? nil
         self.executionStatus = try container.decodeIfPresent(StarknetTransactionExecutionStatus.self, forKey: .executionStatus) ?? nil
         self.finalityStatus = try container.decodeIfPresent(StarknetTransactionFinalityStatus.self, forKey: .finalityStatus) ?? nil
 
@@ -105,7 +105,7 @@ public enum DevnetClientError: Error {
     case devnetNotRunning
     case timeout
     case transactionFailed
-    case transactoinSucceeded
+    case transactionSucceeded
     case unknownTransactionStatus
     case prefundError
     case networkProviderError

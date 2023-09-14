@@ -119,8 +119,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
         public static let erc20ContractAddress: Felt = "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
         public static let udcContractClassHash: Felt = "0x7b3e05f48f0c69e4a65ce5e076a66271a527aff2c34ce1083ec6e1526997a69"
         public static let udcContractAddress: Felt = "0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf"
-        public static let predeployedAccount1: AccountDetails = .init(privateKey: "0xa2ed22bb0cb0b49c69f6d6a8d24bc5ea", publicKey: "0x198e98e771ebb5da7f4f05658a80a3d6be2213dc5096d055cbbefa62901ab06", address: "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b", salt: 20, maxFee: 1_000_000_000_000_000)
-        public static let predeployedAccount2: AccountDetails = .init(privateKey: "0xc1c7db92d22ef773de96f8bde8e56c85", publicKey: "0x26df62f8e61920575f9c9391ed5f08397cfcfd2ade02d47781a4a8836c091fd", address: "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35", salt: 20, maxFee: 1_000_000_000_000_000)
+        public static let predeployedAccount1: AccountDetails = .init(privateKey: "0xa2ed22bb0cb0b49c69f6d6a8d24bc5ea", publicKey: "0x198e98e771ebb5da7f4f05658a80a3d6be2213dc5096d055cbbefa62901ab06", address: "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b", salt: 20)
+        public static let predeployedAccount2: AccountDetails = .init(privateKey: "0xc1c7db92d22ef773de96f8bde8e56c85", publicKey: "0x26df62f8e61920575f9c9391ed5f08397cfcfd2ade02d47781a4a8836c091fd", address: "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35", salt: 20)
 
         private var deployedContractsAtName: [String: DeployContractResult] = [:]
 
@@ -549,7 +549,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func assertTransactionFailed(transactionHash: Felt) async throws {
             guard try await isTransactionSuccessful(transactionHash: transactionHash) == false else {
-                throw DevnetClientError.transactoinSucceeded
+                throw DevnetClientError.transactionSucceeded
             }
         }
 
