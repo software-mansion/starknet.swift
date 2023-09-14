@@ -214,7 +214,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
-            
+
             let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
             let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
             let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
@@ -234,8 +234,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.scarbTomlPath = newScarbTomlPath.path
             self.contractsPath = newContractsPath.path
 
-
-            
             self.devnetProcess = devnetProcess
 
             // Initialize new accounts file

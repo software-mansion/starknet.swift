@@ -41,7 +41,7 @@ struct DeploySnCastResponse: SnCastResponse {
     let error: String? = nil
     let contractAddress: Felt
     let transactionHash: Felt
-   
+
     enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
         case transactionHash = "transaction_hash"
