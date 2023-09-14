@@ -60,7 +60,7 @@ jobs:
         run: |
           if [[ ! -d "$DEVNET_BUILD_PATH" ]]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-            pushd "$DEVNET_BUILD_PATH"
+            pushd ${{ github.workspace }}/starknet-devnet-rs
             cargo build --release 
             popd
           else
