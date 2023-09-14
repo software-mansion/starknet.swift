@@ -442,11 +442,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let result = try runSnCast(
                 command: "declare",
                 args: params
-            ) as! DelareSnCastResponse
+            ) as! DeclareSnCastResponse
 
             return DeclareContractResult(
                 classHash: result.classHash,
-                transcactionHash: result.transactionHash
+                transactionHash: result.transactionHash
             )
         }
 
