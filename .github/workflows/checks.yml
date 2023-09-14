@@ -7,6 +7,8 @@ on:
 jobs:
   test_and_lint:
     runs-on: macos-12
+    env:
+      DEVNET_BUILD_PATH: ${{ github.workspace }}/starknet-devnet-rs/target/release
     steps:
       - uses: actions/checkout@v3
 
@@ -40,11 +42,11 @@ jobs:
       - name: Run SwiftFormat lint
         run: mint run swiftformat --lint .
 
-      # TODO: Replace with installing release when release is avaiable
+      # TODO: Replace with installing release when release is available
       - name: Clone starknet-devnet-rs
         run: |
           git clone https://github.com/0xSpaceShard/starknet-devnet-rs.git starknet-devnet-rs
-          pushd starknet-devnet-rs
+          pushd "$DEVNET_BUILD_PATH"
           git checkout 7586b55d221e9010809a6e61b7e28e53fc9ff5c2
           popd
 
@@ -56,9 +58,9 @@ jobs:
 
       - name: Build devnet
         run: |
-          if [[ ! -d "${{ github.workspace }}/starknet-devnet-rs/target/release" ]]; then
+          if [[ ! -d "$DEVNET_BUILD_PATH" ]]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-            pushd {{ github.workspace }}/starknet-devnet-rs
+            pushd "$DEVNET_BUILD_PATH"
             cargo build --release 
             popd
           else
@@ -74,7 +76,7 @@ jobs:
 
       - name: Run tests
         run: |
-          export DEVNET_PATH="${{ github.workspace }}/starknet-devnet-rs/target/release"
+          export DEVNET_PATH="$DEVNET_BUILD_PATH"
           export SCARB_PATH=$(which scarb)
           export SNCAST_PAT="$(which sncast)"
           swift test --disable-sandbox
