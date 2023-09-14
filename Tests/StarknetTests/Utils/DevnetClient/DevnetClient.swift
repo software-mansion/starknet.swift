@@ -106,7 +106,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private var devnetProcess: Process?
 
         private let devnetPath: String
-        private let starknetPath: String
         private let scarbPath: String
         private let snCastPath: String
         private var scarbTomlPath: String!
@@ -139,7 +138,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             rpcUrl = "\(baseUrl)/rpc"
 
             devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "starknet-devnet"
-            starknetPath = ProcessInfo.processInfo.environment["STARKNET_PATH"] ?? "starknet"
             scarbPath = ProcessInfo.processInfo.environment["SCARB_PATH"] ?? "scarb"
             snCastPath = ProcessInfo.processInfo.environment["SNCAST_PATH"] ?? "sncast"
 
@@ -155,7 +153,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.scarbTomlPath = scarbTomlPath
             contractsPath = URL(fileURLWithPath: scarbTomlPath).deletingLastPathComponent().path
 
-            guard !self.devnetPath.isEmpty, !self.starknetPath.isEmpty, !self.scarbPath.isEmpty, !self.snCastPath.isEmpty else {
+            guard !self.devnetPath.isEmpty, !self.scarbPath.isEmpty, !self.snCastPath.isEmpty else {
                 throw DevnetClientError.environmentVariablesNotSet
             }
 
