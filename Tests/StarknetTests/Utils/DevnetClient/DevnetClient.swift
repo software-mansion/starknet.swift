@@ -265,58 +265,9 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
             request.httpBody = try JSONEncoder().encode(payload)
 
-            if let httpBody = request.httpBody, let jsonString = String(data: httpBody, encoding: .utf8) {
-                print(jsonString)
-            }
-
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-
-            var response: URLResponse?
-
-            (_, response) = try await URLSession.shared.data(for: request)
-
-            guard let response = response as? HTTPURLResponse else {
-                throw DevnetClientError.devnetError
-            }
-
-            guard response.statusCode == 200 else {
-                throw DevnetClientError.devnetError
-            }
-        }
-
-        public func deployDefaultAccount() async throws {
-            let url = URL(string: "\(baseUrl)/rpc")!
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-
-            try await prefundAccount(address: "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b")
-
-            let requestBody = """
-            {
-                "jsonrpc": "2.0",
-                "id": 0,
-                "method": "starknet_addDeployAccountTransaction",
-                "params": {
-                    "deploy_account_transaction": {
-                        "class_hash": "0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f",
-                        "max_fee": "0x38d7ea4c68000",
-                        "constructor_calldata": [
-                            "0x151ad0243e1a58c79ef68002aefc69c2d64c2554d391ad942cbb611e6310490"
-                        ],
-                        "signature": [
-                            "0x4c2fc0d87f47db664d73f9662c052ec1abd65375d597b7abbaee5c4b9bf71d6",
-                            "0x1b3f4e86b97013287b7584b5ebcf739da2e07101fb073ca2a3cdd24c35135aa"
-                        ],
-                        "version": "0x1",
-                        "contract_address_salt": "0x0",
-                        "type": "DEPLOY_ACCOUNT",
-                        "nonce": "0x0"
-                    }
-                }
-            }
-            """
-            request.httpBody = try JSONEncoder().encode(requestBody)
+//             if let httpBody = request.httpBody, let jsonString = String(data: httpBody, encoding: .utf8) {
+//                 print(jsonString)
+//             }
 
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
