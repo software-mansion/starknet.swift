@@ -46,7 +46,7 @@ jobs:
       - name: Clone starknet-devnet-rs
         run: |
           git clone https://github.com/0xSpaceShard/starknet-devnet-rs.git starknet-devnet-rs
-          pushd "$DEVNET_BUILD_PATH"
+          pushd ${{ github.workspace }}/starknet-devnet-rs
           git checkout 7586b55d221e9010809a6e61b7e28e53fc9ff5c2
           popd
 
