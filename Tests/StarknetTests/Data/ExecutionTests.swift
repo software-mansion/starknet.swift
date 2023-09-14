@@ -18,9 +18,10 @@ final class ExecutionTests: XCTestCase {
         }
 
         provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
-        signer = StarkCurveSigner(privateKey: "0x5421eb02ce8a5a972addcd89daefd93c")!
-        account = StarknetAccount(address: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8", signer: signer, provider: provider, cairoVersion: .one)
-        balanceContractAddress = try await Self.devnetClient.deployContract(contractName: "balance", deprecated: true).address
+        let accountDetails = DevnetClient.predeployedAccount1
+        signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
+        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .one)
+        balanceContractAddress = try await Self.devnetClient.declareDeployContract(contractName: "Balance").contractAddress
     }
 
     override class func setUp() {

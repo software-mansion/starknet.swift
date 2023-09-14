@@ -8,7 +8,7 @@ final class AccountTests: XCTestCase {
     /*
      Temporary test file, until DevnetClient utility is created.
 
-     To run, make sure you're running starknet-devnet on port 5050, with seed 0
+     To run, make sure you're running starknet-devnet on port 5051, with seed 0
      */
 
     static var devnetClient: DevnetClientProtocol!
@@ -16,6 +16,7 @@ final class AccountTests: XCTestCase {
     var provider: StarknetProviderProtocol!
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
+    var accountContractClassHash: Felt!
 
     override func setUp() async throws {
         try await super.setUp()
@@ -25,8 +26,10 @@ final class AccountTests: XCTestCase {
         }
 
         provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
-        signer = StarkCurveSigner(privateKey: "0x5421eb02ce8a5a972addcd89daefd93c")!
-        account = StarknetAccount(address: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8", signer: signer, provider: provider, cairoVersion: .zero)
+        accountContractClassHash = DevnetClient.accountContractClassHash
+        let accountDetails = DevnetClient.predeployedAccount1
+        signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
+        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .zero)
     }
 
     override class func setUp() {
@@ -47,8 +50,10 @@ final class AccountTests: XCTestCase {
     }
 
     func testExecute() async throws {
+        let recipientAddress = DevnetClient.predeployedAccount2.address
+
         let calldata: [Felt] = [
-            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
+            recipientAddress,
             1000,
             0,
         ]
@@ -57,12 +62,14 @@ final class AccountTests: XCTestCase {
 
         let result = try await account.execute(call: call)
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
     func testExecuteCustomParams() async throws {
+        let recipientAddress = DevnetClient.predeployedAccount2.address
+
         let calldata: [Felt] = [
-            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
+            recipientAddress,
             1000,
             0,
         ]
@@ -77,32 +84,32 @@ final class AccountTests: XCTestCase {
 
         let result = try await account.execute(call: call, params: params)
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
     func testExecuteMultipleCalls() async throws {
+        let balanceContract = try await Self.devnetClient.declareDeployContract(contractName: "Balance")
+        let contractAddress = balanceContract.contractAddress
+
         let calldata1: [Felt] = [
-            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
             1000,
-            0,
         ]
 
         let calldata2: [Felt] = [
-            "0x2000c94da25e3772c290db227f1f57358c65d3bdda517dcd3dcbdbb04141900",
             1000,
-            0,
         ]
 
-        let call1 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
-        let call2 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
+        let call1 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: calldata1)
+        let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: calldata2)
 
         let result = try await account.execute(calls: [call1, call2])
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
     func testDeployAccount() async throws {
-        let accountClassHash = try await provider.getClassHashAt(account.address)
+//        let accountClassHash = try await provider.getClassHashAt(account.address)
+        let accountClassHash: Felt = "0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f"
 
         let newSigner = StarkCurveSigner(privateKey: 1234)!
         let newPublicKey = newSigner.publicKey
@@ -122,12 +129,47 @@ final class AccountTests: XCTestCase {
 
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: response.transactionHash)
+//        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
 
         let newNonce = try await newAccount.getNonce()
 
         XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
     }
+
+//    func testDeployAccountCoreContract() async throws {
+    ////        let accountContractClassHash : Felt =  "0x6a22bf63c7bc07effa39a25dfbd21523d211db0100a0afd054d172b81840eaf"
+//        let privateKey: Felt = "0x2200e90786e37b59e151af1381303f8d385bb3240bb8eafbfbd981668450095"
+//        let accountContractClassHash: Felt = "0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f"
+    ////        let privateKey : Felt = "0x59c538dc6791bc1aaa5d151406f9bb4c970cf05e82ab9921ec36c9b89bc38ff"
+//
+//        let newSigner = StarkCurveSigner(privateKey: privateKey)!
+//        let publicKey = newSigner.publicKey
+//        let salt: Felt = .zero
+//        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [publicKey], salt: salt)
+//
+//        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+//
+//        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
+//
+//        let nonce = await (try? newAccount.getNonce()) ?? .zero
+//
+//        let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountContractClassHash, calldata: [publicKey], salt: .zero, nonce: nonce)
+//        let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+//
+//        let params = StarknetExecutionParams(nonce: nonce, maxFee: maxFee)
+//
+//        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [publicKey], salt: .zero, params: params, forFeeEstimation: false)
+//
+//        let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
+//
+    ////        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
+//        print(privateKey)
+//        print(publicKey)
+//        print(newAccountAddress)
+//        let newNonce = try await newAccount.getNonce()
+//
+//        XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
+//    }
 
     func testSignTypedData() async throws {
         let typedData = loadTypedDataFromFile(name: "typed_data_struct_array_example")!

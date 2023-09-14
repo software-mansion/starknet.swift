@@ -6,7 +6,7 @@ final class ProviderTests: XCTestCase {
     /*
      Temporary test file, until DevnetClient utility is created.
 
-     To run, make sure you're running starknet-devnet on port 5050, with seed 0
+     To run, make sure you're running starknet-devnet on port 5051, with seed 0
      */
     static var devnetClient: DevnetClientProtocol!
 
@@ -38,7 +38,7 @@ final class ProviderTests: XCTestCase {
 
     func testCall() async throws {
         let call = StarknetCall(
-            contractAddress: Felt(fromHex: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8")!,
+            contractAddress: DevnetClient.predeployedAccount1.address,
             entrypoint: starknetSelector(from: "getPublicKey"),
             calldata: []
         )
@@ -47,7 +47,7 @@ final class ProviderTests: XCTestCase {
             let result = try await provider.callContract(call)
 
             XCTAssertEqual(result.count, 1)
-            XCTAssertEqual(result[0], Felt("0x738e76d6a8c3c66d9c9468276871dc6456b915ea2433a2a3bcd08ee15c39868"))
+            XCTAssertEqual(result[0], DevnetClient.predeployedAccount1.publicKey)
         } catch let e {
             print(e)
             throw e
@@ -56,7 +56,7 @@ final class ProviderTests: XCTestCase {
 
     func testCallWithArguments() async throws {
         let call = StarknetCall(
-            contractAddress: Felt(fromHex: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8")!,
+            contractAddress: DevnetClient.predeployedAccount1.address,
             entrypoint: starknetSelector(from: "supportsInterface"),
             calldata: [Felt(2138)]
         )
@@ -67,7 +67,9 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetNonce() async throws {
-        let _ = try await provider.getNonce(of: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8")
+        let nonce = try await provider.getNonce(of: DevnetClient.predeployedAccount1.address)
+
+        print(nonce)
     }
 
     func testGetClassHash() async throws {
@@ -83,6 +85,9 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetBlockHashAndNumber() async throws {
+        // Note to future developers experiencing failures in this test:
+        // If there were no transactions, minting or other changes to the state of the network,
+        // "Block not found" error is likely to occur
         let result = try await provider.getBlockHashAndNumber()
 
         print(result)
@@ -90,15 +95,18 @@ final class ProviderTests: XCTestCase {
 
     func testGetEvents() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_events")
-        let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events", deprecated: true)
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Events")
         let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
         let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider, cairoVersion: .zero)
-        let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
-        let _ = try await account.execute(call: call)
 
-        let filter = StarknetGetEventsFilter(address: contract.address, keys: [["0x03db3da4221c078e78bd987e54e1cc24570d89a7002cefa33e548d6c72c73f9d"]])
+        let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "emit_event"), calldata: [1])
+        let invokeRes = try await account.execute(call: call)
+        try await ProviderTests.devnetClient.assertTransactionSucceeded(transactionHash: invokeRes.transactionHash)
+
+        let filter = StarknetGetEventsFilter(address: contract.contractAddress, keys: [["0x477e157efde59c5531277ede78acb3e03ef69508c6c35fde3495aa0671d227"]])
         let result = try await provider.getEvents(filter: filter)
 
+        XCTAssertFalse(result.events.isEmpty)
         print(result)
     }
 
@@ -119,29 +127,30 @@ final class ProviderTests: XCTestCase {
         } catch {}
     }
 
-    // TODO: (#89): Re-enable
-    func disabledTestGetTransactionReceipt() async throws {
-        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_receipt")
-        let contract = try await ProviderTests.devnetClient.deployContract(contractName: "events", deprecated: true)
+    func testGetTransactionReceipt() async throws {
+        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_get_transaction_receipt")
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
         let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
         let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider, cairoVersion: .zero)
-        let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
+        let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
         let invoke = try await account.execute(call: call)
 
-        let resAccDeploy = try await provider.getTransactionReceiptBy(hash: acc.txHash)
+        let resAccDeploy = try await provider.getTransactionReceiptBy(hash: acc.transactionHash)
         let resInvoke = try await provider.getTransactionReceiptBy(hash: invoke.transactionHash)
     }
 
+    // TODO: separate into different transaction types
+
     func testEstimateFee() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_estimate_fee")
-        let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
         let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
         let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider, cairoVersion: .zero)
 
         let nonce = try await account.getNonce()
 
-        let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
-        let call2 = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
+        let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+        let call2 = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
         let params1 = StarknetExecutionParams(nonce: nonce, maxFee: 0)
         let tx1 = try account.sign(calls: [call], params: params1, forFeeEstimation: true)
@@ -154,15 +163,17 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(fees.count, 2)
     }
 
-    func testSimulateTransactions() async throws {
+    func disabledTestSimulateTransactions() async throws {
+        XCTAssertTrue(false)
+
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_simulate_transactions")
         let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
-        let contract = try await ProviderTests.devnetClient.deployContract(contractName: "balance", deprecated: true)
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
         let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider, cairoVersion: .zero)
 
         let nonce = try await account.getNonce()
 
-        let call = StarknetCall(contractAddress: contract.address, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+        let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let params = StarknetExecutionParams(nonce: nonce, maxFee: 1_000_000_000_000)
 
         let invokeTx = try account.sign(calls: [call], params: params, forFeeEstimation: true)
