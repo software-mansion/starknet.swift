@@ -75,9 +75,9 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.4.1
 
-#      - name: Run tests
-#        run: |
-#          export DEVNET_PATH="$DEVNET_BUILD_PATH"
-#          export SCARB_PATH=$(which scarb)
-#          export SNCAST_PAT="$(which sncast)"
-#          swift test --disable-sandbox
+      - name: Run tests
+        run: |
+          export DEVNET_PATH="$DEVNET_BUILD_PATH"
+          export SCARB_PATH=$(which scarb)
+          export SNCAST_PAT="$(which sncast)"
+          swift test --disable-sandbox
