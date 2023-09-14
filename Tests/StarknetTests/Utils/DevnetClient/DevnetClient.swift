@@ -265,10 +265,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
             request.httpBody = try JSONEncoder().encode(payload)
 
-//             if let httpBody = request.httpBody, let jsonString = String(data: httpBody, encoding: .utf8) {
-//                 print(jsonString)
-//             }
-
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
 

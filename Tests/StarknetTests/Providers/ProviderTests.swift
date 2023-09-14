@@ -3,11 +3,6 @@ import XCTest
 @testable import Starknet
 
 final class ProviderTests: XCTestCase {
-    /*
-     Temporary test file, until DevnetClient utility is created.
-
-     To run, make sure you're running starknet-devnet on port 5051, with seed 0
-     */
     static var devnetClient: DevnetClientProtocol!
 
     var provider: StarknetProviderProtocol!
@@ -96,8 +91,8 @@ final class ProviderTests: XCTestCase {
     func testGetEvents() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_events")
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Events")
-        let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
-        let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider, cairoVersion: .zero)
+        let signerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
+        let account = StarknetAccount(address: acc.details.address, signer: signerProtocol!, provider: provider, cairoVersion: .zero)
 
         let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "emit_event"), calldata: [1])
         let invokeRes = try await account.execute(call: call)
@@ -130,8 +125,8 @@ final class ProviderTests: XCTestCase {
     func testGetTransactionReceipt() async throws {
         let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_get_transaction_receipt")
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-        let sigerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
-        let account = StarknetAccount(address: acc.details.address, signer: sigerProtocol!, provider: provider, cairoVersion: .zero)
+        let signerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
+        let account = StarknetAccount(address: acc.details.address, signer: signerProtocol!, provider: provider, cairoVersion: .zero)
         let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
         let invoke = try await account.execute(call: call)
 

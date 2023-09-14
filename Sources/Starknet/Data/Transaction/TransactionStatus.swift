@@ -18,7 +18,7 @@ public enum StarknetTransactionFinalityStatus: String, Codable {
     }
 }
 
-public enum StarknetTransactionStatus: String, Codable {
+public enum DeprecatedStarknetTransactionStatus: String, Codable {
     case pending = "PENDING"
     case rejected = "REJECTED"
     case acceptedL1 = "ACCEPTED_ON_L1"
