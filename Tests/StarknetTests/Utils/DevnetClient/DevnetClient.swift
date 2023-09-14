@@ -342,39 +342,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        private func deployAccountOld(name: String) async throws -> DeployAccountResult {
-            try guardDevnetIsRunning()
-
-            let params = [
-                "--account_dir",
-                accountDirectory.absoluteString,
-                "--account",
-                name,
-                "--wallet",
-                "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
-            ]
-
-            let _ = try runStarknetCli(
-                command: "new_account",
-                args: params.joined(separator: " ")
-            )
-
-            let details = try readAccountDetails(accountName: name)
-            try await prefundAccount(address: details.address)
-
-            let result = try runStarknetCli(
-                command: "deploy_account",
-                args: params.joined(separator: " ")
-            )
-
-            let array = result.components(separatedBy: CharacterSet.newlines)
-            let transactionResult = getTransactionResult(lines: array, offset: 3)
-
-            try await assertTransactionSucceeded(transactionHash: transactionResult.transactionHash)
-
-            return DeployAccountResult(details: details, transactionHash: transactionResult.transactionHash)
-        }
-
         public func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult {
             try guardDevnetIsRunning()
 
@@ -468,68 +435,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        private func deployContractOld(contractName: String, deprecated: Bool) async throws -> DeployContractResult {
-            try guardDevnetIsRunning()
-
-            if let transactionResult = deployedContractsAtName[contractName] {
-                return transactionResult
-            }
-
-            let classHash = try await declareContract(contractName: contractName, deprecated: deprecated)
-
-            let params = [
-                "--class_hash",
-                classHash.toHex(),
-                "--account_dir",
-                accountDirectory.absoluteString,
-                "--wallet",
-                "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
-            ]
-
-            let result = try runStarknetCli(
-                command: "deploy",
-                args: params.joined(separator: " ")
-            )
-
-            let array = result.components(separatedBy: CharacterSet.newlines)
-            let transactionResult = getTransactionResult(lines: array)
-
-            try await isTransactionSuccessful(transactionHash: transactionResult.transactionHash)
-            return transactionResult
-        }
-
-        private func declareContract(contractName: String, deprecated: Bool) async throws -> Felt {
-            try guardDevnetIsRunning()
-
-            guard let contractPath = Bundle.module.path(forResource: contractName, ofType: "json") else {
-                throw DevnetClientError.missingResourceFile
-            }
-
-            var params = [
-                "--contract",
-                contractPath,
-                "--account_dir",
-                accountDirectory.absoluteString,
-                "--wallet",
-                "starkware.starknet.wallets.open_zeppelin.OpenZeppelinAccount",
-            ]
-
-            if deprecated {
-                params.append("--deprecated")
-            }
-
-            let result = try runStarknetCli(
-                command: "declare",
-                args: params.joined(separator: " ")
-            )
-
-            let array = result.components(separatedBy: CharacterSet.newlines)
-
-            let classHash = getValueFromLine(line: array[2])
-
-            return Felt(fromHex: classHash)!
-        }
-
         public func isRunning() -> Bool {
             if let devnetProcess, devnetProcess.isRunning {
                 return true
@@ -611,40 +516,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
 //            return outputDict
             return result.response
-        }
-
-        private func runStarknetCli(command: String, args: String) throws -> String {
-            let process = Process()
-
-            let outputPipe = Pipe()
-            let errorPipe = Pipe()
-            process.standardOutput = outputPipe
-            process.standardError = errorPipe
-            process.arguments = [
-                "-l",
-                "-c",
-                "\(starknetPath) \(command) \(args) --gateway_url \(gatewayUrl) --feeder_gateway_url \(feederGatewayUrl) --network alpha-goerli",
-            ]
-
-            process.launchPath = "/bin/sh"
-            process.standardInput = nil
-            process.launch()
-            process.waitUntilExit()
-
-            let command = "\(process.launchPath!) \(process.arguments!)"
-            print(command)
-
-            guard process.terminationStatus == 0 else {
-                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-                let error = String(decoding: errorData, as: UTF8.self)
-
-                throw DevnetClientError.devnetError
-            }
-
-            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(decoding: outputData, as: UTF8.self)
-
-            return output
         }
 
         typealias AccountDetailsResponse = [String: [String: AccountDetails]]
