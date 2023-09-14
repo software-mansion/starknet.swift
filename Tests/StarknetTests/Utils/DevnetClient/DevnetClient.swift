@@ -192,6 +192,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try await sleep(seconds: 3)
 
             guard let output = String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) else {
+                print(1)
                 throw DevnetClientError.devnetError
             }
 
@@ -200,12 +201,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             guard devnetProcess.isRunning else {
-//                print(String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) ?? "No available output")
+                print(String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) ?? "No available output")
+                print(2)
                 throw DevnetClientError.devnetError
             }
 
             let fileManager = FileManager.default
             guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else {
+                print(3)
                 throw DevnetClientError.devnetError
             }
 
@@ -273,10 +276,12 @@ func makeDevnetClient() -> DevnetClientProtocol {
             (_, response) = try await URLSession.shared.data(for: request)
 
             guard let response = response as? HTTPURLResponse else {
+                print(4)
                 throw DevnetClientError.devnetError
             }
 
             guard response.statusCode == 200 else {
+                print(5)
                 throw DevnetClientError.devnetError
             }
         }
@@ -571,6 +576,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             } catch _ as HttpNetworkProviderError {
                 throw DevnetClientError.networkProviderError
             } catch {
+                print(6)
                 throw DevnetClientError.devnetError
             }
 
@@ -579,6 +585,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             } else if let error = response.error {
                 throw DevnetClientError.jsonRpcError(error.code, error.message)
             } else {
+                print(7)
                 throw DevnetClientError.devnetError
             }
         }
