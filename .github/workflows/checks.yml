@@ -79,5 +79,5 @@ jobs:
         run: |
           export DEVNET_PATH="$DEVNET_BUILD_PATH"
           export SCARB_PATH=$(which scarb)
-          export SNCAST_PAT="$(which sncast)"
+          export SNCAST_PATH="$(which sncast)"
           swift test --disable-sandbox
