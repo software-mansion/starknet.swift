@@ -80,4 +80,7 @@ jobs:
           export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
           export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
+          echo "$DEVNET_PATH"
+          echo "$SCARB_PATH"
+          echo "$SNCAST_PATH"      
           swift test --disable-sandbox
