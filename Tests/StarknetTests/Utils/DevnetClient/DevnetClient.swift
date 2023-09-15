@@ -3,9 +3,13 @@ import Foundation
 @testable import Starknet
 
 protocol DevnetClientProtocol {
-    var gatewayUrl: String { get }
-    var feederGatewayUrl: String { get }
     var rpcUrl: String { get }
+    var mintUrl: String { get }
+
+    var host: String { get }
+    var port: Int { get }
+    var seed: Int { get }
+    var baseUrl: String { get }
 
     func start() async throws
     func close()
@@ -97,20 +101,17 @@ func makeDevnetClient() -> DevnetClientProtocol {
 #if os(macOS)
 
     class DevnetClient: DevnetClientProtocol {
-        private let host: String
-        private let port: Int
-        private let seed: Int
-        private let accountDirectory: URL
-        private let baseUrl: String
-
         private var devnetProcess: Process?
 
+        private let accountDirectory: URL
         private let devnetPath: String
         private let scarbPath: String
         private let snCastPath: String
         private var scarbTomlPath: String!
         private var contractsPath: String!
         private let tmpPath: String
+
+        private var deployedContractsAtName: [String: DeployContractResult] = [:]
 
         // Source: https://github.com/0xSpaceShard/starknet-devnet-rs/blob/323f907bc3e3e4dc66b403ec6f8b58744e8d6f9a/crates/starknet/src/constants.rs
         public static let accountContractClassHash: Felt = "0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f"
@@ -121,11 +122,12 @@ func makeDevnetClient() -> DevnetClientProtocol {
         public static let predeployedAccount1: AccountDetails = .init(privateKey: "0xa2ed22bb0cb0b49c69f6d6a8d24bc5ea", publicKey: "0x198e98e771ebb5da7f4f05658a80a3d6be2213dc5096d055cbbefa62901ab06", address: "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b", salt: 20)
         public static let predeployedAccount2: AccountDetails = .init(privateKey: "0xc1c7db92d22ef773de96f8bde8e56c85", publicKey: "0x26df62f8e61920575f9c9391ed5f08397cfcfd2ade02d47781a4a8836c091fd", address: "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35", salt: 20)
 
-        private var deployedContractsAtName: [String: DeployContractResult] = [:]
-
-        let gatewayUrl: String
-        let feederGatewayUrl: String
+        let host: String
+        let port: Int
+        let seed: Int
+        let baseUrl: String
         let rpcUrl: String
+        let mintUrl: String
 
         init(host: String = "127.0.0.1", port: Int = 5051, seed: Int = 1_053_545_547) {
             self.host = host
@@ -133,9 +135,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.seed = seed
 
             baseUrl = "http://\(host):\(port)"
-            gatewayUrl = "\(baseUrl)/gateway"
-            feederGatewayUrl = "\(baseUrl)/feeder_gateway"
             rpcUrl = "\(baseUrl)/rpc"
+            mintUrl = "\(baseUrl)/mint"
 
             devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "starknet-devnet"
             scarbPath = ProcessInfo.processInfo.environment["SCARB_PATH"] ?? "scarb"
@@ -146,32 +147,22 @@ func makeDevnetClient() -> DevnetClientProtocol {
         }
 
         public func start() async throws {
-            guard let scarbTomlPath = Bundle.module.path(forResource: "Scarb", ofType: "toml") else {
-                throw DevnetClientError.missingResourceFile
-            }
-
-            self.scarbTomlPath = scarbTomlPath
-            contractsPath = URL(fileURLWithPath: scarbTomlPath).deletingLastPathComponent().path
-
             guard !self.devnetPath.isEmpty, !self.scarbPath.isEmpty, !self.snCastPath.isEmpty else {
                 throw DevnetClientError.environmentVariablesNotSet
             }
 
-            // This kills any zombie devnet processes left over from previous
-            // test runs, if any.
+            // This kills any zombie devnet processes left over from previous test runs, if any.
             let task = Process()
             task.arguments = [
                 "-c",
                 "pkill -f starknet-devnet",
             ]
-
             task.launchPath = "/bin/sh"
             task.launch()
             task.waitUntilExit()
 
             let devnetProcess = Process()
             let pipe = Pipe()
-
             devnetProcess.standardOutput = pipe
             devnetProcess.standardError = pipe
             devnetProcess.arguments = [
@@ -182,7 +173,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "--seed",
                 "\(seed)",
             ]
-
             devnetProcess.launchPath = devnetPath
             devnetProcess.standardInput = nil
             devnetProcess.launch()
@@ -190,8 +180,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try await sleep(seconds: 3)
 
             guard let output = String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) else {
-                print(1)
-                throw DevnetClientError.devnetError
+                throw DevnetClientError.startupError
             }
 
             if output.contains("Connection in use") {
@@ -199,67 +188,42 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             guard devnetProcess.isRunning else {
-                print(String(data: pipe.fileHandleForReading.availableData, encoding: .utf8) ?? "No available output")
-                print(2)
-                throw DevnetClientError.devnetError
+                throw DevnetClientError.devnetNotRunning
             }
 
+            self.devnetProcess = devnetProcess
             let fileManager = FileManager.default
             guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else {
-                print(3)
-                throw DevnetClientError.devnetError
+                throw DevnetClientError.fileManagerError
             }
-
             for filePath in filePaths {
                 try? fileManager.removeItem(at: filePath)
             }
 
-            //  Recreating proper file structure requried by scarb
-            do {
-                let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
-                let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
-                try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
-                try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
-                let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
-                let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
-                try fileManager.copyItem(at: originalScarbTomlPath, to: newScarbTomlPath)
-
-                guard let cairoSrcPaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
-                    throw DevnetClientError.missingResourceFile
-                }
-
-                for cairoContract in cairoSrcPaths {
-                    let newCairoContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(cairoContract.lastPathComponent)")
-                    try fileManager.copyItem(at: cairoContract, to: newCairoContractPath)
-                }
-
-                self.scarbTomlPath = newScarbTomlPath.path
-                self.contractsPath = newContractsPath.path
-            } catch {
-                print("File copying error: \(error)")
+            //  Recreating a file structure requried by scarb
+            guard let scarbTomlPath = Bundle.module.path(forResource: "Scarb", ofType: "toml") else {
+                throw DevnetClientError.missingResourceFile
+            }
+            let ScarbTomlResourcePath = URL(fileURLWithPath: scarbTomlPath)
+            guard let contractResourcePaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
+                throw DevnetClientError.missingResourceFile
             }
 
-//            let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
-//            let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
-//            let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
-//            let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
-//            try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
-//            try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
-//
-//            try fileManager.copyItem(at: originalScarbTomlPath, to: newScarbTomlPath)
-//
-//            guard let cairoSrcPaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
-//                throw DevnetClientError.missingResourceFile
-//            }
-//            for cairoContract in cairoSrcPaths {
-//                let newCairoContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(cairoContract.lastPathComponent)")
-//                try fileManager.copyItem(at: cairoContract, to: newCairoContractPath)
-//            }
+            let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
+            let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
+            let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
 
-//            self.scarbTomlPath = newScarbTomlPath.path
-//            self.contractsPath = newContractsPath.path
+            try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
+            try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
 
-            self.devnetProcess = devnetProcess
+            try fileManager.copyItem(at: ScarbTomlResourcePath, to: newScarbTomlPath)
+            for contractPath in contractResourcePaths {
+                let newContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(contractPath.lastPathComponent)")
+                try fileManager.copyItem(at: contractPath, to: newContractPath)
+            }
+
+            self.scarbTomlPath = newScarbTomlPath.path
+            self.contractsPath = newContractsPath.path
 
             // Initialize new accounts file
             let _ = try await deployAccount(name: "__default_cast__")
@@ -281,62 +245,29 @@ func makeDevnetClient() -> DevnetClientProtocol {
         }
 
         public func prefundAccount(address: Felt) async throws {
-//            try guardDevnetIsRunning()
+            try guardDevnetIsRunning()
 
-//            let url = URL(string: "\(baseUrl)/mint")!
-//            var request = URLRequest(url: url)
-//            request.httpMethod = "POST"
-//
-//            let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
-//            request.httpBody = try JSONEncoder().encode(payload)
-//
-            ////             if let httpBody = request.httpBody, let jsonString = String(data: httpBody, encoding: .utf8) {
-            ////                 print(jsonString)
-            ////             }
-//
-//            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-//            request.addValue("application/json", forHTTPHeaderField: "Accept")
-//
-//            var response: URLResponse?
-//
-//            (_, response) = try await URLSession.shared.data(for: request)
-//
-//            guard let response = response as? HTTPURLResponse else {
-//                print(4)
-//                throw DevnetClientError.devnetError
-//            }
-//
-//            guard response.statusCode == 200 else {
-//                print(5)
-//                throw DevnetClientError.devnetError
-//            }
+            let url = URL(string: mintUrl)!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
 
+            let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
+            request.httpBody = try JSONEncoder().encode(payload)
+
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+
+            var response: URLResponse?
             do {
-                try guardDevnetIsRunning()
-
-                let url = URL(string: "\(baseUrl)/mint")!
-                var request = URLRequest(url: url)
-                request.httpMethod = "POST"
-
-                let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
-                request.httpBody = try JSONEncoder().encode(payload)
-
-                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue("application/json", forHTTPHeaderField: "Accept")
-                var response: URLResponse?
                 (_, response) = try await URLSession.shared.data(for: request)
-
-                guard let response = response as? HTTPURLResponse else {
-                    print(4)
-                    throw DevnetClientError.devnetError
-                }
-
-                guard response.statusCode == 200 else {
-                    print(5)
-                    throw DevnetClientError.devnetError
-                }
             } catch {
-                print("An error happened: \(error)")
+                throw DevnetClientError.prefundError
+            }
+            guard let response = response as? HTTPURLResponse else {
+                throw DevnetClientError.prefundError
+            }
+            guard response.statusCode == 200 else {
+                throw DevnetClientError.prefundError
             }
         }
 
@@ -616,39 +547,30 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let params = [transactionHash]
             let rpcPayload = JsonRpcPayload(method: .getTransactionReceipt, params: params)
 
+            let url = URL(string: rpcUrl)!
+            let networkProvider = HttpNetworkProvider()
+            var response: JsonRpcResponse<DevnetReceipt>
+
+            let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
+                (header: "Content-Type", value: "application/json"),
+                (header: "Accept", value: "application/json"),
+            ])
+
             do {
-                let url = URL(string: rpcUrl)!
-                let networkProvider = HttpNetworkProvider()
-                var response: JsonRpcResponse<DevnetReceipt>
-
-                let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
-                    (header: "Content-Type", value: "application/json"),
-                    (header: "Accept", value: "application/json"),
-                ])
-
-                do {
-                    response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<DevnetReceipt>.self)
-                } catch _ as HttpNetworkProviderError {
-                    throw DevnetClientError.networkProviderError
-                } catch {
-                    print(6)
-                    throw DevnetClientError.devnetError
-                }
-
-                if let result = response.result {
-                    return result.isSuccessful
-                } else if let error = response.error {
-                    throw DevnetClientError.jsonRpcError(error.code, error.message)
-                } else {
-                    print(7)
-                    throw DevnetClientError.devnetError
-                }
-
+                response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<DevnetReceipt>.self)
+            } catch _ as HttpNetworkProviderError {
+                throw DevnetClientError.networkProviderError
             } catch {
-                print("Network request error: \(error)")
+                throw DevnetClientError.devnetError
             }
 
-            return false
+            if let result = response.result {
+                return result.isSuccessful
+            } else if let error = response.error {
+                throw DevnetClientError.jsonRpcError(error.code, error.message)
+            } else {
+                throw DevnetClientError.devnetError
+            }
         }
     }
 
