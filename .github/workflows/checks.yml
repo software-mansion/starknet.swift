@@ -10,42 +10,42 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-#      - name: Cache/Restore Mint packages
-#        id: mint-cache
-#        uses: actions/cache@v2
-#        with:
-#          path: ${{ github.workspace }}/mint
-#          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
-#          restore-keys: ${{ runner.os }}-mint-
-#
-#      - name: Check if Mint is installed
-#        id: mint-installed
-#        run: brew list | grep mint
-#        continue-on-error: true
-#
-#      - name: Upgrade package manager "Mint"
-#        if: steps.mint-installed.outcome == 'success'
-#        run: |
-#          brew upgrade mint
-#
-#      - name: Install package manager "Mint"
-#        if: steps.mint-installed.outcome != 'success'
-#        run: |
-#          brew install mint
-#
-#      - name: Install command line tool (if not yet cached)
-#        if: steps.mint-cache.outputs.cache-hit != 'true'
-#        run: mint bootstrap
-#
-#      - name: Run SwiftFormat lint
-#        run: mint run swiftformat --lint .
+      - name: Cache/Restore Mint packages
+        id: mint-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          restore-keys: ${{ runner.os }}-mint-
+
+      - name: Check if Mint is installed
+        id: mint-installed
+        run: brew list | grep mint
+        continue-on-error: true
+
+      - name: Upgrade package manager "Mint"
+        if: steps.mint-installed.outcome == 'success'
+        run: |
+          brew upgrade mint
+
+      - name: Install package manager "Mint"
+        if: steps.mint-installed.outcome != 'success'
+        run: |
+          brew install mint
+
+      - name: Install command line tool (if not yet cached)
+        if: steps.mint-cache.outputs.cache-hit != 'true'
+        run: mint bootstrap
+
+      - name: Run SwiftFormat lint
+        run: mint run swiftformat --lint .
 
       # TODO: Replace with installing release when release is available
       - name: Clone starknet-devnet-rs
         run: |
           git clone https://github.com/0xSpaceShard/starknet-devnet-rs.git starknet-devnet-rs
           pushd ${{ github.workspace }}/starknet-devnet-rs
-          git checkout 7586b55d221e9010809a6e61b7e28e53fc9ff5c2
+          git checkout a0d87f2f621adb6278c1bdba523ddb58268bf483
           popd
 
       - name: Cache devnet build

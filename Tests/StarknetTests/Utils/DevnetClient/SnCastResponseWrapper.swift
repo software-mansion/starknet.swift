@@ -38,7 +38,7 @@ enum SnCastResponseWrapper: Decodable {
         let command = try container.decode(SnCastCommand.self, forKey: .command)
         let error = try container.decodeIfPresent(String.self, forKey: .error)
         guard error == nil else {
-            throw SnCastError.commandError(error!)
+            throw SnCastError.commandFailed(error!)
         }
 
         switch command {
@@ -51,7 +51,7 @@ enum SnCastResponseWrapper: Decodable {
         case .deploy:
             self = try .deploy(DeploySnCastResponse(from: decoder))
         default:
-            throw SnCastError.snCastError("Invalid command response Json.")
+            throw SnCastError.invalidCommandType
         }
     }
 }

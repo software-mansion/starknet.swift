@@ -188,12 +188,15 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             guard devnetProcess.isRunning else {
-                throw DevnetClientError.devnetNotRunning
+                throw DevnetClientError.startupError
             }
 
             self.devnetProcess = devnetProcess
+
+            // Setting up a temporary directory for accounts file and cairo contracts
             let fileManager = FileManager.default
-            guard let filePaths = try? fileManager.contentsOfDirectory(at: accountDirectory, includingPropertiesForKeys: nil, options: []) else {
+            let tmpDirectoryPath = URL(string: tmpPath)!
+            guard let filePaths = try? fileManager.contentsOfDirectory(at: tmpDirectoryPath, includingPropertiesForKeys: nil, options: []) else {
                 throw DevnetClientError.fileManagerError
             }
             for filePath in filePaths {
@@ -226,7 +229,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.contractsPath = newContractsPath.path
 
             // Initialize new accounts file
-            let _ = try await deployAccount(name: "__default_cast__")
+            let _ = try await deployAccount(name: "__default__")
         }
 
         public func close() {
@@ -442,9 +445,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.currentDirectoryPath = contractsPath!
             process.arguments = [
                 "--json",
-//                "--path-to-scarb-toml",
-//                contractsPath,
-//                scarbTomlPath!,
+                "--path-to-scarb-toml",
+                scarbTomlPath!,
                 "--accounts-file",
                 "\(accountDirectory)/starknet_open_zeppelin_accounts.json",
                 "--profile",
@@ -485,7 +487,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 throw SnCastError.invalidResponseJson
             }
 
-            // Try parsing the trimmed output as JSON
             let outputDataTrimmed = output.data(using: .utf8)!
             let result = try JSONDecoder().decode(SnCastResponseWrapper.self, from: outputDataTrimmed)
 
@@ -495,7 +496,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
         typealias AccountDetailsResponse = [String: [String: AccountDetails]]
 
         public func readAccountDetails(accountName: String) throws -> AccountDetails {
-            let result = AccountDetails(privateKey: 0, publicKey: 0, address: 0, salt: 0)
             let filename = "\(accountDirectory)/starknet_open_zeppelin_accounts.json"
 
             let contents = try String(contentsOfFile: filename)

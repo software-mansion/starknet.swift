@@ -5,7 +5,7 @@ final class devnetClientTests: XCTestCase {
     var client: DevnetClientProtocol!
 
     override func setUp() async throws {
-        client = try makeDevnetClient()
+        client = makeDevnetClient()
         try await client.start()
     }
 

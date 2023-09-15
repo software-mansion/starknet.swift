@@ -61,7 +61,9 @@ struct PrefundPayload: Codable {
     let amount: UInt64
 }
 
-// Simplified receipt for RPC 0.3 and 0.4, only use it for checking whether transaction was successful
+// Simplified receipt that is intended to support any JSON-RPC version starting 0.3,
+// to avoid DevnetClient relying on StarknetTransactionReceipt.
+// Only use it for checking whether a transaction was successful.
 struct DevnetReceipt: Decodable {
     let status: DeprecatedStarknetTransactionStatus?
     let executionStatus: StarknetTransactionExecutionStatus?

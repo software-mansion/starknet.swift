@@ -55,6 +55,7 @@ protocol SnCastResponse: Decodable {
 
 public enum SnCastError: Error {
     case snCastError(String)
-    case commandError(String)
+    case commandFailed(String)
     case invalidResponseJson
+    case invalidCommandType
 }
