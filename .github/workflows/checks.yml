@@ -60,24 +60,19 @@ jobs:
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
             pushd ${{ github.workspace }}/starknet-devnet-rs
             cargo build --release
-            chmod +x ${{ github.workspace }}/starknet-devnet-rs/target/release/* 
-            if [[ ! -d ${{ github.workspace }}/starknet-devnet-rs/target/release ]]; then
-              echo "Failed to build starknet-devnet-rs"
-              exit 1
-            fi
             popd
           else
             echo "Found existing starknet-devnet-rs build, skipping compilation."
           fi
 
-      - name: Setup scarb 0.6.0
+      - name: Setup scarb 0.7.0
         uses: software-mansion/setup-scarb@v1.3.1
         with:
-          scarb-version: "0.6.0"
+          scarb-version: "0.7.0"
 
-      - name: Install sncast 0.4.1
+      - name: Install sncast 0.6.0
         run: |
-          curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.4.1
+          curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.6.0
           source /Users/runner/.bashrc
           echo "$(dirname $(which sncast))" >> $GITHUB_PATH
 

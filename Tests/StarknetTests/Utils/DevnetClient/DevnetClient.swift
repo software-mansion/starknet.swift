@@ -480,6 +480,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             var output = String(decoding: outputData, as: UTF8.self)
 
             // TODO: remove this - pending sncast update
+            // Tracking:
+            // As of sncast 0.6.0, "account create" currently outputs non-json data
             if let range = output.range(of: "{") {
                 // Remove all characters before the first `{`
                 output.removeSubrange(output.startIndex ..< range.lowerBound)
