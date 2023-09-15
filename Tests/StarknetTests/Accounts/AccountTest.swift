@@ -82,19 +82,22 @@ final class AccountTests: XCTestCase {
     }
 
     func testExecuteMultipleCalls() async throws {
-        let balanceContract = try await Self.devnetClient.declareDeployContract(contractName: "Balance")
-        let contractAddress = balanceContract.contractAddress
+        let recipientAddress = DevnetClient.predeployedAccount2.address
 
         let calldata1: [Felt] = [
+            recipientAddress,
             1000,
+            0,
         ]
 
         let calldata2: [Felt] = [
+            recipientAddress,
             1000,
+            0,
         ]
 
-        let call1 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: calldata1)
-        let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: calldata2)
+        let call1 = StarknetCall(contractAddress: DevnetClient.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
+        let call2 = StarknetCall(contractAddress: DevnetClient.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
         let result = try await account.execute(calls: [call1, call2])
 
