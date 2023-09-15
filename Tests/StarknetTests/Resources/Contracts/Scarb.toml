@@ -11,12 +11,12 @@ sierra = true
 
 [tool.sncast]
 name = "default"
-url = "http://0.0.0.0:5051/rpc"
+url = "http://127.0.0.1:5051/rpc"
 account = "__default_cast__"
 network = "testnet"
 
 [tool.sncast.default]
 name = "default"
-url = "http://0.0.0.0:5051/rpc"
+url = "http://127.0.0.1:5051/rpc"
 account = "__default_cast__"
 network = "testnet"

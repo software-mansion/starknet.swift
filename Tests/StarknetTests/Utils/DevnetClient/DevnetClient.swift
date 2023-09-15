@@ -127,7 +127,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
         let feederGatewayUrl: String
         let rpcUrl: String
 
-        init(host: String = "0.0.0.0", port: Int = 5051, seed: Int = 1_053_545_547) {
+        init(host: String = "127.0.0.1", port: Int = 5051, seed: Int = 1_053_545_547) {
             self.host = host
             self.port = port
             self.seed = seed
