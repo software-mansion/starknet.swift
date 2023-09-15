@@ -281,31 +281,64 @@ func makeDevnetClient() -> DevnetClientProtocol {
         }
 
         public func prefundAccount(address: Felt) async throws {
-            try guardDevnetIsRunning()
+//            try guardDevnetIsRunning()
 
-            let url = URL(string: "\(baseUrl)/mint")!
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
+            
+//            let url = URL(string: "\(baseUrl)/mint")!
+//            var request = URLRequest(url: url)
+//            request.httpMethod = "POST"
+//
+//            let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
+//            request.httpBody = try JSONEncoder().encode(payload)
+//
+////             if let httpBody = request.httpBody, let jsonString = String(data: httpBody, encoding: .utf8) {
+////                 print(jsonString)
+////             }
+//
+//            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+//            request.addValue("application/json", forHTTPHeaderField: "Accept")
+//
+//            var response: URLResponse?
+//
+//            (_, response) = try await URLSession.shared.data(for: request)
+//
+//            guard let response = response as? HTTPURLResponse else {
+//                print(4)
+//                throw DevnetClientError.devnetError
+//            }
+//
+//            guard response.statusCode == 200 else {
+//                print(5)
+//                throw DevnetClientError.devnetError
+//            }
+            
+            do {
+                    try guardDevnetIsRunning()
+                
+                    let url = URL(string: "\(baseUrl)/mint")!
+                    var request = URLRequest(url: url)
+                    request.httpMethod = "POST"
+                
+                    let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
+                    request.httpBody = try JSONEncoder().encode(payload)
+                
+                    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request.addValue("application/json", forHTTPHeaderField: "Accept")
+                    var response: URLResponse?
+                    (_, response) = try await URLSession.shared.data(for: request)
 
-            let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
-            request.httpBody = try JSONEncoder().encode(payload)
+                    guard let response = response as? HTTPURLResponse else {
+                        print(4)
+                        throw DevnetClientError.devnetError
+                    }
 
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-
-            var response: URLResponse?
-
-            (_, response) = try await URLSession.shared.data(for: request)
-
-            guard let response = response as? HTTPURLResponse else {
-                print(4)
-                throw DevnetClientError.devnetError
-            }
-
-            guard response.statusCode == 200 else {
-                print(5)
-                throw DevnetClientError.devnetError
-            }
+                    guard response.statusCode == 200 else {
+                        print(5)
+                        throw DevnetClientError.devnetError
+                    }
+                } catch {
+                    print("An error happened: \(error)")
+                }
         }
 
         private func createAccount(name: String,
