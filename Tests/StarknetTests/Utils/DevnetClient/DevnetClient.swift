@@ -232,13 +232,13 @@ func makeDevnetClient() -> DevnetClientProtocol {
                     let newCairoContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(cairoContract.lastPathComponent)")
                     try fileManager.copyItem(at: cairoContract, to: newCairoContractPath)
                 }
-                
+
                 self.scarbTomlPath = newScarbTomlPath.path
                 self.contractsPath = newContractsPath.path
             } catch {
                 print("File copying error: \(error)")
             }
-            
+
 //            let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
 //            let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
 //            let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
@@ -585,16 +585,15 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let rpcPayload = JsonRpcPayload(method: .getTransactionReceipt, params: params)
 
             do {
-                
                 let url = URL(string: rpcUrl)!
                 let networkProvider = HttpNetworkProvider()
                 var response: JsonRpcResponse<DevnetReceipt>
-                
+
                 let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
                     (header: "Content-Type", value: "application/json"),
                     (header: "Accept", value: "application/json"),
                 ])
-                
+
                 do {
                     response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<DevnetReceipt>.self)
                 } catch _ as HttpNetworkProviderError {
@@ -603,7 +602,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
                     print(6)
                     throw DevnetClientError.devnetError
                 }
-                
+
                 if let result = response.result {
                     return result.isSuccessful
                 } else if let error = response.error {
@@ -612,11 +611,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
                     print(7)
                     throw DevnetClientError.devnetError
                 }
-                
+
             } catch {
                 print("Network request error: \(error)")
             }
-            
+
             return false
         }
     }
