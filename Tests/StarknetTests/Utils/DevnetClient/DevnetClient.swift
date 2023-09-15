@@ -215,25 +215,49 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             //  Recreating proper file structure requried by scarb
-            let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
-            let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
-            let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
-            let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
-            try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
-            try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
+            do {
+                let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
+                let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
+                try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
+                try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
+                let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
+                let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
+                try fileManager.copyItem(at: originalScarbTomlPath, to: newScarbTomlPath)
 
-            try fileManager.copyItem(at: originalScarbTomlPath, to: newScarbTomlPath)
+                guard let cairoSrcPaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
+                    throw DevnetClientError.missingResourceFile
+                }
 
-            guard let cairoSrcPaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
-                throw DevnetClientError.missingResourceFile
+                for cairoContract in cairoSrcPaths {
+                    let newCairoContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(cairoContract.lastPathComponent)")
+                    try fileManager.copyItem(at: cairoContract, to: newCairoContractPath)
+                }
+                
+                self.scarbTomlPath = newScarbTomlPath.path
+                self.contractsPath = newContractsPath.path
+            } catch {
+                print("File copying error: \(error)")
             }
-            for cairoContract in cairoSrcPaths {
-                let newCairoContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(cairoContract.lastPathComponent)")
-                try fileManager.copyItem(at: cairoContract, to: newCairoContractPath)
-            }
+            
+//            let originalScarbTomlPath = URL(fileURLWithPath: self.scarbTomlPath)
+//            let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
+//            let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
+//            let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
+//            try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
+//            try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
+//
+//            try fileManager.copyItem(at: originalScarbTomlPath, to: newScarbTomlPath)
+//
+//            guard let cairoSrcPaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
+//                throw DevnetClientError.missingResourceFile
+//            }
+//            for cairoContract in cairoSrcPaths {
+//                let newCairoContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(cairoContract.lastPathComponent)")
+//                try fileManager.copyItem(at: cairoContract, to: newCairoContractPath)
+//            }
 
-            self.scarbTomlPath = newScarbTomlPath.path
-            self.contractsPath = newContractsPath.path
+//            self.scarbTomlPath = newScarbTomlPath.path
+//            self.contractsPath = newContractsPath.path
 
             self.devnetProcess = devnetProcess
 
@@ -560,32 +584,40 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let params = [transactionHash]
             let rpcPayload = JsonRpcPayload(method: .getTransactionReceipt, params: params)
 
-            let url = URL(string: rpcUrl)!
-            let networkProvider = HttpNetworkProvider()
-            var response: JsonRpcResponse<DevnetReceipt>
-
-            let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
-                (header: "Content-Type", value: "application/json"),
-                (header: "Accept", value: "application/json"),
-            ])
-
             do {
-                response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<DevnetReceipt>.self)
-            } catch _ as HttpNetworkProviderError {
-                throw DevnetClientError.networkProviderError
+                
+                let url = URL(string: rpcUrl)!
+                let networkProvider = HttpNetworkProvider()
+                var response: JsonRpcResponse<DevnetReceipt>
+                
+                let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
+                    (header: "Content-Type", value: "application/json"),
+                    (header: "Accept", value: "application/json"),
+                ])
+                
+                do {
+                    response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<DevnetReceipt>.self)
+                } catch _ as HttpNetworkProviderError {
+                    throw DevnetClientError.networkProviderError
+                } catch {
+                    print(6)
+                    throw DevnetClientError.devnetError
+                }
+                
+                if let result = response.result {
+                    return result.isSuccessful
+                } else if let error = response.error {
+                    throw DevnetClientError.jsonRpcError(error.code, error.message)
+                } else {
+                    print(7)
+                    throw DevnetClientError.devnetError
+                }
+                
             } catch {
-                print(6)
-                throw DevnetClientError.devnetError
+                print("Network request error: \(error)")
             }
-
-            if let result = response.result {
-                return result.isSuccessful
-            } else if let error = response.error {
-                throw DevnetClientError.jsonRpcError(error.code, error.message)
-            } else {
-                print(7)
-                throw DevnetClientError.devnetError
-            }
+            
+            return false
         }
     }
 

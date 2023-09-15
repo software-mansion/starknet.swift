@@ -94,5 +94,5 @@ jobs:
           echo "$SNCAST_PATH"
           $DEVNET_PATH --version
           $SCARB_PATH --version   
-          $SNCAST_PATH --version   
-          swift test --disable-sandbox -v
+          $SNCAST_PATH --version
+          swift test --disable-sandbox

@@ -53,10 +53,20 @@ class HttpNetworkProvider {
             throw HttpNetworkProviderError.encodingError
         }
 
+        // Print JSON request payload
+        if let jsonString = String(data: encoded, encoding: .utf8) {
+            print("IN: \(jsonString)")
+        }
+
         let request = makeRequestWith(body: encoded, config: config)
 
         guard let (data, response) = try? await session.data(for: request) else {
             throw HttpNetworkProviderError.unknownError
+        }
+
+        // Print JSON response
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("OUT: \(jsonString)")
         }
 
         if let result = try? JSONDecoder().decode(U.self, from: data) {
