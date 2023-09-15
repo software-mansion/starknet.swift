@@ -95,4 +95,4 @@ jobs:
           $DEVNET_PATH --version
           $SCARB_PATH --version   
           $SNCAST_PATH --version   
-          swift test --disable-sandbox
+          swift test --disable-sandbox -v
