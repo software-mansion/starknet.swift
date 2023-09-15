@@ -7,8 +7,6 @@ on:
 jobs:
   test_and_lint:
     runs-on: macos-12
-    env:
-      DEVNET_BUILD_PATH: ${{ github.workspace }}/starknet-devnet-rs/target/release
     steps:
       - uses: actions/checkout@v3
 
@@ -81,7 +79,6 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.4.1
           source /Users/runner/.bashrc
-          echo "$(dirname $(which sncast))"
           echo "$(dirname $(which sncast))" >> $GITHUB_PATH
 
       - name: Run tests
@@ -89,10 +86,4 @@ jobs:
           export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
           export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
-          echo "$DEVNET_PATH"
-          echo "$SCARB_PATH"
-          echo "$SNCAST_PATH"
-          $DEVNET_PATH --version
-          $SCARB_PATH --version   
-          $SNCAST_PATH --version
           swift test --disable-sandbox
