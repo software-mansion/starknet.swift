@@ -62,8 +62,8 @@ jobs:
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
             pushd ${{ github.workspace }}/starknet-devnet-rs
             cargo build --release
-            chmod +x ${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
-            if ! -d [ ! -d ${{ github.workspace }}/starknet-devnet-rs/target/release ]]; then
+            chmod +x ${{ github.workspace }}/starknet-devnet-rs/target/release/* 
+            if [[ ! -d ${{ github.workspace }}/starknet-devnet-rs/target/release ]]; then
               echo "Failed to build starknet-devnet-rs"
               exit 1
             fi
@@ -91,5 +91,8 @@ jobs:
           export SNCAST_PATH="$(which sncast)"
           echo "$DEVNET_PATH"
           echo "$SCARB_PATH"
-          echo "$SNCAST_PATH"      
+          echo "$SNCAST_PATH"
+          $DEVNET_PATH --version
+          $SCARB_PATH --version   
+          $SNCAST_PATH --version   
           swift test --disable-sandbox
