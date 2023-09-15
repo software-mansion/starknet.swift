@@ -99,6 +99,7 @@ public enum DevnetClientError: Error {
     case invalidTestPlatform
     case environmentVariablesNotSet
     case devnetError
+    case startupError
     case snCastError(String)
     case jsonRpcError(Int, String)
     case portAlreadyInUse
@@ -111,5 +112,6 @@ public enum DevnetClientError: Error {
     case networkProviderError
     case deserializationError
     case missingResourceFile
+    case fileManagerError
     case accountNotFound
 }
