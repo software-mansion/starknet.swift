@@ -7,6 +7,8 @@ on:
 jobs:
   test_and_lint:
     runs-on: macos-12
+    env:
+      DEVNET_SHA: a0d87f2f621adb6278c1bdba523ddb58268bf483
     steps:
       - uses: actions/checkout@v3
 
@@ -45,14 +47,14 @@ jobs:
         run: |
           git clone https://github.com/0xSpaceShard/starknet-devnet-rs.git starknet-devnet-rs
           pushd ${{ github.workspace }}/starknet-devnet-rs
-          git checkout a0d87f2f621adb6278c1bdba523ddb58268bf483
+          git checkout ${{ env.DEVNET_SHA }}
           popd
 
       - name: Cache devnet build
         uses: actions/cache@v3
         with:
           path: starknet-devnet-rs/target/release
-          key: ${{ runner.os }}-starknet-devnet-rs-target-release-${{ hashFiles('starknet-devnet-rs/Cargo.lock') }}
+          key: ${{ runner.os }}-starknet-devnet-rs-target-release-${{ env.DEVNET_SHA }}
 
       - name: Build devnet
         run: |
