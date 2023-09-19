@@ -87,9 +87,9 @@ struct DevnetReceipt: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        self.status = try container.decodeIfPresent(LegacyStarknetTransactionStatus.self, forKey: .status) ?? nil
-        self.executionStatus = try container.decodeIfPresent(StarknetTransactionExecutionStatus.self, forKey: .executionStatus) ?? nil
-        self.finalityStatus = try container.decodeIfPresent(StarknetTransactionFinalityStatus.self, forKey: .finalityStatus) ?? nil
+        self.status = try container.decodeIfPresent(LegacyStarknetTransactionStatus.self, forKey: .status)
+        self.executionStatus = try container.decodeIfPresent(StarknetTransactionExecutionStatus.self, forKey: .executionStatus)
+        self.finalityStatus = try container.decodeIfPresent(StarknetTransactionFinalityStatus.self, forKey: .finalityStatus)
 
         guard status != nil || (executionStatus != nil && finalityStatus != nil) else {
             throw DevnetClientError.unknownTransactionStatus
