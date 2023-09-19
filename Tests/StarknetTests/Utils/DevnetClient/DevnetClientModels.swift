@@ -65,7 +65,7 @@ struct PrefundPayload: Codable {
 // to avoid DevnetClient relying on StarknetTransactionReceipt.
 // Only use it for checking whether a transaction was successful.
 struct DevnetReceipt: Decodable {
-    let status: DeprecatedStarknetTransactionStatus?
+    let status: LegacyStarknetTransactionStatus?
     let executionStatus: StarknetTransactionExecutionStatus?
     let finalityStatus: StarknetTransactionFinalityStatus?
 
@@ -87,7 +87,7 @@ struct DevnetReceipt: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        self.status = try container.decodeIfPresent(DeprecatedStarknetTransactionStatus.self, forKey: .status) ?? nil
+        self.status = try container.decodeIfPresent(LegacyStarknetTransactionStatus.self, forKey: .status) ?? nil
         self.executionStatus = try container.decodeIfPresent(StarknetTransactionExecutionStatus.self, forKey: .executionStatus) ?? nil
         self.finalityStatus = try container.decodeIfPresent(StarknetTransactionFinalityStatus.self, forKey: .finalityStatus) ?? nil
 
