@@ -276,7 +276,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         private func createAccount(name: String,
                                    classHash: Felt = accountContractClassHash,
-                                   salt: Felt? = nil) async throws -> AccountCreateSnCastResponse
+                                   salt: Felt? = nil) async throws -> CreateAccountResult
         {
             var params = [
                 "create",
@@ -295,7 +295,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 args: params
             ) as! AccountCreateSnCastResponse
 
-            return response
+            return CreateAccountResult(
+                accountAddress: response.accountAddress,
+                maxFee: response.maxFee
+            )
         }
 
         public func deployAccount(name: String,
@@ -413,14 +416,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 params.append(salt!.toHex())
             }
 
-            let result = try runSnCast(
+            let response = try runSnCast(
                 command: "deploy",
                 args: params
             ) as! DeploySnCastResponse
 
             return DeployContractResult(
-                contractAddress: result.contractAddress,
-                transactionHash: result.transactionHash
+                contractAddress: response.contractAddress,
+                transactionHash: response.transactionHash
             )
         }
 

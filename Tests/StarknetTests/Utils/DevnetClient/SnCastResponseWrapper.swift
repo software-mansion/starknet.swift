@@ -2,13 +2,6 @@ import BigInt
 import Foundation
 @testable import Starknet
 
-enum SnCastCommand: String, Codable {
-    case accountCreate = "account create"
-    case accountDeploy = "account deploy"
-    case declare
-    case deploy
-}
-
 enum SnCastResponseWrapper: Decodable {
     fileprivate enum Keys: String, CodingKey {
         case command

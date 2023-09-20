@@ -53,6 +53,13 @@ protocol SnCastResponse: Decodable {
     var error: String? { get }
 }
 
+enum SnCastCommand: String, Codable {
+    case accountCreate = "account create"
+    case accountDeploy = "account deploy"
+    case declare
+    case deploy
+}
+
 public enum SnCastError: Error {
     case snCastError(String)
     case commandFailed(String)
