@@ -430,7 +430,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult {
             try guardDevnetIsRunning()
-            
+
             let params = [
                 "--contract-name",
                 contractName,
