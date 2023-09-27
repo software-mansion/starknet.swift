@@ -1,16 +1,18 @@
-#[starknet::interface] trait IBalance<T> {
+#[starknet::interface]
+trait IBalance<T> {
     // Returns the current balance.
     fn get_balance(self: @T) -> u128;
     // Increases the balance by the given amount.
     fn increase_balance(ref self: T, a: u128);
 }
 
-#[starknet::contract] mod Balance {
+#[starknet::contract]
+mod Balance {
     use traits::Into;
 
     #[storage]
     struct Storage {
-        value: u128, 
+        value: u128,
     }
 
     #[constructor]
