@@ -430,13 +430,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult {
             try guardDevnetIsRunning()
-
-            let cairoFilePath = "\(self.contractsPath!)/src/\(contractName).cairo"
-
-            guard FileManager.default.fileExists(atPath: cairoFilePath) else {
-                throw DevnetClientError.missingResourceFile
-            }
-
+            
             let params = [
                 "--contract-name",
                 contractName,
