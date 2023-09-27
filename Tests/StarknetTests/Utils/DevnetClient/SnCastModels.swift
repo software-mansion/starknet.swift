@@ -48,6 +48,16 @@ struct DeploySnCastResponse: SnCastResponse {
     }
 }
 
+struct InvokeSnCastResponse: SnCastResponse {
+    let command: SnCastCommand = .invoke
+    let error: String? = nil
+    let transactionHash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case transactionHash = "transaction_hash"
+    }
+}
+
 protocol SnCastResponse: Decodable {
     var command: SnCastCommand { get }
     var error: String? { get }
@@ -58,6 +68,7 @@ enum SnCastCommand: String, Codable {
     case accountDeploy = "account deploy"
     case declare
     case deploy
+    case invoke
 }
 
 public enum SnCastError: Error {

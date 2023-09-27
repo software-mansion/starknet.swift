@@ -12,6 +12,7 @@ enum SnCastResponseWrapper: Decodable {
     case accountDeploy(AccountDeploySnCastResponse)
     case declare(DeclareSnCastResponse)
     case deploy(DeploySnCastResponse)
+    case invoke(InvokeSnCastResponse)
 
     public var response: any SnCastResponse {
         switch self {
@@ -22,6 +23,8 @@ enum SnCastResponseWrapper: Decodable {
         case let .declare(res):
             return res
         case let .deploy(res):
+            return res
+        case let .invoke(res):
             return res
         }
     }
@@ -43,6 +46,8 @@ enum SnCastResponseWrapper: Decodable {
             self = try .declare(DeclareSnCastResponse(from: decoder))
         case .deploy:
             self = try .deploy(DeploySnCastResponse(from: decoder))
+        case .invoke:
+            self = try .invoke(InvokeSnCastResponse(from: decoder))
         default:
             throw SnCastError.invalidCommandType
         }

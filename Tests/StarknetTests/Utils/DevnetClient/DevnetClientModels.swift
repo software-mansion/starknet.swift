@@ -7,22 +7,19 @@ struct AccountDetails: Codable {
     let publicKey: Felt
     let address: Felt
     let salt: Felt
-    var maxFee: Felt
 
     enum CodingKeys: String, CodingKey {
         case privateKey = "private_key"
         case publicKey = "public_key"
         case address
         case salt
-        case maxFee = "max_fee"
     }
 
-    init(privateKey: Felt, publicKey: Felt, address: Felt, salt: Felt, maxFee: Felt = 1_000_000_000_000) {
+    init(privateKey: Felt, publicKey: Felt, address: Felt, salt: Felt) {
         self.privateKey = privateKey
         self.publicKey = publicKey
         self.address = address
         self.salt = salt
-        self.maxFee = maxFee
     }
 
     public init(from decoder: Decoder) throws {
@@ -32,7 +29,6 @@ struct AccountDetails: Codable {
         self.publicKey = try container.decode(Felt.self, forKey: .publicKey)
         self.address = try container.decode(Felt.self, forKey: .address)
         self.salt = try container.decode(Felt.self, forKey: .salt)
-        self.maxFee = try container.decodeIfPresent(Felt.self, forKey: .maxFee) ?? 1_000_000_000_000
     }
 }
 
@@ -42,7 +38,8 @@ struct DeployAccountResult {
 }
 
 struct CreateAccountResult {
-    let accountAddress: Felt
+    let name: String
+    let details: AccountDetails
     let maxFee: Felt
 }
 
@@ -53,6 +50,10 @@ struct DeclareContractResult {
 
 struct DeployContractResult {
     let contractAddress: Felt
+    let transactionHash: Felt
+}
+
+struct InvokeContractResult {
     let transactionHash: Felt
 }
 

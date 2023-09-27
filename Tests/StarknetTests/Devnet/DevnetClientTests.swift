@@ -13,12 +13,43 @@ final class devnetClientTests: XCTestCase {
         client.close()
     }
 
-    func testDeployAccount() async throws {
-        let _ = try await client.deployAccount(name: "Account1")
-        let _ = try await client.deployAccount()
+    func testCreateDeployAccount() async throws {
+        let account = try await client.createDeployAccount(name: "Account1")
+        try await client.assertTransactionSucceeded(transactionHash: account.transactionHash)
+
+        let account2 = try await client.createDeployAccount()
+        try await client.assertTransactionSucceeded(transactionHash: account2.transactionHash)
+    }
+
+    func testCreateAndDeployAccount() async throws {
+        let account = try await client.createAccount()
+        try await client.prefundAccount(address: account.details.address)
+        let deployedAccount = try await client.deployAccount(name: account.name)
+        try await client.assertTransactionSucceeded(transactionHash: deployedAccount.transactionHash)
     }
 
     func testDeclareDeploy() async throws {
-        let _ = try await client.declareDeployContract(contractName: "Balance")
+        let deployedContract = try await client.declareDeployContract(contractName: "Balance")
+        try await client.assertTransactionSucceeded(transactionHash: deployedContract.transactionHash)
+
+        let declaredContract2 = try await client.declareContract(contractName: "Events")
+        try await client.assertTransactionSucceeded(transactionHash: declaredContract2.transactionHash)
+        let deployedContract2 = try await client.deployContract(classHash: declaredContract2.classHash)
+        try await client.assertTransactionSucceeded(transactionHash: deployedContract2.transactionHash)
+    }
+
+    func testDeclareDeployConstructor() async throws {
+        let declaredContract = try await client.declareDeployContract(contractName: "ContractWithConstructor", constructorCalldata: [2137, 451])
+        try await client.assertTransactionSucceeded(transactionHash: declaredContract.transactionHash)
+    }
+
+    func testInvokeContract() async throws {
+        let calldata = [
+            DevnetClient.predeployedAccount1.address,
+            1000,
+            0,
+        ]
+        let invokeResult = try await client.invokeContract(contractAddress: DevnetClient.erc20ContractAddress, function: "transfer", calldata: calldata)
+        try await client.assertTransactionSucceeded(transactionHash: invokeResult.transactionHash)
     }
 }

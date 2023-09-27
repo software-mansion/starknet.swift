@@ -89,14 +89,9 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetEvents() async throws {
-        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_events")
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Events")
+        let invokeResult = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract.contractAddress, function: "emit_event", calldata: [1])
 
-        let signerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
-        let account = StarknetAccount(address: acc.details.address, signer: signerProtocol!, provider: provider, cairoVersion: .zero)
-
-        let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "emit_event"), calldata: [1])
-        let invokeResult = try await account.execute(call: call)
         try await ProviderTests.devnetClient.assertTransactionSucceeded(transactionHash: invokeResult.transactionHash)
 
         let filter = StarknetGetEventsFilter(address: contract.contractAddress, keys: [["0x477e157efde59c5531277ede78acb3e03ef69508c6c35fde3495aa0671d227"]])
@@ -124,22 +119,20 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetTransactionReceipt() async throws {
-        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_receipt")
+        let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_receipt")
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-
-        let signerProtocol = StarkCurveSigner(privateKey: acc.details.privateKey)
-        let account = StarknetAccount(address: acc.details.address, signer: signerProtocol!, provider: provider, cairoVersion: .zero)
-
-        let call = StarknetCall(contractAddress: contract.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [2137])
-        let invokeResult = try await account.execute(call: call)
+        let invokeTransaction = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract.contractAddress, function: "increase_balance", calldata: [2137])
 
         let deployAccountReceipt = try await provider.getTransactionReceiptBy(hash: acc.transactionHash)
-        let invokeReceipt = try await provider.getTransactionReceiptBy(hash: invokeResult.transactionHash)
+        XCTAssertTrue(deployAccountReceipt.isSuccessful)
+
+        let invokeReceipt = try await provider.getTransactionReceiptBy(hash: invokeTransaction.transactionHash)
+        XCTAssertTrue(invokeReceipt.isSuccessful)
     }
 
     // TODO: (#100) separate estimateFee tests based on transaction type
     func testEstimateFee() async throws {
-        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_estimate_fee")
+        let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_estimate_fee")
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
 
         let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
@@ -164,7 +157,7 @@ final class ProviderTests: XCTestCase {
     func disabledTestSimulateTransactions() async throws {
         XCTAssertTrue(false)
 
-        let acc = try await ProviderTests.devnetClient.deployAccount(name: "test_simulate_transactions")
+        let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_simulate_transactions")
         let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
         let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider, cairoVersion: .zero)

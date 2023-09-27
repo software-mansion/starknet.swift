@@ -17,10 +17,13 @@ protocol DevnetClientProtocol {
     func isRunning() -> Bool
 
     func prefundAccount(address: Felt) async throws
-    func deployAccount(name: String, classHash: Felt, salt: Felt?, maxFee: Felt?) async throws -> DeployAccountResult
-    func deployContract(classHash: Felt, constructorCalldata: [Felt], salt: Felt?, unique: Bool, maxFee: Felt) async throws -> DeployContractResult
+    func createDeployAccount(name: String, classHash: Felt, salt: Felt?, maxFee: Felt) async throws -> DeployAccountResult
+    func createAccount(name: String, classHash: Felt, salt: Felt?) async throws -> CreateAccountResult
+    func deployAccount(name: String, classHash: Felt, maxFee: Felt) async throws -> DeployAccountResult
     func declareDeployContract(contractName: String, constructorCalldata: [Felt], salt: Felt?, unique: Bool, maxFeeDeclare: Felt, maxFeeDeploy: Felt) async throws -> DeployContractResult
     func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult
+    func deployContract(classHash: Felt, constructorCalldata: [Felt], salt: Felt?, unique: Bool, maxFee: Felt) async throws -> DeployContractResult
+    func invokeContract(contractAddress: Felt, function: String, calldata: [Felt], maxFee: Felt) async throws -> InvokeContractResult
     func readAccountDetails(accountName: String) throws -> AccountDetails
 
     func assertTransactionSucceeded(transactionHash: Felt) async throws
@@ -29,12 +32,13 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
-    func deployAccount(name: String,
-                       classHash: Felt = DevnetClient.accountContractClassHash,
-                       salt: Felt? = .zero,
-                       maxFee: Felt? = nil) async throws -> DeployAccountResult
-    {
-        try await deployAccount(
+    func createDeployAccount(
+        name: String,
+        classHash: Felt = DevnetClient.accountContractClassHash,
+        salt: Felt? = .zero,
+        maxFee: Felt = 1_000_000_000_000_000
+    ) async throws -> DeployAccountResult {
+        try await createDeployAccount(
             name: name,
             classHash: classHash,
             salt: salt,
@@ -42,26 +46,55 @@ extension DevnetClientProtocol {
         )
     }
 
-    func deployAccount() async throws -> DeployAccountResult {
-        try await deployAccount(
+    func createDeployAccount() async throws -> DeployAccountResult {
+        try await createDeployAccount(
             name: UUID().uuidString,
             classHash: DevnetClient.accountContractClassHash,
             salt: .zero,
-            maxFee: nil
+            maxFee: 1_000_000_000_000_000
         )
+    }
+
+    func createAccount(
+        name: String,
+        classHash: Felt = DevnetClient.accountContractClassHash,
+        salt: Felt? = .zero
+    ) async throws -> CreateAccountResult {
+        try await createAccount(
+            name: name,
+            classHash: classHash,
+            salt: salt
+        )
+    }
+
+    func createAccount() async throws -> CreateAccountResult {
+        try await createAccount(
+            name: UUID().uuidString,
+            classHash: DevnetClient.accountContractClassHash,
+            salt: .zero
+        )
+    }
+
+    func deployAccount(
+        name: String,
+        classHash: Felt = DevnetClient.accountContractClassHash,
+        maxFee: Felt = 1_000_000_000_000_000
+    ) async throws -> DeployAccountResult {
+        try await deployAccount(name: name, classHash: classHash, maxFee: maxFee)
     }
 
     func declareContract(contractName: String, maxFee: Felt = 1_000_000_000_000_000) async throws -> DeclareContractResult {
         try await declareContract(contractName: contractName, maxFee: maxFee)
     }
 
-    func declareDeployContract(contractName: String,
-                               constructorCalldata: [Felt] = [],
-                               salt: Felt? = .zero,
-                               unique: Bool = false,
-                               maxFeeDeclare: Felt = 1_000_000_000_000_000,
-                               maxFeeDeploy: Felt = 1_000_000_000_000_000) async throws -> DeployContractResult
-    {
+    func declareDeployContract(
+        contractName: String,
+        constructorCalldata: [Felt] = [],
+        salt: Felt? = .zero,
+        unique: Bool = false,
+        maxFeeDeclare: Felt = 1_000_000_000_000_000,
+        maxFeeDeploy: Felt = 1_000_000_000_000_000
+    ) async throws -> DeployContractResult {
         try await declareDeployContract(
             contractName: contractName,
             constructorCalldata: constructorCalldata,
@@ -72,17 +105,32 @@ extension DevnetClientProtocol {
         )
     }
 
-    func deployContract(classHash: Felt,
-                        constructorCalldata: [Felt] = [],
-                        salt: Felt? = .zero,
-                        unique: Bool,
-                        maxFee: Felt) async throws -> DeployContractResult
-    {
+    func deployContract(
+        classHash: Felt,
+        constructorCalldata: [Felt] = [],
+        salt: Felt? = .zero,
+        unique: Bool = false,
+        maxFee: Felt = 1_000_000_000_000_000
+    ) async throws -> DeployContractResult {
         try await deployContract(
             classHash: classHash,
             constructorCalldata: constructorCalldata,
             salt: salt,
             unique: unique,
+            maxFee: maxFee
+        )
+    }
+
+    func invokeContract(
+        contractAddress: Felt,
+        function: String,
+        calldata: [Felt] = [],
+        maxFee: Felt = 1_000_000_000_000_000
+    ) async throws -> InvokeContractResult {
+        try await invokeContract(
+            contractAddress: contractAddress,
+            function: function,
+            calldata: calldata,
             maxFee: maxFee
         )
     }
@@ -229,7 +277,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.contractsPath = newContractsPath.path
 
             // Initialize new accounts file
-            let _ = try await deployAccount(name: "__default__")
+            let _ = try await createDeployAccount(name: "__default__")
         }
 
         public func close() {
@@ -274,10 +322,30 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
         }
 
-        private func createAccount(name: String,
-                                   classHash: Felt = accountContractClassHash,
-                                   salt: Felt? = nil) async throws -> CreateAccountResult
-        {
+        public func createDeployAccount(
+            name: String,
+            classHash: Felt = DevnetClient.accountContractClassHash,
+            salt: Felt? = nil,
+            maxFee: Felt = 1_000_000_000_000_000
+        ) async throws -> DeployAccountResult {
+            try guardDevnetIsRunning()
+
+            let createResult = try await createAccount(name: name, salt: salt)
+            let details = createResult.details
+            try await prefundAccount(address: details.address)
+            let deployResult = try await deployAccount(name: name, classHash: classHash, maxFee: maxFee)
+
+            return DeployAccountResult(
+                details: details,
+                transactionHash: deployResult.transactionHash
+            )
+        }
+
+        public func createAccount(
+            name: String,
+            classHash: Felt = accountContractClassHash,
+            salt: Felt? = nil
+        ) async throws -> CreateAccountResult {
             var params = [
                 "create",
                 "--name",
@@ -295,31 +363,28 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 args: params
             ) as! AccountCreateSnCastResponse
 
+            let details = try readAccountDetails(accountName: name)
+
             return CreateAccountResult(
-                accountAddress: response.accountAddress,
+                name: name,
+                details: details,
                 maxFee: response.maxFee
             )
         }
 
-        public func deployAccount(name: String,
-                                  classHash: Felt = DevnetClient.accountContractClassHash,
-                                  salt: Felt? = nil,
-                                  maxFee: Felt? = nil) async throws -> DeployAccountResult
-        {
-            try guardDevnetIsRunning()
-
-            let newAccount = try await createAccount(name: name, salt: salt)
-            let maxFeeEstimate = newAccount.maxFee
-
+        public func deployAccount(
+            name: String,
+            classHash: Felt = accountContractClassHash,
+            maxFee: Felt = 1_000_000_000_000_000
+        ) async throws -> DeployAccountResult {
             let details = try readAccountDetails(accountName: name)
-            try await prefundAccount(address: details.address)
 
             let params = [
                 "deploy",
                 "--name",
                 name,
                 "--max-fee",
-                maxFee?.toHex() ?? Felt(maxFeeEstimate.value * 2)!.toHex(),
+                maxFee.toHex(),
                 "--class-hash",
                 classHash.toHex(),
             ]
@@ -332,6 +397,35 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 details: details,
                 transactionHash: result.transactionHash
             )
+        }
+
+        public func declareDeployContract(
+            contractName: String,
+            constructorCalldata: [Felt] = [],
+            salt: Felt? = nil,
+            unique: Bool = false,
+            maxFeeDeclare: Felt = 1_000_000_000_000_000,
+            maxFeeDeploy: Felt = 1_000_000_000_000_000
+        ) async throws -> DeployContractResult {
+            try guardDevnetIsRunning()
+
+            if let result = deployedContractsAtName[contractName] {
+                return result
+            }
+            let declaredContract = try await declareContract(contractName: contractName, maxFee: maxFeeDeclare)
+
+            let classHash = declaredContract.classHash
+            let result = try await deployContract(
+                classHash: classHash,
+                constructorCalldata: constructorCalldata,
+                salt: salt,
+                unique: unique,
+                maxFee: maxFeeDeploy
+            )
+
+            deployedContractsAtName[contractName] = result
+
+            return result
         }
 
         public func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult {
@@ -360,40 +454,13 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        public func declareDeployContract(contractName: String,
-                                          constructorCalldata: [Felt] = [],
-                                          salt: Felt? = nil,
-                                          unique: Bool = false,
-                                          maxFeeDeclare: Felt = 1_000_000_000_000_000,
-                                          maxFeeDeploy: Felt = 1_000_000_000_000_000) async throws -> DeployContractResult
-        {
-            try guardDevnetIsRunning()
-
-            if let result = deployedContractsAtName[contractName] {
-                return result
-            }
-            let declaredContract = try await declareContract(contractName: contractName, maxFee: maxFeeDeclare)
-
-            let classHash = declaredContract.classHash
-            let result = try await deployContract(
-                classHash: classHash,
-                constructorCalldata: constructorCalldata,
-                salt: salt,
-                unique: unique,
-                maxFee: maxFeeDeploy
-            )
-
-            deployedContractsAtName[contractName] = result
-
-            return result
-        }
-
-        public func deployContract(classHash: Felt,
-                                   constructorCalldata: [Felt] = [],
-                                   salt: Felt? = nil,
-                                   unique: Bool = false,
-                                   maxFee: Felt = 1_000_000_000_000_000) async throws -> DeployContractResult
-        {
+        public func deployContract(
+            classHash: Felt,
+            constructorCalldata: [Felt] = [],
+            salt: Felt? = nil,
+            unique: Bool = false,
+            maxFee: Felt = 1_000_000_000_000_000
+        ) async throws -> DeployContractResult {
             try guardDevnetIsRunning()
 
             var params = [
@@ -404,9 +471,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             ]
             if !constructorCalldata.isEmpty {
                 params.append("--constructor-calldata")
-
                 let hexCalldata = constructorCalldata.map { $0.toHex() }
-                params.append(contentsOf: hexCalldata)
+                params.append(hexCalldata.joined(separator: " "))
             }
             if unique {
                 params.append("--unique")
@@ -425,6 +491,34 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 contractAddress: response.contractAddress,
                 transactionHash: response.transactionHash
             )
+        }
+
+        public func invokeContract(
+            contractAddress: Felt,
+            function: String,
+            calldata: [Felt] = [],
+            maxFee: Felt = 1_000_000_000_000_000
+        ) async throws -> InvokeContractResult {
+            var params = [
+                "--contract-address",
+                contractAddress.toHex(),
+                "--function",
+                function,
+                "--max-fee",
+                maxFee.toHex(),
+            ]
+            if !calldata.isEmpty {
+                params.append("--calldata")
+                let hexCalldata = calldata.map { $0.toHex() }
+                params.append(hexCalldata.joined(separator: " "))
+            }
+
+            let response = try runSnCast(
+                command: "invoke",
+                args: params
+            ) as! InvokeSnCastResponse
+
+            return InvokeContractResult(transactionHash: response.transactionHash)
         }
 
         public func isRunning() -> Bool {
@@ -512,17 +606,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             throw DevnetClientError.accountNotFound
-        }
-
-        private func getValueFromLine(line: String, index: Int = 1) -> String {
-            let split = line.components(separatedBy: ": ")
-            return split[index]
-        }
-
-        private func getTransactionResult(lines: [String], offset: Int = 2) -> DeployContractResult {
-            let address = Felt(fromHex: getValueFromLine(line: lines[offset])) ?? 0
-            let transactionHash = Felt(fromHex: getValueFromLine(line: lines[offset + 1])) ?? 0
-            return DeployContractResult(contractAddress: address, transactionHash: transactionHash)
         }
 
         private func guardDevnetIsRunning() throws {
