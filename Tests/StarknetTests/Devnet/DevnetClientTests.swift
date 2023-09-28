@@ -31,11 +31,13 @@ final class devnetClientTests: XCTestCase {
     func testDeclareDeploy() async throws {
         let deployedContract = try await client.declareDeployContract(contractName: "Balance")
         try await client.assertTransactionSucceeded(transactionHash: deployedContract.transactionHash)
+    }
 
-        let declaredContract2 = try await client.declareContract(contractName: "Events")
-        try await client.assertTransactionSucceeded(transactionHash: declaredContract2.transactionHash)
-        let deployedContract2 = try await client.deployContract(classHash: declaredContract2.classHash)
-        try await client.assertTransactionSucceeded(transactionHash: deployedContract2.transactionHash)
+    func testDeclareAndDeploy() async throws {
+        let declaredContract = try await client.declareContract(contractName: "Events")
+        try await client.assertTransactionSucceeded(transactionHash: declaredContract.transactionHash)
+        let deployedContract = try await client.deployContract(classHash: declaredContract.classHash)
+        try await client.assertTransactionSucceeded(transactionHash: deployedContract.transactionHash)
     }
 
     func testDeclareDeployConstructor() async throws {
