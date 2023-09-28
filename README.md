@@ -55,7 +55,7 @@ You will need to set some environment variables:
 
 You can set them in XCode scheme or by running these commands:
 ```bash
-export DEVNET_PATH="$(which starknet-devnet-rs)"
+export DEVNET_PATH="$(which starknet-devnet)"
 export SCARB_PATH="$(which scarb)"
 export SNCAST_PATH="$(which sncast)"
 ```
