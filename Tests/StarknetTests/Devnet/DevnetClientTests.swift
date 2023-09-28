@@ -29,8 +29,9 @@ final class devnetClientTests: XCTestCase {
     }
 
     func testDeclareDeploy() async throws {
-        let deployedContract = try await client.declareDeployContract(contractName: "Balance")
-        try await client.assertTransactionSucceeded(transactionHash: deployedContract.transactionHash)
+        let contract = try await client.declareDeployContract(contractName: "Balance")
+        try await client.assertTransactionSucceeded(transactionHash: contract.declare.transactionHash)
+        try await client.assertTransactionSucceeded(transactionHash: contract.deploy.transactionHash)
     }
 
     func testDeclareAndDeploy() async throws {
@@ -41,8 +42,9 @@ final class devnetClientTests: XCTestCase {
     }
 
     func testDeclareDeployConstructor() async throws {
-        let declaredContract = try await client.declareDeployContract(contractName: "ContractWithConstructor", constructorCalldata: [2137, 451])
-        try await client.assertTransactionSucceeded(transactionHash: declaredContract.transactionHash)
+        let contract = try await client.declareDeployContract(contractName: "ContractWithConstructor", constructorCalldata: [2137, 451])
+        try await client.assertTransactionSucceeded(transactionHash: contract.declare.transactionHash)
+        try await client.assertTransactionSucceeded(transactionHash: contract.deploy.transactionHash)
     }
 
     func testInvokeContract() async throws {

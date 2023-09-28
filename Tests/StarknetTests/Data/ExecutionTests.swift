@@ -21,7 +21,7 @@ final class ExecutionTests: XCTestCase {
         let accountDetails = DevnetClient.predeployedAccount1
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .one)
-        balanceContractAddress = try await Self.devnetClient.declareDeployContract(contractName: "Balance").contractAddress
+        balanceContractAddress = try await Self.devnetClient.declareDeployContract(contractName: "Balance").deploy.contractAddress
     }
 
     override class func setUp() {

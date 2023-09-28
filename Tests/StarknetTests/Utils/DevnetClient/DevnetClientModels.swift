@@ -53,6 +53,11 @@ struct DeployContractResult {
     let transactionHash: Felt
 }
 
+struct DeclareDeployContractResult {
+    let declare: DeclareContractResult
+    let deploy: DeployContractResult
+}
+
 struct InvokeContractResult {
     let transactionHash: Felt
 }
