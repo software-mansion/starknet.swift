@@ -119,15 +119,30 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetTransactionReceipt() async throws {
-        let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_receipt")
-        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-        let invokeTransaction = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract.contractAddress, function: "increase_balance", calldata: [2137])
+        let accountName = "test_receipt"
+        let _ = try await ProviderTests.devnetClient.createAccount(name: accountName)
+        let acc = try await ProviderTests.devnetClient.deployAccount(name: accountName)
+        let acc2 = try await ProviderTests.devnetClient.deployAccount(name: accountName)
+
+        let declaredContract = try await ProviderTests.devnetClient.declareContract(contractName: "Balance")
+        let deployedContract = try await ProviderTests.devnetClient.deployContract(classHash: declaredContract.classHash, unique: true)
+        let invokeTransaction = try await ProviderTests.devnetClient.invokeContract(contractAddress: deployedContract.contractAddress, function: "increase_balance", calldata: [2137])
+
+        let declareReceipt = try await provider.getTransactionReceiptBy(hash: declaredContract.transactionHash)
+        XCTAssertTrue(declareReceipt.isSuccessful)
+
+        let deployReceipt = try await provider.getTransactionReceiptBy(hash: deployedContract.transactionHash)
+        XCTAssertTrue(deployReceipt.isSuccessful)
+
+        let invokeReceipt = try await provider.getTransactionReceiptBy(hash: invokeTransaction.transactionHash)
+        XCTAssertTrue(invokeReceipt.isSuccessful)
 
         let deployAccountReceipt = try await provider.getTransactionReceiptBy(hash: acc.transactionHash)
         XCTAssertTrue(deployAccountReceipt.isSuccessful)
 
-        let invokeReceipt = try await provider.getTransactionReceiptBy(hash: invokeTransaction.transactionHash)
-        XCTAssertTrue(invokeReceipt.isSuccessful)
+        let deployAccountReceipt2 = try await provider.getTransactionReceiptBy(hash: acc2.transactionHash)
+        XCTAssertFalse(deployAccountReceipt2.isSuccessful)
+        XCTAssertNotNil(deployAccountReceipt2.revertReason)
     }
 
     // TODO: (#100) separate estimateFee tests based on transaction type
