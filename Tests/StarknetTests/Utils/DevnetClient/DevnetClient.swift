@@ -532,7 +532,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return false
         }
 
-        private func runSnCast(command: String, args: [String], profileName: String = "default") throws -> SnCastResponse {
+        private func runSnCast(command: String, args: [String], accountName: String = "__default__") throws -> SnCastResponse {
             let process = Process()
 
             let outputPipe = Pipe()
@@ -549,8 +549,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 scarbTomlPath!,
                 "--accounts-file",
                 "\(accountDirectory)/starknet_open_zeppelin_accounts.json",
-                "--profile",
-                profileName,
+                "--url",
+                rpcUrl,
+                "--account",
+                accountName,
                 command,
             ] + args
 
