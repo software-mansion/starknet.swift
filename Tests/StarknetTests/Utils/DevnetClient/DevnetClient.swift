@@ -16,10 +16,10 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt) async throws
+    func prefundAccount(address: Felt, amount: UInt64) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?, maxFee: Felt) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?) async throws -> CreateAccountResult
-    func deployAccount(name: String, classHash: Felt, maxFee: Felt) async throws -> DeployAccountResult
+    func deployAccount(name: String, classHash: Felt, maxFee: Felt, prefund: Bool) async throws -> DeployAccountResult
     func declareDeployContract(contractName: String, constructorCalldata: [Felt], salt: Felt?, unique: Bool, maxFeeDeclare: Felt, maxFeeDeploy: Felt) async throws -> DeployContractResult
     func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult
     func deployContract(classHash: Felt, constructorCalldata: [Felt], salt: Felt?, unique: Bool, maxFee: Felt) async throws -> DeployContractResult
@@ -32,6 +32,10 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
+    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000) async throws {
+        try await prefundAccount(address: address, amount: amount)
+    }
+
     func createDeployAccount(
         name: String,
         classHash: Felt = DevnetClient.accountContractClassHash,
@@ -78,9 +82,10 @@ extension DevnetClientProtocol {
     func deployAccount(
         name: String,
         classHash: Felt = DevnetClient.accountContractClassHash,
-        maxFee: Felt = 1_000_000_000_000_000
+        maxFee: Felt = 1_000_000_000_000_000,
+        prefund: Bool = true
     ) async throws -> DeployAccountResult {
-        try await deployAccount(name: name, classHash: classHash, maxFee: maxFee)
+        try await deployAccount(name: name, classHash: classHash, maxFee: maxFee, prefund: prefund)
     }
 
     func declareContract(contractName: String, maxFee: Felt = 1_000_000_000_000_000) async throws -> DeclareContractResult {
@@ -295,14 +300,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt) async throws {
+        public func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
 
-            let payload = PrefundPayload(address: address, amount: 5_000_000_000_000_000)
+            let payload = PrefundPayload(address: address, amount: amount)
             request.httpBody = try JSONEncoder().encode(payload)
 
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -375,9 +380,13 @@ func makeDevnetClient() -> DevnetClientProtocol {
         public func deployAccount(
             name: String,
             classHash: Felt = accountContractClassHash,
-            maxFee: Felt = 1_000_000_000_000_000
+            maxFee: Felt = 1_000_000_000_000_000,
+            prefund: Bool = true
         ) async throws -> DeployAccountResult {
             let details = try readAccountDetails(accountName: name)
+            if prefund {
+                try await prefundAccount(address: details.address)
+            }
 
             let params = [
                 "deploy",
