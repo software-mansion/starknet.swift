@@ -20,7 +20,7 @@ let erc20ContractAddress: Felt = "0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C7
 // If you used a different port, please change it below as well.
 
 // Address to the the rpc endpoint of a local devnet instance
-let rpcEndpoint = "http://localhost:5050/rpc"
+let rpcEndpoint = "http://127.0.0.1:5050/rpc"
 
 // !!! Important !!!
 // These private keys are for demo only. Never publish a privateKey of your wallet, nor

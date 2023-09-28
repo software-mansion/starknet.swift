@@ -5,17 +5,12 @@ import XCTest
 let erc20Address: Felt = "0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7"
 
 final class AccountTests: XCTestCase {
-    /*
-     Temporary test file, until DevnetClient utility is created.
-
-     To run, make sure you're running starknet-devnet on port 5050, with seed 0
-     */
-
     static var devnetClient: DevnetClientProtocol!
 
     var provider: StarknetProviderProtocol!
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
+    var accountContractClassHash: Felt!
 
     override func setUp() async throws {
         try await super.setUp()
@@ -25,8 +20,10 @@ final class AccountTests: XCTestCase {
         }
 
         provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
-        signer = StarkCurveSigner(privateKey: "0x5421eb02ce8a5a972addcd89daefd93c")!
-        account = StarknetAccount(address: "0x5fa2c31b541653fc9db108f7d6857a1c2feda8e2abffbfa4ab4eaf1fcbfabd8", signer: signer, provider: provider, cairoVersion: .zero)
+        accountContractClassHash = DevnetClient.accountContractClassHash
+        let accountDetails = DevnetClient.predeployedAccount1
+        signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
+        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .zero)
     }
 
     override class func setUp() {
@@ -47,8 +44,10 @@ final class AccountTests: XCTestCase {
     }
 
     func testExecute() async throws {
+        let recipientAddress = DevnetClient.predeployedAccount2.address
+
         let calldata: [Felt] = [
-            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
+            recipientAddress,
             1000,
             0,
         ]
@@ -57,12 +56,14 @@ final class AccountTests: XCTestCase {
 
         let result = try await account.execute(call: call)
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
     func testExecuteCustomParams() async throws {
+        let recipientAddress = DevnetClient.predeployedAccount2.address
+
         let calldata: [Felt] = [
-            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
+            recipientAddress,
             1000,
             0,
         ]
@@ -77,52 +78,52 @@ final class AccountTests: XCTestCase {
 
         let result = try await account.execute(call: call, params: params)
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
     func testExecuteMultipleCalls() async throws {
+        let recipientAddress = DevnetClient.predeployedAccount2.address
+
         let calldata1: [Felt] = [
-            "0x7598217a5d6159c7dc954996eeafacf96b782524a97c44e417e10a8353afbd4",
+            recipientAddress,
             1000,
             0,
         ]
 
         let calldata2: [Felt] = [
-            "0x2000c94da25e3772c290db227f1f57358c65d3bdda517dcd3dcbdbb04141900",
+            recipientAddress,
             1000,
             0,
         ]
 
-        let call1 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
-        let call2 = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
+        let call1 = StarknetCall(contractAddress: DevnetClient.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
+        let call2 = StarknetCall(contractAddress: DevnetClient.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
         let result = try await account.execute(calls: [call1, call2])
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: result.transactionHash)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
     func testDeployAccount() async throws {
-        let accountClassHash = try await provider.getClassHashAt(account.address)
-
         let newSigner = StarkCurveSigner(privateKey: 1234)!
         let newPublicKey = newSigner.publicKey
-        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
+        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
         let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
         let nonce = await (try? newAccount.getNonce()) ?? .zero
 
-        let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
+        let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
         let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
         let params = StarknetExecutionParams(nonce: nonce, maxFee: maxFee)
 
-        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
+        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
-        try await Self.devnetClient.assertTransactionPassed(transactionHash: response.transactionHash)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
 
         let newNonce = try await newAccount.getNonce()
 

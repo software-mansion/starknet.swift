@@ -7,6 +7,8 @@ on:
 jobs:
   test_and_lint:
     runs-on: macos-12
+    env:
+      DEVNET_SHA: a0d87f2f621adb6278c1bdba523ddb58268bf483
     steps:
       - uses: actions/checkout@v3
 
@@ -40,23 +42,45 @@ jobs:
       - name: Run SwiftFormat lint
         run: mint run swiftformat --lint .
 
-      - name: Set up Python 3.9.12
-        uses: actions/setup-python@v2
+      # TODO: Replace with installing release when release is available
+      - name: Clone starknet-devnet-rs
+        run: |
+          git clone https://github.com/0xSpaceShard/starknet-devnet-rs.git starknet-devnet-rs
+          pushd ${{ github.workspace }}/starknet-devnet-rs
+          git checkout ${{ env.DEVNET_SHA }}
+          popd
+
+      - name: Cache devnet build
+        uses: actions/cache@v3
         with:
-          python-version: 3.9.12
+          path: starknet-devnet-rs/target/release
+          key: ${{ runner.os }}-starknet-devnet-rs-target-release-${{ env.DEVNET_SHA }}
 
-      - name: Install devnet
+      - name: Build devnet
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [[ ! -d ${{ github.workspace }}/starknet-devnet-rs/target/release ]]; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            pushd ${{ github.workspace }}/starknet-devnet-rs
+            cargo build --release
+            popd
+          else
+            echo "Found existing starknet-devnet-rs build, skipping compilation."
+          fi
 
-      - name: Compile resource contracts
+      - name: Setup scarb 0.7.0
+        uses: software-mansion/setup-scarb@v1.3.1
+        with:
+          scarb-version: "0.7.0"
+
+      - name: Install sncast 0.6.0
         run: |
-          chmod +x ./Tests/StarknetTests/Resources/compileContracts.sh
-          ./Tests/StarknetTests/Resources/compileContracts.sh
+          curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.6.0
+          source /Users/runner/.bashrc
+          echo "$(dirname $(which sncast))" >> $GITHUB_PATH
 
       - name: Run tests
         run: |
-          export DEVNET_PATH="$(which starknet-devnet)"
-          export STARKNET_PATH="$(which starknet)"
+          export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
+          export SCARB_PATH="$(which scarb)"
+          export SNCAST_PATH="$(which sncast)"
           swift test --disable-sandbox
