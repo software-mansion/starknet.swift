@@ -109,7 +109,16 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - transactions: list of transactions to simulate
     ///  - blockId: block used to run the simulation
-    ///  - simulationFlags: a set of simulation flags
+    ///  - simulationFlags: a set of simulation
+
+    /// Get the gateway status of a submitted transaction
+    /// This method is supported only by Pathfinder nodes. Use on your own risk.
+    ///
+    /// - Parameters:
+    ///  - hash: The hash of the requested transaction
+    /// - Returns: Transaction found with provided hash
+    func getPathfinderTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus
+
     func simulateTransactions(_ transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction]
 }
 

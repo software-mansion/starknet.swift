@@ -118,6 +118,14 @@ struct GetTransactionReceiptPayload: Encodable {
     }
 }
 
+struct GetTransactionStatusPayload: Encodable {
+    let transactionHash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case transactionHash = "transaction_hash"
+    }
+}
+
 struct SimulateTransactionsParams: Encodable {
     let transactions: [any StarknetSequencerTransaction]
     let blockId: StarknetBlockId
