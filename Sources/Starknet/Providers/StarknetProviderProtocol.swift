@@ -8,7 +8,7 @@ public protocol StarknetProviderProtocol {
     ///
     ///  - Returns: the version of the Starknet JSON-RPC specification being used.
     func specVersion() async throws -> String
-    
+
     /// Call starknet contract.
     ///
     /// - Parameters

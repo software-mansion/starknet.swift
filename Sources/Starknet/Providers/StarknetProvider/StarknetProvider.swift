@@ -51,12 +51,12 @@ public class StarknetProvider: StarknetProviderProtocol {
             throw StarknetProviderError.unknownError
         }
     }
-    
+
     public func specVersion() async throws -> String {
         let params = EmptySequence()
-        
-        let result = try await makeRequest(method: .specVersion, params:params, receive: String.self)
-        
+
+        let result = try await makeRequest(method: .specVersion, params: params, receive: String.self)
+
         return result
     }
 
