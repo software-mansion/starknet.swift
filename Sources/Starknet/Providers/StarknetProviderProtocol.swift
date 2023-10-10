@@ -111,8 +111,8 @@ public protocol StarknetProviderProtocol {
     ///  - blockId: block used to run the simulation
     ///  - simulationFlags: a set of simulation
 
-    /// Get the gateway status of a submitted transaction
-    /// This method is supported only by Pathfinder nodes. Use on your own risk.
+    /// Get the gateway status of a submitted transaction.
+    /// This method is supported only by Pathfinder nodes.
     ///
     /// - Parameters:
     ///  - hash: The hash of the requested transaction
