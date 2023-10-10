@@ -51,6 +51,14 @@ public class StarknetProvider: StarknetProviderProtocol {
             throw StarknetProviderError.unknownError
         }
     }
+    
+    public func specVersion() async throws -> String {
+        let params = EmptySequence()
+        
+        let result = try await makeRequest(method: .specVersion, params:params, receive: String.self)
+        
+        return result
+    }
 
     public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt] {
         let params = CallParams(request: call, blockId: blockId)

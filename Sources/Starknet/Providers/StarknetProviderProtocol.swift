@@ -4,6 +4,11 @@ import Foundation
 public protocol StarknetProviderProtocol {
     var starknetChainId: StarknetChainId { get }
 
+    /// Get the version of the Starknet JSON-RPC specification being used by the node.
+    ///
+    ///  - Returns: the version of the Starknet JSON-RPC specification being used.
+    func specVersion() async throws -> String
+    
     /// Call starknet contract.
     ///
     /// - Parameters
