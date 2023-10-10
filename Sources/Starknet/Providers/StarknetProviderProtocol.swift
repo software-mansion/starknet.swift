@@ -104,13 +104,6 @@ public protocol StarknetProviderProtocol {
     /// - Returns: receipt of a transaction identified by given hash
     func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceipt
 
-    /// Simulate running a given list of transactions, and generate the execution trace
-    ///
-    /// - Parameters:
-    ///  - transactions: list of transactions to simulate
-    ///  - blockId: block used to run the simulation
-    ///  - simulationFlags: a set of simulation
-
     /// Get the gateway status of a submitted transaction.
     /// This method is supported only by Pathfinder nodes.
     ///
@@ -119,6 +112,12 @@ public protocol StarknetProviderProtocol {
     /// - Returns: Transaction found with provided hash
     func getPathfinderTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus
 
+    /// Simulate running a given list of transactions, and generate the execution trace
+    ///
+    /// - Parameters:
+    ///  - transactions: list of transactions to simulate
+    ///  - blockId: block used to run the simulation
+    ///  - simulationFlags: a set of simulation flags
     func simulateTransactions(_ transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction]
 }
 
