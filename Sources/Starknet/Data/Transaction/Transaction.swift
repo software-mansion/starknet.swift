@@ -108,7 +108,7 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
-        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys.self)
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 }
@@ -268,8 +268,8 @@ public struct StarknetDeclareTransactionV0: StarknetTransaction {
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
-        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
-        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys.self)
+        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys.self)
     }
 }
 
@@ -319,8 +319,8 @@ public struct StarknetDeclareTransactionV1: StarknetTransaction {
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
-        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
-        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys.self)
+        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys.self)
     }
 }
 
@@ -375,8 +375,8 @@ public struct StarknetDeclareTransactionV2: StarknetTransaction {
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
-        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
-        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys.self)
+        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys.self)
     }
 }
 
@@ -416,8 +416,8 @@ public struct StarknetDeployTransaction: StarknetTransaction {
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
-        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys)
-        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys)
+        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys.self)
+        try verifyTransactionVersion(container: container, codingKeysType: Self.CodingKeys.self)
     }
 }
 
