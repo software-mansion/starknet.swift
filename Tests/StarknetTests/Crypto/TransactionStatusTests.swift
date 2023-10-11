@@ -15,17 +15,17 @@ final class TransactionStatusTests: XCTestCase {
         """.data(using: .utf8)!
 
         let decoder = JSONDecoder()
-        
+
         var status: StarknetGetTransactionStatusResponse?
         XCTAssertNoThrow(status = try decoder.decode(StarknetGetTransactionStatusResponse.self, from: json))
         XCTAssertNotNil(status)
         XCTAssertNil(status!.executionStatus)
-        
-        var status2:StarknetGetTransactionStatusResponse?
+
+        var status2: StarknetGetTransactionStatusResponse?
         XCTAssertNoThrow(status2 = try decoder.decode(StarknetGetTransactionStatusResponse.self, from: json2))
         XCTAssertNotNil(status2)
         XCTAssertNotNil(status2!.executionStatus)
-        
+
         XCTAssertThrowsError(try decoder.decode(StarknetGetTransactionStatusResponse.self, from: invalidJson))
     }
 }
