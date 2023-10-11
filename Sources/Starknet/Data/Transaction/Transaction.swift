@@ -108,7 +108,7 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
-        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys.self)
+        try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 }

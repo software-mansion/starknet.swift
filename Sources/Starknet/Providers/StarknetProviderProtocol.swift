@@ -109,13 +109,12 @@ public protocol StarknetProviderProtocol {
     /// - Returns: receipt of a transaction identified by given hash
     func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceipt
 
-    /// Get the gateway status of a submitted transaction.
-    /// This method is supported only by Pathfinder nodes.
+    /// Get the status of a submitted transaction.
     ///
     /// - Parameters:
     ///  - hash: The hash of the requested transaction
-    /// - Returns: Transaction found with provided hash
-    func pathfinderGetTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus
+    /// - Returns: The status(es) of a transaction
+    func getTransactionStatus(hash: Felt) async throws -> StarknetGetTransactionStatusResponse
 
     /// Simulate running a given list of transactions, and generate the execution trace
     ///

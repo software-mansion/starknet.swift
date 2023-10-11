@@ -49,3 +49,13 @@ public struct StarknetGetEventsResponse: Decodable, Equatable {
         case events
     }
 }
+
+public struct StarknetGetTransactionStatusResponse: Decodable, Equatable {
+    public let finalityStatus: StarknetTransactionStatus
+    public let executionStatus: StarknetTransactionExecutionStatus?
+
+    enum CodingKeys: String, CodingKey {
+        case finalityStatus = "finality_status"
+        case executionStatus = "execution_status"
+    }
+}

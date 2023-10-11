@@ -5,15 +5,27 @@ import XCTest
 final class TransactionStatusTests: XCTestCase {
     func testGetTransactionStatusResponse() async throws {
         let json = """
-        {"jsonrpc":"2.0","result":"REJECTED","id":0}
+        {"finality_status":"REJECTED"}
+        """.data(using: .utf8)!
+        let json2 = """
+        {"finality_status":"ACCEPTED_ON_L2","execution_status":"SUCCEEDED"}
         """.data(using: .utf8)!
         let invalidJson = """
-        {"jsonrpc":"2.0","result":"INVALID_STATUS","id":0}
+        {"finality_status":"INVALID_STATUS"}
         """.data(using: .utf8)!
 
         let decoder = JSONDecoder()
-
-        XCTAssertNoThrow(try decoder.decode(JsonRpcResponse<StarknetGatewayTransactionStatus>.self, from: json))
-        XCTAssertThrowsError(try decoder.decode(JsonRpcResponse<StarknetGatewayTransactionStatus>.self, from: invalidJson))
+        
+        var status: StarknetGetTransactionStatusResponse?
+        XCTAssertNoThrow(status = try decoder.decode(StarknetGetTransactionStatusResponse.self, from: json))
+        XCTAssertNotNil(status)
+        XCTAssertNil(status!.executionStatus)
+        
+        var status2:StarknetGetTransactionStatusResponse?
+        XCTAssertNoThrow(status2 = try decoder.decode(StarknetGetTransactionStatusResponse.self, from: json2))
+        XCTAssertNotNil(status2)
+        XCTAssertNotNil(status2!.executionStatus)
+        
+        XCTAssertThrowsError(try decoder.decode(StarknetGetTransactionStatusResponse.self, from: invalidJson))
     }
 }
