@@ -33,7 +33,7 @@ final class ProviderTests: XCTestCase {
 
     func testCall() async throws {
         let call = StarknetCall(
-            contractAddress: DevnetClient.predeployedAccount1.address,
+            contractAddress: ProviderTests.devnetClient.constants.predeployedAccount1.address,
             entrypoint: starknetSelector(from: "getPublicKey"),
             calldata: []
         )
@@ -42,7 +42,7 @@ final class ProviderTests: XCTestCase {
             let result = try await provider.callContract(call)
 
             XCTAssertEqual(result.count, 1)
-            XCTAssertEqual(result[0], DevnetClient.predeployedAccount1.publicKey)
+            XCTAssertEqual(result[0], ProviderTests.devnetClient.constants.predeployedAccount1.publicKey)
         } catch let e {
             print(e)
             throw e
@@ -51,7 +51,7 @@ final class ProviderTests: XCTestCase {
 
     func testCallWithArguments() async throws {
         let call = StarknetCall(
-            contractAddress: DevnetClient.predeployedAccount1.address,
+            contractAddress: ProviderTests.devnetClient.constants.predeployedAccount1.address,
             entrypoint: starknetSelector(from: "supportsInterface"),
             calldata: [Felt(2138)]
         )
@@ -62,7 +62,7 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetNonce() async throws {
-        let nonce = try await provider.getNonce(of: DevnetClient.predeployedAccount1.address)
+        let nonce = try await provider.getNonce(of: ProviderTests.devnetClient.constants.predeployedAccount1.address)
 
         print(nonce)
     }

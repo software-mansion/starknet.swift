@@ -49,11 +49,11 @@ final class devnetClientTests: XCTestCase {
 
     func testInvokeContract() async throws {
         let calldata = [
-            DevnetClient.predeployedAccount1.address,
+            client.constants.predeployedAccount1.address,
             1000,
             0,
         ]
-        let invokeResult = try await client.invokeContract(contractAddress: DevnetClient.erc20ContractAddress, function: "transfer", calldata: calldata)
+        let invokeResult = try await client.invokeContract(contractAddress: client.constants.erc20ContractAddress, function: "transfer", calldata: calldata)
         try await client.assertTransactionSucceeded(transactionHash: invokeResult.transactionHash)
     }
 }

@@ -18,7 +18,7 @@ final class ExecutionTests: XCTestCase {
         }
 
         provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
-        let accountDetails = DevnetClient.predeployedAccount1
+        let accountDetails = ExecutionTests.devnetClient.constants.predeployedAccount1
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .one)
         balanceContractAddress = try await Self.devnetClient.declareDeployContract(contractName: "Balance").deploy.contractAddress
