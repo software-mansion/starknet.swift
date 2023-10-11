@@ -153,7 +153,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result.transactionReceipt
     }
 
-    public func getPathfinderTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus {
+    public func pathfinderGetTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus {
         #warning("This method is currently supported only by Pathfinder nodes. It will be replaced by getTransactionStatus in starknet.swift 0.7.0")
         let params = GetTransactionStatusPayload(transactionHash: hash)
 

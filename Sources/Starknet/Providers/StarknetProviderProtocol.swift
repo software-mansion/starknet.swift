@@ -110,7 +110,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - hash: The hash of the requested transaction
     /// - Returns: Transaction found with provided hash
-    func getPathfinderTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus
+    func pathfinderGetTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus
 
     /// Simulate running a given list of transactions, and generate the execution trace
     ///
