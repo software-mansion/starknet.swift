@@ -6,12 +6,12 @@ enum TransactionReceiptWrapper: Decodable {
         case blockNumber = "block_number"
     }
 
-    case common(StarknetCommonTransactionReceipt)
+    case standard(StarknetTransactionReceipt)
     case pending(StarknetPendingTransactionReceipt)
 
-    public var transactionReceipt: any StarknetTransactionReceipt {
+    public var transactionReceipt: any StarknetTransactionReceiptProtocol {
         switch self {
-        case let .common(tx):
+        case let .standard(tx):
             return tx
         case let .pending(tx):
             return tx
@@ -29,7 +29,7 @@ enum TransactionReceiptWrapper: Decodable {
         if isPending {
             self = try .pending(StarknetPendingTransactionReceipt(from: decoder))
         } else {
-            self = try .common(StarknetCommonTransactionReceipt(from: decoder))
+            self = try .standard(StarknetTransactionReceipt(from: decoder))
         }
     }
 }

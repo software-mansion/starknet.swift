@@ -129,13 +129,13 @@ final class TransactionReceiptTests: XCTestCase {
         let pendingReceipt = pendingReceiptWrapper?.transactionReceipt
 
         XCTAssertTrue(pendingReceipt is StarknetPendingTransactionReceipt)
-        XCTAssertFalse(pendingReceipt is StarknetCommonTransactionReceipt)
+        XCTAssertFalse(pendingReceipt is StarknetTransactionReceipt)
 
         var commonReceiptWrapper: TransactionReceiptWrapper?
         XCTAssertNoThrow(commonReceiptWrapper = try decoder.decode(TransactionReceiptWrapper.self, from: commonReceiptJson))
         let commonReceipt = commonReceiptWrapper?.transactionReceipt
 
-        XCTAssertTrue(commonReceipt is StarknetCommonTransactionReceipt)
+        XCTAssertTrue(commonReceipt is StarknetTransactionReceipt)
         XCTAssertFalse(commonReceipt is StarknetPendingTransactionReceipt)
     }
 }

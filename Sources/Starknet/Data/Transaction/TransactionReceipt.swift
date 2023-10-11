@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StarknetCommonTransactionReceipt: StarknetTransactionReceipt, Decodable {
+public struct StarknetTransactionReceipt: StarknetTransactionReceiptProtocol, Decodable {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let executionStatus: StarknetTransactionExecutionStatus
@@ -32,7 +32,7 @@ public struct StarknetCommonTransactionReceipt: StarknetTransactionReceipt, Deco
     }
 }
 
-public struct StarknetPendingTransactionReceipt: StarknetTransactionReceipt, Decodable {
+public struct StarknetPendingTransactionReceipt: StarknetTransactionReceiptProtocol, Decodable {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let executionStatus: StarknetTransactionExecutionStatus
@@ -60,7 +60,7 @@ public struct StarknetPendingTransactionReceipt: StarknetTransactionReceipt, Dec
     }
 }
 
-public protocol StarknetTransactionReceipt: Decodable {
+public protocol StarknetTransactionReceiptProtocol: Decodable {
     var transactionHash: Felt { get }
     var actualFee: Felt { get }
     var messagesSent: [MessageToL1] { get }
