@@ -18,11 +18,15 @@ public enum StarknetTransactionFinalityStatus: String, Codable {
     }
 }
 
-public enum LegacyStarknetTransactionStatus: String, Codable {
+public enum StarknetGatewayTransactionStatus: String, Codable {
     case pending = "PENDING"
     case rejected = "REJECTED"
     case acceptedL1 = "ACCEPTED_ON_L1"
     case acceptedL2 = "ACCEPTED_ON_L2"
+    case received = "RECEIVED"
+    case notReceived = "NOT_RECEIVED"
+    case reverted = "REVERTED"
+    case aborted = "ABORTED"
 
     public var encodedValue: Felt {
         Felt.fromShortString(self.rawValue.lowercased())!
