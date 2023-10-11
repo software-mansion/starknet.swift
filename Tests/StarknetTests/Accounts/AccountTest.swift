@@ -20,8 +20,8 @@ final class AccountTests: XCTestCase {
         }
 
         provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
-        accountContractClassHash = DevnetClient.accountContractClassHash
-        let accountDetails = DevnetClient.predeployedAccount1
+        accountContractClassHash = AccountTests.devnetClient.constants.accountContractClassHash
+        let accountDetails = AccountTests.devnetClient.constants.predeployedAccount1
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .zero)
     }
@@ -44,7 +44,7 @@ final class AccountTests: XCTestCase {
     }
 
     func testExecute() async throws {
-        let recipientAddress = DevnetClient.predeployedAccount2.address
+        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata: [Felt] = [
             recipientAddress,
@@ -60,7 +60,7 @@ final class AccountTests: XCTestCase {
     }
 
     func testExecuteCustomParams() async throws {
-        let recipientAddress = DevnetClient.predeployedAccount2.address
+        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata: [Felt] = [
             recipientAddress,
@@ -82,7 +82,7 @@ final class AccountTests: XCTestCase {
     }
 
     func testExecuteMultipleCalls() async throws {
-        let recipientAddress = DevnetClient.predeployedAccount2.address
+        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata1: [Felt] = [
             recipientAddress,
@@ -96,8 +96,8 @@ final class AccountTests: XCTestCase {
             0,
         ]
 
-        let call1 = StarknetCall(contractAddress: DevnetClient.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
-        let call2 = StarknetCall(contractAddress: DevnetClient.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
+        let call1 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
+        let call2 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
         let result = try await account.execute(calls: [call1, call2])
 
