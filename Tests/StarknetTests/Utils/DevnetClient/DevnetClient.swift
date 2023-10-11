@@ -11,6 +11,8 @@ protocol DevnetClientProtocol {
     var seed: Int { get }
     var baseUrl: String { get }
 
+    var constants: DevnetClientConstants.Type { get }
+
     func start() async throws
     func close()
 
@@ -38,7 +40,7 @@ extension DevnetClientProtocol {
 
     func createDeployAccount(
         name: String,
-        classHash: Felt = DevnetClient.accountContractClassHash,
+        classHash: Felt = DevnetClientConstants.accountContractClassHash,
         salt: Felt? = .zero,
         maxFee: Felt = 1_000_000_000_000_000
     ) async throws -> DeployAccountResult {
@@ -53,7 +55,7 @@ extension DevnetClientProtocol {
     func createDeployAccount() async throws -> DeployAccountResult {
         try await createDeployAccount(
             name: UUID().uuidString,
-            classHash: DevnetClient.accountContractClassHash,
+            classHash: DevnetClientConstants.accountContractClassHash,
             salt: .zero,
             maxFee: 1_000_000_000_000_000
         )
@@ -61,7 +63,7 @@ extension DevnetClientProtocol {
 
     func createAccount(
         name: String,
-        classHash: Felt = DevnetClient.accountContractClassHash,
+        classHash: Felt = DevnetClientConstants.accountContractClassHash,
         salt: Felt? = .zero
     ) async throws -> CreateAccountResult {
         try await createAccount(
@@ -74,14 +76,14 @@ extension DevnetClientProtocol {
     func createAccount() async throws -> CreateAccountResult {
         try await createAccount(
             name: UUID().uuidString,
-            classHash: DevnetClient.accountContractClassHash,
+            classHash: DevnetClientConstants.accountContractClassHash,
             salt: .zero
         )
     }
 
     func deployAccount(
         name: String,
-        classHash: Felt = DevnetClient.accountContractClassHash,
+        classHash: Felt = DevnetClientConstants.accountContractClassHash,
         maxFee: Felt = 1_000_000_000_000_000,
         prefund: Bool = true
     ) async throws -> DeployAccountResult {
@@ -168,21 +170,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private var declaredContractsAtName: [String: DeclareContractResult] = [:]
         private var deployedContracts: [Felt: DeployContractResult] = [:]
 
-        // Source: https://github.com/0xSpaceShard/starknet-devnet-rs/blob/323f907bc3e3e4dc66b403ec6f8b58744e8d6f9a/crates/starknet/src/constants.rs
-        public static let accountContractClassHash: Felt = "0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f"
-        public static let erc20ContractClassHash: Felt = "0x6a22bf63c7bc07effa39a25dfbd21523d211db0100a0afd054d172b81840eaf"
-        public static let erc20ContractAddress: Felt = "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
-        public static let udcContractClassHash: Felt = "0x7b3e05f48f0c69e4a65ce5e076a66271a527aff2c34ce1083ec6e1526997a69"
-        public static let udcContractAddress: Felt = "0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf"
-        public static let predeployedAccount1: AccountDetails = .init(privateKey: "0xa2ed22bb0cb0b49c69f6d6a8d24bc5ea", publicKey: "0x198e98e771ebb5da7f4f05658a80a3d6be2213dc5096d055cbbefa62901ab06", address: "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b", salt: 20)
-        public static let predeployedAccount2: AccountDetails = .init(privateKey: "0xc1c7db92d22ef773de96f8bde8e56c85", publicKey: "0x26df62f8e61920575f9c9391ed5f08397cfcfd2ade02d47781a4a8836c091fd", address: "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35", salt: 20)
-
         let host: String
         let port: Int
         let seed: Int
         let baseUrl: String
         let rpcUrl: String
         let mintUrl: String
+
+        let constants: DevnetClientConstants.Type = DevnetClientConstants.self
 
         init(host: String = "127.0.0.1", port: Int = 5051, seed: Int = 1_053_545_547) {
             self.host = host
@@ -331,7 +326,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func createDeployAccount(
             name: String,
-            classHash: Felt = DevnetClient.accountContractClassHash,
+            classHash: Felt = DevnetClientConstants.accountContractClassHash,
             salt: Felt? = nil,
             maxFee: Felt = 1_000_000_000_000_000
         ) async throws -> DeployAccountResult {
@@ -350,7 +345,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func createAccount(
             name: String,
-            classHash: Felt = accountContractClassHash,
+            classHash: Felt = DevnetClientConstants.accountContractClassHash,
             salt: Felt? = nil
         ) async throws -> CreateAccountResult {
             var params = [
@@ -381,7 +376,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func deployAccount(
             name: String,
-            classHash: Felt = accountContractClassHash,
+            classHash: Felt = DevnetClientConstants.accountContractClassHash,
             maxFee: Felt = 1_000_000_000_000_000,
             prefund: Bool = true
         ) async throws -> DeployAccountResult {
