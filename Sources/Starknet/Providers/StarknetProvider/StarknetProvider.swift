@@ -161,6 +161,15 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result.transactionReceipt
     }
 
+    public func pathfinderGetTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus {
+        #warning("This method is currently supported only by Pathfinder nodes. It will be replaced by getTransactionStatus in starknet.swift 0.7.0")
+        let params = GetTransactionStatusPayload(transactionHash: hash)
+
+        let result = try await makeRequest(method: .pathfinderGetTransactionStatus, params: params, receive: StarknetGatewayTransactionStatus.self)
+
+        return result
+    }
+
     public func simulateTransactions(_ transactions: [any StarknetSequencerTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
