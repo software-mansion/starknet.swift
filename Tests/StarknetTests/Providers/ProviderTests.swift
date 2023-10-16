@@ -30,6 +30,12 @@ final class ProviderTests: XCTestCase {
     func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
         StarknetProvider(starknetChainId: .testnet, url: url)!
     }
+    
+    // TODO: Re-enable when devnet-rs supports RPC 0.5.0
+    func disabledTestSpecVersion() async throws {
+        let result = try await provider.specVersion()
+        XCTAssertFalse(result.isEmpty)
+    }
 
     func testCall() async throws {
         let call = StarknetCall(
@@ -168,6 +174,7 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(fees.count, 2)
     }
 
+    // TODO: Re-enable when devnet-rs supports RPC 0.5.0
     func disabledTestSimulateTransactions() async throws {
         XCTAssertTrue(false)
 
