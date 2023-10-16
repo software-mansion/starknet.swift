@@ -30,7 +30,7 @@ final class ProviderTests: XCTestCase {
     func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
         StarknetProvider(starknetChainId: .testnet, url: url)!
     }
-    
+
     // TODO: Re-enable when devnet-rs supports RPC 0.5.0
     func disabledTestSpecVersion() async throws {
         let result = try await provider.specVersion()
