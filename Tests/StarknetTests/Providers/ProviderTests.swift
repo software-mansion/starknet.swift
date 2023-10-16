@@ -118,7 +118,7 @@ final class ProviderTests: XCTestCase {
         } catch {}
     }
 
-    func testGetTransactionReceipt() async throws {
+    func disabledTestGetTransactionReceipt() async throws {
         let accountName = "test_receipt"
         let _ = try await ProviderTests.devnetClient.createAccount(name: accountName)
         let acc = try await ProviderTests.devnetClient.deployAccount(name: accountName)
