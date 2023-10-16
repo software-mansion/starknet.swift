@@ -130,14 +130,14 @@ public class StarknetAccount: StarknetAccountProtocol {
             }
 
             return result[0] > 0
-        } catch let StarknetProviderError.jsonRpcError(code, errorMessage) {
+        } catch let StarknetProviderError.jsonRpcError(code, errorMessage, data) {
             // isValidSignature contract method throws an error, when the signature is incorrect,
             // so we catch it here.
             if errorMessage.contains("Signature"), errorMessage.contains("is invalid") {
                 return false
             }
 
-            throw StarknetProviderError.jsonRpcError(code, errorMessage)
+            throw StarknetProviderError.jsonRpcError(code, errorMessage, data)
         }
         // And we want to rethrow all other errors.
     }

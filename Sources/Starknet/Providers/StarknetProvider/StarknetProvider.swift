@@ -3,7 +3,7 @@ import Foundation
 public enum StarknetProviderError: Error {
     case networkProviderError
     case unknownError
-    case jsonRpcError(Int, String)
+    case jsonRpcError(Int, String, String?)
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
@@ -46,7 +46,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         if let result = response.result {
             return result
         } else if let error = response.error {
-            throw StarknetProviderError.jsonRpcError(error.code, error.message)
+            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data?.revertError)
         } else {
             throw StarknetProviderError.unknownError
         }
