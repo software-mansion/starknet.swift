@@ -153,7 +153,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result.transaction
     }
 
-    public func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceipt {
+    public func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceiptProtocol {
         let params = GetTransactionReceiptPayload(transactionHash: hash)
 
         let result = try await makeRequest(method: .getTransactionReceipt, params: params, receive: TransactionReceiptWrapper.self)
