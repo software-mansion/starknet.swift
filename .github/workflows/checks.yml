@@ -83,4 +83,5 @@ jobs:
           export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
           export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
+          curl 'https://api.ipify.org?format=json'
           swift test --disable-sandbox
