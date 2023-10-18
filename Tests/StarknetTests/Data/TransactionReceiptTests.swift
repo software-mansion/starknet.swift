@@ -128,7 +128,7 @@ let pendingL1HandlerReceipt = """
 
 final class TransactionReceiptTests: XCTestCase {
     func testTransactionReceiptWrapperDecoding() throws {
-        let cases: [(String, StarknetTransactionReceiptType, Bool, StarknetTransactionReceiptProtocol.Type)] = [
+        let cases: [(String, StarknetTransactionType, Bool, StarknetTransactionReceiptProtocol.Type)] = [
             (invokeReceipt, .invoke, false, StarknetInvokeTransactionReceipt.self),
             (declareReceipt, .declare, false, StarknetDeclareTransactionReceipt.self),
             (deployAccountReceipt, .deployAccount, false, StarknetDeployAccountTransactionReceipt.self),
@@ -139,7 +139,7 @@ final class TransactionReceiptTests: XCTestCase {
             (pendingDeployAccountReceipt, .deployAccount, true, StarknetPendingDeployAccountTransactionReceipt.self),
             (pendingL1HandlerReceipt, .l1Handler, true, StarknetPendingL1HandlerTransactionReceipt.self),
         ]
-        try cases.forEach { (string: String, txType: StarknetTransactionReceiptType, isPending: Bool, receiptType: StarknetTransactionReceiptProtocol.Type) in
+        try cases.forEach { (string: String, txType: StarknetTransactionType, isPending: Bool, receiptType: StarknetTransactionReceiptProtocol.Type) in
             let data = string.data(using: .utf8)!
             let decoder = JSONDecoder()
 

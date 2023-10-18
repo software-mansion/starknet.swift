@@ -43,7 +43,7 @@ enum TransactionReceiptWrapper: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
 
-        let type = try container.decode(StarknetTransactionReceiptType.self, forKey: Keys.type)
+        let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
         let blockHash = try container.decodeIfPresent(Felt.self, forKey: Keys.blockHash)
         let blockNumber = try container.decodeIfPresent(Felt.self, forKey: Keys.blockHash)
 

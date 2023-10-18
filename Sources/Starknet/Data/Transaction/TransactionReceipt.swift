@@ -11,7 +11,7 @@ public struct StarknetInvokeTransactionReceipt: StarknetTransactionReceipt {
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
     public let executionResources: StarknetExecutionResources
-    public let type: StarknetTransactionReceiptType = .invoke
+    public let type: StarknetTransactionType = .invoke
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -40,7 +40,7 @@ public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactio
     public let finalityStatus: StarknetTransactionFinalityStatus
     public var executionResources: StarknetExecutionResources
     public let revertReason: String?
-    public let type: StarknetTransactionReceiptType = .invoke
+    public let type: StarknetTransactionType = .invoke
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -69,7 +69,7 @@ public struct StarknetDeclareTransactionReceipt: StarknetTransactionReceipt {
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
     public let executionResources: StarknetExecutionResources
-    public let type: StarknetTransactionReceiptType = .declare
+    public let type: StarknetTransactionType = .declare
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -98,7 +98,7 @@ public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransacti
     public let finalityStatus: StarknetTransactionFinalityStatus
     public var executionResources: StarknetExecutionResources
     public let revertReason: String?
-    public let type: StarknetTransactionReceiptType = .declare
+    public let type: StarknetTransactionType = .declare
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -128,7 +128,7 @@ public struct StarknetDeployAccountTransactionReceipt: StarknetTransactionReceip
     public let executionStatus: StarknetTransactionExecutionStatus
     public let executionResources: StarknetExecutionResources
     public let contractAddress: Felt
-    public let type: StarknetTransactionReceiptType = .deployAccount
+    public let type: StarknetTransactionType = .deployAccount
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -159,7 +159,7 @@ public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTra
     public var executionResources: StarknetExecutionResources
     public let revertReason: String?
     public let contractAddress: Felt
-    public let type: StarknetTransactionReceiptType = .deployAccount
+    public let type: StarknetTransactionType = .deployAccount
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -190,7 +190,7 @@ public struct StarknetDeployTransactionReceipt: StarknetTransactionReceipt {
     public let executionStatus: StarknetTransactionExecutionStatus
     public let executionResources: StarknetExecutionResources
     public let contractAddress: Felt
-    public let type: StarknetTransactionReceiptType = .deploy
+    public let type: StarknetTransactionType = .deploy
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -223,7 +223,7 @@ public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
     public let executionStatus: StarknetTransactionExecutionStatus
     public let executionResources: StarknetExecutionResources
     public let messageHash: Felt
-    public let type: StarknetTransactionReceiptType = .l1Handler
+    public let type: StarknetTransactionType = .l1Handler
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -254,7 +254,7 @@ public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransac
     public var executionResources: StarknetExecutionResources
     public let revertReason: String?
     public let messageHash: Felt
-    public let type: StarknetTransactionReceiptType = .l1Handler
+    public let type: StarknetTransactionType = .l1Handler
 
     public var isSuccessful: Bool {
         executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
