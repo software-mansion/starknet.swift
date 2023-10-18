@@ -89,7 +89,7 @@ public struct StarknetDeclareTransactionReceipt: StarknetTransactionReceipt {
     }
 }
 
-public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransactionReceipt {
+public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeclareTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let messagesSent: [StarknetMessageToL1]
@@ -116,7 +116,7 @@ public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransacti
     }
 }
 
-public struct StarknetDeployAccountTransactionReceipt: StarknetTransactionReceipt {
+public struct StarknetDeployAccountTransactionReceipt: StarknetTransactionReceipt, StarknetDeployAccountTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let blockHash: Felt
@@ -149,7 +149,7 @@ public struct StarknetDeployAccountTransactionReceipt: StarknetTransactionReceip
     }
 }
 
-public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTransactionReceipt, Decodable {
+public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeployAccountTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let messagesSent: [StarknetMessageToL1]
@@ -178,7 +178,7 @@ public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTra
     }
 }
 
-public struct StarknetDeployTransactionReceipt: StarknetTransactionReceipt {
+public struct StarknetDeployTransactionReceipt: StarknetTransactionReceipt, StarknetDeployTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let blockHash: Felt
@@ -211,7 +211,7 @@ public struct StarknetDeployTransactionReceipt: StarknetTransactionReceipt {
     }
 }
 
-public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
+public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt, StarknetL1HandlerTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let blockHash: Felt
@@ -244,7 +244,7 @@ public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
     }
 }
 
-public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransactionReceipt {
+public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransactionReceipt, StarknetL1HandlerTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: Felt
     public let messagesSent: [StarknetMessageToL1]
