@@ -113,7 +113,10 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
     }
 }
 
-public struct StarknetDeployAccountTransaction: StarknetTransaction {
+// TODO: Remove when migrating to RPC 0.6.0
+public typealias StarknetDeployAccountTransaction = StarknetDeployAccountTransactionV1
+
+public struct StarknetDeployAccountTransactionV1: StarknetTransaction {
     public let type: StarknetTransactionType = .deployAccount
 
     public let version: Felt = .one
