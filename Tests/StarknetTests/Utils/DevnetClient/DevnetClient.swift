@@ -335,7 +335,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let createResult = try await createAccount(name: name, salt: salt)
             let details = createResult.details
             try await prefundAccount(address: details.address)
-            let deployResult = try await deployAccountV1(name: name, classHash: classHash, maxFee: maxFee)
+            let deployResult = try await deployAccount(name: name, classHash: classHash, maxFee: maxFee)
 
             return DeployAccountResult(
                 details: details,
@@ -374,7 +374,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        public func deployAccountV1(
+        public func deployAccount(
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
             maxFee: Felt = 1_000_000_000_000_000,
