@@ -1,6 +1,7 @@
 import Foundation
 
 enum JsonRpcMethod: String, Encodable {
+    case specVersion = "starknet_specVersion"
     case call = "starknet_call"
     case getNonce = "starknet_getNonce"
     case invokeFunction = "starknet_addInvokeTransaction"
@@ -16,5 +17,4 @@ enum JsonRpcMethod: String, Encodable {
     case simulateTransactions = "starknet_simulateTransactions"
     case estimateMessageFee = "starknet_estimateMessageFee"
     case getTransactionStatus = "starknet_getTransactionStatus"
-    case specVersion = "starknet_specVersion"
 }
