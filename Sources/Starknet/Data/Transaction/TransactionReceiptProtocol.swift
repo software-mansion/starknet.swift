@@ -1,13 +1,17 @@
 import Foundation
 
-public protocol StarknetInvokeTransactionReceiptProtocol : Decodable, Equatable {}
-public protocol StarknetDeclareTransactionReceiptProtocol : Decodable, Equatable {}
-public protocol StarknetDeployTransactionReceiptProtocol : Decodable, Equatable {
+public protocol StarknetInvokeTransactionReceiptProtocol: Decodable, Equatable {}
+
+public protocol StarknetDeclareTransactionReceiptProtocol: Decodable, Equatable {}
+
+public protocol StarknetDeployTransactionReceiptProtocol: Decodable, Equatable {
     var contractAddress: Felt { get }
 }
-public protocol StarknetDeployAccountTransactionReceiptProtocol : Decodable, Equatable {
+
+public protocol StarknetDeployAccountTransactionReceiptProtocol: Decodable, Equatable {
     var contractAddress: Felt { get }
 }
+
 public protocol StarknetL1HandlerTransactionReceiptProtocol: Decodable, Equatable {
     var messageHash: Felt { get }
 }
