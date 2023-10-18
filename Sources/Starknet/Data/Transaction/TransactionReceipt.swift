@@ -10,7 +10,7 @@ public struct StarknetInvokeTransactionReceipt: StarknetTransactionReceipt {
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
-    public let executionResources: ExecutionResources
+    public let executionResources: StarknetExecutionResources
     public let type: StarknetTransactionReceiptType = .invoke
 
     public var isSuccessful: Bool {
@@ -38,7 +38,7 @@ public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactio
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: ExecutionResources
+    public var executionResources: StarknetExecutionResources
     public let revertReason: String?
     public let type: StarknetTransactionReceiptType = .invoke
 
@@ -68,7 +68,7 @@ public struct StarknetDeclareTransactionReceipt: StarknetTransactionReceipt {
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
-    public let executionResources: ExecutionResources
+    public let executionResources: StarknetExecutionResources
     public let type: StarknetTransactionReceiptType = .declare
 
     public var isSuccessful: Bool {
@@ -96,7 +96,7 @@ public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransacti
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: ExecutionResources
+    public var executionResources: StarknetExecutionResources
     public let revertReason: String?
     public let type: StarknetTransactionReceiptType = .declare
 
@@ -126,7 +126,7 @@ public struct StarknetDeployAccountTransactionReceipt: StarknetTransactionReceip
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
-    public let executionResources: ExecutionResources
+    public let executionResources: StarknetExecutionResources
     public let contractAddress: Felt
     public let type: StarknetTransactionReceiptType = .deployAccount
 
@@ -156,7 +156,7 @@ public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTra
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: ExecutionResources
+    public var executionResources: StarknetExecutionResources
     public let revertReason: String?
     public let contractAddress: Felt
     public let type: StarknetTransactionReceiptType = .deployAccount
@@ -188,7 +188,7 @@ public struct StarknetDeployTransactionReceipt: StarknetTransactionReceipt {
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
-    public let executionResources: ExecutionResources
+    public let executionResources: StarknetExecutionResources
     public let contractAddress: Felt
     public let type: StarknetTransactionReceiptType = .deploy
 
@@ -221,7 +221,7 @@ public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
-    public let executionResources: ExecutionResources
+    public let executionResources: StarknetExecutionResources
     public let messageHash: Felt
     public let type: StarknetTransactionReceiptType = .l1Handler
 
@@ -251,7 +251,7 @@ public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransac
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: ExecutionResources
+    public var executionResources: StarknetExecutionResources
     public let revertReason: String?
     public let messageHash: Felt
     public let type: StarknetTransactionReceiptType = .l1Handler
