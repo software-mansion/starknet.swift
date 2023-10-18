@@ -9,7 +9,7 @@ public protocol StarknetTransactionReceipt: StarknetTransactionReceiptProtocol {
     var events: [StarknetEvent] { get }
     var finalityStatus: StarknetTransactionFinalityStatus { get }
     var executionStatus: StarknetTransactionExecutionStatus { get }
-    var executionResources: ExecutionResources { get }
+    var executionResources: StarknetExecutionResources { get }
     var revertReason: String? { get }
     var type: StarknetTransactionReceiptType { get }
 
@@ -23,7 +23,7 @@ public protocol StarknetPendingTransactionReceipt: StarknetTransactionReceiptPro
     var events: [StarknetEvent] { get }
     var finalityStatus: StarknetTransactionFinalityStatus { get }
     var executionStatus: StarknetTransactionExecutionStatus { get }
-    var executionResources: ExecutionResources { get }
+    var executionResources: StarknetExecutionResources { get }
     var revertReason: String? { get }
     var type: StarknetTransactionReceiptType { get }
 
@@ -37,7 +37,7 @@ public protocol StarknetTransactionReceiptProtocol: Decodable {
     var events: [StarknetEvent] { get }
     var finalityStatus: StarknetTransactionFinalityStatus { get }
     var executionStatus: StarknetTransactionExecutionStatus { get }
-    var executionResources: ExecutionResources { get }
+    var executionResources: StarknetExecutionResources { get }
     var revertReason: String? { get }
     var type: StarknetTransactionReceiptType { get }
 

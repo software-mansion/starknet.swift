@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ExecutionResources: Decodable, Equatable {
+public struct StarknetExecutionResources: Decodable, Equatable {
     public let steps: Felt
     public let memoryHoles: Felt?
     public let rangeCheckApplications: Felt
