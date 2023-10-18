@@ -1,6 +1,6 @@
 import Foundation
 
-public struct MessageToL1: Decodable, Equatable {
+public struct StarknetMessageToL1: Decodable, Equatable {
     public let fromAddress: Felt
     public let toAddress: Felt
     public let payload: [Felt]
@@ -12,7 +12,7 @@ public struct MessageToL1: Decodable, Equatable {
     }
 }
 
-public struct MessageFromL1: Codable, Equatable {
+public struct StarknetMessageFromL1: Codable, Equatable {
     public let fromAddress: Felt
     public let toAddress: Felt
     public let entryPointSelector: Felt

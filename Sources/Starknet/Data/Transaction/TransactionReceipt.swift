@@ -5,7 +5,7 @@ public struct StarknetInvokeTransactionReceipt: StarknetTransactionReceipt {
     public let actualFee: Felt
     public let blockHash: Felt
     public let blockNumber: UInt64
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -34,7 +34,7 @@ public struct StarknetInvokeTransactionReceipt: StarknetTransactionReceipt {
 public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactionReceipt {
     public let transactionHash: Felt
     public let actualFee: Felt
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -63,7 +63,7 @@ public struct StarknetDeclareTransactionReceipt: StarknetTransactionReceipt {
     public let actualFee: Felt
     public let blockHash: Felt
     public let blockNumber: UInt64
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -92,7 +92,7 @@ public struct StarknetDeclareTransactionReceipt: StarknetTransactionReceipt {
 public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransactionReceipt {
     public let transactionHash: Felt
     public let actualFee: Felt
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -121,7 +121,7 @@ public struct StarknetDeployAccountTransactionReceipt: StarknetTransactionReceip
     public let actualFee: Felt
     public let blockHash: Felt
     public let blockNumber: UInt64
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -152,7 +152,7 @@ public struct StarknetDeployAccountTransactionReceipt: StarknetTransactionReceip
 public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTransactionReceipt, Decodable {
     public let transactionHash: Felt
     public let actualFee: Felt
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -183,7 +183,7 @@ public struct StarknetDeployTransactionReceipt: StarknetTransactionReceipt {
     public let actualFee: Felt
     public let blockHash: Felt
     public let blockNumber: UInt64
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -216,7 +216,7 @@ public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
     public let actualFee: Felt
     public let blockHash: Felt
     public let blockNumber: UInt64
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
     public let finalityStatus: StarknetTransactionFinalityStatus
@@ -247,7 +247,7 @@ public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
 public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransactionReceipt {
     public let transactionHash: Felt
     public let actualFee: Felt
-    public let messagesSent: [MessageToL1]
+    public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
     public let finalityStatus: StarknetTransactionFinalityStatus

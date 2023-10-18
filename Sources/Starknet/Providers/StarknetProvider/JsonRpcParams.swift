@@ -61,7 +61,7 @@ struct EstimateFeeParams: Encodable {
 }
 
 public struct EstimateMessageFeeParams: Encodable {
-    let message: MessageFromL1
+    let message: StarknetMessageFromL1
     let blockId: StarknetBlockId
 
     enum CodingKeys: String, CodingKey {

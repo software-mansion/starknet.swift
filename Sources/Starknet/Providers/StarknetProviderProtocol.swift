@@ -41,7 +41,7 @@ public protocol StarknetProviderProtocol {
     ///  - message: the message's parameters
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: the fee estimation
-    func estimateMessageFee(_ message: MessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate
+    func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate
 
     /// Invoke a function.
     ///
@@ -172,7 +172,7 @@ public extension StarknetProviderProtocol {
     /// - Parameters:
     ///  - message: the message's parameters
     /// - Returns: the fee estimation
-    func estimateMessageFee(_ message: MessageFromL1) async throws -> StarknetFeeEstimate {
+    func estimateMessageFee(_ message: StarknetMessageFromL1) async throws -> StarknetFeeEstimate {
         try await estimateMessageFee(message, at: defaultBlockId)
     }
 

@@ -27,7 +27,7 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let result: [Felt]?
     public let calls: [StarknetFunctionInvocation]?
     public let events: [StarknetEventContent]?
-    public let messages: [MessageToL1]?
+    public let messages: [StarknetMessageToL1]?
 
     private enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
