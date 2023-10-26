@@ -7,17 +7,17 @@ enum TransactionReceiptWrapper: Decodable {
         case type
     }
 
-    case invoke(StarknetInvokeTransactionReceipt)
-    case declare(StarknetDeclareTransactionReceipt)
-    case deployAccount(StarknetDeployAccountTransactionReceipt)
-    case l1Handler(StarknetL1HandlerTransactionReceipt)
-    case deploy(StarknetDeployTransactionReceipt)
+    case invoke(StarknetProcessedInvokeTransactionReceipt)
+    case declare(StarknetProcessedDeclareTransactionReceipt)
+    case deployAccount(StarknetProcessedDeployAccountTransactionReceipt)
+    case l1Handler(StarknetProcessedL1HandlerTransactionReceipt)
+    case deploy(StarknetProcessedDeployTransactionReceipt)
     case pendingInvoke(StarknetPendingInvokeTransactionReceipt)
     case pendingDeclare(StarknetPendingDeclareTransactionReceipt)
     case pendingDeployAccount(StarknetPendingDeployAccountTransactionReceipt)
     case pendingL1Handler(StarknetPendingL1HandlerTransactionReceipt)
 
-    public var transactionReceipt: any StarknetTransactionReceiptProtocol {
+    public var transactionReceipt: any StarknetTransactionReceipt {
         switch self {
         case let .invoke(tx):
             return tx
@@ -51,15 +51,15 @@ enum TransactionReceiptWrapper: Decodable {
 
         switch (type, isPending) {
         case (.invoke, false):
-            self = try .invoke(StarknetInvokeTransactionReceipt(from: decoder))
+            self = try .invoke(StarknetProcessedInvokeTransactionReceipt(from: decoder))
         case (.declare, false):
-            self = try .declare(StarknetDeclareTransactionReceipt(from: decoder))
+            self = try .declare(StarknetProcessedDeclareTransactionReceipt(from: decoder))
         case (.deployAccount, false):
-            self = try .deployAccount(StarknetDeployAccountTransactionReceipt(from: decoder))
+            self = try .deployAccount(StarknetProcessedDeployAccountTransactionReceipt(from: decoder))
         case (.l1Handler, false):
-            self = try .l1Handler(StarknetL1HandlerTransactionReceipt(from: decoder))
+            self = try .l1Handler(StarknetProcessedL1HandlerTransactionReceipt(from: decoder))
         case (.deploy, false):
-            self = try .deploy(StarknetDeployTransactionReceipt(from: decoder))
+            self = try .deploy(StarknetProcessedDeployTransactionReceipt(from: decoder))
         case (.invoke, true):
             self = try .pendingInvoke(StarknetPendingInvokeTransactionReceipt(from: decoder))
         case (.declare, true):

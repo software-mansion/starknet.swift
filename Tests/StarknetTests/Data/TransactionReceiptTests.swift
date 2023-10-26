@@ -128,18 +128,18 @@ let pendingL1HandlerReceipt = """
 
 final class TransactionReceiptTests: XCTestCase {
     func testTransactionReceiptWrapperDecoding() throws {
-        let cases: [(String, StarknetTransactionType, Bool, StarknetTransactionReceiptProtocol.Type)] = [
-            (invokeReceipt, .invoke, false, StarknetInvokeTransactionReceipt.self),
-            (declareReceipt, .declare, false, StarknetDeclareTransactionReceipt.self),
-            (deployAccountReceipt, .deployAccount, false, StarknetDeployAccountTransactionReceipt.self),
-            (l1HandlerReceipt, .l1Handler, false, StarknetL1HandlerTransactionReceipt.self),
-            (deployReceipt, .deploy, false, StarknetDeployTransactionReceipt.self),
+        let cases: [(String, StarknetTransactionType, Bool, any StarknetTransactionReceipt.Type)] = [
+            (invokeReceipt, .invoke, false, StarknetProcessedInvokeTransactionReceipt.self),
+            (declareReceipt, .declare, false, StarknetProcessedDeclareTransactionReceipt.self),
+            (deployAccountReceipt, .deployAccount, false, StarknetProcessedDeployAccountTransactionReceipt.self),
+            (l1HandlerReceipt, .l1Handler, false, StarknetProcessedL1HandlerTransactionReceipt.self),
+            (deployReceipt, .deploy, false, StarknetProcessedDeployTransactionReceipt.self),
             (pendingInvokeReceipt, .invoke, true, StarknetPendingInvokeTransactionReceipt.self),
             (pendingDeclareReceipt, .declare, true, StarknetPendingDeclareTransactionReceipt.self),
             (pendingDeployAccountReceipt, .deployAccount, true, StarknetPendingDeployAccountTransactionReceipt.self),
             (pendingL1HandlerReceipt, .l1Handler, true, StarknetPendingL1HandlerTransactionReceipt.self),
         ]
-        try cases.forEach { (string: String, txType: StarknetTransactionType, isPending: Bool, receiptType: StarknetTransactionReceiptProtocol.Type) in
+        try cases.forEach { (string: String, txType: StarknetTransactionType, isPending: Bool, receiptType: StarknetTransactionReceipt.Type) in
             let data = string.data(using: .utf8)!
             let decoder = JSONDecoder()
 
@@ -147,9 +147,9 @@ final class TransactionReceiptTests: XCTestCase {
             let receipt = receiptWrapper.transactionReceipt
 
             if isPending {
-                XCTAssertTrue(receipt is StarknetPendingTransactionReceipt)
+                XCTAssertTrue(receipt is (any StarknetPendingTransactionReceipt))
             } else {
-                XCTAssertTrue(receipt is StarknetTransactionReceipt)
+                XCTAssertTrue(receipt is (any StarknetProcessedTransactionReceipt))
             }
 
             XCTAssertTrue(type(of: receipt) == receiptType)

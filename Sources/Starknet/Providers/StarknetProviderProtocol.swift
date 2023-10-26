@@ -107,7 +107,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - hash : the hash of the requested transaction
     /// - Returns: receipt of a transaction identified by given hash
-    func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceiptProtocol
+    func getTransactionReceiptBy(hash: Felt) async throws -> any StarknetTransactionReceipt
 
     /// Get the status of a submitted transaction.
     ///

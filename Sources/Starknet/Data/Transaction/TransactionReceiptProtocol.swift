@@ -1,52 +1,29 @@
 import Foundation
 
-public protocol StarknetInvokeTransactionReceiptProtocol: Decodable, Equatable {}
+public protocol StarknetInvokeTransactionReceipt: StarknetTransactionReceipt {}
 
-public protocol StarknetDeclareTransactionReceiptProtocol: Decodable, Equatable {}
+public protocol StarknetDeclareTransactionReceipt: StarknetTransactionReceipt {}
 
-public protocol StarknetDeployTransactionReceiptProtocol: Decodable, Equatable {
+public protocol StarknetDeployTransactionReceipt: StarknetTransactionReceipt {
     var contractAddress: Felt { get }
 }
 
-public protocol StarknetDeployAccountTransactionReceiptProtocol: Decodable, Equatable {
+public protocol StarknetDeployAccountTransactionReceipt: StarknetTransactionReceipt {
     var contractAddress: Felt { get }
 }
 
-public protocol StarknetL1HandlerTransactionReceiptProtocol: Decodable, Equatable {
+public protocol StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
     var messageHash: NumAsHex { get }
 }
 
-public protocol StarknetTransactionReceipt: StarknetTransactionReceiptProtocol {
-    var transactionHash: Felt { get }
+public protocol StarknetProcessedTransactionReceipt: StarknetTransactionReceipt {
     var blockHash: Felt { get }
     var blockNumber: UInt64 { get }
-    var actualFee: Felt { get }
-    var messagesSent: [StarknetMessageToL1] { get }
-    var events: [StarknetEvent] { get }
-    var finalityStatus: StarknetTransactionFinalityStatus { get }
-    var executionStatus: StarknetTransactionExecutionStatus { get }
-    var executionResources: StarknetExecutionResources { get }
-    var revertReason: String? { get }
-    var type: StarknetTransactionType { get }
-
-    var isSuccessful: Bool { get }
 }
 
-public protocol StarknetPendingTransactionReceipt: StarknetTransactionReceiptProtocol {
-    var transactionHash: Felt { get }
-    var actualFee: Felt { get }
-    var messagesSent: [StarknetMessageToL1] { get }
-    var events: [StarknetEvent] { get }
-    var finalityStatus: StarknetTransactionFinalityStatus { get }
-    var executionStatus: StarknetTransactionExecutionStatus { get }
-    var executionResources: StarknetExecutionResources { get }
-    var revertReason: String? { get }
-    var type: StarknetTransactionType { get }
+public protocol StarknetPendingTransactionReceipt: StarknetTransactionReceipt {}
 
-    var isSuccessful: Bool { get }
-}
-
-public protocol StarknetTransactionReceiptProtocol: Decodable {
+public protocol StarknetTransactionReceipt: Decodable, Equatable {
     var transactionHash: Felt { get }
     var actualFee: Felt { get }
     var messagesSent: [StarknetMessageToL1] { get }
