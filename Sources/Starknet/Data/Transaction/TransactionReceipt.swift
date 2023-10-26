@@ -222,7 +222,7 @@ public struct StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt, S
     public let finalityStatus: StarknetTransactionFinalityStatus
     public let executionStatus: StarknetTransactionExecutionStatus
     public let executionResources: StarknetExecutionResources
-    public let messageHash: Felt
+    public let messageHash: NumAsHex
     public let type: StarknetTransactionType = .l1Handler
 
     public var isSuccessful: Bool {
@@ -253,7 +253,7 @@ public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransac
     public let finalityStatus: StarknetTransactionFinalityStatus
     public var executionResources: StarknetExecutionResources
     public let revertReason: String?
-    public let messageHash: Felt
+    public let messageHash: NumAsHex
     public let type: StarknetTransactionType = .l1Handler
 
     public var isSuccessful: Bool {

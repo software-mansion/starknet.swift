@@ -1,15 +1,15 @@
 import Foundation
 
 public struct StarknetExecutionResources: Decodable, Equatable {
-    public let steps: Felt
-    public let memoryHoles: Felt?
-    public let rangeCheckApplications: Felt
-    public let pedersenApplications: Felt
-    public let poseidonApplications: Felt
-    public let ecOpApplications: Felt
-    public let ecdsaApplications: Felt
-    public let bitwiseApplications: Felt
-    public let keccakApplications: Felt
+    public let steps: NumAsHex
+    public let memoryHoles: NumAsHex?
+    public let rangeCheckApplications: NumAsHex
+    public let pedersenApplications: NumAsHex
+    public let poseidonApplications: NumAsHex
+    public let ecOpApplications: NumAsHex
+    public let ecdsaApplications: NumAsHex
+    public let bitwiseApplications: NumAsHex
+    public let keccakApplications: NumAsHex
 
     enum CodingKeys: String, CodingKey {
         case steps

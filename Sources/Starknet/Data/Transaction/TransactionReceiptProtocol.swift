@@ -13,7 +13,7 @@ public protocol StarknetDeployAccountTransactionReceiptProtocol: Decodable, Equa
 }
 
 public protocol StarknetL1HandlerTransactionReceiptProtocol: Decodable, Equatable {
-    var messageHash: Felt { get }
+    var messageHash: NumAsHex { get }
 }
 
 public protocol StarknetTransactionReceipt: StarknetTransactionReceiptProtocol {
