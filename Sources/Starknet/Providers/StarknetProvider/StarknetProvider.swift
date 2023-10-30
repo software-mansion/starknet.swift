@@ -161,7 +161,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result.transactionReceipt
     }
 
-    public func getTransactionStatus(hash: Felt) async throws -> StarknetGetTransactionStatusResponse {
+    public func getTransactionStatusBy(hash: Felt) async throws -> StarknetGetTransactionStatusResponse {
         let params = GetTransactionStatusPayload(transactionHash: hash)
 
         let result = try await makeRequest(method: .getTransactionStatus, params: params, receive: StarknetGetTransactionStatusResponse.self)

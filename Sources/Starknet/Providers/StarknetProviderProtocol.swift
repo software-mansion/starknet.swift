@@ -114,7 +114,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - hash: The hash of the requested transaction
     /// - Returns: The status(es) of a transaction
-    func getTransactionStatus(hash: Felt) async throws -> StarknetGetTransactionStatusResponse
+    func getTransactionStatusBy(hash: Felt) async throws -> StarknetGetTransactionStatusResponse
 
     /// Simulate running a given list of transactions, and generate the execution trace
     ///
