@@ -125,7 +125,7 @@ final class ProviderTests: XCTestCase {
     }
 
     // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
-    func testGetTransactionStatus() async throws {
+    func disabledTestGetTransactionStatus() async throws {
         let deployedContract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
         let status = try await provider.getTransactionStatusBy(hash: deployedContract.declare.transactionHash)
         let status2 = try await provider.getTransactionStatusBy(hash: deployedContract.deploy.transactionHash)
