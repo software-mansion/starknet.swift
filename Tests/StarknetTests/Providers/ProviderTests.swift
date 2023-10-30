@@ -123,7 +123,18 @@ final class ProviderTests: XCTestCase {
             XCTFail("Fetching transaction with nonexistent hash should fail")
         } catch {}
     }
+    
+    // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
+    func testGetTransactionStatus() async throws {
+       let deployedContract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+        let status = try await provider.getTransactionStatusBy(hash: deployedContract.declare.transactionHash)
+        let status2 = try await provider.getTransactionStatusBy(hash: deployedContract.deploy.transactionHash)
+        
+        XCTAssertEqual(status.finalityStatus, .acceptedL2)
+        XCTAssertEqual(status2.finalityStatus, .acceptedL2)
+    }
 
+    // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
     func disabledTestGetTransactionReceipt() async throws {
         let accountName = "test_receipt"
         let _ = try await ProviderTests.devnetClient.createAccount(name: accountName)
