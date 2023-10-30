@@ -37,8 +37,8 @@ public class StarknetProvider: StarknetProviderProtocol {
 
         do {
             response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<U>.self)
-        } catch _ as HttpNetworkProviderError {
-            throw StarknetProviderError.networkProviderError
+        } catch let error as HttpNetworkProviderError {
+            throw error
         } catch {
             throw StarknetProviderError.unknownError
         }
