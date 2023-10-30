@@ -81,7 +81,7 @@ public struct StarknetInvokeTransactionTrace: StarknetInvokeTransactionProtocol 
 
 public struct StarknetRevertedInvokeTransactionTrace: StarknetInvokeTransactionProtocol {
     public let validateInvocation: StarknetFunctionInvocation
-    public let executeInvocation: StarknetRevertedFunctionInvocation?
+    public let executeInvocation: StarknetRevertedFunctionInvocation
     public let feeTransferInvocation: StarknetFunctionInvocation
     public let stateDiff: StarknetStateDiff
     public let type: StarknetTransactionType = .invoke
