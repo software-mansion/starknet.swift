@@ -1,7 +1,7 @@
 import Foundation
 
 public struct StarknetStateDiff: Decodable, Equatable {
-    public let storageDiffs: [StarknetStorageDiffItem]
+    public let storageDiffs: [StarknetContractStorageDiffItem]
     public let deprecatedDeclaredClasses: [Felt]
     public let declaredClasses: [StarknetDeclaredClassItem]
     public let deployedContracts: [StarknetDeployedContractItem]

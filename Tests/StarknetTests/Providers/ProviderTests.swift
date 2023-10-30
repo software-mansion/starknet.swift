@@ -31,7 +31,7 @@ final class ProviderTests: XCTestCase {
         StarknetProvider(starknetChainId: .testnet, url: url)!
     }
 
-    // TODO (#89): Re-enable once devnet-rs supports RPC 0.5.0
+    // TODO: (#89): Re-enable once devnet-rs supports RPC 0.5.0
     func disabledTestSpecVersion() async throws {
         let result = try await provider.specVersion()
         XCTAssertFalse(result.isEmpty)
@@ -123,13 +123,13 @@ final class ProviderTests: XCTestCase {
             XCTFail("Fetching transaction with nonexistent hash should fail")
         } catch {}
     }
-    
+
     // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
     func testGetTransactionStatus() async throws {
-       let deployedContract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+        let deployedContract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
         let status = try await provider.getTransactionStatusBy(hash: deployedContract.declare.transactionHash)
         let status2 = try await provider.getTransactionStatusBy(hash: deployedContract.deploy.transactionHash)
-        
+
         XCTAssertEqual(status.finalityStatus, .acceptedL2)
         XCTAssertEqual(status2.finalityStatus, .acceptedL2)
     }
@@ -184,10 +184,10 @@ final class ProviderTests: XCTestCase {
 
         XCTAssertEqual(fees.count, 2)
     }
-    
+
     func testEstimateMessageFee() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-        
+
         let message = StarknetMessageFromL1(
             fromAddress: "0xbe1259ff905cadbbaa62514388b71bdefb8aacc1",
             toAddress: contract.deploy.contractAddress,
@@ -209,7 +209,7 @@ final class ProviderTests: XCTestCase {
         XCTAssertNotEqual(Felt.zero, feeEstimate.overallFee)
         XCTAssertEqual(feeEstimate.gasPrice.value * feeEstimate.gasConsumed.value, feeEstimate.overallFee.value)
     }
-    
+
     // TODO: Re-enable when devnet-rs supports RPC 0.5.0
     func disabledTestSimulateTransactions() async throws {
         XCTAssertTrue(false)

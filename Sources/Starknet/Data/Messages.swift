@@ -32,3 +32,17 @@ public struct StarknetMessageFromL1: Codable, Equatable {
         self.payload = payload
     }
 }
+
+public struct StarknetOrderedMessageToL1: Decodable, Equatable {
+    public let order: Int
+    public let fromAddress: Felt
+    public let toAddress: Felt
+    public let payload: [Felt]
+
+    enum CodingKeys: String, CodingKey {
+        case order
+        case fromAddress = "from_address"
+        case toAddress = "to_address"
+        case payload
+    }
+}

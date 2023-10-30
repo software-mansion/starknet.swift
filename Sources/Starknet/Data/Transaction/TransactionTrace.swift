@@ -16,16 +16,6 @@ public enum StarknetSimulationFlag: String, Codable {
     case skipFeeCharge = "SKIP_FEE_CHARGE"
 }
 
-public struct StarknetOrderedEvent: Decodable, Equatable {
-    public let order: Int
-    public let event: StarknetEventContent
-}
-
-public struct StarknetOrderedMessageToL1: Decodable, Equatable {
-    public let order: Int
-    public let message: StarknetMessageToL1
-}
-
 public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let contractAddress: Felt
     public let entrypoint: Felt
