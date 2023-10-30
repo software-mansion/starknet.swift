@@ -553,6 +553,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.currentDirectoryPath = contractsPath!
             process.arguments = [
                 "--json",
+                "--hex-format",
                 "--path-to-scarb-toml",
                 scarbTomlPath!,
                 "--accounts-file",
