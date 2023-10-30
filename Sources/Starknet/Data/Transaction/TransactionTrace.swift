@@ -158,7 +158,8 @@ enum StarknetTransactionTraceWrapper: Decodable {
         let container = try decoder.container(keyedBy: Keys.self)
 
         let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
-        let isReverted = try container.decodeIfPresent(StarknetRevertedFunctionInvocation.self, forKey: Keys.executeInvocation) != nil
+        let revertedFunctionInvocation = try? container.decodeIfPresent(StarknetRevertedFunctionInvocation.self, forKey: Keys.executeInvocation)
+        let isReverted = revertedFunctionInvocation != nil
 
         switch (type, isReverted) {
         case (.invoke, false):
