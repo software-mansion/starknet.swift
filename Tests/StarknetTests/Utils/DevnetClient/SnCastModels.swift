@@ -17,10 +17,14 @@ struct AccountCreateSnCastResponse: SnCastResponse {
     let error: String? = nil
     let accountAddress: Felt
     let maxFee: Felt
+    let addProfile: String?
+    let message: String?
 
     enum CodingKeys: String, CodingKey {
         case accountAddress = "address"
         case maxFee = "max_fee"
+        case addProfile = "add_profile"
+        case message
     }
 }
 
