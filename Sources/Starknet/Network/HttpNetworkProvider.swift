@@ -5,10 +5,9 @@ import Foundation
 #endif
 
 enum HttpNetworkProviderError: Error {
-    case encodingError
-    case decodingError
+    case encodingError(EncodingError)
+    case decodingError(DecodingError)
     case unknownError
-    case noResult
     case requestRejected
 }
 
@@ -49,8 +48,15 @@ class HttpNetworkProvider {
     }
 
     func send<U>(payload: some Encodable, config: Configuration, receive _: U.Type) async throws -> U where U: Decodable {
-        guard let encoded = try? JSONEncoder().encode(payload) else {
-            throw HttpNetworkProviderError.encodingError
+        let encoded: Data
+        do {
+            encoded = try JSONEncoder().encode(payload)
+        } catch {
+            if let encodingError = error as? EncodingError {
+                throw HttpNetworkProviderError.encodingError(encodingError)
+            } else {
+                throw HttpNetworkProviderError.unknownError
+            }
         }
 
         let request = makeRequestWith(body: encoded, config: config)
@@ -59,12 +65,17 @@ class HttpNetworkProvider {
             throw HttpNetworkProviderError.unknownError
         }
 
-        if let result = try? JSONDecoder().decode(U.self, from: data) {
+        do {
+            let result = try JSONDecoder().decode(U.self, from: data)
             return result
-        } else if let response = response as? HTTPURLResponse, response.statusCode < 200 || response.statusCode > 299 {
-            throw HttpNetworkProviderError.requestRejected
+        } catch {
+            if let response = response as? HTTPURLResponse, response.statusCode < 200 || response.statusCode > 299 {
+                throw HttpNetworkProviderError.requestRejected
+            } else if let decodingError = error as? DecodingError {
+                throw HttpNetworkProviderError.decodingError(decodingError)
+            } else {
+                throw HttpNetworkProviderError.unknownError
+            }
         }
-
-        throw HttpNetworkProviderError.noResult
     }
 }
