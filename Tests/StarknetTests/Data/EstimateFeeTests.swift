@@ -30,7 +30,7 @@ final class EstimateFeeTests: XCTestCase {
     }
 
     func testEstimateMessageFeeParamsEncoding() throws {
-        let messageFromL1 = MessageFromL1(fromAddress: "0xbe1259ff905cadbbaa62514388b71bdefb8aacc1", toAddress: "0x73314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82", entryPointSelector: "0x2d757788a8d8d6f21d1cd40bce38a8222d70654214e96ff95d8086e684fbee5", payload: ["0x2bf223f583a5940873cd804ef3333a8a9306e878b5d4a7d00881f1616894d4d", "0x16345785d8a0000", "0x0"])
+        let messageFromL1 = StarknetMessageFromL1(fromAddress: "0xbe1259ff905cadbbaa62514388b71bdefb8aacc1", toAddress: "0x73314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82", entryPointSelector: "0x2d757788a8d8d6f21d1cd40bce38a8222d70654214e96ff95d8086e684fbee5", payload: ["0x2bf223f583a5940873cd804ef3333a8a9306e878b5d4a7d00881f1616894d4d", "0x16345785d8a0000", "0x0"])
         let estimateMessageFeeParams = EstimateMessageFeeParams(message: messageFromL1, blockId: .number(306_687))
 
         let encoder = JSONEncoder()

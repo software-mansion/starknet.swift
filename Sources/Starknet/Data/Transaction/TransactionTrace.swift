@@ -20,14 +20,14 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let contractAddress: Felt
     public let entrypoint: Felt
     public let calldata: StarknetCalldata
-    public let callerAddress: Felt?
-    public let classHash: Felt?
-    public let entryPointType: StarknetEntryPointType?
-    public let callType: StarknetCallType?
-    public let result: [Felt]?
-    public let calls: [StarknetFunctionInvocation]?
-    public let events: [StarknetEventContent]?
-    public let messages: [MessageToL1]?
+    public let callerAddress: Felt
+    public let classHash: Felt
+    public let entryPointType: StarknetEntryPointType
+    public let callType: StarknetCallType
+    public let result: [Felt]
+    public let calls: [StarknetFunctionInvocation]
+    public let events: [StarknetOrderedEvent]
+    public let messages: [StarknetOrderedMessageToL1]
 
     private enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
@@ -44,56 +44,98 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
     }
 }
 
-public protocol StarknetTransactionTrace: Decodable, Equatable {}
+public struct StarknetRevertedFunctionInvocation: Decodable, Equatable {
+    public let revertReason: String
 
-public struct StarknetInvokeTransactionTrace: StarknetTransactionTrace {
-    public let validateInvocation: StarknetFunctionInvocation?
-    public let executeInvocation: StarknetFunctionInvocation?
-    public let feeTransferInvocation: StarknetFunctionInvocation?
+    private enum CodingKeys: String, CodingKey {
+        case revertReason = "revert_reason"
+    }
+}
+
+public protocol StarknetTransactionTrace: Decodable, Equatable {
+    var stateDiff: StarknetStateDiff { get }
+    var type: StarknetTransactionType { get }
+}
+
+public protocol StarknetInvokeTransactionTraceProtocol: StarknetTransactionTrace {
+    var validateInvocation: StarknetFunctionInvocation { get }
+    var feeTransferInvocation: StarknetFunctionInvocation { get }
+    var stateDiff: StarknetStateDiff { get }
+    var type: StarknetTransactionType { get }
+}
+
+public struct StarknetInvokeTransactionTrace: StarknetInvokeTransactionTraceProtocol {
+    public let validateInvocation: StarknetFunctionInvocation
+    public let executeInvocation: StarknetFunctionInvocation
+    public let feeTransferInvocation: StarknetFunctionInvocation
+    public let stateDiff: StarknetStateDiff
+    public let type: StarknetTransactionType = .invoke
 
     private enum CodingKeys: String, CodingKey {
         case validateInvocation = "validate_invocation"
         case executeInvocation = "execute_invocation"
         case feeTransferInvocation = "fee_transfer_invocation"
+        case stateDiff = "state_diff"
+    }
+}
+
+public struct StarknetRevertedInvokeTransactionTrace: StarknetInvokeTransactionTraceProtocol {
+    public let validateInvocation: StarknetFunctionInvocation
+    public let executeInvocation: StarknetRevertedFunctionInvocation
+    public let feeTransferInvocation: StarknetFunctionInvocation
+    public let stateDiff: StarknetStateDiff
+    public let type: StarknetTransactionType = .invoke
+
+    private enum CodingKeys: String, CodingKey {
+        case validateInvocation = "validate_invocation"
+        case executeInvocation = "execute_invocation"
+        case feeTransferInvocation = "fee_transfer_invocation"
+        case stateDiff = "state_diff"
     }
 }
 
 public struct StarknetDeployAccountTransactionTrace: StarknetTransactionTrace {
-    public let validateInvocation: StarknetFunctionInvocation?
-    public let constructorInvocation: StarknetFunctionInvocation?
-    public let feeTransferInvocation: StarknetFunctionInvocation?
+    public let validateInvocation: StarknetFunctionInvocation
+    public let constructorInvocation: StarknetFunctionInvocation
+    public let feeTransferInvocation: StarknetFunctionInvocation
+    public let stateDiff: StarknetStateDiff
+    public let type: StarknetTransactionType = .deployAccount
 
     private enum CodingKeys: String, CodingKey {
         case validateInvocation = "validate_invocation"
         case constructorInvocation = "constructor_invocation"
         case feeTransferInvocation = "fee_transfer_invocation"
+        case stateDiff = "state_diff"
     }
 }
 
 public struct StarknetL1HandlerTransactionTrace: StarknetTransactionTrace {
-    public let functionInvocation: StarknetFunctionInvocation?
+    public let functionInvocation: StarknetFunctionInvocation
+    public let stateDiff: StarknetStateDiff
+    public let type: StarknetTransactionType = .l1Handler
 
     private enum CodingKeys: String, CodingKey {
         case functionInvocation = "function_invocation"
+        case stateDiff = "state_diff"
     }
 }
 
 enum StarknetTransactionTraceWrapper: Decodable {
     fileprivate enum Keys: String, CodingKey {
-        case validateInvocation = "validate_invocation"
         case executeInvocation = "execute_invocation"
-        case feeTransferInvocation = "fee_transfer_invocation"
-        case constructorInvocation = "constructor_invocation"
-        case functionInvocation = "function_invocation"
+        case type
     }
 
     case invoke(StarknetInvokeTransactionTrace)
+    case revertedInvoke(StarknetRevertedInvokeTransactionTrace)
     case deployAccount(StarknetDeployAccountTransactionTrace)
     case l1Handler(StarknetL1HandlerTransactionTrace)
 
     public var transactionTrace: any StarknetTransactionTrace {
         switch self {
         case let .invoke(txTrace):
+            return txTrace
+        case let .revertedInvoke(txTrace):
             return txTrace
         case let .deployAccount(txTrace):
             return txTrace
@@ -105,47 +147,22 @@ enum StarknetTransactionTraceWrapper: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
 
-        // Invocations can be null, so `if let = try?` syntax won't work here.
-        do {
-            let validateInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .validateInvocation)
-            let executeInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .executeInvocation)
-            let feeTransferInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .feeTransferInvocation)
+        let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
+        let revertedFunctionInvocation = try? container.decodeIfPresent(StarknetRevertedFunctionInvocation.self, forKey: Keys.executeInvocation)
+        let isReverted = revertedFunctionInvocation != nil
 
-            self = .invoke(StarknetInvokeTransactionTrace(
-                validateInvocation: validateInvocation,
-                executeInvocation: executeInvocation,
-                feeTransferInvocation: feeTransferInvocation
-            ))
-            return
-        } catch {}
-
-        do {
-            let validateInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .validateInvocation)
-            let constructorInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .constructorInvocation)
-            let feeTransferInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .feeTransferInvocation)
-
-            self = .deployAccount(StarknetDeployAccountTransactionTrace(
-                validateInvocation: validateInvocation,
-                constructorInvocation: constructorInvocation,
-                feeTransferInvocation: feeTransferInvocation
-            ))
-            return
-        } catch {}
-
-        do {
-            let functionInvocation = try container.decode(StarknetFunctionInvocation?.self, forKey: .functionInvocation)
-
-            self = .l1Handler(StarknetL1HandlerTransactionTrace(
-                functionInvocation: functionInvocation
-            ))
-            return
-        } catch {}
-
-        throw DecodingError.dataCorrupted(
-            DecodingError.Context(
-                codingPath: container.codingPath,
-                debugDescription: "Invalid transaction trace"
-            ))
+        switch (type, isReverted) {
+        case (.invoke, false):
+            self = try .invoke(StarknetInvokeTransactionTrace(from: decoder))
+        case (.invoke, true):
+            self = try .revertedInvoke(StarknetRevertedInvokeTransactionTrace(from: decoder))
+        case (.deployAccount, _):
+            self = try .deployAccount(StarknetDeployAccountTransactionTrace(from: decoder))
+        case (.l1Handler, _):
+            self = try .l1Handler(StarknetL1HandlerTransactionTrace(from: decoder))
+        default:
+            throw DecodingError.dataCorruptedError(forKey: Keys.type, in: container, debugDescription: "Invalid transaction type (\(type))")
+        }
     }
 }
 

@@ -4,6 +4,11 @@ import Foundation
 public protocol StarknetProviderProtocol {
     var starknetChainId: StarknetChainId { get }
 
+    /// Get the version of the Starknet JSON-RPC specification being used by the node.
+    ///
+    ///  - Returns: the version of the Starknet JSON-RPC specification being used.
+    func specVersion() async throws -> String
+
     /// Call starknet contract.
     ///
     /// - Parameters
@@ -36,7 +41,7 @@ public protocol StarknetProviderProtocol {
     ///  - message: the message's parameters
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: the fee estimation
-    func estimateMessageFee(_ message: MessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate
+    func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate
 
     /// Invoke a function.
     ///
@@ -102,15 +107,14 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - hash : the hash of the requested transaction
     /// - Returns: receipt of a transaction identified by given hash
-    func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceipt
+    func getTransactionReceiptBy(hash: Felt) async throws -> any StarknetTransactionReceipt
 
-    /// Get the gateway status of a submitted transaction.
-    /// This method is supported only by Pathfinder nodes.
+    /// Get the status of a submitted transaction.
     ///
     /// - Parameters:
     ///  - hash: The hash of the requested transaction
-    /// - Returns: Transaction found with provided hash
-    func pathfinderGetTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus
+    /// - Returns: The status(es) of a transaction
+    func getTransactionStatusBy(hash: Felt) async throws -> StarknetGetTransactionStatusResponse
 
     /// Simulate running a given list of transactions, and generate the execution trace
     ///
@@ -168,7 +172,7 @@ public extension StarknetProviderProtocol {
     /// - Parameters:
     ///  - message: the message's parameters
     /// - Returns: the fee estimation
-    func estimateMessageFee(_ message: MessageFromL1) async throws -> StarknetFeeEstimate {
+    func estimateMessageFee(_ message: StarknetMessageFromL1) async throws -> StarknetFeeEstimate {
         try await estimateMessageFee(message, at: defaultBlockId)
     }
 

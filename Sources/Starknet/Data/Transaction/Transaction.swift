@@ -3,7 +3,7 @@ import Foundation
 public struct StarknetInvokeTransactionV1: StarknetTransaction {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt = .one
+    public let version: Felt
 
     public let senderAddress: Felt
 
@@ -17,12 +17,13 @@ public struct StarknetInvokeTransactionV1: StarknetTransaction {
 
     public let hash: Felt?
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, hash: Felt? = nil) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, maxFee: Felt, nonce: Felt, version: Felt = .one, hash: Felt? = nil) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
         self.maxFee = maxFee
         self.nonce = nonce
+        self.version = version
         self.hash = hash
     }
 
@@ -33,6 +34,7 @@ public struct StarknetInvokeTransactionV1: StarknetTransaction {
             signature: sequencerTransaction.signature,
             maxFee: sequencerTransaction.maxFee,
             nonce: sequencerTransaction.nonce,
+            version: sequencerTransaction.version,
             hash: hash
         )
     }
@@ -55,10 +57,10 @@ public struct StarknetInvokeTransactionV1: StarknetTransaction {
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
+        self.version = try container.decode(Felt.self, forKey: .version)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
-        try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 }
 
@@ -108,12 +110,15 @@ public struct StarknetInvokeTransactionV0: StarknetTransaction {
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
-        try verifyTransactionType(container: container, codingKeysType: Self.CodingKeys.self)
+        try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 }
 
-public struct StarknetDeployAccountTransaction: StarknetTransaction {
+// TODO: Remove when migrating to RPC 0.6.0
+public typealias StarknetDeployAccountTransaction = StarknetDeployAccountTransactionV1
+
+public struct StarknetDeployAccountTransactionV1: StarknetTransaction {
     public let type: StarknetTransactionType = .deployAccount
 
     public let version: Felt = .one

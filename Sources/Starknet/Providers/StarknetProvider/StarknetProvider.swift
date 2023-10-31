@@ -3,7 +3,7 @@ import Foundation
 public enum StarknetProviderError: Error {
     case networkProviderError
     case unknownError
-    case jsonRpcError(Int, String)
+    case jsonRpcError(Int, String, String?)
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
@@ -37,8 +37,8 @@ public class StarknetProvider: StarknetProviderProtocol {
 
         do {
             response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<U>.self)
-        } catch _ as HttpNetworkProviderError {
-            throw StarknetProviderError.networkProviderError
+        } catch let error as HttpNetworkProviderError {
+            throw error
         } catch {
             throw StarknetProviderError.unknownError
         }
@@ -46,10 +46,18 @@ public class StarknetProvider: StarknetProviderProtocol {
         if let result = response.result {
             return result
         } else if let error = response.error {
-            throw StarknetProviderError.jsonRpcError(error.code, error.message)
+            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data?.revertError)
         } else {
             throw StarknetProviderError.unknownError
         }
+    }
+
+    public func specVersion() async throws -> String {
+        let params = EmptySequence()
+
+        let result = try await makeRequest(method: .specVersion, params: params, receive: String.self)
+
+        return result
     }
 
     public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt] {
@@ -60,7 +68,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func estimateMessageFee(_ message: MessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
+    public func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
         let params = EstimateMessageFeeParams(message: message, blockId: blockId)
 
         let result = try await makeRequest(method: .estimateMessageFee, params: params, receive: StarknetFeeEstimate.self)
@@ -145,7 +153,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result.transaction
     }
 
-    public func getTransactionReceiptBy(hash: Felt) async throws -> StarknetTransactionReceipt {
+    public func getTransactionReceiptBy(hash: Felt) async throws -> any StarknetTransactionReceipt {
         let params = GetTransactionReceiptPayload(transactionHash: hash)
 
         let result = try await makeRequest(method: .getTransactionReceipt, params: params, receive: TransactionReceiptWrapper.self)
@@ -153,11 +161,10 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result.transactionReceipt
     }
 
-    public func pathfinderGetTransactionStatus(hash: Felt) async throws -> StarknetGatewayTransactionStatus {
-        #warning("This method is currently supported only by Pathfinder nodes. It will be replaced by getTransactionStatus in starknet.swift 0.7.0")
+    public func getTransactionStatusBy(hash: Felt) async throws -> StarknetGetTransactionStatusResponse {
         let params = GetTransactionStatusPayload(transactionHash: hash)
 
-        let result = try await makeRequest(method: .pathfinderGetTransactionStatus, params: params, receive: StarknetGatewayTransactionStatus.self)
+        let result = try await makeRequest(method: .getTransactionStatus, params: params, receive: StarknetGetTransactionStatusResponse.self)
 
         return result
     }

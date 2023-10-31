@@ -31,6 +31,12 @@ final class ProviderTests: XCTestCase {
         StarknetProvider(starknetChainId: .testnet, url: url)!
     }
 
+    // TODO: (#89): Re-enable once devnet-rs supports RPC 0.5.0
+    func disabledTestSpecVersion() async throws {
+        let result = try await provider.specVersion()
+        XCTAssertFalse(result.isEmpty)
+    }
+
     func testCall() async throws {
         let call = StarknetCall(
             contractAddress: ProviderTests.devnetClient.constants.predeployedAccount1.address,
@@ -118,7 +124,18 @@ final class ProviderTests: XCTestCase {
         } catch {}
     }
 
-    func testGetTransactionReceipt() async throws {
+    // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
+    func disabledTestGetTransactionStatus() async throws {
+        let deployedContract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+        let status = try await provider.getTransactionStatusBy(hash: deployedContract.declare.transactionHash)
+        let status2 = try await provider.getTransactionStatusBy(hash: deployedContract.deploy.transactionHash)
+
+        XCTAssertEqual(status.finalityStatus, .acceptedL2)
+        XCTAssertEqual(status2.finalityStatus, .acceptedL2)
+    }
+
+    // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
+    func disabledTestGetTransactionReceipt() async throws {
         let accountName = "test_receipt"
         let _ = try await ProviderTests.devnetClient.createAccount(name: accountName)
         let acc = try await ProviderTests.devnetClient.deployAccount(name: accountName)
@@ -168,6 +185,32 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(fees.count, 2)
     }
 
+    func testEstimateMessageFee() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+
+        let message = StarknetMessageFromL1(
+            fromAddress: "0xbe1259ff905cadbbaa62514388b71bdefb8aacc1",
+            toAddress: contract.deploy.contractAddress,
+            entryPointSelector: starknetSelector(from: "increase_balance"),
+            payload: [
+                "0x54d01e5fc6eb4e919ceaab6ab6af192e89d1beb4f29d916768c61a4d48e6c95",
+                "0x38d7ea4c68000",
+                0,
+            ]
+        )
+
+        let feeEstimate = try await provider.estimateMessageFee(
+            message,
+            at: StarknetBlockId.tag(.latest)
+        )
+
+        XCTAssertNotEqual(Felt.zero, feeEstimate.gasPrice)
+        XCTAssertNotEqual(Felt.zero, feeEstimate.gasConsumed)
+        XCTAssertNotEqual(Felt.zero, feeEstimate.overallFee)
+        XCTAssertEqual(feeEstimate.gasPrice.value * feeEstimate.gasConsumed.value, feeEstimate.overallFee.value)
+    }
+
+    // TODO: Re-enable when devnet-rs supports RPC 0.5.0
     func disabledTestSimulateTransactions() async throws {
         XCTAssertTrue(false)
 

@@ -66,3 +66,15 @@ public struct StarknetEventContent: Decodable, Equatable {
         case data
     }
 }
+
+public struct StarknetOrderedEvent: Decodable, Equatable {
+    public let order: Int
+    public let keys: [Felt]
+    public let data: [Felt]
+
+    enum CodingKeys: String, CodingKey {
+        case order
+        case keys
+        case data
+    }
+}

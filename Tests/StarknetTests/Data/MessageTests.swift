@@ -17,7 +17,7 @@ final class MessageTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        XCTAssertNoThrow(try decoder.decode(MessageToL1.self, from: json))
+        XCTAssertNoThrow(try decoder.decode(StarknetMessageToL1.self, from: json))
     }
 
     func testMessageFromL1Decoding() throws {
@@ -36,11 +36,11 @@ final class MessageTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        XCTAssertNoThrow(try decoder.decode(MessageFromL1.self, from: json))
+        XCTAssertNoThrow(try decoder.decode(StarknetMessageFromL1.self, from: json))
     }
 
     func testMessageFromL1Encoding() throws {
-        let messageFromL1 = MessageFromL1(
+        let messageFromL1 = StarknetMessageFromL1(
             fromAddress: "0xBe1259ff905cAdBbAA62514388b71BdEfB8aacC1",
             toAddress: "0x73314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82",
             entryPointSelector: "0x2d757788a8d8d6f21d1cd40bce38a8222d70654214e96ff95d8086e684fbee5",
