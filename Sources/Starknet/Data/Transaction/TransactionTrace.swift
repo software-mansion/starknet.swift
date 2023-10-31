@@ -57,14 +57,14 @@ public protocol StarknetTransactionTrace: Decodable, Equatable {
     var type: StarknetTransactionType { get }
 }
 
-public protocol StarknetInvokeTransactionProtocol: StarknetTransactionTrace {
+public protocol StarknetInvokeTransactionTraceProtocol: StarknetTransactionTrace {
     var validateInvocation: StarknetFunctionInvocation { get }
     var feeTransferInvocation: StarknetFunctionInvocation { get }
     var stateDiff: StarknetStateDiff { get }
     var type: StarknetTransactionType { get }
 }
 
-public struct StarknetInvokeTransactionTrace: StarknetInvokeTransactionProtocol {
+public struct StarknetInvokeTransactionTrace: StarknetInvokeTransactionTraceProtocol {
     public let validateInvocation: StarknetFunctionInvocation
     public let executeInvocation: StarknetFunctionInvocation
     public let feeTransferInvocation: StarknetFunctionInvocation
@@ -79,7 +79,7 @@ public struct StarknetInvokeTransactionTrace: StarknetInvokeTransactionProtocol 
     }
 }
 
-public struct StarknetRevertedInvokeTransactionTrace: StarknetInvokeTransactionProtocol {
+public struct StarknetRevertedInvokeTransactionTrace: StarknetInvokeTransactionTraceProtocol {
     public let validateInvocation: StarknetFunctionInvocation
     public let executeInvocation: StarknetRevertedFunctionInvocation
     public let feeTransferInvocation: StarknetFunctionInvocation
