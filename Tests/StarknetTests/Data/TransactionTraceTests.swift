@@ -296,12 +296,12 @@ final class TransactionTraceTests: XCTestCase {
         XCTAssertTrue(tx2 is StarknetRevertedInvokeTransactionTrace)
 
         let invokeTx = tx1 as! StarknetInvokeTransactionTrace
-        let revertedInvokeTx = tx2 as! StarknetRevertedInvokeTransactionTrace
         XCTAssertEqual(invokeTx.type, .invoke)
         XCTAssertNotNil(invokeTx.stateDiff)
         XCTAssertNotNil(invokeTx.feeTransferInvocation)
         XCTAssertNotNil(invokeTx.validateInvocation)
-
+        
+        let revertedInvokeTx = tx2 as! StarknetRevertedInvokeTransactionTrace
         XCTAssertNotNil(revertedInvokeTx.executeInvocation.revertReason)
     }
 }
