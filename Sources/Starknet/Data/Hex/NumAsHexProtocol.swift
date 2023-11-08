@@ -75,7 +75,7 @@ public extension NumAsHexProtocol {
     }
 }
 
-extension NumAsHexProtocol {
+public extension NumAsHexProtocol {
     init?(_ data: Data) {
         let value = BigUInt(data)
 
