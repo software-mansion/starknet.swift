@@ -553,6 +553,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.currentDirectoryPath = contractsPath!
             process.arguments = [
                 "--json",
+                "--hex-format",
                 "--path-to-scarb-toml",
                 scarbTomlPath!,
                 "--accounts-file",
@@ -576,9 +577,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.launch()
             process.waitUntilExit()
 
-//            let command = "\(process.launchPath!) \(process.arguments!.joined(separator: " "))"
-//             print(command)
-
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let error = String(decoding: errorData, as: UTF8.self)
@@ -587,19 +585,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
-            var output = String(decoding: outputData, as: UTF8.self)
 
-            // TODO: remove this - pending sncast update
-            // As of sncast 0.6.0, "account create" currently outputs non-json data
-            if let range = output.range(of: "{") {
-                // Remove all characters before the first `{`
-                output.removeSubrange(output.startIndex ..< range.lowerBound)
-            } else {
-                throw SnCastError.invalidResponseJson
-            }
-
-            let outputDataTrimmed = output.data(using: .utf8)!
-            let result = try JSONDecoder().decode(SnCastResponseWrapper.self, from: outputDataTrimmed)
+            let result = try JSONDecoder().decode(SnCastResponseWrapper.self, from: outputData)
 
             return result.response
         }
