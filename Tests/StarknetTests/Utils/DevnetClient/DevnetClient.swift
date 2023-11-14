@@ -253,7 +253,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 try? fileManager.removeItem(at: filePath)
             }
 
-            //  Recreating a file structure requried by scarb
+            //  Recreating a file structure required by scarb
             guard let scarbTomlPath = Bundle.module.path(forResource: "Scarb", ofType: "toml") else {
                 throw DevnetClientError.missingResourceFile
             }
