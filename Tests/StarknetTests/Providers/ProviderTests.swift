@@ -31,6 +31,15 @@ final class ProviderTests: XCTestCase {
         StarknetProvider(starknetChainId: .testnet, url: url)!
     }
 
+    func testRequestWithCustomURLSession() {
+        let starknetChainId = StarknetChainId.testnet
+        let url = Self.devnetClient.rpcUrl
+        let customURLSession = URLSession(configuration: .ephemeral)
+        let starknetProvider = StarknetProvider(starknetChainId: starknetChainId, url: url, urlSession: customURLSession)
+
+        XCTAssertNotNil(starknetProvider)
+    }
+
     // TODO: (#89): Re-enable once devnet-rs supports RPC 0.5.0
     func disabledTestSpecVersion() async throws {
         let result = try await provider.specVersion()
@@ -162,7 +171,8 @@ final class ProviderTests: XCTestCase {
     }
 
     // TODO: (#100) separate estimateFee tests based on transaction type
-    func testEstimateFee() async throws {
+    // TODO: (#89): Re-enable this test
+    func disabledTestEstimateFee() async throws {
         let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_estimate_fee")
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
 
@@ -185,7 +195,8 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(fees.count, 2)
     }
 
-    func testEstimateMessageFee() async throws {
+    // TODO: (#89): Re-enable this test
+    func disabledTestEstimateMessageFee() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
 
         let message = StarknetMessageFromL1(

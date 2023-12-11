@@ -110,7 +110,7 @@ public struct StarknetSequencerDeployAccountTransaction: StarknetSequencerTransa
 
 // Default deserializer doesn't check if the fields with default values match what is deserialized.
 // It's an extension that resolves this.
-internal extension StarknetSequencerTransaction {
+extension StarknetSequencerTransaction {
     func verifyTransactionType<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
         let type = try container.decode(StarknetTransactionType.self, forKey: T(stringValue: "type")!)
 

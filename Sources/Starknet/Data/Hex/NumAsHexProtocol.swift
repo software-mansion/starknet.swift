@@ -109,7 +109,7 @@ public extension NumAsHexProtocol {
     }
 }
 
-internal extension String {
+extension String {
     func components(withMaxLength length: Int) -> [String] {
         stride(from: 0, to: self.count, by: length).map {
             let start = self.index(self.startIndex, offsetBy: $0)

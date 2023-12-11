@@ -25,6 +25,19 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.init(starknetChainId: starknetChainId, url: url)
     }
 
+    public init(starknetChainId: StarknetChainId, url: URL, urlSession: URLSession) {
+        self.starknetChainId = starknetChainId
+        self.url = url
+        self.networkProvider = HttpNetworkProvider(session: urlSession)
+    }
+
+    public convenience init?(starknetChainId: StarknetChainId, url: String, urlSession: URLSession) {
+        guard let url = URL(string: url) else {
+            return nil
+        }
+        self.init(starknetChainId: starknetChainId, url: url, urlSession: urlSession)
+    }
+
     private func makeRequest<U>(method: JsonRpcMethod, params: some Encodable = EmptyParams(), receive _: U.Type) async throws -> U where U: Decodable {
         let rpcPayload = JsonRpcPayload(method: method, params: params)
 

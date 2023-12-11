@@ -32,7 +32,7 @@ final class ExecutionTests: XCTestCase {
     override class func tearDown() {
         super.tearDown()
 
-        if let devnetClient = Self.devnetClient {
+        if let devnetClient {
             devnetClient.close()
         }
     }
