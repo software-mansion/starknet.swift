@@ -1,6 +1,6 @@
 import Foundation
 
-internal func runWithBuffer(resultSize: Int, expectedReturnCode: Int, body: (_ buffer: UnsafeMutablePointer<CChar>) -> Int32) -> Data? {
+func runWithBuffer(resultSize: Int, expectedReturnCode: Int, body: (_ buffer: UnsafeMutablePointer<CChar>) -> Int32) -> Data? {
     let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: outBufferSize)
     defer {
         buffer.deallocate()
@@ -20,9 +20,9 @@ internal func runWithBuffer(resultSize: Int, expectedReturnCode: Int, body: (_ b
 }
 
 private let outBufferSize = 1024
-internal let standardResultSize = 32
+let standardResultSize = 32
 
-internal extension Data {
+extension Data {
     func paddingLeft(toLength length: Int) -> Data {
         let paddingLength = length - self.count
 

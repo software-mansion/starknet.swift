@@ -84,7 +84,7 @@ public class StarknetCurve {
     /// Sign hash with StarknetPrivate key and given k value.
     ///
     /// This method is internal, as using bad k parameter is very dangerous and may lead to exposing the private key.
-    internal class func sign(privateKey: Felt, hash: Felt, k: BigUInt) throws -> StarknetCurveSignature {
+    class func sign(privateKey: Felt, hash: Felt, k: BigUInt) throws -> StarknetCurveSignature {
         let signatureData = try CryptoCpp.sign(privateKey: privateKey.serialize(), hash: hash.serialize(), k: k.serialize())
 
         let r = try signatureData.subdata(in: 0 ..< 32).toFelt()
