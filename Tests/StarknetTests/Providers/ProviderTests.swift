@@ -31,6 +31,15 @@ final class ProviderTests: XCTestCase {
         StarknetProvider(starknetChainId: .testnet, url: url)!
     }
 
+    func testRequestWithCustomURLSession() {
+        let starknetChainId = StarknetChainId.testnet
+        let url = Self.devnetClient.rpcUrl
+        let customURLSession = URLSession(configuration: .ephemeral)
+        let starknetProvider = StarknetProvider(starknetChainId: starknetChainId, url: url, urlSession: customURLSession)
+
+        XCTAssertNotNil(starknetProvider)
+    }
+
     // TODO: (#89): Re-enable once devnet-rs supports RPC 0.5.0
     func disabledTestSpecVersion() async throws {
         let result = try await provider.specVersion()
