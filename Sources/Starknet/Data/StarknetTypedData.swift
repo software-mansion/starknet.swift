@@ -1,5 +1,5 @@
 //
-//  TypedData.swift
+//  StarknetTypedData.swift
 //
 //
 //  Created by Bartosz Rybarski on 14/02/2023.
