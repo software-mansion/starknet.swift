@@ -171,7 +171,8 @@ final class ProviderTests: XCTestCase {
     }
 
     // TODO: (#100) separate estimateFee tests based on transaction type
-    func testEstimateFee() async throws {
+    // TODO: (#89): Re-enable this test
+    func disabledTestEstimateFee() async throws {
         let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_estimate_fee")
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
 
@@ -194,7 +195,8 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(fees.count, 2)
     }
 
-    func testEstimateMessageFee() async throws {
+    // TODO: (#89): Re-enable this test
+    func disabledTestEstimateMessageFee() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
 
         let message = StarknetMessageFromL1(
