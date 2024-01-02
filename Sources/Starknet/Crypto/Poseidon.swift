@@ -106,12 +106,7 @@ public class Poseidon {
     /// - Returns: BigUInt.
     private static func combineToBigUInt(_ values: (UInt64, UInt64, UInt64, UInt64)) -> BigUInt {
         let arr: [UInt64] = [values.0, values.1, values.2, values.3]
-        let powersOfTwo = [
-            BigUInt(2).power(0),
-            BigUInt(2).power(64),
-            BigUInt(2).power(128),
-            BigUInt(2).power(192),
-        ]
+        let powersOfTwo = [0, 64, 128, 192].map { BigUInt(2).power($0) }
 
         // w * 2**0 + x * 2**64 + y * 2**128 + z * 2**192
         var result = BigUInt(0)
