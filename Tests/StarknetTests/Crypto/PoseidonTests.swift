@@ -52,7 +52,7 @@ final class PoseidonTests: XCTestCase {
         let result = Poseidon.poseidonHash([
             Felt(10),
             Felt(8),
-            Felt(5)
+            Felt(5),
         ])
         XCTAssertEqual(result, Felt(fromHex: "0x53aa661c2388b74f48a16163c38893760e26884211599194ffe264f14b5c6e7")!)
     }
