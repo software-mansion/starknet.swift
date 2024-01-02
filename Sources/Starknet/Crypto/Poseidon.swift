@@ -17,6 +17,9 @@ public class Poseidon {
         ))
     }
 
+    /// Convert a BigUInt into a tuple of 64-bit chunks.
+    ///
+    /// - Returns: Tuple of 64-bit chunks.
     private static func splitBigUInt(_ value: BigUInt) -> (UInt64, UInt64, UInt64, UInt64) {
         var result: [UInt64] = [0, 0, 0, 0]
 
@@ -34,6 +37,9 @@ public class Poseidon {
         return (result[0], result[1], result[2], result[3])
     }
 
+    /// Combine a tuple of 64-bit chunks into a single BigUInt.
+    ///
+    /// - Returns: BigUInt.
     private static func combineToBigUInt(_ values: (UInt64, UInt64, UInt64, UInt64)) -> BigUInt {
         let arr: [UInt64] = [values.0, values.1, values.2, values.3]
         let powersOfTwo = [
