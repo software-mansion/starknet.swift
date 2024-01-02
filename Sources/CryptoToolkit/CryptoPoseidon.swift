@@ -2,7 +2,7 @@ import CFrameworkWrapper
 import Foundation
 
 public class CryptoPoseidon {
-    public static func hades(
+    public class func hades(
         _ values: [(UInt64, UInt64, UInt64, UInt64)]
     ) -> [(UInt64, UInt64, UInt64, UInt64)] {
         var state = values
