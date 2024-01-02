@@ -3,13 +3,35 @@ import CryptoToolkit
 import Foundation
 
 public class Poseidon {
-    /// Compute poseidon hash on input values.
+    private static let m = 3
+    private static let r = 2
+
+    /// Compute poseidon hash on single
     ///
-    /// - Returns: Poseidon hash of the two values as Felt.
-    public class func poseidonHash(x: Felt, y: Felt) -> Felt {
+    /// - Parameters:
+    ///   - value: single value to hash.
+    /// - Returns: Poseidon hash of the value as Felt.
+    public class func poseidonHash(_ value: Felt) -> Felt {
         let state = [
-            splitBigUInt(x.value),
-            splitBigUInt(y.value),
+            splitBigUInt(value.value),
+            (0, 0, 0, 0),
+            (1, 0, 0, 0),
+        ]
+        return Felt(clamping: combineToBigUInt(
+            CryptoPoseidon.hades(state)[0]
+        ))
+    }
+
+    /// Compute poseidon hash on two Felts.
+    ///
+    /// - Parameters:
+    ///    - first: First value to hash.
+    ///    - second: Second value to hash.
+    /// - Returns: Poseidon hash of the two values as Felt.
+    public class func poseidonHash(first: Felt, second: Felt) -> Felt {
+        let state = [
+            splitBigUInt(first.value),
+            splitBigUInt(second.value),
             (2, 0, 0, 0),
         ]
         return Felt(clamping: combineToBigUInt(
@@ -17,8 +39,48 @@ public class Poseidon {
         ))
     }
 
-    /// Convert a BigUInt into a tuple of 64-bit chunks.
+    /// Compute poseidon hash on many Felts.
     ///
+    /// - Parameters:
+    ///     - elements: array of Felt values to hash.
+    /// - Returns: Poseidon hash of the values as Felt.
+    public class func poseidonHash(_ values: [Felt]) -> Felt {
+        if (values.count == 1) {
+            return poseidonHash(values[0])
+        }
+        if (values.count == 2) {
+            return poseidonHash(first: values[0], second: values[1])
+        }
+        var inputValues = values + [Felt.one]
+        if inputValues.count % r == 1 {
+            inputValues.append(Felt.zero)
+        }
+        var state : [(UInt64, UInt64, UInt64, UInt64)] = Array(repeating: (0, 0, 0, 0), count: m)
+        
+        for iter in stride(from: 0, to: inputValues.count, by: 2) {
+            state = CryptoPoseidon.hades([
+                splitBigUInt(combineToBigUInt(state[0]) + inputValues[iter].value),
+                splitBigUInt(combineToBigUInt(state[1]) + inputValues[iter + 1].value),
+                state[2],
+            ])
+        }
+
+        return Felt(clamping: combineToBigUInt((state[0])))
+    }
+    
+    /// Compute poseidon hash on variable number of Felts
+    ///
+    /// - Parameters:
+    ///    - values: any number of Felt values to hash.
+    /// - Returns: Poseidon hash of the values as Felt.
+    public class func poseidonHash(_ values: Felt...) -> Felt {
+        return poseidonHash(values)
+    }
+
+    /// Convert a BigUInt into a tuple of four 64-bit chunks.
+    ///
+    /// - Parameters:
+    ///    - value: BigUInt to convert.
     /// - Returns: Tuple of 64-bit chunks.
     private static func splitBigUInt(_ value: BigUInt) -> (UInt64, UInt64, UInt64, UInt64) {
         var result: [UInt64] = [0, 0, 0, 0]
@@ -39,6 +101,8 @@ public class Poseidon {
 
     /// Combine a tuple of 64-bit chunks into a single BigUInt.
     ///
+    /// - Parameters:
+    ///    - values: Tuple of four 64-bit chunks.
     /// - Returns: BigUInt.
     private static func combineToBigUInt(_ values: (UInt64, UInt64, UInt64, UInt64)) -> BigUInt {
         let arr: [UInt64] = [values.0, values.1, values.2, values.3]
