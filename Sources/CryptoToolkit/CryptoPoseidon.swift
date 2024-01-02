@@ -1,0 +1,59 @@
+import BigInt
+import CFrameworkWrapper
+import Foundation
+
+public class CryptoPoseidon {
+    public class func poseidonHash(x: BigUInt, y: BigUInt) -> BigUInt {
+        unsplitBigUInt(
+            hades(
+                [
+                    splitBigUInt(x),
+                    splitBigUInt(y),
+                    (2, 0, 0, 0),
+                ]
+            )[0]
+        )
+    }
+
+    private static func hades(_ values: [(UInt64, UInt64, UInt64, UInt64)]) -> [(UInt64, UInt64, UInt64, UInt64)] {
+        permutation3(values)
+    }
+
+    private static func permutation3(_ state: [(UInt64, UInt64, UInt64, UInt64)]) -> [(UInt64, UInt64, UInt64, UInt64)] {
+        var mutableState = state
+        permutation_3(&mutableState)
+        return mutableState
+    }
+
+    private static func splitBigUInt(_ value: BigUInt) -> (UInt64, UInt64, UInt64, UInt64) {
+        var result: [UInt64] = [0, 0, 0, 0]
+
+        // if the input is zero, return the array of zeros
+        if value != BigUInt(0) {
+            // mask has all bits set to 1 except the least significant one
+            let mask = BigUInt(2).power(64) - 1
+
+            // loop through the 64-bit chunks of the BigUInt, shift them and store in the LongArray
+            for i in 0 ..< 4 {
+                result[i] = UInt64(value >> (i * 64) & mask)
+            }
+        }
+
+        return (result[0], result[1], result[2], result[3])
+    }
+
+    /// <#Description#>
+    /// - Parameter values: <#values description#>
+    /// - Returns: <#description#>
+    private static func unsplitBigUInt(_ values: (UInt64, UInt64, UInt64, UInt64)) -> BigUInt {
+        var arr: [UInt64] = [values.0, values.1, values.2, values.3]
+        let powersOfTwo = [BigUInt(2).power(0), BigUInt(2).power(64), BigUInt(2).power(128), BigUInt(2).power(192)]
+
+        // w * 2**0 + x * 2**64 + y * 2**128 + z * 2**192
+        var result = BigUInt(0)
+        for (b, p) in zip(arr, powersOfTwo) {
+            result += BigUInt(b) * p
+        }
+        return result
+    }
+}
