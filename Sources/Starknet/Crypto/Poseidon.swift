@@ -6,7 +6,7 @@ public class Poseidon {
     private static let m = 3
     private static let r = 2
 
-    /// Compute poseidon hash on single
+    /// Compute poseidon hash on single Felt.
     ///
     /// - Parameters:
     ///   - value: single value to hash.
@@ -68,7 +68,7 @@ public class Poseidon {
         return Felt(clamping: combineToBigUInt(state[0]))
     }
 
-    /// Compute poseidon hash on variable number of Felts
+    /// Compute poseidon hash on variable number of Felts.
     ///
     /// - Parameters:
     ///    - values: any number of Felt values to hash.
