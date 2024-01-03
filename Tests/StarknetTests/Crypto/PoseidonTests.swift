@@ -7,14 +7,12 @@ import BigInt
 
 final class PoseidonTests: XCTestCase {
     func testPoseidonHashSingleZero() {
-        let zeroValue = Felt.zero
-        let result = StarknetPoseidon.poseidonHash(zeroValue)
+        let result = StarknetPoseidon.poseidonHash(Felt.zero)
         XCTAssertEqual(result, Felt(fromHex: "0x60009f680a43e6f760790f76214b26243464cdd4f31fdc460baf66d32897c1b")!)
     }
 
     func testPoseidonHashSingleOne() {
-        let oneValue = Felt.one
-        let result = StarknetPoseidon.poseidonHash(oneValue)
+        let result = StarknetPoseidon.poseidonHash(Felt.one)
         XCTAssertEqual(result, Felt(fromHex: "0x6d226d4c804cd74567f5ac59c6a4af1fe2a6eced19fb7560a9124579877da25")!)
     }
 
@@ -39,12 +37,6 @@ final class PoseidonTests: XCTestCase {
     func testPoseidonHashManyAllZeros() {
         let zeroValue = Felt.zero
         let result = StarknetPoseidon.poseidonHash(zeroValue, zeroValue, zeroValue)
-        XCTAssertEqual(result, Felt(fromHex: "0x29aee7812642221479b7e8af204ceaa5a7b7e113349fc8fb93e6303b477eb4d")!)
-    }
-
-    func testPoseidonHashManyZeros() {
-        let zeroValue = Felt.zero
-        let result = StarknetPoseidon.poseidonHash([zeroValue, zeroValue, zeroValue])
         XCTAssertEqual(result, Felt(fromHex: "0x29aee7812642221479b7e8af204ceaa5a7b7e113349fc8fb93e6303b477eb4d")!)
     }
 
@@ -81,8 +73,17 @@ final class PoseidonTests: XCTestCase {
     }
 
     func testPoseidonHash10NumbersZeros() {
-        let zeroValue = Felt.zero
-        let result = StarknetPoseidon.poseidonHash(Array(repeating: zeroValue, count: 10))
+        let zeroValues = Array(repeating: Felt.zero, count: 10)
+        let result = StarknetPoseidon.poseidonHash(zeroValues)
         XCTAssertEqual(result, Felt(fromHex: "0x7c19756199eacf9ac8c06ecab986929be144ee4a852db16f796435562e69c7c")!)
+    }
+
+    func testPoseidonHashVarArgs() {
+        let result = StarknetPoseidon.poseidonHash(
+            Felt(10),
+            Felt(8),
+            Felt(5)
+        )
+        XCTAssertEqual(result, Felt(fromHex: "0x53aa661c2388b74f48a16163c38893760e26884211599194ffe264f14b5c6e7")!)
     }
 }
