@@ -17,9 +17,9 @@ public class StarknetPoseidon {
             (0, 0, 0, 0),
             (1, 0, 0, 0),
         ]
-        return Felt(clamping: combineToBigUInt(
+        return combineToBigUInt(
             CryptoPoseidon.hades(state)[0]
-        ))
+        ).toFelt()!
     }
 
     /// Compute poseidon hash on two Felts.
@@ -34,9 +34,9 @@ public class StarknetPoseidon {
             splitBigUInt(second.value),
             (2, 0, 0, 0),
         ]
-        return Felt(clamping: combineToBigUInt(
+        return combineToBigUInt(
             CryptoPoseidon.hades(state)[0]
-        ))
+        ).toFelt()!
     }
 
     /// Compute poseidon hash on many Felts.
@@ -65,7 +65,7 @@ public class StarknetPoseidon {
             ])
         }
 
-        return Felt(clamping: combineToBigUInt(state[0]))
+        return combineToBigUInt(state[0]).toFelt()!
     }
 
     /// Compute poseidon hash on variable number of Felts.
