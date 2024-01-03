@@ -5,11 +5,11 @@
 	<key>CFBundleExecutable</key>
 	<string>libposeidon</string>
 	<key>CFBundleGetInfoString</key>
-	<string>StarknetPoseidon</string>
+	<string>CryptoPoseidon</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.swmansion.StarknetPoseidon</string>
+	<string>com.swmansion.CryptoPoseidon</string>
 	<key>CFBundleName</key>
-	<string>StarknetPoseidon</string>
+	<string>CryptoPoseidon</string>
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleVersion</key>
