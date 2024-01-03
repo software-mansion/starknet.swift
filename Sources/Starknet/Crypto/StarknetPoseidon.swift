@@ -2,7 +2,7 @@ import BigInt
 import CryptoToolkit
 import Foundation
 
-public class Poseidon {
+public class StarknetPoseidon {
     private static let m = 3
     private static let r = 2
 
