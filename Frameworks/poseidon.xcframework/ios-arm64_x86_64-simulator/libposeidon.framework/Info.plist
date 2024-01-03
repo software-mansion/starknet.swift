@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>libcrypto_c_exports</string>
+	<string>libposeidon</string>
 	<key>CFBundleGetInfoString</key>
-	<string>StarknetCryptoCpp</string>
+	<string>StarknetPoseidon</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.swmansion.StarknetCryptoCpp</string>
+	<string>com.swmansion.StarknetPoseidon</string>
 	<key>CFBundleName</key>
-	<string>StarknetCryptoCpp</string>
+	<string>StarknetPoseidon</string>
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleVersion</key>
