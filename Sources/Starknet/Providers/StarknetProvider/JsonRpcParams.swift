@@ -43,6 +43,7 @@ struct WrappedSequencerTransaction: Encodable {
 
 struct EstimateFeeParams: Encodable {
     let request: [any StarknetSequencerTransaction]
+    let simulationFlags: [StarknetSimulationFlagForEstimateFee]
     let blockId: StarknetBlockId
 
     func encode(to encoder: Encoder) throws {
@@ -51,11 +52,13 @@ struct EstimateFeeParams: Encodable {
         let wrappedRequest = request.map { WrappedSequencerTransaction(transaction: $0) }
 
         try container.encode(wrappedRequest, forKey: .request)
+        try container.encode(simulationFlags, forKey: .simulationFlags)
         try container.encode(blockId, forKey: .blockId)
     }
 
     enum CodingKeys: String, CodingKey {
         case request
+        case simulationFlags = "simulation_flags"
         case blockId = "block_id"
     }
 }
