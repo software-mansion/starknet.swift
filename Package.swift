@@ -30,8 +30,9 @@ let package = Package(
             dependencies: ["BigInt", "CryptoToolkit", "CryptoSwift"]
         ),
         .target(name: "CryptoToolkit", dependencies: ["CFrameworkWrapper"]),
-        .target(name: "CFrameworkWrapper", dependencies: ["ccryptocpp", "CryptoRs"]),
+        .target(name: "CFrameworkWrapper", dependencies: ["ccryptocpp", "poseidon", "CryptoRs"]),
         .binaryTarget(name: "ccryptocpp", path: "Frameworks/ccryptocpp.xcframework"),
+        .binaryTarget(name: "poseidon", path: "Frameworks/poseidon.xcframework"),
         .binaryTarget(name: "CryptoRs", path: "Frameworks/CryptoRs.xcframework"),
         .testTarget(
             name: "StarknetTests",

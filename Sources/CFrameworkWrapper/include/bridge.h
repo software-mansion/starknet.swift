@@ -6,6 +6,8 @@
 #import <libcrypto_c_exports/pedersen_hash.h>
 #import <libcrypto_c_exports/ecdsa.h>
 
+#import <libposeidon/poseidon.h>
+
 #import "crypto-rs.h"
 
 #endif
