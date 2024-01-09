@@ -430,3 +430,13 @@ public enum StarknetTransactionDecodingError: Error {
     case invalidVersion
     case invalidType
 }
+
+extension StarknetSequencerTransaction {
+    private static func estimateVersion(_ version: Felt) -> Felt {
+        Felt(BigUInt(2).power(128).advanced(by: BigInt(version.value)))!
+    }
+
+    static func computeVersion(_ version: Felt, forFeeEstimation: Bool) -> Felt {
+        forFeeEstimation ? estimateVersion(version) : version
+    }
+}
