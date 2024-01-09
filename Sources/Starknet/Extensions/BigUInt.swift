@@ -9,7 +9,7 @@ public extension BigUInt {
     func toFeltClamped() -> Felt {
         self > Felt.max.value ? Felt.max : Felt(self)!
     }
-    
+
     func toNumAsHex() -> NumAsHex? {
         NumAsHex(self)
     }
