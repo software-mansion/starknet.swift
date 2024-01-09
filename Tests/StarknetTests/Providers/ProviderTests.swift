@@ -254,7 +254,7 @@ final class ProviderTests: XCTestCase {
         XCTAssertTrue(simulations[0].transactionTrace is StarknetInvokeTransactionTrace)
         XCTAssertTrue(simulations[1].transactionTrace is StarknetDeployAccountTransactionTrace)
 
-        let invokeWithoutSignature = StarknetSequencerInvokeTransaction(
+        let invokeWithoutSignature = StarknetInvokeTransactionV1(
             senderAddress: invokeTx.senderAddress,
             calldata: invokeTx.calldata,
             signature: [],
@@ -262,14 +262,13 @@ final class ProviderTests: XCTestCase {
             nonce: invokeTx.nonce
         )
 
-        let deployAccountWithoutSignature = StarknetSequencerDeployAccountTransaction(
+        let deployAccountWithoutSignature = StarknetDeployAccountTransactionV1(
             signature: [],
             maxFee: deployAccountTx.maxFee,
             nonce: deployAccountTx.nonce,
             contractAddressSalt: deployAccountTx.contractAddressSalt,
             constructorCalldata: deployAccountTx.constructorCalldata,
-            classHash: deployAccountTx.classHash,
-            version: deployAccountTx.version
+            classHash: deployAccountTx.classHash
         )
 
         let simulations2 = try await provider.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.latest), simulationFlags: [.skipValidate])

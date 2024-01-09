@@ -25,7 +25,7 @@ struct GetNonceParams: Encodable {
 }
 
 struct AddInvokeTransactionParams: Encodable {
-    let invokeTransaction: StarknetSequencerInvokeTransaction
+    let invokeTransaction: StarknetInvokeTransactionV1
 
     enum CodingKeys: String, CodingKey {
         case invokeTransaction = "invoke_transaction"
@@ -71,7 +71,7 @@ public struct EstimateMessageFeeParams: Encodable {
 }
 
 struct AddDeployAccountTransactionParams: Encodable {
-    let deployAccountTransaction: StarknetSequencerDeployAccountTransaction
+    let deployAccountTransaction: StarknetDeployAccountTransactionV1
 
     enum CodingKeys: String, CodingKey {
         case deployAccountTransaction = "deploy_account_transaction"

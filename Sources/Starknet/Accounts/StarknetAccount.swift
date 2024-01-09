@@ -30,43 +30,41 @@ public class StarknetAccount: StarknetAccountProtocol {
         self.cairoVersion = cairoVersion
     }
 
-    private func makeSequencerInvokeTransaction(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, forFeeEstimation: Bool = false) -> StarknetSequencerInvokeTransaction {
-        StarknetSequencerInvokeTransaction(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
+    private func makeInvokeTransaction(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV1 {
+        StarknetInvokeTransactionV1(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
     }
 
-    private func makeSequencerDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams, version: Felt) -> StarknetSequencerDeployAccountTransaction {
-        StarknetSequencerDeployAccountTransaction(
+    private func makeDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParams) -> StarknetDeployAccountTransactionV1 {
+        StarknetDeployAccountTransactionV1(
             signature: signature,
             maxFee: params.maxFee,
             nonce: params.nonce,
             contractAddressSalt: salt,
             constructorCalldata: calldata,
-            classHash: classHash,
-            version: version
+            classHash: classHash
         )
     }
 
-    public func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerInvokeTransaction {
+    public func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1 {
         let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
 
-        let sequencerTransaction = makeSequencerInvokeTransaction(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
+        let sequencerTransaction = makeInvokeTransaction(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
-        return makeSequencerInvokeTransaction(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
+        return makeInvokeTransaction(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetSequencerDeployAccountTransaction {
-        let version = forFeeEstimation ? estimateVersion : version
-        let sequencerTransaction = makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, version: version)
+    public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams, forFeeEstimation _: Bool) throws -> StarknetDeployAccountTransactionV1 {
+        let sequencerTransaction = makeDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
-        return makeSequencerDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params, version: version)
+        return makeDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params)
     }
 
     public func execute(calls: [StarknetCall], params: StarknetOptionalExecutionParams) async throws -> StarknetInvokeTransactionResponse {

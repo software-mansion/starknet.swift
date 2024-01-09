@@ -104,7 +104,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func addInvokeTransaction(_ transaction: StarknetSequencerInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
+    public func addInvokeTransaction(_ transaction: StarknetInvokeTransactionV1) async throws -> StarknetInvokeTransactionResponse {
         let params = AddInvokeTransactionParams(invokeTransaction: transaction)
 
         let result = try await makeRequest(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
@@ -112,7 +112,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func addDeployAccountTransaction(_ transaction: StarknetSequencerDeployAccountTransaction) async throws -> StarknetDeployAccountResponse {
+    public func addDeployAccountTransaction(_ transaction: StarknetDeployAccountTransactionV1) async throws -> StarknetDeployAccountResponse {
         let params = AddDeployAccountTransactionParams(deployAccountTransaction: transaction)
 
         let result = try await makeRequest(method: .deployAccount, params: params, receive: StarknetDeployAccountResponse.self)

@@ -23,7 +23,7 @@ public class StarknetTransactionHashCalculator {
         )
     }
 
-    public class func computeHash(of transaction: StarknetSequencerInvokeTransaction, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetInvokeTransactionV1, chainId: StarknetChainId) -> Felt {
         computeHashCommon(
             transactionType: transaction.type,
             version: transaction.version,
@@ -36,7 +36,7 @@ public class StarknetTransactionHashCalculator {
         )
     }
 
-    public class func computeHash(of transaction: StarknetSequencerDeployAccountTransaction, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetDeployAccountTransactionV1, chainId: StarknetChainId) -> Felt {
         let contractAddress = StarknetContractAddressCalculator.calculateFrom(
             classHash: transaction.classHash,
             calldata: transaction.constructorCalldata,
