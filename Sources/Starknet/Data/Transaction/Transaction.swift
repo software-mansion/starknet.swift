@@ -149,7 +149,6 @@ public struct StarknetDeployAccountTransactionV1: StarknetTransaction {
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
-        try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
     }
 
     enum CodingKeys: String, CodingKey {
