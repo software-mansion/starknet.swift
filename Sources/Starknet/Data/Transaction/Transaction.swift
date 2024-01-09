@@ -410,12 +410,32 @@ public enum StarknetTransactionDecodingError: Error {
     case invalidType
 }
 
-extension StarknetSequencerTransaction {
+extension StarknetTransaction {
     private static func estimateVersion(_ version: Felt) -> Felt {
         Felt(BigUInt(2).power(128).advanced(by: BigInt(version.value)))!
     }
 
     static func computeVersion(_ version: Felt, forFeeEstimation: Bool) -> Felt {
         forFeeEstimation ? estimateVersion(version) : version
+    }
+}
+
+// Default deserializer doesn't check if the fields with default values match what is deserialized.
+// It's an extension that resolves this.
+extension StarknetTransaction {
+    func verifyTransactionType<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
+        let type = try container.decode(StarknetTransactionType.self, forKey: T(stringValue: "type")!)
+
+        guard type == self.type else {
+            throw StarknetTransactionDecodingError.invalidType
+        }
+    }
+
+    func verifyTransactionVersion<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
+        let version = try container.decode(Felt.self, forKey: T(stringValue: "version")!)
+
+        guard version == self.version else {
+            throw StarknetTransactionDecodingError.invalidVersion
+        }
     }
 }
