@@ -219,7 +219,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
         self.hash = hash
         // As of Starknet 0.13, most of v3 fields have hardcoded values.
         self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
-        self.tip = UInt64AsHex(0)
+        self.tip = .zero
         self.paymasterData = []
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
