@@ -1,6 +1,8 @@
 import Foundation
 
 public typealias StarknetCalldata = [Felt]
+public typealias StarknetPaymasterData = [Felt]
+public typealias StarknetAccountDeploymentData = [Felt]
 public typealias StarknetSignature = [Felt]
 
 public struct StarknetCall: Codable, Equatable {
