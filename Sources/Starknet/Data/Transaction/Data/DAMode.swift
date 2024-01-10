@@ -1,14 +1,15 @@
+import BigInt
 import Foundation
 
 public enum StarknetDAMode: String, Codable {
-    case L1
-    case L2
+    case l1 = "L1"
+    case l2 = "L2"
 
-    public var value: UInt {
+    public var value: BigUInt {
         switch self {
-        case .L1:
+        case .l1:
             return 0
-        case .L2:
+        case .l2:
             return 1
         }
     }
