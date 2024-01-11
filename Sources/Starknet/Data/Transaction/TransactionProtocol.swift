@@ -19,12 +19,12 @@ public protocol StarknetDeclareTransaction {
 }
 
 public protocol StarknetTransactionV3: StarknetTransaction {
+    var nonce: Felt { get }
     var resourceBounds: StarknetResourceBoundsMapping { get }
     var tip: UInt64AsHex { get }
     var paymasterData: StarknetPaymasterData { get }
     var nonceDataAvailabilityMode: StarknetDAMode { get }
     var feeDataAvailabilityMode: StarknetDAMode { get }
-    var nonce: Felt { get }
 }
 
 public protocol StarknetDeprecatedTransaction: StarknetTransaction {
