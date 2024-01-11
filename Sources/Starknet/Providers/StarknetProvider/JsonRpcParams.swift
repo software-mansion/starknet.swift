@@ -25,8 +25,13 @@ struct GetNonceParams: Encodable {
 }
 
 struct AddInvokeTransactionParams: Encodable {
-    let invokeTransaction: StarknetInvokeTransactionV1
+    let invokeTransaction: any StarknetExecutableInvokeTransaction
 
+    func encode(to encoder: Encoder) throws {
+        try invokeTransaction.encode(to: encoder)
+    }
+    
+    
     enum CodingKeys: String, CodingKey {
         case invokeTransaction = "invoke_transaction"
     }
@@ -34,7 +39,7 @@ struct AddInvokeTransactionParams: Encodable {
 
 // Workaround to allow encoding polymorphic array
 struct WrappedSequencerTransaction: Encodable {
-    let transaction: any StarknetTransaction
+    let transaction: any StarknetExecutableTransaction
 
     func encode(to encoder: Encoder) throws {
         try transaction.encode(to: encoder)
@@ -42,8 +47,8 @@ struct WrappedSequencerTransaction: Encodable {
 }
 
 struct EstimateFeeParams: Encodable {
-    let request: [any StarknetTransaction]
-    let simulationFlags: [StarknetSimulationFlagForEstimateFee]
+    let request: [any StarknetExecutableTransaction]
+    let simulationFlags: Set<StarknetSimulationFlagForEstimateFee>
     let blockId: StarknetBlockId
 
     func encode(to encoder: Encoder) throws {
@@ -130,7 +135,7 @@ struct GetTransactionStatusPayload: Encodable {
 }
 
 struct SimulateTransactionsParams: Encodable {
-    let transactions: [any StarknetTransaction]
+    let transactions: [any StarknetExecutableTransaction]
     let blockId: StarknetBlockId
     let simulationFlags: Set<StarknetSimulationFlag>
 

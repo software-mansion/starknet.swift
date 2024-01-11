@@ -33,7 +33,7 @@ public protocol StarknetProviderProtocol {
     ///  - transactions: list of transactions for which the fees should be estimated.
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: Array of fee estimates
-    func estimateFee(for transactions: [any StarknetTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate]
+    func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate]
 
     /// Estimate the L2 fee of a message sent on L1
     ///
@@ -51,7 +51,7 @@ public protocol StarknetProviderProtocol {
     ///     - payload: invoke function payload.
     ///
     /// - Returns: transaction hash of invoked transaction.
-    func addInvokeTransaction(_ transaction: StarknetInvokeTransactionV1) async throws -> StarknetInvokeTransactionResponse
+    func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) async throws -> StarknetInvokeTransactionResponse
 
     /// Deploy account
     ///
@@ -122,7 +122,7 @@ public protocol StarknetProviderProtocol {
     ///  - transactions: list of transactions to simulate
     ///  - blockId: block used to run the simulation
     ///  - simulationFlags: a set of simulation flags
-    func simulateTransactions(_ transactions: [any StarknetTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction]
+    func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction]
 }
 
 let defaultBlockId = StarknetBlockId.tag(.pending)
@@ -143,7 +143,7 @@ public extension StarknetProviderProtocol {
     /// - Parameters:
     ///  -  transactions: transactions for which the fees should be estimated.
     /// - Returns: Array of fee estimates
-    func estimateFee(for transactions: [any StarknetTransaction]) async throws -> [StarknetFeeEstimate] {
+    func estimateFee(for transactions: [any StarknetExecutableTransaction]) async throws -> [StarknetFeeEstimate] {
         try await estimateFee(for: transactions, at: defaultBlockId)
     }
 
@@ -153,7 +153,7 @@ public extension StarknetProviderProtocol {
     ///  -  transaction: transaction for which the fee should be estimated.
     ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: Fee estimate
-    func estimateFee(for transaction: any StarknetTransaction, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
+    func estimateFee(for transaction: any StarknetExecutableTransaction, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
         let estimate = try await estimateFee(for: [transaction], at: blockId)
         return estimate[0]
     }
@@ -163,7 +163,7 @@ public extension StarknetProviderProtocol {
     /// - Parameters:
     ///  -  transaction: transaction for which the fee should be estimated.
     /// - Returns: Fee estimate
-    func estimateFee(for transaction: any StarknetTransaction) async throws -> StarknetFeeEstimate {
+    func estimateFee(for transaction: any StarknetExecutableTransaction) async throws -> StarknetFeeEstimate {
         try await estimateFee(for: transaction, at: defaultBlockId)
     }
 
@@ -200,7 +200,7 @@ public extension StarknetProviderProtocol {
     /// - Parameters:
     ///  - transactions: list of transactions to simulate
     ///  - simulationFlags: a set of simulation flags
-    func simulateTransactions(_ transactions: [any StarknetTransaction], simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
+    func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
         try await simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
 }
