@@ -57,7 +57,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         return makeInvokeTransaction(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams, forFeeEstimation _: Bool) throws -> StarknetDeployAccountTransactionV1 {
+    public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeprecatedExecutionParams, forFeeEstimation _: Bool) throws -> StarknetDeployAccountTransactionV1 {
         let sequencerTransaction = makeDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)

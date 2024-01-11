@@ -52,7 +52,7 @@ public struct StarknetDeprecatedExecutionParams {
     }
 }
 
-public struct StarknetOptionalExecutionParams {
+public struct StarknetOptionalDeprecatedExecutionParams {
     public let nonce: Felt?
     public let maxFee: Felt?
 
