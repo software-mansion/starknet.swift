@@ -12,7 +12,7 @@ public protocol StarknetAccountProtocol {
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed SequencerInvokeTransaction
-    func sign(calls: [StarknetCall], params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1
+    func sign(calls: [StarknetCall], params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1
 
     /// Create and sign deploy account transaction
     ///
@@ -23,7 +23,7 @@ public protocol StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed sequencer deploy account transaction
-    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV1
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV1
 
     /// Sign TypedData for off-chain usage with this account's privateKey.
     ///
@@ -47,7 +47,7 @@ public protocol StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func execute(calls: [StarknetCall], params: StarknetOptionalExecutionParams) async throws -> StarknetInvokeTransactionResponse
+    func execute(calls: [StarknetCall], params: StarknetOptionalDeprecatedExecutionParams) async throws -> StarknetInvokeTransactionResponse
 
     /// Execute list of calls
     ///
@@ -87,7 +87,7 @@ public extension StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///
     /// - Returns: Signed SequencerInvokeTransaction
-    func sign(calls: [StarknetCall], params: StarknetExecutionParams) throws -> StarknetInvokeTransactionV1 {
+    func sign(calls: [StarknetCall], params: StarknetDeprecatedExecutionParams) throws -> StarknetInvokeTransactionV1 {
         try sign(calls: calls, params: params, forFeeEstimation: false)
     }
 
@@ -100,7 +100,7 @@ public extension StarknetAccountProtocol {
     ///  - maxFee: max acceptable fee for the transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed sequencer deploy account transaction
-    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParams) throws -> StarknetDeployAccountTransactionV1 {
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeprecatedExecutionParams) throws -> StarknetDeployAccountTransactionV1 {
         try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: false)
     }
 
@@ -111,7 +111,7 @@ public extension StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///
     /// - Returns: Signed SequencerInvokeTransaction
-    func sign(call: StarknetCall, params: StarknetExecutionParams, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV1 {
+    func sign(call: StarknetCall, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV1 {
         try sign(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
     }
 
@@ -122,7 +122,7 @@ public extension StarknetAccountProtocol {
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse {
-        try await execute(calls: calls, params: StarknetOptionalExecutionParams())
+        try await execute(calls: calls, params: StarknetOptionalDeprecatedExecutionParams())
     }
 
     /// Execute a call
@@ -132,7 +132,7 @@ public extension StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func execute(call: StarknetCall, params: StarknetOptionalExecutionParams) async throws -> StarknetInvokeTransactionResponse {
+    func execute(call: StarknetCall, params: StarknetOptionalDeprecatedExecutionParams) async throws -> StarknetInvokeTransactionResponse {
         try await execute(calls: [call], params: params)
     }
 
