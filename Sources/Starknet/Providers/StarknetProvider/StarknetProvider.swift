@@ -89,8 +89,6 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func estimateFee(for transactions: [any StarknetTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
-        let params = EstimateFeeParams(request: transactions, blockId: blockId)
     public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
 
         let result = try await makeRequest(method: .estimateFee, params: params, receive: [StarknetFeeEstimate].self)
@@ -105,8 +103,8 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func addInvokeTransaction(_ transaction: StarknetInvokeTransactionV1) async throws -> StarknetInvokeTransactionResponse {
-        let params = AddInvokeTransactionParams(invokeTransaction: transaction)
+    public func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
+        let params = AddInvokeTransactionParams(invokeTransaction: transaction as! StarknetInvokeTransactionV1)
 
         let result = try await makeRequest(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
 

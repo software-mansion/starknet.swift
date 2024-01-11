@@ -28,7 +28,9 @@ struct AddInvokeTransactionParams: Encodable {
     let invokeTransaction: any StarknetExecutableInvokeTransaction
 
     func encode(to encoder: Encoder) throws {
-        try invokeTransaction.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(invokeTransaction, forKey: .invokeTransaction) 
     }
     
     
