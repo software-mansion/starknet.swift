@@ -134,6 +134,9 @@ public class StarknetAccount: StarknetAccountProtocol {
             if errorMessage.contains("Signature"), errorMessage.contains("is invalid") {
                 return false
             }
+            if let unwrappedData = data, unwrappedData.contains("Signature"), unwrappedData.contains("is invalid") {
+                return false
+            }
 
             throw StarknetProviderError.jsonRpcError(code, errorMessage, data)
         }
