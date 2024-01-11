@@ -5,7 +5,7 @@ import XCTest
 final class EstimateFeeTests: XCTestCase {
     func testEstimateFeeParamsEncoding() throws {
         let invokeTransaction = StarknetInvokeTransactionV1(senderAddress: "0x6f8fa881a2a1305d874c3472962e84377d080862a7ab9241faf71e47e354fce", calldata: ["0x1", "0x5cd21d6b3952a869fda11fa9a5bd2657bd68080d3da255655ded47a81c8bd53", "0x1d7377b4b2053672e38039a02d909f73c4e538c9fddbb7e97aadf700cb9a01a", "0x0", "0x2", "0x2", "0x1d2c3b7a8", "0x451"], signature: ["0x54536091df45ce05f3f1bf3aeca81d7509927f77776ded4556032379dd14953", "0x2ecdae0ff4acaed3d071c7ae1ae3f38d822c41b5a8b0ab8e468844b1d87198b"], maxFee: 0, nonce: 1, forFeeEstimation: true)
-        let estimateFeeParams = EstimateFeeParams(request: [invokeTransaction], blockId: .tag(.latest))
+        let estimateFeeParams = EstimateFeeParams(request: [invokeTransaction], simulationFlags: [], blockId: .tag(.latest))
 
         let encoder = JSONEncoder()
         let encodedParams = try encoder.encode(estimateFeeParams)
