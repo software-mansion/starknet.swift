@@ -148,7 +148,7 @@ public extension StarknetProviderProtocol {
     func estimateFee(for transactions: [any StarknetExecutableTransaction]) async throws -> [StarknetFeeEstimate] {
         try await estimateFee(for: transactions, at: defaultBlockId, simulationFlags: defaultSimulationFlags)
     }
-    
+
     /// Estimate fee for a list of transactions with default flags.
     ///
     /// - Parameters:
@@ -158,7 +158,7 @@ public extension StarknetProviderProtocol {
     func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
         try await estimateFee(for: transactions, at: blockId, simulationFlags: defaultSimulationFlags)
     }
-    
+
     /// Estimate fee for a list of transactions in the pending block..
     ///
     /// - Parameters:
@@ -168,7 +168,7 @@ public extension StarknetProviderProtocol {
     func estimateFee(for transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> [StarknetFeeEstimate] {
         try await estimateFee(for: transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
-    
+
     /// Estimate fee for a single transaction with default flags in the pending block.
     ///
     /// - Parameters:
@@ -177,7 +177,7 @@ public extension StarknetProviderProtocol {
     func estimateFee(for transaction: any StarknetExecutableTransaction) async throws -> StarknetFeeEstimate {
         try await estimateFee(for: [transaction])[0]
     }
-    
+
     /// Estimate fee for a single transaction with default flags.
     ///
     /// - Parameters:
@@ -187,7 +187,7 @@ public extension StarknetProviderProtocol {
     func estimateFee(for transaction: any StarknetExecutableTransaction, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
         try await estimateFee(for: [transaction], at: blockId)[0]
     }
-    
+
     /// Estimate fee for a single transaction in the pending block..
     ///
     /// - Parameters:
