@@ -222,6 +222,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "\(port)",
                 "--seed",
                 "\(seed)",
+                "--state-archive-capacity",
+                "full",
             ]
             devnetProcess.launchPath = devnetPath
             devnetProcess.standardInput = nil
@@ -257,7 +259,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             guard let scarbTomlPath = Bundle.module.path(forResource: "Scarb", ofType: "toml") else {
                 throw DevnetClientError.missingResourceFile
             }
-            let ScarbTomlResourcePath = URL(fileURLWithPath: scarbTomlPath)
+            let scarbTomlResourcePath = URL(fileURLWithPath: scarbTomlPath)
             guard let contractResourcePaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
                 throw DevnetClientError.missingResourceFile
             }
@@ -269,7 +271,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
             try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
 
-            try fileManager.copyItem(at: ScarbTomlResourcePath, to: newScarbTomlPath)
+            try fileManager.copyItem(at: scarbTomlResourcePath, to: newScarbTomlPath)
             for contractPath in contractResourcePaths {
                 let newContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(contractPath.lastPathComponent)")
                 try fileManager.copyItem(at: contractPath, to: newContractPath)
@@ -278,8 +280,18 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.scarbTomlPath = newScarbTomlPath.path
             self.contractsPath = newContractsPath.path
 
-            // Initialize new accounts file
-            let _ = try await createDeployAccount(name: "__default__")
+            // TODO: (#130) Use the old approach once we're able to update sncast
+            guard let accountsPath = Bundle.module.path(forResource: "starknet_open_zeppelin_accounts", ofType: "json") else {
+                throw DevnetClientError.missingResourceFile
+            }
+            let accountsResourcePath = URL(fileURLWithPath: accountsPath)
+            let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
+            try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
+
+            let _ = try await deployAccount(name: "__default__")
+
+            // // Initialize new accounts file
+            // let _ = try await createDeployAccount(name: "__default__")
         }
 
         public func close() {
@@ -576,8 +588,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.launch()
             process.waitUntilExit()
 
-//            let command = "\(process.launchPath!) \(process.arguments!.joined(separator: " "))"
-//             print(command)
+            let command = "\(process.launchPath!) \(process.arguments!.joined(separator: " "))"
+            print(command)
 
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
