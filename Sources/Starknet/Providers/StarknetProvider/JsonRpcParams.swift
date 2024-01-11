@@ -30,10 +30,9 @@ struct AddInvokeTransactionParams: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(invokeTransaction, forKey: .invokeTransaction) 
+        try container.encode(invokeTransaction, forKey: .invokeTransaction)
     }
-    
-    
+
     enum CodingKeys: String, CodingKey {
         case invokeTransaction = "invoke_transaction"
     }
