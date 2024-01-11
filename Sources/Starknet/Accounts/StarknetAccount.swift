@@ -13,11 +13,6 @@ public enum CairoVersion: String, Encodable {
 public class StarknetAccount: StarknetAccountProtocol {
     private let version = Felt.one
     private let cairoVersion: CairoVersion
-
-    private var estimateVersion: Felt {
-        Felt(BigUInt(2).power(128).advanced(by: BigInt(version.value)))!
-    }
-
     public let address: Felt
 
     private let signer: StarknetSignerProtocol
