@@ -89,7 +89,8 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
+    public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> [StarknetFeeEstimate] {
+        let params = EstimateFeeParams(request: transactions, simulationFlags: simulationFlags, blockId: blockId)
 
         let result = try await makeRequest(method: .estimateFee, params: params, receive: [StarknetFeeEstimate].self)
         return result
