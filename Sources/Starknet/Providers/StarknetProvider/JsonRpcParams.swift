@@ -80,7 +80,13 @@ public struct EstimateMessageFeeParams: Encodable {
 }
 
 struct AddDeployAccountTransactionParams: Encodable {
-    let deployAccountTransaction: StarknetDeployAccountTransactionV1
+    let deployAccountTransaction: any StarknetExecutableDeployAccountTransaction
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(deployAccountTransaction, forKey: .deployAccountTransaction)
+    }
 
     enum CodingKeys: String, CodingKey {
         case deployAccountTransaction = "deploy_account_transaction"

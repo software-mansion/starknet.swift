@@ -61,7 +61,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters:
     ///  - transaction: deploy account transaction to be executed
     /// - Returns: transaction hash and contract address of deployed account
-    func addDeployAccountTransaction(_ transaction: StarknetDeployAccountTransactionV1) async throws -> StarknetDeployAccountResponse
+    func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) async throws -> StarknetDeployAccountResponse
 
     /// Get the contract class hash for the contract deployed at the given address.
     ///
