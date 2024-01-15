@@ -12,8 +12,12 @@ struct JsonRpcError: Decodable {
 
         do {
             let anyDecodable = try container.decode(AnyDecodable.self, forKey: .data)
-            let jsonData = try JSONSerialization.data(withJSONObject: anyDecodable.value)
-            data = String(data: jsonData, encoding: .utf8)
+            if anyDecodable.value is String {
+                data = anyDecodable.value as? String
+            } else {
+                let jsonData = try JSONSerialization.data(withJSONObject: anyDecodable.value)
+                data = String(data: jsonData, encoding: .utf8)
+            }
         } catch {
             data = nil
         }
