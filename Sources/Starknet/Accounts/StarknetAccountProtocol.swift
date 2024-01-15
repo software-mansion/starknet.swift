@@ -4,15 +4,25 @@ public protocol StarknetAccountProtocol {
     /// Address of starknet account.
     var address: Felt { get }
 
-    /// Sign list of calls
+    /// Sign list of calls as invoke transaction v1
     ///
     /// - Parameters:
-    ///  - calls: list of calls to be signed.
+    ///  - calls: list of calls to be signed
     ///  - params: additional params for a given transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
-    /// - Returns: Signed SequencerInvokeTransaction
+    /// - Returns: Signed invoke v1 transaction
     func sign(calls: [StarknetCall], params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1
+
+    /// Sign list of calls as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be signed
+    ///  - params: additional params for a given transaction
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
+    ///
+    /// - Returns: Signed invoke v3 transaction
+    func signV3(calls: [StarknetCall], params: StarknetExecutionParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3
 
     /// Create and sign deploy account transaction
     ///
@@ -56,6 +66,23 @@ public protocol StarknetAccountProtocol {
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse
+
+    /// Execute list of calls
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be executed.
+    ///  - params: additional params for a given transaction
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func executeV3(calls: [StarknetCall], params: StarknetOptionalExecutionParamsV3) async throws -> StarknetInvokeTransactionResponse
+
+    /// Execute list of calls
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be executed.
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func executeV3(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse
 
     /// Estimate fee for a list of calls
     ///
@@ -115,7 +142,7 @@ public extension StarknetAccountProtocol {
         try sign(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    /// Execute list of calls
+    /// Execute list of calls as invoke transaction v1
     ///
     /// - Parameters:
     ///  - calls: list of calls to be executed.
@@ -123,6 +150,16 @@ public extension StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse {
         try await execute(calls: calls, params: StarknetOptionalDeprecatedExecutionParams())
+    }
+
+    /// Execute list of calls using invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be executed.
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func executeV3(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse {
+        try await executeV3(calls: calls, params: StarknetOptionalExecutionParamsV3())
     }
 
     /// Execute a call

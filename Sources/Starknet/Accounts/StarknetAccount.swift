@@ -25,11 +25,15 @@ public class StarknetAccount: StarknetAccountProtocol {
         self.cairoVersion = cairoVersion
     }
 
-    private func makeInvokeTransaction(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV1 {
+    private func makeInvokeTransactionV1(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV1 {
         StarknetInvokeTransactionV1(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
     }
 
-    private func makeDeployAccountTransaction(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeprecatedExecutionParams) -> StarknetDeployAccountTransactionV1 {
+    private func makeInvokeTransactionV3(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParamsV3, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV3 {
+        StarknetInvokeTransactionV3(senderAddress: address, calldata: calldata, signature: signature, l1ResourceBounds: params.resourceBounds.l1Gas, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
+    }
+
+    private func makeDeployAccountTransactionV1(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeprecatedExecutionParams) -> StarknetDeployAccountTransactionV1 {
         StarknetDeployAccountTransactionV1(
             signature: signature,
             maxFee: params.maxFee,
@@ -43,23 +47,35 @@ public class StarknetAccount: StarknetAccountProtocol {
     public func sign(calls: [StarknetCall], params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1 {
         let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
 
-        let sequencerTransaction = makeInvokeTransaction(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
+        let transaction = makeInvokeTransactionV1(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
+        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: provider.starknetChainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
-        return makeInvokeTransaction(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
+        return makeInvokeTransactionV1(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
+    }
+
+    public func signV3(calls: [StarknetCall], params: StarknetExecutionParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3 {
+        let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
+
+        let transaction = makeInvokeTransactionV3(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
+
+        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: provider.starknetChainId)
+
+        let signature = try signer.sign(transactionHash: hash)
+
+        return makeInvokeTransactionV3(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
     public func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeprecatedExecutionParams, forFeeEstimation _: Bool) throws -> StarknetDeployAccountTransactionV1 {
-        let sequencerTransaction = makeDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params)
+        let sequencerTransaction = makeDeployAccountTransactionV1(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: sequencerTransaction, chainId: provider.starknetChainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
-        return makeDeployAccountTransaction(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params)
+        return makeDeployAccountTransactionV1(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params)
     }
 
     public func execute(calls: [StarknetCall], params: StarknetOptionalDeprecatedExecutionParams) async throws -> StarknetInvokeTransactionResponse {
@@ -81,6 +97,32 @@ public class StarknetAccount: StarknetAccountProtocol {
 
         let signParams = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
         let transaction = try sign(calls: calls, params: signParams, forFeeEstimation: false)
+
+        let result = try await provider.addInvokeTransaction(transaction)
+
+        return result
+    }
+
+    public func executeV3(calls: [StarknetCall], params: StarknetOptionalExecutionParamsV3) async throws -> StarknetInvokeTransactionResponse {
+        var nonce: Felt
+        var resourceBounds: StarknetResourceBoundsMapping
+
+        if let paramsNonce = params.nonce {
+            nonce = paramsNonce
+        } else {
+            nonce = try await getNonce()
+        }
+
+        if let paramsResourceBounds = params.resourceBounds {
+            resourceBounds = paramsResourceBounds
+        } else {
+            let txForFeeEstimation = try signV3(calls: calls, params: StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero), forFeeEstimation: true)
+            let feeEstimate = try await provider.estimateFee(for: txForFeeEstimation)
+            resourceBounds = feeEstimate.toResourceBounds()
+        }
+
+        let signParams = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
+        let transaction = try signV3(calls: calls, params: signParams, forFeeEstimation: false)
 
         let result = try await provider.addInvokeTransaction(transaction)
 
