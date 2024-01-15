@@ -24,7 +24,7 @@ public protocol StarknetAccountProtocol {
     /// - Returns: Signed invoke v3 transaction
     func signV3(calls: [StarknetCall], params: StarknetExecutionParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3
 
-    /// Create and sign deploy account transaction
+    /// Create and sign deploy account transaction v1
     ///
     /// - Parameters:
     ///  - classHash: class hash of account to be deployed
@@ -32,8 +32,19 @@ public protocol StarknetAccountProtocol {
     ///  - salt: contract salt
     ///  - params: additional params for a given transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
-    /// - Returns: Signed sequencer deploy account transaction
+    /// - Returns: Signed deploy account transaction v1
     func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV1
+
+    /// Create and sign deploy account transaction v3
+    ///
+    /// - Parameters:
+    ///  - classHash: class hash of account to be deployed
+    ///  - calldata: constructor calldata
+    ///  - salt: contract salt
+    ///  - params: additional params for a given transaction
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
+    /// - Returns: Signed deploy account transaction v3
+    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParamsV3, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV3
 
     /// Sign TypedData for off-chain usage with this account's privateKey.
     ///
@@ -100,6 +111,8 @@ public protocol StarknetAccountProtocol {
     /// - Returns: struct containing fee estimate
     func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate
 
+    func estimateDeployAccountV3Fee(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate
+
     /// Get current nonce of the account
     ///
     /// - Returns: current nonce, as felt value.
@@ -118,17 +131,29 @@ public extension StarknetAccountProtocol {
         try sign(calls: calls, params: params, forFeeEstimation: false)
     }
 
-    /// Create and sign deploy account transaction
+    /// Create and sign deploy account transaction v1
     ///
     /// - Parameters:
     ///  - classHash: class hash of account to be deployed
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     ///  - maxFee: max acceptable fee for the transaction
+    /// - Returns: Signed deploy account transaction v1
+    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetDeployAccountTransactionV1 {
+        try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeprecatedExecutionParams(nonce: .zero, maxFee: maxFee), forFeeEstimation: false)
+    }
+
+    /// Create and sign deploy account transaction v3
+    ///
+    /// - Parameters:
+    ///  - classHash: class hash of account to be deployed
+    ///  - calldata: constructor calldata
+    ///  - salt: contract salt
+    ///  - l1ResourceBounds: max acceptable l1 resource bounds
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
-    /// - Returns: Signed sequencer deploy account transaction
-    func signDeployAccount(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeprecatedExecutionParams) throws -> StarknetDeployAccountTransactionV1 {
-        try signDeployAccount(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: false)
+    /// - Returns: Signed deploy account transaction v3
+    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, l1ResourceBounds: StarknetResourceBounds) throws -> StarknetDeployAccountTransactionV3 {
+        try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetExecutionParamsV3(nonce: .zero, l1ResourceBounds: l1ResourceBounds), forFeeEstimation: false)
     }
 
     /// Sign a call.
