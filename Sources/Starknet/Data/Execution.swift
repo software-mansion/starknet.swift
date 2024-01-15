@@ -28,6 +28,7 @@ public struct StarknetExecutionParamsV3 {
     public let resourceBounds: StarknetResourceBoundsMapping
     public let tip: UInt64AsHex
     public let paymasterData: StarknetPaymasterData
+    public let accountDeploymentData: StarknetAccountDeploymentData
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
@@ -37,6 +38,7 @@ public struct StarknetExecutionParamsV3 {
         self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
         self.tip = .zero
         self.paymasterData = []
+        self.accountDeploymentData = []
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
     }
