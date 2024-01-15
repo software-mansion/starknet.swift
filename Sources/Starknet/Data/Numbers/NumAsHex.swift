@@ -17,6 +17,11 @@ public struct NumAsHex: NumAsHexProtocol {
         self.value = value
     }
 
+    public init(clamping: some BinaryInteger) {
+        let value = BigUInt(clamping: clamping)
+        self.value = value
+    }
+
     public init?(fromHex hex: String) {
         guard hex.hasPrefix("0x") else { return nil }
 
