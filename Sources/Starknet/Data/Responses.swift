@@ -12,11 +12,13 @@ public struct StarknetFeeEstimate: Decodable, Equatable {
     public let gasConsumed: Felt
     public let gasPrice: Felt
     public let overallFee: Felt
+    public let feeUnit: StarknetPriceUnit
 
     enum CodingKeys: String, CodingKey {
         case gasConsumed = "gas_consumed"
         case gasPrice = "gas_price"
         case overallFee = "overall_fee"
+        case feeUnit = "unit"
     }
 }
 
@@ -58,4 +60,9 @@ public struct StarknetGetTransactionStatusResponse: Decodable, Equatable {
         case finalityStatus = "finality_status"
         case executionStatus = "execution_status"
     }
+}
+
+public enum StarknetPriceUnit: String, Codable {
+    case wei = "WEI"
+    case fri = "FRI"
 }
