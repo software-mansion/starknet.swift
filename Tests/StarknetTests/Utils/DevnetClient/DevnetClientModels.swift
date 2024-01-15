@@ -78,6 +78,7 @@ struct InvokeContractResult {
 struct PrefundPayload: Codable {
     let address: Felt
     let amount: UInt64
+    let unit: StarknetPriceUnit
 }
 
 // Simplified receipt that is intended to support any JSON-RPC version starting 0.3,

@@ -18,7 +18,7 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt64) async throws
+    func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?, maxFee: Felt) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, maxFee: Felt, prefund: Bool) async throws -> DeployAccountResult
@@ -34,8 +34,8 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000) async throws {
-        try await prefundAccount(address: address, amount: amount)
+    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
+        try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
     func createDeployAccount(
@@ -309,14 +309,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000) async throws {
+        public func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
 
-            let payload = PrefundPayload(address: address, amount: amount)
+            let payload = PrefundPayload(address: address, amount: amount, unit: unit)
             request.httpBody = try JSONEncoder().encode(payload)
 
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
