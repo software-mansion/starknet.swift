@@ -105,7 +105,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 
     public func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
-        let params = AddInvokeTransactionParams(invokeTransaction: transaction as! StarknetInvokeTransactionV1)
+        let params = AddInvokeTransactionParams(invokeTransaction: transaction)
 
         let result = try await makeRequest(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
 
