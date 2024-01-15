@@ -55,7 +55,7 @@ final class ExecutionTests: XCTestCase {
             entrypoint: starknetSelector(from: "another_method"),
             calldata: [Felt(100), Felt(200)]
         )
-        let params = StarknetExecutionParams(nonce: .zero, maxFee: .zero)
+        let params = StarknetDeprecatedExecutionParams(nonce: .zero, maxFee: .zero)
 
         let signedTx = try account.sign(calls: [call1, call2, call3], params: params)
         let expectedCalldata = [

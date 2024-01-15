@@ -59,6 +59,22 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
+    func testExecuteV3() async throws {
+        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
+
+        let calldata: [Felt] = [
+            recipientAddress,
+            1000,
+            0,
+        ]
+
+        let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+
+        let result = try await account.executeV3(calls: [call])
+
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
+    }
+
     func testExecuteCustomParams() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
@@ -74,7 +90,7 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await account.estimateFee(call: call, nonce: nonce)
         let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
-        let params = StarknetOptionalExecutionParams(nonce: nonce, maxFee: maxFee)
+        let params = StarknetOptionalDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
 
         let result = try await account.execute(call: call, params: params)
 
@@ -117,9 +133,34 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
         let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
-        let params = StarknetExecutionParams(nonce: nonce, maxFee: maxFee)
+        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
 
         let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
+
+        let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
+
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
+
+        let newNonce = try await newAccount.getNonce()
+
+        XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
+    }
+
+    func testDeployAccountV3() async throws {
+        let newSigner = StarkCurveSigner(privateKey: 4567)!
+        let newPublicKey = newSigner.publicKey
+        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress, unit: .fri)
+
+        let nonce = await (try? newAccount.getNonce()) ?? .zero
+
+        let feeEstimate = try await newAccount.estimateDeployAccountV3Fee(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
+
+        let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: feeEstimate.toResourceBounds().l1Gas)
+
+        let deployAccountTransaction = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
