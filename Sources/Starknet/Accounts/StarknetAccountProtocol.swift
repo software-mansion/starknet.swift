@@ -61,16 +61,25 @@ public protocol StarknetAccountProtocol {
     /// - Returns: Boolean indicating whether the signature is valid.
     func verify(signature: StarknetSignature, for typedData: StarknetTypedData) async throws -> Bool
 
-    /// Execute list of calls
+    /// Execute list of calls as invoke transaction v1
     ///
     /// - Parameters:
     ///  - calls: list of calls to be executed.
-    ///  - params: additional params for a given transaction
+    ///  - params: additional params for a given transaction.
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(calls: [StarknetCall], params: StarknetOptionalDeprecatedExecutionParams) async throws -> StarknetInvokeTransactionResponse
 
-    /// Execute list of calls
+    /// Execute list of calls as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be executed.
+    ///  - params: additional params for a given transaction.
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func executeV3(calls: [StarknetCall], params: StarknetOptionalExecutionParamsV3) async throws -> StarknetInvokeTransactionResponse
+
+    /// Execute list of calls as invoke transaction v1
     ///
     /// - Parameters:
     ///  - calls: list of calls to be executed.
@@ -78,16 +87,7 @@ public protocol StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func execute(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse
 
-    /// Execute list of calls
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls to be executed.
-    ///  - params: additional params for a given transaction
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV3(calls: [StarknetCall], params: StarknetOptionalExecutionParamsV3) async throws -> StarknetInvokeTransactionResponse
-
-    /// Execute list of calls
+    /// Execute list of calls as invoke transaction v3
     ///
     /// - Parameters:
     ///  - calls: list of calls to be executed.
@@ -95,12 +95,25 @@ public protocol StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse
 
-    /// Estimate fee for a list of calls
+    /// Estimate fee for a list of calls as invoke transaction v1
     ///
     /// - Parameters:
     ///  - calls: list of calls, for which the fee should be estimated.
+    ///  - nonce: nonce of the account.
+    ///  - simulationFlags: a set of simulation flags.
+    ///
     /// - Returns: struct containing fee estimate
-    func estimateFee(calls: [StarknetCall], nonce: Felt) async throws -> StarknetFeeEstimate
+    func estimateFee(calls: [StarknetCall], nonce: Felt, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate
+
+    /// Estimate fee for a list of calls as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls, for which the fee should be estimated.
+    ///  - nonce: nonce of the account.
+    ///  - simulationFlags: a set of simulation flags.
+
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(calls: [StarknetCall], nonce: Felt, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate
 
     /// Estimate fee for a deploy account transaction
     ///
@@ -111,7 +124,7 @@ public protocol StarknetAccountProtocol {
     /// - Returns: struct containing fee estimate
     func estimateDeployAccountFee(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate
 
-    func estimateDeployAccountV3Fee(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate
+    func estimateDeployAccountFeeV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate
 
     /// Get current nonce of the account
     ///
@@ -120,18 +133,32 @@ public protocol StarknetAccountProtocol {
 }
 
 public extension StarknetAccountProtocol {
-    /// Sign list of calls
+    /// Sign list of calls for exectution as invoke transaction v1.
+    /// Avoid using this method to sign calls for fee estimation.
     ///
     /// - Parameters:
     ///  - calls: list of calls to be signed.
     ///  - params: additional params for a given transaction
     ///
-    /// - Returns: Signed SequencerInvokeTransaction
+    /// - Returns: Signed invoke transaction v1
     func sign(calls: [StarknetCall], params: StarknetDeprecatedExecutionParams) throws -> StarknetInvokeTransactionV1 {
         try sign(calls: calls, params: params, forFeeEstimation: false)
     }
 
+    /// Sign list of calls for execution as invoke transaction v3.
+    /// Avoid using this method to sign calls for fee estimation.
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls to be signed.
+    ///  - params: additional params for a given transaction
+    ///
+    /// - Returns: Signed invoke transaction v3
+    func signV3(calls: [StarknetCall], params: StarknetExecutionParamsV3) throws -> StarknetInvokeTransactionV3 {
+        try signV3(calls: calls, params: params, forFeeEstimation: false)
+    }
+
     /// Create and sign deploy account transaction v1
+    /// Avoid using this method to sign transaction for fee estimation.
     ///
     /// - Parameters:
     ///  - classHash: class hash of account to be deployed
@@ -144,6 +171,7 @@ public extension StarknetAccountProtocol {
     }
 
     /// Create and sign deploy account transaction v3
+    /// Avoid using this method to sign transaction for fee estimation.
     ///
     /// - Parameters:
     ///  - classHash: class hash of account to be deployed
@@ -156,15 +184,25 @@ public extension StarknetAccountProtocol {
         try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetExecutionParamsV3(nonce: .zero, l1ResourceBounds: l1ResourceBounds), forFeeEstimation: false)
     }
 
-    /// Sign a call.
+    /// Sign a call as invoke transaction v1
     ///
     /// - Parameters:
     ///  - call: a call to be signed.
     ///  - params: additional params for a given transaction
     ///
-    /// - Returns: Signed SequencerInvokeTransaction
+    /// - Returns: Signed invoke transaction v1
     func sign(call: StarknetCall, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV1 {
         try sign(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
+    }
+
+    /// Sign a call as invoke transaction v3
+    /// - Parameters:
+    ///  - call: a call to be signed.
+    ///  - params: additional params for a given transaction
+    ///
+    /// - Returns: Signed invoke transaction v3
+    func signV3(call: StarknetCall, params: StarknetExecutionParamsV3, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV3 {
+        try signV3(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
     }
 
     /// Execute list of calls as invoke transaction v1
@@ -187,7 +225,7 @@ public extension StarknetAccountProtocol {
         try await executeV3(calls: calls, params: StarknetOptionalExecutionParamsV3())
     }
 
-    /// Execute a call
+    /// Execute a call as invoke transaction v1
     ///
     /// - Parameters:
     ///  - call: a call to be executed.
@@ -198,7 +236,18 @@ public extension StarknetAccountProtocol {
         try await execute(calls: [call], params: params)
     }
 
-    /// Execute a call
+    /// Execute a call as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - call: a call to be executed.
+    ///  - params: additional params for a given transaction
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func executeV3(call: StarknetCall, params: StarknetOptionalExecutionParamsV3) async throws -> StarknetInvokeTransactionResponse {
+        try await executeV3(calls: [call], params: params)
+    }
+
+    /// Execute a call as invoke transaction v1
     ///
     /// - Parameters:
     ///  - call: a call to be executed.
@@ -208,7 +257,63 @@ public extension StarknetAccountProtocol {
         try await execute(calls: [call])
     }
 
-    /// Estimate fee for a list of calls
+    /// Execute a call as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - call: a call to be executed.
+    ///
+    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+    func executeV3(call: StarknetCall) async throws -> StarknetInvokeTransactionResponse {
+        try await executeV3(calls: [call])
+    }
+
+    /// Estimate fee for a list of calls as invoke transaction v1
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls, for which the fee should be estimated.
+    ///  - nonce: nonce of the account.
+
+    /// - Returns: struct containing fee estimate
+    func estimateFee(calls: [StarknetCall], nonce: Felt) async throws -> StarknetFeeEstimate {
+        try await estimateFee(calls: calls, nonce: nonce, simulationFlags: defaultSimulationFlagsForEstimateFee)
+    }
+
+    /// Estimate fee for a list of calls as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls, for which the fee should be estimated.
+    ///  - nonce: nonce of the account.
+
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(calls: [StarknetCall], nonce: Felt) async throws -> StarknetFeeEstimate {
+        try await estimateFeeV3(calls: calls, nonce: nonce, simulationFlags: defaultSimulationFlagsForEstimateFee)
+    }
+
+    /// Estimate fee for a list of calls as invoke transaction v1
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls, for which the fee should be estimated.
+    ///  - simulationFlags: set of simulation flags for fee estimation.
+
+    /// - Returns: struct containing fee estimate
+    func estimateFee(calls: [StarknetCall], simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
+        let nonce = try await getNonce()
+        return try await estimateFee(calls: calls, nonce: nonce, simulationFlags: simulationFlags)
+    }
+
+    /// Estimate fee for a list of calls as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls, for which the fee should be estimated.
+    ///  - simulationFlags: set of simulation flags for fee estimation.
+
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(calls: [StarknetCall], simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
+        let nonce = try await getNonce()
+        return try await estimateFeeV3(calls: calls, nonce: nonce, simulationFlags: simulationFlags)
+    }
+
+    /// Estimate fee for a list of calls as invoke transaction v1
     ///
     /// - Parameters:
     ///  - calls: list of calls, for which the fee should be estimated.
@@ -218,22 +323,102 @@ public extension StarknetAccountProtocol {
         return try await estimateFee(calls: calls, nonce: nonce)
     }
 
-    /// Estimate fee for a call
+    /// Estimate fee for a list of calls as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - calls: list of calls, for which the fee should be estimated.
+    ///
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(calls: [StarknetCall]) async throws -> StarknetFeeEstimate {
+        let nonce = try await getNonce()
+        return try await estimateFeeV3(calls: calls, nonce: nonce)
+    }
+
+    /// Estimate fee for a call as invoke transaction v1
     ///
     /// - Parameters:
     ///  - call: a call for which the fee should be estimated.
-    ///  - nonce: a nonce to be used in a transaction
+    ///  - nonce: a nonce to be used in a transaction.
+    ///  - simulationFlags: a set of simulation flags.
+    ///
+    /// - Returns: struct containing fee estimate
+    func estimateFee(call: StarknetCall, nonce: Felt, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
+        try await estimateFee(calls: [call], nonce: nonce, simulationFlags: simulationFlags)
+    }
+
+    /// Estimate fee for a call as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - call: a call for which the fee should be estimated.
+    ///  - nonce: a nonce to be used in a transaction.
+    ///  - simulationFlags: a set of simulation flags.
+    ///
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(call: StarknetCall, nonce: Felt, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
+        try await estimateFeeV3(calls: [call], nonce: nonce, simulationFlags: simulationFlags)
+    }
+
+    /// Estimate fee for a call as invoke transaction v1
+    ///
+    /// - Parameters:
+    ///  - call: a call for which the fee should be estimated.
+    ///  - simulationFlags: a set of simulation flags.
+    ///
+    /// - Returns: struct containing fee estimate
+    func estimateFee(call: StarknetCall, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
+        try await estimateFee(calls: [call], simulationFlags: simulationFlags)
+    }
+
+    /// Estimate fee for a call as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - call: a call for which the fee should be estimated.
+    ///  - simulationFlags: a set of simulation flags.
+    ///
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(call: StarknetCall, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
+        try await estimateFeeV3(calls: [call], simulationFlags: simulationFlags)
+    }
+
+    /// Estimate fee for a call as invoke transaction v1
+    ///
+    /// - Parameters:
+    ///  - call: a call for which the fee should be estimated.
+    ///  - nonce: a nonce to be used in a transaction.
+    ///
     /// - Returns: struct containing fee estimate
     func estimateFee(call: StarknetCall, nonce: Felt) async throws -> StarknetFeeEstimate {
         try await estimateFee(calls: [call], nonce: nonce)
     }
 
-    /// Estimate fee for a call
+    /// Estimate fee for a call as invoke transaction v3
     ///
     /// - Parameters:
     ///  - call: a call for which the fee should be estimated.
+    ///  - nonce: a nonce to be used in a transaction
+    ///
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(call: StarknetCall, nonce: Felt) async throws -> StarknetFeeEstimate {
+        try await estimateFeeV3(calls: [call], nonce: nonce)
+    }
+
+    /// Estimate fee for a call as invoke transaction v1
+    ///
+    /// - Parameters:
+    ///  - call: a call for which the fee should be estimated.
+    ///
     /// - Returns: struct containing fee estimate
     func estimateFee(call: StarknetCall) async throws -> StarknetFeeEstimate {
         try await estimateFee(calls: [call])
+    }
+
+    /// Estimate fee for a call as invoke transaction v3
+    ///
+    /// - Parameters:
+    ///  - call: a call for which the fee should be estimated.
+    ///
+    /// - Returns: struct containing fee estimate
+    func estimateFeeV3(call: StarknetCall) async throws -> StarknetFeeEstimate {
+        try await estimateFeeV3(calls: [call])
     }
 }

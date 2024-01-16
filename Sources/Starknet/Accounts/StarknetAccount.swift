@@ -11,7 +11,6 @@ public enum CairoVersion: String, Encodable {
 }
 
 public class StarknetAccount: StarknetAccountProtocol {
-    private let version = Felt.one
     private let cairoVersion: CairoVersion
     public let address: Felt
 
@@ -152,9 +151,16 @@ public class StarknetAccount: StarknetAccountProtocol {
         return result
     }
 
-    public func estimateFee(calls: [StarknetCall], nonce: Felt) async throws -> StarknetFeeEstimate {
+    public func estimateFee(calls: [StarknetCall], nonce: Felt, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
         let signParams = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: .zero)
         let transaction = try sign(calls: calls, params: signParams, forFeeEstimation: true)
+
+        return try await provider.estimateFee(for: transaction, simulationFlags: simulationFlags)
+    }
+
+    public func estimateFeeV3(calls: [StarknetCall], nonce: Felt, simulationFlags _: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
+        let signParams = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
+        let transaction = try signV3(calls: calls, params: signParams, forFeeEstimation: true)
 
         return try await provider.estimateFee(for: transaction)
     }
@@ -166,7 +172,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         return try await provider.estimateFee(for: signedTransaction)
     }
 
-    public func estimateDeployAccountV3Fee(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate {
+    public func estimateDeployAccountFeeV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate {
         let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
         let signedTransaction = try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
 
