@@ -97,6 +97,28 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
+    func testExecuteV3CustomParams() async throws {
+        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
+
+        let calldata: [Felt] = [
+            recipientAddress,
+            1000,
+            0,
+        ]
+
+        let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+
+        let nonce = try await account.getNonce()
+        let feeEstimate = try await account.estimateFeeV3(call: call, nonce: nonce)
+        let resourceBounds = feeEstimate.toResourceBounds()
+
+        let params = StarknetOptionalExecutionParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
+
+        let result = try await account.executeV3(calls: [call], params: params)
+
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
+    }
+
     func testExecuteMultipleCalls() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
