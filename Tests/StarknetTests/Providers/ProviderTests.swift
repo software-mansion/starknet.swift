@@ -40,8 +40,7 @@ final class ProviderTests: XCTestCase {
         XCTAssertNotNil(starknetProvider)
     }
 
-    // TODO: (#89): Re-enable once devnet-rs supports RPC 0.5.0
-    func disabledTestSpecVersion() async throws {
+    func testSpecVersion() async throws {
         let result = try await provider.specVersion()
         XCTAssertFalse(result.isEmpty)
     }
