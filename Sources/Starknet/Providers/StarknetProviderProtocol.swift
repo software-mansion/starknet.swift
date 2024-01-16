@@ -127,7 +127,7 @@ public protocol StarknetProviderProtocol {
 }
 
 let defaultBlockId = StarknetBlockId.tag(.pending)
-let defaultSimulationFlags: Set<StarknetSimulationFlagForEstimateFee> = [.skipValidate]
+let defaultSimulationFlagsForEstimateFee: Set<StarknetSimulationFlagForEstimateFee> = [.skipValidate]
 
 public extension StarknetProviderProtocol {
     /// Call starknet contract in the pending block.
@@ -146,7 +146,7 @@ public extension StarknetProviderProtocol {
     ///  -  transactions: transactions for which the fees should be estimated.
     /// - Returns: Array of fee estimates
     func estimateFee(for transactions: [any StarknetExecutableTransaction]) async throws -> [StarknetFeeEstimate] {
-        try await estimateFee(for: transactions, at: defaultBlockId, simulationFlags: defaultSimulationFlags)
+        try await estimateFee(for: transactions, at: defaultBlockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
     }
 
     /// Estimate fee for a list of transactions with default flags.
@@ -156,7 +156,7 @@ public extension StarknetProviderProtocol {
     ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
     /// - Returns: Array of fee estimates
     func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
-        try await estimateFee(for: transactions, at: blockId, simulationFlags: defaultSimulationFlags)
+        try await estimateFee(for: transactions, at: blockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
     }
 
     /// Estimate fee for a list of transactions in the pending block..
