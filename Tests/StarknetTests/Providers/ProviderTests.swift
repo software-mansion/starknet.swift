@@ -29,8 +29,8 @@ final class ProviderTests: XCTestCase {
 
         provider = makeStarknetProvider(url: Self.devnetClient.rpcUrl)
 
-        accountContractClassHash = ProviderTests.devnetClient.constants.accountContractClassHash
-        let accountDetails = ProviderTests.devnetClient.constants.predeployedAccount2
+        accountContractClassHash = Self.devnetClient.constants.accountContractClassHash
+        let accountDetails = Self.devnetClient.constants.predeployedAccount2
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .zero)
     }
@@ -140,50 +140,66 @@ final class ProviderTests: XCTestCase {
         } catch {}
     }
 
-    // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
-    func disabledTestGetTransactionStatus() async throws {
-        let deployedContract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-        let status = try await provider.getTransactionStatusBy(hash: deployedContract.declare.transactionHash)
-        let status2 = try await provider.getTransactionStatusBy(hash: deployedContract.deploy.transactionHash)
+    func testGetInvokeTransactionByHash() async throws {
+        let contract = try await Self.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+        let transactionHash = try await Self.devnetClient.invokeContract(contractAddress: contract.deploy.contractAddress, function: "increase_balance", calldata: [2137]).transactionHash
+
+        let result = try await provider.getTransactionBy(hash: transactionHash)
+        XCTAssertTrue(result.type == .invoke)
+    }
+
+    func testGetDeployAccountTransactionByHash() async throws {
+        let account = try await ProviderTests.devnetClient.deployAccount(name: "provider_test")
+
+        let result = try await provider.getTransactionBy(hash: account.transactionHash)
+        XCTAssertTrue(result.type == .deployAccount)
+    }
+
+    func testGetDeclareTransactionByHash() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+
+        let result = try await provider.getTransactionBy(hash: contract.declare.transactionHash)
+        XCTAssertTrue(result.type == .declare)
+    }
+
+    func testGetTransactionStatus() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+        let status = try await provider.getTransactionStatusBy(hash: contract.declare.transactionHash)
+        let status2 = try await provider.getTransactionStatusBy(hash: contract.deploy.transactionHash)
 
         XCTAssertEqual(status.finalityStatus, .acceptedL2)
         XCTAssertEqual(status2.finalityStatus, .acceptedL2)
     }
 
-    // TODO: (#89) Re-enable once devnet-rs supports RPC 0.5.0
-    func disabledTestGetTransactionReceipt() async throws {
-        let accountName = "provider_test"
-        let _ = try await ProviderTests.devnetClient.createAccount(name: accountName)
-        let acc = try await ProviderTests.devnetClient.deployAccount(name: accountName)
-        let acc2 = try await ProviderTests.devnetClient.deployAccount(name: accountName)
+    func testGetInvokeTransactionReceipt() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+        let transactionHash = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract.deploy.contractAddress, function: "increase_balance", calldata: [2137]).transactionHash
 
-        let deployedContract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-        let invokeTransaction = try await ProviderTests.devnetClient.invokeContract(contractAddress: deployedContract.deploy.contractAddress, function: "increase_balance", calldata: [2137])
+        let receipt = try await provider.getTransactionReceiptBy(hash: transactionHash)
+        XCTAssertTrue(receipt.isSuccessful)
+    }
 
-        let declareReceipt = try await provider.getTransactionReceiptBy(hash: deployedContract.declare.transactionHash)
-        XCTAssertTrue(declareReceipt.isSuccessful)
+    func testGetDeployAccountTransactionReceipt() async throws {
+        let account = try await ProviderTests.devnetClient.deployAccount(name: "provider_test")
 
-        let deployReceipt = try await provider.getTransactionReceiptBy(hash: deployedContract.deploy.transactionHash)
-        XCTAssertTrue(deployReceipt.isSuccessful)
+        let receipt = try await provider.getTransactionReceiptBy(hash: account.transactionHash)
+        XCTAssertTrue(receipt.isSuccessful)
+    }
 
-        let invokeReceipt = try await provider.getTransactionReceiptBy(hash: invokeTransaction.transactionHash)
-        XCTAssertTrue(invokeReceipt.isSuccessful)
+    func testGetDeclareTransactionReceipt() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
-        let deployAccountReceipt = try await provider.getTransactionReceiptBy(hash: acc.transactionHash)
-        XCTAssertTrue(deployAccountReceipt.isSuccessful)
-
-        let deployAccountReceipt2 = try await provider.getTransactionReceiptBy(hash: acc2.transactionHash)
-        XCTAssertFalse(deployAccountReceipt2.isSuccessful)
-        XCTAssertNotNil(deployAccountReceipt2.revertReason)
+        let receipt = try await provider.getTransactionReceiptBy(hash: contract.declare.transactionHash)
+        XCTAssertTrue(receipt.isSuccessful)
     }
 
     func testEstimateInvokeV1Fee() async throws {
-        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+        let contractAddress = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000]).deploy.contractAddress
 
         let nonce = try await account.getNonce()
 
-        let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
-        let call2 = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
+        let call = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+        let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
         let params1 = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: 0)
         let tx1 = try account.sign(calls: [call], params: params1, forFeeEstimation: true)
@@ -197,11 +213,11 @@ final class ProviderTests: XCTestCase {
     }
 
     func testEstimateInvokeV3Fee() async throws {
-        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+        let contractAddress = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000]).deploy.contractAddress
         let nonce = try await account.getNonce()
 
-        let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
-        let call2 = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
+        let call = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+        let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
         let params1 = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
         let tx1 = try account.signV3(calls: [call], params: params1, forFeeEstimation: true)
