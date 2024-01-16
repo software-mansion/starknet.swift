@@ -6,6 +6,9 @@ final class ProviderTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
     var provider: StarknetProviderProtocol!
+    var signer: StarknetSignerProtocol!
+    var account: StarknetAccountProtocol!
+    var accountContractClassHash: Felt!
 
     override class func setUp() {
         super.setUp()
@@ -25,6 +28,11 @@ final class ProviderTests: XCTestCase {
         }
 
         provider = makeStarknetProvider(url: Self.devnetClient.rpcUrl)
+
+        accountContractClassHash = ProviderTests.devnetClient.constants.accountContractClassHash
+        let accountDetails = ProviderTests.devnetClient.constants.predeployedAccount2
+        signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
+        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .zero)
     }
 
     func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
