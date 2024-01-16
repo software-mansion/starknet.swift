@@ -156,7 +156,7 @@ final class AccountTests: XCTestCase {
 
         let nonce = await (try? newAccount.getNonce()) ?? .zero
 
-        let feeEstimate = try await newAccount.estimateDeployAccountV3Fee(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
+        let feeEstimate = try await newAccount.estimateDeployAccountFeeV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
 
         let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: feeEstimate.toResourceBounds().l1Gas)
 

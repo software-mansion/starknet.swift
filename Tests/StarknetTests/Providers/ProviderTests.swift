@@ -184,10 +184,10 @@ final class ProviderTests: XCTestCase {
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let call2 = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
-        let params1 = StarknetExecutionParams(nonce: nonce, maxFee: 0)
+        let params1 = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: 0)
         let tx1 = try account.sign(calls: [call], params: params1, forFeeEstimation: true)
 
-        let params2 = StarknetExecutionParams(nonce: Felt(nonce.value + 1)!, maxFee: 0)
+        let params2 = StarknetDeprecatedExecutionParams(nonce: Felt(nonce.value + 1)!, maxFee: 0)
         let tx2 = try account.sign(calls: [call, call2], params: params2, forFeeEstimation: true)
 
         let fees = try await provider.estimateFee(for: [tx1, tx2])
@@ -233,7 +233,7 @@ final class ProviderTests: XCTestCase {
         let nonce = try await account.getNonce()
 
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
-        let params = StarknetExecutionParams(nonce: nonce, maxFee: 1_000_000_000_000)
+        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: 1_000_000_000_000)
 
         let invokeTx = try account.sign(calls: [call], params: params, forFeeEstimation: true)
 
@@ -245,7 +245,7 @@ final class ProviderTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
-        let newAccountParams = StarknetExecutionParams(nonce: 0, maxFee: 0)
+        let newAccountParams = StarknetDeprecatedExecutionParams(nonce: 0, maxFee: 0)
         let deployAccountTx = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: true)
 
         let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.latest), simulationFlags: [])
