@@ -207,9 +207,12 @@ final class ProviderTests: XCTestCase {
         let params2 = StarknetDeprecatedExecutionParams(nonce: Felt(nonce.value + 1)!, maxFee: 0)
         let tx2 = try account.sign(calls: [call, call2], params: params2, forFeeEstimation: true)
 
-        let fees = try await provider.estimateFee(for: [tx1, tx2])
+        let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: [])
 
-        XCTAssertEqual(fees.count, 2)
+        let tx1WithoutSignature = StarknetInvokeTransactionV1(senderAddress: tx1.senderAddress, calldata: tx1.calldata, signature: [], maxFee: tx1.maxFee, nonce: nonce, forFeeEstimation: true)
+        let tx2WithoutSignature = StarknetInvokeTransactionV1(senderAddress: tx2.senderAddress, calldata: tx2.calldata, signature: [], maxFee: tx2.maxFee, nonce: Felt(nonce.value + 1)!, forFeeEstimation: true)
+
+        let _ = try await provider.estimateFee(for: [tx1WithoutSignature, tx2WithoutSignature], simulationFlags: [.skipValidate])
     }
 
     func testEstimateInvokeV3Fee() async throws {
@@ -225,9 +228,12 @@ final class ProviderTests: XCTestCase {
         let params2 = StarknetExecutionParamsV3(nonce: Felt(nonce.value + 1)!, l1ResourceBounds: .zero)
         let tx2 = try account.signV3(calls: [call, call2], params: params2, forFeeEstimation: true)
 
-        let fees = try await provider.estimateFee(for: [tx1, tx2])
+        let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: [])
 
-        XCTAssertEqual(fees.count, 2)
+        let tx1WithoutSignature = StarknetInvokeTransactionV3(senderAddress: tx1.senderAddress, calldata: tx1.calldata, signature: [], l1ResourceBounds: tx1.resourceBounds.l1Gas, nonce: nonce, forFeeEstimation: true)
+        let tx2WithoutSignature = StarknetInvokeTransactionV3(senderAddress: tx2.senderAddress, calldata: tx2.calldata, signature: [], l1ResourceBounds: tx2.resourceBounds.l1Gas, nonce: Felt(nonce.value + 1)!, forFeeEstimation: true)
+
+        let _ = try await provider.estimateFee(for: [tx1WithoutSignature, tx2WithoutSignature], simulationFlags: [.skipValidate])
     }
 
     func testEstimateDeployAccountV1Fee() async throws {
@@ -242,9 +248,13 @@ final class ProviderTests: XCTestCase {
 
         let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: .zero)
 
-        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
+        let tx = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: deployAccountTransaction)
+        let _ = try await provider.estimateFee(for: tx, simulationFlags: [])
+
+        let txWithoutSignature = StarknetDeployAccountTransactionV1(signature: [], maxFee: tx.maxFee, nonce: tx.maxFee, contractAddressSalt: tx.contractAddressSalt, constructorCalldata: tx.constructorCalldata, classHash: tx.classHash, forFeeEstimation: true)
+
+        let _ = try await provider.estimateFee(for: txWithoutSignature, simulationFlags: [.skipValidate])
     }
 
     func testEstimateDeployAccountV3Fee() async throws {
@@ -259,9 +269,13 @@ final class ProviderTests: XCTestCase {
 
         let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
 
-        let deployAccountTransaction = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
+        let tx = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: deployAccountTransaction)
+        let _ = try await provider.estimateFee(for: tx)
+
+        let txWithoutSignature = StarknetDeployAccountTransactionV3(signature: [], l1ResourceBounds: tx.resourceBounds.l1Gas, nonce: tx.nonce, contractAddressSalt: tx.contractAddressSalt, constructorCalldata: tx.constructorCalldata, classHash: tx.classHash, forFeeEstimation: true)
+
+        let _ = try await provider.estimateFee(for: txWithoutSignature, simulationFlags: [.skipValidate])
     }
 
     func testEstimateMessageFee() async throws {
