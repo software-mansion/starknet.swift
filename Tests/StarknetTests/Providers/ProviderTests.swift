@@ -177,14 +177,8 @@ final class ProviderTests: XCTestCase {
         XCTAssertNotNil(deployAccountReceipt2.revertReason)
     }
 
-    // TODO: (#100) separate estimateFee tests based on transaction type
-    // TODO: (#89): Re-enable this test
-    func disabledTestEstimateFee() async throws {
-        let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_estimate_fee")
-        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-
-        let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
-        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider, cairoVersion: .zero)
+    func testEstimateInvokeV1Fee() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
         let nonce = try await account.getNonce()
 
@@ -202,9 +196,58 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(fees.count, 2)
     }
 
-    // TODO: (#89): Re-enable this test
-    func disabledTestEstimateMessageFee() async throws {
-        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+    func testEstimateInvokeV3Fee() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+        let nonce = try await account.getNonce()
+
+        let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
+        let call2 = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
+
+        let params1 = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
+        let tx1 = try account.signV3(calls: [call], params: params1, forFeeEstimation: true)
+
+        let params2 = StarknetExecutionParamsV3(nonce: Felt(nonce.value + 1)!, l1ResourceBounds: .zero)
+        let tx2 = try account.signV3(calls: [call, call2], params: params2, forFeeEstimation: true)
+
+        let fees = try await provider.estimateFee(for: [tx1, tx2])
+
+        XCTAssertEqual(fees.count, 2)
+    }
+
+    func testEstimateDeployAccountV1Fee() async throws {
+        let newSigner = StarkCurveSigner(privateKey: 1111)!
+        let newPublicKey = newSigner.publicKey
+        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
+
+        let nonce = await (try? newAccount.getNonce()) ?? .zero
+
+        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: .zero)
+
+        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
+
+        let _ = try await provider.estimateFee(for: deployAccountTransaction)
+    }
+
+    func testEstimateDeployAccountV3Fee() async throws {
+        let newSigner = StarkCurveSigner(privateKey: 3333)!
+        let newPublicKey = newSigner.publicKey
+        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
+
+        let nonce = await (try? newAccount.getNonce()) ?? .zero
+
+        let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
+
+        let deployAccountTransaction = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
+
+        let _ = try await provider.estimateFee(for: deployAccountTransaction)
+    }
+
     func testEstimateMessageFee() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "l1_l2")
 
