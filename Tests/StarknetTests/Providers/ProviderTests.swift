@@ -272,19 +272,13 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(feeEstimate.gasPrice.value * feeEstimate.gasConsumed.value, feeEstimate.overallFee.value)
     }
 
-    // TODO: Re-enable when devnet-rs supports RPC 0.5.0
-    func disabledTestSimulateTransactions() async throws {
-        XCTAssertTrue(false)
-
-        let acc = try await ProviderTests.devnetClient.createDeployAccount(name: "test_simulate_transactions")
-        let signer = StarkCurveSigner(privateKey: acc.details.privateKey)!
-        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-        let account = StarknetAccount(address: acc.details.address, signer: signer, provider: provider, cairoVersion: .zero)
+    func testSimulateTransactionsV1() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
         let nonce = try await account.getNonce()
 
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
-        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: 1_000_000_000_000)
+        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: 500_000_000_000_000)
 
         let invokeTx = try account.sign(calls: [call], params: params, forFeeEstimation: true)
 
@@ -296,10 +290,10 @@ final class ProviderTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
-        let newAccountParams = StarknetDeprecatedExecutionParams(nonce: 0, maxFee: 0)
-        let deployAccountTx = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: true)
+        let newAccountParams = StarknetDeprecatedExecutionParams(nonce: 0, maxFee: 500_000_000_000_000)
+        let deployAccountTx = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
-        let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.latest), simulationFlags: [])
+        let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: [])
 
         XCTAssertEqual(simulations.count, 2)
         XCTAssertTrue(simulations[0].transactionTrace is StarknetInvokeTransactionTrace)
