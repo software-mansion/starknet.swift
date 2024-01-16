@@ -327,9 +327,9 @@ final class ProviderTests: XCTestCase {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
         let nonce = try await account.getNonce()
-        
+
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
-        
+
         try await Self.devnetClient.prefundAccount(address: account.address, amount: 5_000_000_000_000_000_000, unit: .fri)
         let invokeL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
         let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: invokeL1Gas)

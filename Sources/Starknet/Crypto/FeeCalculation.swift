@@ -31,6 +31,10 @@ public extension StarknetFeeEstimate {
         let l1Gas = StarknetResourceBounds(maxAmount: maxAmount, maxPricePerUnit: maxUnitPrice)
         return StarknetResourceBoundsMapping(l1Gas: l1Gas)
     }
+
+    func toMaxFee(overhead: Double = 0.5) -> Felt {
+        addOverhead(self.overallFee.value, overhead).toFeltClamped()
+    }
 }
 
 private func addOverhead(_ value: BigUInt, _ overhead: Double) -> BigUInt {
