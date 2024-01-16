@@ -138,8 +138,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         if let paramsResourceBounds = params.resourceBounds {
             resourceBounds = paramsResourceBounds
         } else {
-            let txForFeeEstimation = try signV3(calls: calls, params: StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero), forFeeEstimation: true)
-            let feeEstimate = try await provider.estimateFee(for: txForFeeEstimation)
+            let feeEstimate = try await estimateFeeV3(calls: calls, nonce: nonce)
             resourceBounds = feeEstimate.toResourceBounds()
         }
 
