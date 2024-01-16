@@ -198,21 +198,22 @@ final class ProviderTests: XCTestCase {
     // TODO: (#89): Re-enable this test
     func disabledTestEstimateMessageFee() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+    func testEstimateMessageFee() async throws {
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "l1_l2")
+
+        let l1Address: Felt = "0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0"
+        let user: Felt = .one
 
         let message = StarknetMessageFromL1(
-            fromAddress: "0xbe1259ff905cadbbaa62514388b71bdefb8aacc1",
+            fromAddress: l1Address,
             toAddress: contract.deploy.contractAddress,
-            entryPointSelector: starknetSelector(from: "increase_balance"),
-            payload: [
-                "0x54d01e5fc6eb4e919ceaab6ab6af192e89d1beb4f29d916768c61a4d48e6c95",
-                "0x38d7ea4c68000",
-                0,
-            ]
+            entryPointSelector: starknetSelector(from: "deposit"),
+            payload: [user, 1000]
         )
 
         let feeEstimate = try await provider.estimateMessageFee(
             message,
-            at: StarknetBlockId.tag(.latest)
+            at: StarknetBlockId.tag(.pending)
         )
 
         XCTAssertNotEqual(Felt.zero, feeEstimate.gasPrice)
