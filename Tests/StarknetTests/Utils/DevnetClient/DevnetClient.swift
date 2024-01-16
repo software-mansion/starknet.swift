@@ -169,6 +169,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
         // Cache declared and deployed contracts by name and classHash respectively
         private var declaredContractsAtName: [String: DeclareContractResult] = [:]
         private var deployedContracts: [Felt: DeployContractResult] = [:]
+        private var deployedAccounts: [Felt: DeployAccountResult] = [:]
 
         let host: String
         let port: Int
@@ -393,6 +394,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
             prefund: Bool = true
         ) async throws -> DeployAccountResult {
             let details = try readAccountDetails(accountName: name)
+
+            if let result = deployedAccounts[details.address] {
+                return result
+            }
+
             if prefund {
                 try await prefundAccount(address: details.address)
             }
@@ -406,15 +412,19 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "--class-hash",
                 classHash.toHex(),
             ]
-            let result = try runSnCast(
+            let response = try runSnCast(
                 command: "account",
                 args: params
             ) as! AccountDeploySnCastResponse
 
-            return DeployAccountResult(
+            let result = DeployAccountResult(
                 details: details,
-                transactionHash: result.transactionHash
+                transactionHash: response.transactionHash
             )
+
+            deployedAccounts[details.address] = result
+
+            return result
         }
 
         public func declareDeployContract(
