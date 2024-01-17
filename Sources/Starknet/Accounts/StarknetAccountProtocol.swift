@@ -32,6 +32,7 @@ public protocol StarknetAccountProtocol {
     ///  - salt: contract salt
     ///  - params: additional params for a given transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
+    ///
     /// - Returns: Signed deploy account transaction v1
     func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV1
 
@@ -43,6 +44,7 @@ public protocol StarknetAccountProtocol {
     ///  - salt: contract salt
     ///  - params: additional params for a given transaction
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
+    ///
     /// - Returns: Signed deploy account transaction v3
     func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetExecutionParamsV3, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV3
 
@@ -50,6 +52,7 @@ public protocol StarknetAccountProtocol {
     ///
     /// - Parameters:
     ///  - typedData: a TypedData object to sign
+    ///
     /// - Returns: a signature for provided TypedData object.
     func sign(typedData: StarknetTypedData) throws -> StarknetSignature
 
@@ -58,6 +61,7 @@ public protocol StarknetAccountProtocol {
     /// - Parameters:
     ///  - signature: a signature of typedData
     ///  - typedData: a TypedData instance which signature will be verified
+    ///
     /// - Returns: Boolean indicating whether the signature is valid.
     func verify(signature: StarknetSignature, for typedData: StarknetTypedData) async throws -> Bool
 
@@ -165,6 +169,7 @@ public extension StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     ///  - maxFee: max acceptable fee for the transaction
+    ///
     /// - Returns: Signed deploy account transaction v1
     func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetDeployAccountTransactionV1 {
         try signDeployAccountV1(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeprecatedExecutionParams(nonce: .zero, maxFee: maxFee), forFeeEstimation: false)
@@ -178,6 +183,7 @@ public extension StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     ///  - l1ResourceBounds: max acceptable l1 resource bounds
+    ///
     /// - Returns: Signed deploy account transaction v3
     func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, l1ResourceBounds: StarknetResourceBounds) throws -> StarknetDeployAccountTransactionV3 {
         try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetExecutionParamsV3(nonce: .zero, l1ResourceBounds: l1ResourceBounds), forFeeEstimation: false)
@@ -316,6 +322,7 @@ public extension StarknetAccountProtocol {
     ///
     /// - Parameters:
     ///  - calls: list of calls, for which the fee should be estimated.
+    ///
     /// - Returns: struct containing fee estimate
     func estimateFeeV1(calls: [StarknetCall]) async throws -> StarknetFeeEstimate {
         let nonce = try await getNonce()
