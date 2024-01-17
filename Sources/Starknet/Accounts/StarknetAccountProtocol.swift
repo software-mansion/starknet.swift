@@ -178,7 +178,6 @@ public extension StarknetAccountProtocol {
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
     ///  - l1ResourceBounds: max acceptable l1 resource bounds
-    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     /// - Returns: Signed deploy account transaction v3
     func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, l1ResourceBounds: StarknetResourceBounds) throws -> StarknetDeployAccountTransactionV3 {
         try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetExecutionParamsV3(nonce: .zero, l1ResourceBounds: l1ResourceBounds), forFeeEstimation: false)
