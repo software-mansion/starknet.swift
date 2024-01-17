@@ -9,6 +9,7 @@ final class ProviderTests: XCTestCase {
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
     var accountContractClassHash: Felt!
+    var ethContractAddress: Felt!
 
     override class func setUp() {
         super.setUp()
@@ -28,7 +29,7 @@ final class ProviderTests: XCTestCase {
         }
 
         provider = makeStarknetProvider(url: Self.devnetClient.rpcUrl)
-
+        ethContractAddress = Self.devnetClient.constants.ethErc20ContractAddress
         accountContractClassHash = Self.devnetClient.constants.accountContractClassHash
         let accountDetails = Self.devnetClient.constants.predeployedAccount2
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
@@ -90,7 +91,7 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetClassHash() async throws {
-        let classHash = try await provider.getClassHashAt(erc20Address)
+        let classHash = try await provider.getClassHashAt(ethContractAddress)
 
         print(classHash)
     }

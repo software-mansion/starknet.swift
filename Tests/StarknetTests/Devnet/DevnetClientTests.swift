@@ -55,7 +55,7 @@ final class DevnetClientTests: XCTestCase {
             1000,
             0,
         ]
-        let invokeResult = try await client.invokeContract(contractAddress: client.constants.erc20ContractAddress, function: "transfer", calldata: calldata)
+        let invokeResult = try await client.invokeContract(contractAddress: client.constants.ethErc20ContractAddress, function: "transfer", calldata: calldata)
         try await client.assertTransactionSucceeded(transactionHash: invokeResult.transactionHash)
     }
 }

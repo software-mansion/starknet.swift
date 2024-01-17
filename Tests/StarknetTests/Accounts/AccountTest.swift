@@ -2,8 +2,6 @@ import XCTest
 
 @testable import Starknet
 
-let erc20Address: Felt = "0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7"
-
 final class AccountTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
@@ -11,6 +9,7 @@ final class AccountTests: XCTestCase {
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
     var accountContractClassHash: Felt!
+    var ethContractAddress: Felt!
 
     override func setUp() async throws {
         try await super.setUp()
@@ -20,8 +19,9 @@ final class AccountTests: XCTestCase {
         }
 
         provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
-        accountContractClassHash = AccountTests.devnetClient.constants.accountContractClassHash
-        let accountDetails = AccountTests.devnetClient.constants.predeployedAccount1
+        accountContractClassHash = Self.devnetClient.constants.accountContractClassHash
+        ethContractAddress = Self.devnetClient.constants.ethErc20ContractAddress
+        let accountDetails = Self.devnetClient.constants.predeployedAccount1
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .zero)
     }
@@ -52,7 +52,7 @@ final class AccountTests: XCTestCase {
             0,
         ]
 
-        let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
         let result = try await account.executeV1(call: call)
 
@@ -68,7 +68,7 @@ final class AccountTests: XCTestCase {
             0,
         ]
 
-        let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
         let result = try await account.executeV3(calls: [call])
 
@@ -84,7 +84,7 @@ final class AccountTests: XCTestCase {
             0,
         ]
 
-        let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
         let nonce = try await account.getNonce()
         let feeEstimate = try await account.estimateFeeV1(call: call, nonce: nonce)
@@ -106,7 +106,7 @@ final class AccountTests: XCTestCase {
             0,
         ]
 
-        let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
         let nonce = try await account.getNonce()
         let feeEstimate = try await account.estimateFeeV3(call: call, nonce: nonce)
@@ -134,8 +134,8 @@ final class AccountTests: XCTestCase {
             0,
         ]
 
-        let call1 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
-        let call2 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
+        let call1 = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
+        let call2 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.ethErc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
         let result = try await account.executeV1(calls: [call1, call2])
 
