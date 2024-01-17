@@ -117,12 +117,10 @@ public class StarknetAccount: StarknetAccountProtocol {
             maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
         }
 
-        let signParams = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
-        let transaction = try signV1(calls: calls, params: signParams, forFeeEstimation: false)
+        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
+        let signedTransaction = try signV1(calls: calls, params: params, forFeeEstimation: false)
 
-        let result = try await provider.addInvokeTransaction(transaction)
-
-        return result
+        return try await provider.addInvokeTransaction(signedTransaction)
     }
 
     public func executeV3(calls: [StarknetCall], params: StarknetOptionalExecutionParamsV3) async throws -> StarknetInvokeTransactionResponse {
@@ -142,26 +140,24 @@ public class StarknetAccount: StarknetAccountProtocol {
             resourceBounds = feeEstimate.toResourceBounds()
         }
 
-        let signParams = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
-        let transaction = try signV3(calls: calls, params: signParams, forFeeEstimation: false)
+        let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
+        let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: false)
 
-        let result = try await provider.addInvokeTransaction(transaction)
-
-        return result
+        return try await provider.addInvokeTransaction(signedTransaction)
     }
 
     public func estimateFeeV1(calls: [StarknetCall], nonce: Felt, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
-        let signParams = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: .zero)
-        let transaction = try signV1(calls: calls, params: signParams, forFeeEstimation: true)
+        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: .zero)
+        let signedTransaction = try signV1(calls: calls, params: params, forFeeEstimation: true)
 
-        return try await provider.estimateFee(for: transaction, simulationFlags: simulationFlags)
+        return try await provider.estimateFee(for: signedTransaction, simulationFlags: simulationFlags)
     }
 
     public func estimateFeeV3(calls: [StarknetCall], nonce: Felt, simulationFlags _: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
-        let signParams = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
-        let transaction = try signV3(calls: calls, params: signParams, forFeeEstimation: true)
+        let params = StarknetExecutionParamsV3(nonce: nonce, l1ResourceBounds: .zero)
+        let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: true)
 
-        return try await provider.estimateFee(for: transaction)
+        return try await provider.estimateFee(for: signedTransaction)
     }
 
     public func estimateDeployAccountFeeV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate {
