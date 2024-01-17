@@ -39,7 +39,7 @@ struct AddInvokeTransactionParams: Encodable {
 }
 
 // Workaround to allow encoding polymorphic array
-struct WrappedSequencerTransaction: Encodable {
+struct WrappedExecutableTransaction: Encodable {
     let transaction: any StarknetExecutableTransaction
 
     func encode(to encoder: Encoder) throws {
@@ -55,7 +55,7 @@ struct EstimateFeeParams: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        let wrappedRequest = request.map { WrappedSequencerTransaction(transaction: $0) }
+        let wrappedRequest = request.map { WrappedExecutableTransaction(transaction: $0) }
 
         try container.encode(wrappedRequest, forKey: .request)
         try container.encode(simulationFlags, forKey: .simulationFlags)
@@ -149,7 +149,7 @@ struct SimulateTransactionsParams: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        let wrappedTransactions = transactions.map { WrappedSequencerTransaction(transaction: $0) }
+        let wrappedTransactions = transactions.map { WrappedExecutableTransaction(transaction: $0) }
 
         try container.encode(wrappedTransactions, forKey: .transactions)
         try container.encode(blockId, forKey: .blockId)
