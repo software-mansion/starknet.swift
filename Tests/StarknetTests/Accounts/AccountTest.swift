@@ -54,7 +54,7 @@ final class AccountTests: XCTestCase {
 
         let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let result = try await account.execute(call: call)
+        let result = try await account.executeV1(call: call)
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -87,12 +87,12 @@ final class AccountTests: XCTestCase {
         let call = StarknetCall(contractAddress: erc20Address, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
         let nonce = try await account.getNonce()
-        let feeEstimate = try await account.estimateFee(call: call, nonce: nonce)
+        let feeEstimate = try await account.estimateFeeV1(call: call, nonce: nonce)
         let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
         let params = StarknetOptionalDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
 
-        let result = try await account.execute(call: call, params: params)
+        let result = try await account.executeV1(call: call, params: params)
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -137,7 +137,7 @@ final class AccountTests: XCTestCase {
         let call1 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
         let call2 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.erc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
-        let result = try await account.execute(calls: [call1, call2])
+        let result = try await account.executeV1(calls: [call1, call2])
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -152,12 +152,12 @@ final class AccountTests: XCTestCase {
 
         let nonce = await (try? newAccount.getNonce()) ?? .zero
 
-        let feeEstimate = try await newAccount.estimateDeployAccountFee(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
+        let feeEstimate = try await newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
         let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
         let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
 
-        let deployAccountTransaction = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
+        let deployAccountTransaction = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 

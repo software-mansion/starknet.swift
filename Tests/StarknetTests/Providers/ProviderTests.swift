@@ -202,10 +202,10 @@ final class ProviderTests: XCTestCase {
         let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
         let params1 = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: 0)
-        let tx1 = try account.sign(calls: [call], params: params1, forFeeEstimation: true)
+        let tx1 = try account.signV1(calls: [call], params: params1, forFeeEstimation: true)
 
         let params2 = StarknetDeprecatedExecutionParams(nonce: Felt(nonce.value + 1)!, maxFee: 0)
-        let tx2 = try account.sign(calls: [call, call2], params: params2, forFeeEstimation: true)
+        let tx2 = try account.signV1(calls: [call, call2], params: params2, forFeeEstimation: true)
 
         let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: [])
 
@@ -248,7 +248,7 @@ final class ProviderTests: XCTestCase {
 
         let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: .zero)
 
-        let tx = try newAccount.signDeployAccount(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
+        let tx = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
 
         let _ = try await provider.estimateFee(for: tx, simulationFlags: [])
 
@@ -310,7 +310,7 @@ final class ProviderTests: XCTestCase {
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: 500_000_000_000_000)
 
-        let invokeTx = try account.sign(calls: [call], params: params, forFeeEstimation: false)
+        let invokeTx = try account.signV1(calls: [call], params: params, forFeeEstimation: false)
 
         let accountClassHash = try await provider.getClassHashAt(account.address)
         let newSigner = StarkCurveSigner(privateKey: 1001)!
@@ -321,7 +321,7 @@ final class ProviderTests: XCTestCase {
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
         let newAccountParams = StarknetDeprecatedExecutionParams(nonce: 0, maxFee: 500_000_000_000_000)
-        let deployAccountTx = try newAccount.signDeployAccount(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
+        let deployAccountTx = try newAccount.signDeployAccountV1(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
         let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: [])
 

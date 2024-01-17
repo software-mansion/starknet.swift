@@ -57,7 +57,7 @@ final class ExecutionTests: XCTestCase {
         )
         let params = StarknetDeprecatedExecutionParams(nonce: .zero, maxFee: .zero)
 
-        let signedTx = try account.sign(calls: [call1, call2, call3], params: params)
+        let signedTx = try account.signV1(calls: [call1, call2, call3], params: params)
         let expectedCalldata = [
             Felt(3),
             balanceContractAddress,
@@ -78,7 +78,7 @@ final class ExecutionTests: XCTestCase {
 
         XCTAssertEqual(expectedCalldata, signedTx.calldata)
 
-        let signedEmptyTx = try account.sign(calls: [], params: params)
+        let signedEmptyTx = try account.signV1(calls: [], params: params)
 
         XCTAssertEqual([.zero], signedEmptyTx.calldata)
     }

@@ -244,8 +244,8 @@ final class TransactionReceiptTests: XCTestCase {
 
         let receiptWrapper: TransactionReceiptWrapper = try decoder.decode(TransactionReceiptWrapper.self, from: json)
         let receipt = receiptWrapper.transactionReceipt
-
-        XCTAssertNotNil(receipt)
+            /
+            XCTAssertNotNil(receipt)
         XCTAssertEqual(receipt.events.count, 2)
         XCTAssertNil(receipt.revertReason)
         XCTAssertTrue(receipt.isSuccessful)
