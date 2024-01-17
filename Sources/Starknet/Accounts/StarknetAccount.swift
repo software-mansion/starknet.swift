@@ -33,27 +33,11 @@ public class StarknetAccount: StarknetAccountProtocol {
     }
 
     private func makeDeployAccountTransactionV1(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) -> StarknetDeployAccountTransactionV1 {
-        StarknetDeployAccountTransactionV1(
-            signature: signature,
-            maxFee: params.maxFee,
-            nonce: params.nonce,
-            contractAddressSalt: salt,
-            constructorCalldata: calldata,
-            classHash: classHash,
-            forFeeEstimation: forFeeEstimation
-        )
+        StarknetDeployAccountTransactionV1(signature: signature, maxFee: params.maxFee, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation)
     }
 
     private func makeDeployAccountTransactionV3(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetExecutionParamsV3, forFeeEstimation: Bool) -> StarknetDeployAccountTransactionV3 {
-        StarknetDeployAccountTransactionV3(
-            signature: signature,
-            l1ResourceBounds: params.resourceBounds.l1Gas,
-            nonce: params.nonce,
-            contractAddressSalt: salt,
-            constructorCalldata: calldata,
-            classHash: classHash,
-            forFeeEstimation: forFeeEstimation
-        )
+        StarknetDeployAccountTransactionV3(signature: signature, l1ResourceBounds: params.resourceBounds.l1Gas, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation)
     }
 
     public func signV1(calls: [StarknetCall], params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1 {
