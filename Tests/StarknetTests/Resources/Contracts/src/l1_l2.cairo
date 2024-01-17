@@ -1,7 +1,5 @@
 //! L1 L2 messaging demo contract.
-//! Rewrite in Cairo 1 of the contract from previous Devnet version:
-//! https://github.com/0xSpaceShard/starknet-devnet/blob/e477aa1bbe2348ba92af2a69c32d2eef2579d863/test/contracts/cairo/l1l2.cairo
-//!
+//! Source: https://github.com/0xSpaceShard/starknet-devnet-rs/blob/55191ee549b33ccbb0bc9d20dd929e39832a5ea5/contracts/l1-l2-messaging/cairo/src/l1_l2.cairo
 //! This contract does not use interface to keep the code as simple as possible.
 //!
 
