@@ -61,18 +61,3 @@ public struct StarknetGetTransactionStatusResponse: Decodable, Equatable {
         case executionStatus = "execution_status"
     }
 }
-
-public struct StarknetFeePayment: Decodable, Equatable {
-    public let amount: Felt
-    public let feeUnit: StarknetPriceUnit
-
-    enum CodingKeys: String, CodingKey {
-        case amount
-        case feeUnit = "unit"
-    }
-}
-
-public enum StarknetPriceUnit: String, Codable {
-    case wei = "WEI"
-    case fri = "FRI"
-}
