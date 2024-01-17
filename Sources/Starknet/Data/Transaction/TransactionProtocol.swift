@@ -7,13 +7,13 @@ public protocol StarknetInvokeTransaction: StarknetTransaction {
 
 public typealias StarknetExecutableDeployAccountTransaction = StarknetDeployAccountTransaction & StarknetExecutableTransaction
 
-public protocol StarknetDeployAccountTransaction {
+public protocol StarknetDeployAccountTransaction: StarknetTransaction {
     var classHash: Felt { get }
     var contractAddressSalt: Felt { get }
     var constructorCalldata: StarknetCalldata { get }
 }
 
-public protocol StarknetDeclareTransaction {
+public protocol StarknetDeclareTransaction: StarknetTransaction {
     var classHash: Felt { get }
     var senderAddress: Felt { get }
 }
