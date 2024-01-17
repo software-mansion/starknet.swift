@@ -114,7 +114,7 @@ public class StarknetAccount: StarknetAccountProtocol {
             maxFee = paramsMaxFee
         } else {
             let feeEstimate = try await estimateFeeV1(calls: calls, nonce: nonce)
-            maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+            maxFee = feeEstimate.toMaxFee()
         }
 
         let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
