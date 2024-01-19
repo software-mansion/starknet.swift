@@ -371,6 +371,8 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
     public let signature: StarknetSignature
 
     public let classHash: Felt
+    
+    public let compiledClassHash: Felt
 
     public let senderAddress: Felt
 
@@ -390,10 +392,11 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
 
     public let hash: Felt?
 
-    public init(signature: StarknetSignature, l1ResourceBounds: StarknetResourceBounds, nonce: Felt, classHash: Felt, senderAddress: Felt, hash: Felt? = nil) {
+    public init(signature: StarknetSignature, l1ResourceBounds: StarknetResourceBounds, nonce: Felt, classHash: Felt, compiledClassHash: Felt, senderAddress: Felt, hash: Felt? = nil) {
         self.signature = signature
         self.nonce = nonce
         self.classHash = classHash
+        self.compiledClassHash = compiledClassHash
         self.senderAddress = senderAddress
         self.hash = hash
         // As of Starknet 0.13, most of v3 fields have hardcoded values.
@@ -409,6 +412,7 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
+        self.compiledClassHash = try container.decode(Felt.self, forKey: .compiledClassHash)
         self.senderAddress = try container.decode(Felt.self, forKey: .senderAddress)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
         self.resourceBounds = try container.decode(StarknetResourceBoundsMapping.self, forKey: .resourceBounds)
@@ -430,6 +434,7 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
         case version
         case signature
         case classHash = "class_hash"
+        case compiledClassHash = "compiled_class_hash"
         case senderAddress = "sender_address"
         case nonce
         case resourceBounds = "resource_bounds"
