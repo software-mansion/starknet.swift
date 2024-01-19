@@ -371,7 +371,7 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
     public let signature: StarknetSignature
 
     public let classHash: Felt
-    
+
     public let compiledClassHash: Felt
 
     public let senderAddress: Felt
