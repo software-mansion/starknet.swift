@@ -125,6 +125,7 @@ public protocol StarknetAccountProtocol {
     ///  - classHash: class hash of account to be deployed
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
+    ///  - nonce: nonce of the account to be deployed
     ///  - skipValidate: flag indicating whether validation of the transaction should be skipped
     ///
     /// - Returns: struct containing fee estimate
@@ -136,6 +137,7 @@ public protocol StarknetAccountProtocol {
     ///  - classHash: class hash of account to be deployed
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
+    ///  - nonce: nonce of the account to be deployed
     ///  - skipValidate: flag indicating whether validation of the transaction should be skipped
     ///
     /// - Returns: struct containing fee estimate
@@ -205,6 +207,7 @@ public extension StarknetAccountProtocol {
     /// - Parameters:
     ///  - call: a call to be signed.
     ///  - params: additional params for a given transaction
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed invoke transaction v1
     func signV1(call: StarknetCall, params: StarknetDeprecatedExecutionParams, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV1 {
@@ -215,6 +218,7 @@ public extension StarknetAccountProtocol {
     /// - Parameters:
     ///  - call: a call to be signed.
     ///  - params: additional params for a given transaction
+    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed invoke transaction v3
     func signV3(call: StarknetCall, params: StarknetExecutionParamsV3, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV3 {
@@ -381,6 +385,7 @@ public extension StarknetAccountProtocol {
     ///  - classHash: class hash of account to be deployed
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
+    ///  - nonce: nonce of the account to be deployed
     ///
     /// - Returns: struct containing fee estimate
     func estimateDeployAccountFeeV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate {
@@ -393,6 +398,7 @@ public extension StarknetAccountProtocol {
     ///  - classHash: class hash of account to be deployed
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
+    ///  - nonce: nonce of the account to be deployed
     ///
     /// - Returns: struct containing fee estimate
     func estimateDeployAccountFeeV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt) async throws -> StarknetFeeEstimate {
