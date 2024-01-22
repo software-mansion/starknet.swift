@@ -138,8 +138,7 @@ public protocol StarknetProviderProtocol {
 }
 
 let defaultBlockId = StarknetBlockId.tag(.pending)
-let defaultSimulationFlagsForEstimateFee: Set<StarknetSimulationFlagForEstimateFee> = [.skipValidate]
-
+let defaultSimulationFlagsForEstimateFee: Set<StarknetSimulationFlagForEstimateFee> = []
 public extension StarknetProviderProtocol {
     /// Call starknet contract in the pending block.
     ///
