@@ -109,7 +109,7 @@ final class AccountTests: XCTestCase {
         let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
         let nonce = try await account.getNonce()
-        let feeEstimate = try await account.estimateFeeV3(call: call, nonce: nonce)
+        let feeEstimate = try await account.estimateFeeV3(call: call, nonce: nonce, skipValidate: false)
         let resourceBounds = feeEstimate.toResourceBounds()
 
         let params = StarknetOptionalExecutionParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
@@ -152,7 +152,7 @@ final class AccountTests: XCTestCase {
 
         let nonce = await (try? newAccount.getNonce()) ?? .zero
 
-        let feeEstimate = try await newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
+        let feeEstimate = try await newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce, skipValidate: false)
         let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
 
         let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
