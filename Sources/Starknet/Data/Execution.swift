@@ -23,7 +23,7 @@ public struct StarknetCall: Codable, Equatable {
     }
 }
 
-public struct StarknetExecutionParamsV3 {
+public struct StarknetInvokeParamsV3 {
     public let nonce: Felt
     public let resourceBounds: StarknetResourceBoundsMapping
     public let tip: UInt64AsHex
@@ -44,7 +44,47 @@ public struct StarknetExecutionParamsV3 {
     }
 }
 
-public struct StarknetOptionalExecutionParamsV3 {
+public struct StarknetOptionalInvokeParamsV3 {
+    public let nonce: Felt?
+    public let resourceBounds: StarknetResourceBoundsMapping?
+    public let tip: UInt64AsHex
+    public let paymasterData: StarknetPaymasterData
+    public let accountDeploymentData: StarknetAccountDeploymentData
+    public let nonceDataAvailabilityMode: StarknetDAMode
+    public let feeDataAvailabilityMode: StarknetDAMode
+
+    public init(nonce: Felt? = nil, l1ResourceBounds: StarknetResourceBounds? = nil) {
+        self.nonce = nonce
+        // As of Starknet 0.13, most of v3 fields have hardcoded values.
+        self.resourceBounds = l1ResourceBounds.map(StarknetResourceBoundsMapping.init)
+        self.tip = .zero
+        self.paymasterData = []
+        self.accountDeploymentData = []
+        self.nonceDataAvailabilityMode = .l1
+        self.feeDataAvailabilityMode = .l1
+    }
+}
+
+public struct StarknetDeployAccountParamsV3 {
+    public let nonce: Felt
+    public let resourceBounds: StarknetResourceBoundsMapping
+    public let tip: UInt64AsHex
+    public let paymasterData: StarknetPaymasterData
+    public let nonceDataAvailabilityMode: StarknetDAMode
+    public let feeDataAvailabilityMode: StarknetDAMode
+
+    public init(nonce: Felt, l1ResourceBounds: StarknetResourceBounds) {
+        self.nonce = nonce
+        // As of Starknet 0.13, most of v3 fields have hardcoded values.
+        self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
+        self.tip = .zero
+        self.paymasterData = []
+        self.nonceDataAvailabilityMode = .l1
+        self.feeDataAvailabilityMode = .l1
+    }
+}
+
+public struct StarknetOptionalDeployAccountParamsV3 {
     public let nonce: Felt?
     public let resourceBounds: StarknetResourceBoundsMapping?
     public let tip: UInt64AsHex
