@@ -88,7 +88,7 @@ final class AccountTests: XCTestCase {
 
         let nonce = try await account.getNonce()
         let feeEstimate = try await account.estimateFeeV1(call: call, nonce: nonce)
-        let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+        let maxFee = feeEstimate.toMaxFee()
 
         let params = StarknetOptionalDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
 
@@ -153,7 +153,7 @@ final class AccountTests: XCTestCase {
         let nonce = await (try? newAccount.getNonce()) ?? .zero
 
         let feeEstimate = try await newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce, skipValidate: false)
-        let maxFee = estimatedFeeToMaxFee(feeEstimate.overallFee)
+        let maxFee = feeEstimate.toMaxFee()
 
         let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
 

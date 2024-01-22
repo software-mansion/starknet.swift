@@ -1,19 +1,6 @@
 import BigInt
 import Foundation
 
-/// Convert estimated fee to max fee with added overhead
-///
-/// Add overhead to estimated fee. Calculates multiplier as m = round((1 + ovehead) \* 100%).
-/// Then multiplies fee by m and does integer division by 100.
-///
-/// - Parameters:
-///  - fee: originally estimated fee
-///  - overhead: how big overhead should be added (as a fraction of fee) to the fee, defaults to 0.5
-/// - Returns: max fee with added overhead
-public func estimatedFeeToMaxFee(_ fee: Felt, overhead: Double = 0.5) -> Felt {
-    addOverhead(fee.value, overhead).toFeltClamped()
-}
-
 public extension StarknetFeeEstimate {
     /// Convert estimated fee to resource bounds with added overhead
     ///
