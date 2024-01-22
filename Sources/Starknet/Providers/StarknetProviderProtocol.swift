@@ -185,7 +185,7 @@ public extension StarknetProviderProtocol {
     /// Estimate fee for a single transaction with default flags in the pending block.
     ///
     /// - Parameters:
-    ///  -  transaction: transaction for which the fees should be estimated.
+    ///  -  transaction: transaction for which the fee should be estimated.
     ///
     /// - Returns: Fee estimate
     func estimateFee(for transaction: any StarknetExecutableTransaction) async throws -> StarknetFeeEstimate {
@@ -195,7 +195,7 @@ public extension StarknetProviderProtocol {
     /// Estimate fee for a single transaction with default flags.
     ///
     /// - Parameters:
-    ///  -  transaction: transactions for which the fees should be estimated.
+    ///  -  transaction: transaction for which the fee should be estimated.
     ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: Fee estimate
@@ -250,7 +250,7 @@ public extension StarknetProviderProtocol {
     ///  - transactions: list of transactions to simulate
     ///  - simulationFlags: a set of simulation flags
     ///
-    ///  - Rertunes : array of simulated transactions
+    ///  - Returns : array of simulated transactions
     func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
         try await simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
