@@ -10,6 +10,7 @@ public extension StarknetFeeEstimate {
     /// - Parameters:
     ///  - amountOverhead: how big overhead should be added (as a fraction of amount) to the amount, defaults to 0.1
     ///  - unitPriceOverhead: how big overhead should be added (as a fraction of unit price) to the unit price, defaults to 0.5
+    ///
     /// - Returns: resource bounds with added overhead
     func toResourceBounds(amountOverhead: Double = 0.1, unitPriceOverhead: Double = 0.5) -> StarknetResourceBoundsMapping {
         let maxAmount = addOverhead(self.gasConsumed.value, amountOverhead).toUInt64AsHexClamped()
@@ -19,6 +20,15 @@ public extension StarknetFeeEstimate {
         return StarknetResourceBoundsMapping(l1Gas: l1Gas)
     }
 
+    /// Add overhead to estimated fee
+    ///
+    /// Add overhead to estimated fee. Calculates multiplier as m = round((1 + ovehead) \* 100%).
+    /// Then multiplies fee by m and does integer division by 100.
+    ///
+    /// - Parameters:
+    ///  - overhead: how big overhead should be added (as a fraction of fee) to the fee, defaults to 0.1
+    ///  
+    /// - Returns: fee with added overhead
     func toMaxFee(overhead: Double = 0.5) -> Felt {
         addOverhead(self.overallFee.value, overhead).toFeltClamped()
     }
