@@ -82,6 +82,10 @@ public struct StarknetDeployAccountParamsV3 {
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
     }
+
+    public init(l1ResourceBounds: StarknetResourceBounds) {
+        self.init(nonce: .zero, l1ResourceBounds: l1ResourceBounds)
+    }
 }
 
 public struct StarknetOptionalDeployAccountParamsV3 {
