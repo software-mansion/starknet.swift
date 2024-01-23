@@ -1,4 +1,4 @@
-public typealias StarknetExecutableInvokeTransaction = StarknetInvokeTransaction & StarknetExecutableTransaction
+public typealias StarknetExecutableInvokeTransaction = StarknetExecutableTransaction & StarknetInvokeTransaction
 
 public protocol StarknetInvokeTransaction: StarknetTransaction {
     var calldata: StarknetCalldata { get }

@@ -27,7 +27,7 @@ public extension StarknetFeeEstimate {
     ///
     /// - Parameters:
     ///  - overhead: how big overhead should be added (as a fraction of fee) to the fee, defaults to 0.1
-    ///  
+    ///
     /// - Returns: fee with added overhead
     func toMaxFee(overhead: Double = 0.5) -> Felt {
         addOverhead(self.overallFee.value, overhead).toFeltClamped()
