@@ -23,7 +23,7 @@ public struct StarknetCall: Codable, Equatable {
     }
 }
 
-public struct StarknetInvokeParamsV3 {
+public struct StarknetInvokeParams {
     public let nonce: Felt
     public let resourceBounds: StarknetResourceBoundsMapping
     public let tip: UInt64AsHex
@@ -44,7 +44,7 @@ public struct StarknetInvokeParamsV3 {
     }
 }
 
-public struct StarknetOptionalInvokeParamsV3 {
+public struct StarknetOptionalInvokeParams {
     public let nonce: Felt?
     public let resourceBounds: StarknetResourceBoundsMapping?
     public let tip: UInt64AsHex
@@ -65,7 +65,7 @@ public struct StarknetOptionalInvokeParamsV3 {
     }
 }
 
-public struct StarknetDeployAccountParamsV3 {
+public struct StarknetDeployAccountParams {
     public let nonce: Felt
     public let resourceBounds: StarknetResourceBoundsMapping
     public let tip: UInt64AsHex

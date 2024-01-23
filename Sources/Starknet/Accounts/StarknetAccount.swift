@@ -28,7 +28,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         StarknetInvokeTransactionV1(senderAddress: address, calldata: calldata, signature: signature, maxFee: params.maxFee, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
     }
 
-    private func makeInvokeTransactionV3(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetInvokeParamsV3, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV3 {
+    private func makeInvokeTransactionV3(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetInvokeParams, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV3 {
         StarknetInvokeTransactionV3(senderAddress: address, calldata: calldata, signature: signature, l1ResourceBounds: params.resourceBounds.l1Gas, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
     }
 
@@ -36,7 +36,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         StarknetDeployAccountTransactionV1(signature: signature, maxFee: params.maxFee, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation)
     }
 
-    private func makeDeployAccountTransactionV3(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) -> StarknetDeployAccountTransactionV3 {
+    private func makeDeployAccountTransactionV3(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeployAccountParams, forFeeEstimation: Bool) -> StarknetDeployAccountTransactionV3 {
         StarknetDeployAccountTransactionV3(signature: signature, l1ResourceBounds: params.resourceBounds.l1Gas, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation)
     }
 
@@ -52,7 +52,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         return makeInvokeTransactionV1(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3 {
+    public func signV3(calls: [StarknetCall], params: StarknetInvokeParams, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3 {
         let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
 
         let transaction = makeInvokeTransactionV3(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
@@ -74,7 +74,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         return makeDeployAccountTransactionV1(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV3 {
+    public func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParams, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV3 {
         let transaction = makeDeployAccountTransactionV3(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: provider.starknetChainId)
@@ -107,7 +107,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         return try await provider.addInvokeTransaction(signedTransaction)
     }
 
-    public func executeV3(calls: [StarknetCall], params: StarknetOptionalInvokeParamsV3) async throws -> StarknetInvokeTransactionResponse {
+    public func executeV3(calls: [StarknetCall], params: StarknetOptionalInvokeParams) async throws -> StarknetInvokeTransactionResponse {
         var nonce: Felt
         var resourceBounds: StarknetResourceBoundsMapping
 
@@ -124,7 +124,7 @@ public class StarknetAccount: StarknetAccountProtocol {
             resourceBounds = feeEstimate.toResourceBounds()
         }
 
-        let params = StarknetInvokeParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
+        let params = StarknetInvokeParams(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
         let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: false)
 
         return try await provider.addInvokeTransaction(signedTransaction)
@@ -138,7 +138,7 @@ public class StarknetAccount: StarknetAccountProtocol {
     }
 
     public func estimateFeeV3(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetFeeEstimate {
-        let params = StarknetInvokeParamsV3(nonce: nonce, l1ResourceBounds: .zero)
+        let params = StarknetInvokeParams(nonce: nonce, l1ResourceBounds: .zero)
         let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: true)
 
         return try await provider.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])
@@ -152,7 +152,7 @@ public class StarknetAccount: StarknetAccountProtocol {
     }
 
     public func estimateDeployAccountFeeV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt, skipValidate: Bool) async throws -> StarknetFeeEstimate {
-        let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: .zero)
+        let params = StarknetDeployAccountParams(nonce: nonce, l1ResourceBounds: .zero)
         let signedTransaction = try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
 
         return try await provider.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])
