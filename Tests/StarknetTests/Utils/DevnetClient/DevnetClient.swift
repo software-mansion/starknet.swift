@@ -598,9 +598,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.launch()
             process.waitUntilExit()
 
-            let command = "\(process.launchPath!) \(process.arguments!.joined(separator: " "))"
-            print(command)
-
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let error = String(decoding: errorData, as: UTF8.self)
