@@ -23,7 +23,7 @@ public struct StarknetCall: Codable, Equatable {
     }
 }
 
-public struct StarknetInvokeParams {
+public struct StarknetInvokeParamsV3 {
     public let nonce: Felt
     public let resourceBounds: StarknetResourceBoundsMapping
     public let tip: UInt64AsHex
@@ -44,7 +44,7 @@ public struct StarknetInvokeParams {
     }
 }
 
-public struct StarknetOptionalInvokeParams {
+public struct StarknetOptionalInvokeParamsV3 {
     public let nonce: Felt?
     public let resourceBounds: StarknetResourceBoundsMapping?
     public let tip: UInt64AsHex
@@ -65,7 +65,7 @@ public struct StarknetOptionalInvokeParams {
     }
 }
 
-public struct StarknetDeployAccountParams {
+public struct StarknetDeployAccountParamsV3 {
     public let nonce: Felt
     public let resourceBounds: StarknetResourceBoundsMapping
     public let tip: UInt64AsHex
@@ -88,7 +88,7 @@ public struct StarknetDeployAccountParams {
     }
 }
 
-public struct StarknetDeprecatedExecutionParams {
+public struct StarknetInvokeParamsV1 {
     public let nonce: Felt
     public let maxFee: Felt
 
@@ -98,13 +98,27 @@ public struct StarknetDeprecatedExecutionParams {
     }
 }
 
-public struct StarknetOptionalDeprecatedExecutionParams {
+public struct StarknetOptionalInvokeParamsV1 {
     public let nonce: Felt?
     public let maxFee: Felt?
 
     public init(nonce: Felt? = nil, maxFee: Felt? = nil) {
         self.nonce = nonce
         self.maxFee = maxFee
+    }
+}
+
+public struct StarknetDeployAccountParamsV1 {
+    public let nonce: Felt
+    public let maxFee: Felt
+
+    public init(nonce: Felt, maxFee: Felt) {
+        self.nonce = nonce
+        self.maxFee = maxFee
+    }
+
+    public init(maxFee: Felt) {
+        self.init(nonce: .zero, maxFee: maxFee)
     }
 }
 

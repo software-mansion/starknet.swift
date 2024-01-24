@@ -90,7 +90,7 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await account.estimateFeeV1(call: call, nonce: nonce)
         let maxFee = feeEstimate.toMaxFee()
 
-        let params = StarknetOptionalDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
+        let params = StarknetOptionalInvokeParamsV1(nonce: nonce, maxFee: maxFee)
 
         let result = try await account.executeV1(call: call, params: params)
 
@@ -112,7 +112,7 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await account.estimateFeeV3(call: call, nonce: nonce, skipValidate: false)
         let resourceBounds = feeEstimate.toResourceBounds()
 
-        let params = StarknetOptionalInvokeParams(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
+        let params = StarknetOptionalInvokeParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
 
         let result = try await account.executeV3(calls: [call], params: params)
 
@@ -155,7 +155,7 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce, skipValidate: false)
         let maxFee = feeEstimate.toMaxFee()
 
-        let params = StarknetDeprecatedExecutionParams(nonce: nonce, maxFee: maxFee)
+        let params = StarknetDeployAccountParamsV1(nonce: nonce, maxFee: maxFee)
 
         let deployAccountTransaction = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
@@ -180,7 +180,7 @@ final class AccountTests: XCTestCase {
 
         let feeEstimate = try await newAccount.estimateDeployAccountFeeV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
 
-        let params = StarknetDeployAccountParams(nonce: nonce, l1ResourceBounds: feeEstimate.toResourceBounds().l1Gas)
+        let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: feeEstimate.toResourceBounds().l1Gas)
 
         let deployAccountTransaction = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
