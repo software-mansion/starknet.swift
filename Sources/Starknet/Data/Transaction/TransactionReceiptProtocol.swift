@@ -25,7 +25,7 @@ public protocol StarknetPendingTransactionReceipt: StarknetTransactionReceipt {}
 
 public protocol StarknetTransactionReceipt: Decodable, Equatable {
     var transactionHash: Felt { get }
-    var actualFee: Felt { get }
+    var actualFee: StarknetFeePayment { get }
     var messagesSent: [StarknetMessageToL1] { get }
     var events: [StarknetEvent] { get }
     var finalityStatus: StarknetTransactionFinalityStatus { get }

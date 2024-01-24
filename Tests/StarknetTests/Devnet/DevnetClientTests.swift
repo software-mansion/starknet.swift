@@ -1,7 +1,7 @@
 @testable import Starknet
 import XCTest
 
-final class devnetClientTests: XCTestCase {
+final class DevnetClientTests: XCTestCase {
     var client: DevnetClientProtocol!
 
     override func setUp() async throws {
@@ -13,7 +13,8 @@ final class devnetClientTests: XCTestCase {
         client.close()
     }
 
-    func testCreateDeployAccount() async throws {
+    // TODO: (#130) re-enable once creating accounts is supported again
+    func disabledTestCreateDeployAccount() async throws {
         let account = try await client.createDeployAccount(name: "Account1")
         try await client.assertTransactionSucceeded(transactionHash: account.transactionHash)
 
@@ -21,7 +22,8 @@ final class devnetClientTests: XCTestCase {
         try await client.assertTransactionSucceeded(transactionHash: account2.transactionHash)
     }
 
-    func testCreateAndDeployAccount() async throws {
+    // TODO: (#130) re-enable once creating accounts is supported again
+    func disabledTestCreateAndDeployAccount() async throws {
         let account = try await client.createAccount()
         try await client.prefundAccount(address: account.details.address)
         let deployedAccount = try await client.deployAccount(name: account.name)
@@ -53,7 +55,7 @@ final class devnetClientTests: XCTestCase {
             1000,
             0,
         ]
-        let invokeResult = try await client.invokeContract(contractAddress: client.constants.erc20ContractAddress, function: "transfer", calldata: calldata)
+        let invokeResult = try await client.invokeContract(contractAddress: client.constants.ethErc20ContractAddress, function: "transfer", calldata: calldata)
         try await client.assertTransactionSucceeded(transactionHash: invokeResult.transactionHash)
     }
 }

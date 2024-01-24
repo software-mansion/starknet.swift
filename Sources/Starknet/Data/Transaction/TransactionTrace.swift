@@ -17,6 +17,10 @@ public enum StarknetSimulationFlag: String, Codable {
     case skipFeeCharge = "SKIP_FEE_CHARGE"
 }
 
+public enum StarknetSimulationFlagForEstimateFee: String, Codable {
+    case skipValidate = "SKIP_VALIDATE"
+}
+
 public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let contractAddress: Felt
     public let entrypoint: Felt

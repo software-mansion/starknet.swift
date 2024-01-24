@@ -59,7 +59,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         if let result = response.result {
             return result
         } else if let error = response.error {
-            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data?.revertError)
+            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data)
         } else {
             throw StarknetProviderError.unknownError
         }
@@ -89,8 +89,8 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func estimateFee(for transactions: [any StarknetTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
-        let params = EstimateFeeParams(request: transactions, blockId: blockId)
+    public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> [StarknetFeeEstimate] {
+        let params = EstimateFeeParams(request: transactions, simulationFlags: simulationFlags, blockId: blockId)
 
         let result = try await makeRequest(method: .estimateFee, params: params, receive: [StarknetFeeEstimate].self)
         return result
@@ -104,7 +104,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func addInvokeTransaction(_ transaction: StarknetInvokeTransactionV1) async throws -> StarknetInvokeTransactionResponse {
+    public func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
         let params = AddInvokeTransactionParams(invokeTransaction: transaction)
 
         let result = try await makeRequest(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
@@ -112,7 +112,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func addDeployAccountTransaction(_ transaction: StarknetDeployAccountTransactionV1) async throws -> StarknetDeployAccountResponse {
+    public func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) async throws -> StarknetDeployAccountResponse {
         let params = AddDeployAccountTransactionParams(deployAccountTransaction: transaction)
 
         let result = try await makeRequest(method: .deployAccount, params: params, receive: StarknetDeployAccountResponse.self)
@@ -182,7 +182,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func simulateTransactions(_ transactions: [any StarknetTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
+    public func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
         let result = try await makeRequest(method: .simulateTransactions, params: params, receive: [StarknetSimulatedTransaction].self)
