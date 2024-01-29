@@ -48,6 +48,12 @@ final class ProviderTests: XCTestCase {
         XCTAssertNotNil(starknetProvider)
     }
 
+    func testGetChainId() async throws {
+        let chainId = try await provider.getChainId()
+
+        XCTAssertEqual(chainId, .goerli)
+    }
+
     func testSpecVersion() async throws {
         let result = try await provider.specVersion()
         XCTAssertFalse(result.isEmpty)
