@@ -40,44 +40,48 @@ public class StarknetAccount: StarknetAccountProtocol {
         StarknetDeployAccountTransactionV3(signature: signature, l1ResourceBounds: params.resourceBounds.l1Gas, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1 {
+    public func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1, forFeeEstimation: Bool) async throws -> StarknetInvokeTransactionV1 {
         let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
 
         let transaction = makeInvokeTransactionV1(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: provider.starknetChainId)
+        let chainId = try await provider.getChainId()
+        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
         return makeInvokeTransactionV1(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3 {
+    public func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) async throws -> StarknetInvokeTransactionV3 {
         let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
 
         let transaction = makeInvokeTransactionV3(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: provider.starknetChainId)
+        let chainId = try await provider.getChainId()
+        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
         return makeInvokeTransactionV3(calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV1, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV1 {
+    public func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV1, forFeeEstimation: Bool) async throws -> StarknetDeployAccountTransactionV1 {
         let transaction = makeDeployAccountTransactionV1(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: provider.starknetChainId)
+        let chainId = try await provider.getChainId()
+        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
         return makeDeployAccountTransactionV1(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
 
-    public func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV3 {
+    public func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) async throws -> StarknetDeployAccountTransactionV3 {
         let transaction = makeDeployAccountTransactionV3(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: provider.starknetChainId)
+        let chainId = try await provider.getChainId()
+        let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)
 
@@ -102,7 +106,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         }
 
         let params = StarknetInvokeParamsV1(nonce: nonce, maxFee: maxFee)
-        let signedTransaction = try signV1(calls: calls, params: params, forFeeEstimation: false)
+        let signedTransaction = try await signV1(calls: calls, params: params, forFeeEstimation: false)
 
         return try await provider.addInvokeTransaction(signedTransaction)
     }
@@ -125,35 +129,35 @@ public class StarknetAccount: StarknetAccountProtocol {
         }
 
         let params = StarknetInvokeParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
-        let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: false)
+        let signedTransaction = try await signV3(calls: calls, params: params, forFeeEstimation: false)
 
         return try await provider.addInvokeTransaction(signedTransaction)
     }
 
     public func estimateFeeV1(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetFeeEstimate {
         let params = StarknetInvokeParamsV1(nonce: nonce, maxFee: .zero)
-        let signedTransaction = try signV1(calls: calls, params: params, forFeeEstimation: true)
+        let signedTransaction = try await signV1(calls: calls, params: params, forFeeEstimation: true)
 
         return try await provider.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])
     }
 
     public func estimateFeeV3(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetFeeEstimate {
         let params = StarknetInvokeParamsV3(nonce: nonce, l1ResourceBounds: .zero)
-        let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: true)
+        let signedTransaction = try await signV3(calls: calls, params: params, forFeeEstimation: true)
 
         return try await provider.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])
     }
 
     public func estimateDeployAccountFeeV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt, skipValidate: Bool) async throws -> StarknetFeeEstimate {
         let params = StarknetDeployAccountParamsV1(nonce: nonce, maxFee: 0)
-        let signedTransaction = try signDeployAccountV1(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
+        let signedTransaction = try await signDeployAccountV1(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
 
         return try await provider.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])
     }
 
     public func estimateDeployAccountFeeV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt, skipValidate: Bool) async throws -> StarknetFeeEstimate {
         let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: .zero)
-        let signedTransaction = try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
+        let signedTransaction = try await signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
 
         return try await provider.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])
     }
