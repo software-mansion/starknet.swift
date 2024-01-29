@@ -15,7 +15,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.networkProvider = HttpNetworkProvider()
     }
 
-    public convenience init?(starknetChainId _: StarknetChainId, url: String) {
+    public convenience init?(url: String) {
         guard let url = URL(string: url) else {
             return nil
         }
