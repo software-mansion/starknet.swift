@@ -182,6 +182,14 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
+    public func getChainId() async throws -> StarknetChainId {
+        let params = EmptySequence()
+
+        let result = try await makeRequest(method: .getChainId, params: params, receive: StarknetChainId.self)
+
+        return result
+    }
+
     public func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
