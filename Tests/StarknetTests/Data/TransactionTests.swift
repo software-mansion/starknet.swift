@@ -89,7 +89,7 @@ final class TransactionTests: XCTestCase {
             let data = string.data(using: .utf8)!
 
             let decoder = JSONDecoder()
-            var result: TransactionWrapper = try decoder.decode(TransactionWrapper.self, from: data)
+            let result: TransactionWrapper = try decoder.decode(TransactionWrapper.self, from: data)
             XCTAssertNotNil(result.transaction)
             XCTAssertTrue(result.transaction.type == type && result.transaction.version == version)
         }
