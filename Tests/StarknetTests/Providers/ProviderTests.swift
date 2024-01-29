@@ -37,7 +37,7 @@ final class ProviderTests: XCTestCase {
     }
 
     func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
-        StarknetProvider(starknetChainId: .goerli, url: url)!
+        StarknetProvider(url: url)!
     }
 
     func testRequestWithCustomURLSession() {

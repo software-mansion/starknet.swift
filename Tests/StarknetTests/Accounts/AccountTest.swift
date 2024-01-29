@@ -18,7 +18,7 @@ final class AccountTests: XCTestCase {
             try await Self.devnetClient.start()
         }
 
-        provider = StarknetProvider(starknetChainId: .goerli, url: Self.devnetClient.rpcUrl)!
+        provider = StarknetProvider(url: Self.devnetClient.rpcUrl)!
         accountContractClassHash = Self.devnetClient.constants.accountContractClassHash
         ethContractAddress = Self.devnetClient.constants.ethErc20ContractAddress
         let accountDetails = Self.devnetClient.constants.predeployedAccount1
