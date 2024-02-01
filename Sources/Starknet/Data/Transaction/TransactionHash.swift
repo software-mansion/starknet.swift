@@ -11,7 +11,7 @@ public class StarknetTransactionHashCalculator {
         entryPointSelector: Felt,
         calldata: StarknetCalldata,
         maxFee: Felt,
-        chainId: StarknetChainId,
+        chainId: Felt,
         nonce: Felt
     ) -> Felt {
         StarknetCurve.pedersenOn(
@@ -21,12 +21,12 @@ public class StarknetTransactionHashCalculator {
             entryPointSelector,
             StarknetCurve.pedersenOn(calldata),
             maxFee,
-            chainId.feltValue,
+            chainId,
             nonce
         )
     }
 
-    private class func prepareCommonTransactionV3Fields(of transaction: any StarknetTransactionV3, address: Felt, chainId: StarknetChainId) -> [Felt] {
+    private class func prepareCommonTransactionV3Fields(of transaction: any StarknetTransactionV3, address: Felt, chainId: Felt) -> [Felt] {
         let transactionType = transaction.type
         let version = transaction.version
         let tip = transaction.tip
@@ -45,7 +45,7 @@ public class StarknetTransactionHashCalculator {
                     + StarknetTransactionHashCalculator.resourceBoundsForFee(resourceBounds)
             ),
             StarknetPoseidon.poseidonHash(paymasterData),
-            chainId.feltValue,
+            chainId,
             nonce,
             StarknetTransactionHashCalculator.dataAvailabilityModes(
                 feeDataAvailabilityMode: feeDataAvailabilityMode,
@@ -54,7 +54,7 @@ public class StarknetTransactionHashCalculator {
         ]
     }
 
-    public class func computeHash(of transaction: StarknetInvokeTransactionV1, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetInvokeTransactionV1, chainId: Felt) -> Felt {
         computeCommonDeprecatedTransactionHash(
             transactionType: transaction.type,
             version: transaction.version,
@@ -67,7 +67,7 @@ public class StarknetTransactionHashCalculator {
         )
     }
 
-    public class func computeHash(of transaction: StarknetInvokeTransactionV3, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetInvokeTransactionV3, chainId: Felt) -> Felt {
         let commonFields = StarknetTransactionHashCalculator.prepareCommonTransactionV3Fields(
             of: transaction,
             address: transaction.senderAddress,
@@ -81,7 +81,7 @@ public class StarknetTransactionHashCalculator {
         )
     }
 
-    public class func computeHash(of transaction: StarknetDeployAccountTransactionV1, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetDeployAccountTransactionV1, chainId: Felt) -> Felt {
         let contractAddress = StarknetContractAddressCalculator.calculateFrom(
             classHash: transaction.classHash,
             calldata: transaction.constructorCalldata,
@@ -102,7 +102,7 @@ public class StarknetTransactionHashCalculator {
         )
     }
 
-    public class func computeHash(of transaction: StarknetDeployAccountTransactionV3, chainId: StarknetChainId) -> Felt {
+    public class func computeHash(of transaction: StarknetDeployAccountTransactionV3, chainId: Felt) -> Felt {
         let contractAddress = StarknetContractAddressCalculator.calculateFrom(
             classHash: transaction.classHash,
             calldata: transaction.constructorCalldata,

@@ -2,8 +2,6 @@ import Foundation
 
 /// Provider used to interact with the StakNet blockchain.
 public protocol StarknetProviderProtocol {
-    var starknetChainId: StarknetChainId { get }
-
     /// Get the version of the Starknet JSON-RPC specification being used by the node.
     ///
     ///  - Returns: the version of the Starknet JSON-RPC specification being used.
@@ -125,6 +123,11 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Returns: The status(es) of a transaction
     func getTransactionStatusBy(hash: Felt) async throws -> StarknetGetTransactionStatusResponse
+
+    /// Get the currently configured Starknet chain id
+    ///
+    /// - Returns: The Starknet chain id
+    func getChainId() async throws -> Felt
 
     /// Simulate running a given list of transactions, and generate the execution trace
     ///

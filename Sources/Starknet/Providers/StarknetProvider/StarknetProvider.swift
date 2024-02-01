@@ -7,35 +7,31 @@ public enum StarknetProviderError: Error {
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
-    public let starknetChainId: StarknetChainId
-
     private let url: URL
     private let networkProvider: HttpNetworkProvider
 
-    public init(starknetChainId: StarknetChainId, url: URL) {
-        self.starknetChainId = starknetChainId
+    public init(url: URL) {
         self.url = url
         self.networkProvider = HttpNetworkProvider()
     }
 
-    public convenience init?(starknetChainId: StarknetChainId, url: String) {
+    public convenience init?(url: String) {
         guard let url = URL(string: url) else {
             return nil
         }
-        self.init(starknetChainId: starknetChainId, url: url)
+        self.init(url: url)
     }
 
-    public init(starknetChainId: StarknetChainId, url: URL, urlSession: URLSession) {
-        self.starknetChainId = starknetChainId
+    public init(url: URL, urlSession: URLSession) {
         self.url = url
         self.networkProvider = HttpNetworkProvider(session: urlSession)
     }
 
-    public convenience init?(starknetChainId: StarknetChainId, url: String, urlSession: URLSession) {
+    public convenience init?(url: String, urlSession: URLSession) {
         guard let url = URL(string: url) else {
             return nil
         }
-        self.init(starknetChainId: starknetChainId, url: url, urlSession: urlSession)
+        self.init(url: url, urlSession: urlSession)
     }
 
     private func makeRequest<U>(method: JsonRpcMethod, params: some Encodable = EmptyParams(), receive _: U.Type) async throws -> U where U: Decodable {
@@ -178,6 +174,14 @@ public class StarknetProvider: StarknetProviderProtocol {
         let params = GetTransactionStatusPayload(transactionHash: hash)
 
         let result = try await makeRequest(method: .getTransactionStatus, params: params, receive: StarknetGetTransactionStatusResponse.self)
+
+        return result
+    }
+
+    public func getChainId() async throws -> Felt {
+        let params = EmptySequence()
+
+        let result = try await makeRequest(method: .getChainId, params: params, receive: Felt.self)
 
         return result
     }
