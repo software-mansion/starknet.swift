@@ -2,7 +2,7 @@ import Foundation
 
 public struct StarknetProcessedInvokeTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetInvokeTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let blockHash: Felt
     public let blockNumber: UInt64
     public let messagesSent: [StarknetMessageToL1]
@@ -33,7 +33,7 @@ public struct StarknetProcessedInvokeTransactionReceipt: StarknetProcessedTransa
 
 public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactionReceipt, StarknetInvokeTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
@@ -60,7 +60,7 @@ public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactio
 
 public struct StarknetProcessedDeclareTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeclareTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let blockHash: Felt
     public let blockNumber: UInt64
     public let messagesSent: [StarknetMessageToL1]
@@ -91,7 +91,7 @@ public struct StarknetProcessedDeclareTransactionReceipt: StarknetProcessedTrans
 
 public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeclareTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
@@ -118,7 +118,7 @@ public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransacti
 
 public struct StarknetProcessedDeployAccountTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeployAccountTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let blockHash: Felt
     public let blockNumber: UInt64
     public let messagesSent: [StarknetMessageToL1]
@@ -151,7 +151,7 @@ public struct StarknetProcessedDeployAccountTransactionReceipt: StarknetProcesse
 
 public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeployAccountTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus
@@ -180,7 +180,7 @@ public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTra
 
 public struct StarknetProcessedDeployTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeployTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let blockHash: Felt
     public let blockNumber: UInt64
     public let messagesSent: [StarknetMessageToL1]
@@ -213,7 +213,7 @@ public struct StarknetProcessedDeployTransactionReceipt: StarknetProcessedTransa
 
 public struct StarknetProcessedL1HandlerTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetL1HandlerTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let blockHash: Felt
     public let blockNumber: UInt64
     public let messagesSent: [StarknetMessageToL1]
@@ -246,7 +246,7 @@ public struct StarknetProcessedL1HandlerTransactionReceipt: StarknetProcessedTra
 
 public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransactionReceipt, StarknetL1HandlerTransactionReceipt {
     public let transactionHash: Felt
-    public let actualFee: Felt
+    public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let executionStatus: StarknetTransactionExecutionStatus

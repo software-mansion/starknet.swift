@@ -18,7 +18,7 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt64) async throws
+    func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?, maxFee: Felt) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, maxFee: Felt, prefund: Bool) async throws -> DeployAccountResult
@@ -34,8 +34,8 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000) async throws {
-        try await prefundAccount(address: address, amount: amount)
+    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
+        try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
     func createDeployAccount(
@@ -169,6 +169,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
         // Cache declared and deployed contracts by name and classHash respectively
         private var declaredContractsAtName: [String: DeclareContractResult] = [:]
         private var deployedContracts: [Felt: DeployContractResult] = [:]
+        private var deployedAccounts: [Felt: DeployAccountResult] = [:]
 
         let host: String
         let port: Int
@@ -222,6 +223,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "\(port)",
                 "--seed",
                 "\(seed)",
+                "--state-archive-capacity",
+                "full",
             ]
             devnetProcess.launchPath = devnetPath
             devnetProcess.standardInput = nil
@@ -257,7 +260,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             guard let scarbTomlPath = Bundle.module.path(forResource: "Scarb", ofType: "toml") else {
                 throw DevnetClientError.missingResourceFile
             }
-            let ScarbTomlResourcePath = URL(fileURLWithPath: scarbTomlPath)
+            let scarbTomlResourcePath = URL(fileURLWithPath: scarbTomlPath)
             guard let contractResourcePaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
                 throw DevnetClientError.missingResourceFile
             }
@@ -269,7 +272,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
             try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
 
-            try fileManager.copyItem(at: ScarbTomlResourcePath, to: newScarbTomlPath)
+            try fileManager.copyItem(at: scarbTomlResourcePath, to: newScarbTomlPath)
             for contractPath in contractResourcePaths {
                 let newContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(contractPath.lastPathComponent)")
                 try fileManager.copyItem(at: contractPath, to: newContractPath)
@@ -278,8 +281,18 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.scarbTomlPath = newScarbTomlPath.path
             self.contractsPath = newContractsPath.path
 
-            // Initialize new accounts file
-            let _ = try await createDeployAccount(name: "__default__")
+            // TODO: (#130) Use the old approach once we're able to update sncast
+            guard let accountsPath = Bundle.module.path(forResource: "starknet_open_zeppelin_accounts", ofType: "json") else {
+                throw DevnetClientError.missingResourceFile
+            }
+            let accountsResourcePath = URL(fileURLWithPath: accountsPath)
+            let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
+            try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
+
+            let _ = try await deployAccount(name: "__default__")
+
+            // // Initialize new accounts file
+            // let _ = try await createDeployAccount(name: "__default__")
         }
 
         public func close() {
@@ -297,14 +310,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000) async throws {
+        public func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
 
-            let payload = PrefundPayload(address: address, amount: amount)
+            let payload = PrefundPayload(address: address, amount: amount, unit: unit)
             request.httpBody = try JSONEncoder().encode(payload)
 
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -381,6 +394,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
             prefund: Bool = true
         ) async throws -> DeployAccountResult {
             let details = try readAccountDetails(accountName: name)
+
+            if let result = deployedAccounts[details.address] {
+                return result
+            }
+
             if prefund {
                 try await prefundAccount(address: details.address)
             }
@@ -394,15 +412,19 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "--class-hash",
                 classHash.toHex(),
             ]
-            let result = try runSnCast(
+            let response = try runSnCast(
                 command: "account",
                 args: params
             ) as! AccountDeploySnCastResponse
 
-            return DeployAccountResult(
+            let result = DeployAccountResult(
                 details: details,
-                transactionHash: result.transactionHash
+                transactionHash: response.transactionHash
             )
+
+            deployedAccounts[details.address] = result
+
+            return result
         }
 
         public func declareDeployContract(
@@ -575,9 +597,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.standardInput = nil
             process.launch()
             process.waitUntilExit()
-
-//            let command = "\(process.launchPath!) \(process.arguments!.joined(separator: " "))"
-//             print(command)
 
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()

@@ -45,12 +45,6 @@ public class StarknetPoseidon {
     ///     - elements: array of Felt values to hash.
     /// - Returns: Poseidon hash of the values as Felt.
     public class func poseidonHash(_ values: [Felt]) -> Felt {
-        if values.count == 1 {
-            return poseidonHash(values[0])
-        }
-        if values.count == 2 {
-            return poseidonHash(first: values[0], second: values[1])
-        }
         var inputValues = values + [Felt.one]
         if inputValues.count % r == 1 {
             inputValues.append(Felt.zero)

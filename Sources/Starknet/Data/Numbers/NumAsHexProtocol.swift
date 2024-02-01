@@ -5,6 +5,7 @@ public protocol NumAsHexProtocol: Codable, Equatable, Comparable, Hashable, Expr
     var value: BigUInt { get }
 
     init?(_ exactly: some BinaryInteger)
+    init(clamping: some BinaryInteger)
     init?(fromHex hex: String)
     func toHex() -> String
 }
