@@ -58,7 +58,7 @@ class AccountsStore: ObservableObject {
 
     init() {
         // Create starknet provider that will be used to communicate with the given starknet node.
-        self.provider = StarknetProvider(starknetChainId: .testnet, url: rpcEndpoint)!
+        self.provider = StarknetProvider(url: rpcEndpoint)!
 
         // Create a signer that will be used to sign starknet transactions with provided private key.
         let account1Signer = StarkCurveSigner(privateKey: account1PrivateKey)!
