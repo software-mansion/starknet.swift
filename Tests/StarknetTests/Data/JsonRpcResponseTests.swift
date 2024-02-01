@@ -114,49 +114,4 @@ final class JsonRpcResponseTests: XCTestCase {
         let data = response.error!.data!
         XCTAssertEqual(data, "[\"More data about the execution failure.\",\"And even more data.\"]")
     }
-
-    func testErrorWithStringData() async throws {
-        let json = """
-        {
-            "id": 0,
-            "jsonrpc": "2.0",
-            "error": {
-                "code": 40,
-                "message": "Contract error",
-                "data": "More data about the execution failure."
-            }
-        }
-        """.data(using: .utf8)!
-
-        let decoder = JSONDecoder()
-
-        let response = try decoder.decode(JsonRpcResponse<Int>.self, from: json)
-        XCTAssertNil(response.result)
-        XCTAssertNotNil(response.error)
-        XCTAssertNotNil(response.error!.data)
-    }
-
-    func testErrorWithSequenceData() async throws {
-        let json = """
-        {
-            "id": 0,
-            "jsonrpc": "2.0",
-            "error": {
-                "code": 40,
-                "message": "Contract error",
-                "data": [
-                    "More data about the execution failure.",
-                    "And even more data."
-                ]
-            }
-        }
-        """.data(using: .utf8)!
-
-        let decoder = JSONDecoder()
-
-        let response = try decoder.decode(JsonRpcResponse<Int>.self, from: json)
-        XCTAssertNil(response.result)
-        XCTAssertNotNil(response.error)
-        XCTAssertNotNil(response.error!.data)
-    }
 }
