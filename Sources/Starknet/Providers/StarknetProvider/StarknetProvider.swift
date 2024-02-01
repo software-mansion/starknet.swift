@@ -59,7 +59,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         if let result = response.result {
             return result
         } else if let error = response.error {
-            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data?.revertError)
+            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data)
         } else {
             throw StarknetProviderError.unknownError
         }
