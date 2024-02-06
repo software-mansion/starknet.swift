@@ -17,7 +17,7 @@ final class ExecutionTests: XCTestCase {
             try await Self.devnetClient.start()
         }
 
-        provider = StarknetProvider(starknetChainId: .testnet, url: Self.devnetClient.rpcUrl)!
+        provider = StarknetProvider(url: Self.devnetClient.rpcUrl)!
         let accountDetails = ExecutionTests.devnetClient.constants.predeployedAccount1
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .one)
@@ -37,7 +37,7 @@ final class ExecutionTests: XCTestCase {
         }
     }
 
-    func testStarknetCallsToExecuteCalldataCairo1() throws {
+    func testStarknetCallsToExecuteCalldataCairo1() async throws {
         let call1 = StarknetCall(
             contractAddress: balanceContractAddress,
             entrypoint: starknetSelector(from: "increase_balance"),
@@ -57,7 +57,7 @@ final class ExecutionTests: XCTestCase {
         )
         let params = StarknetInvokeParamsV1(nonce: .zero, maxFee: .zero)
 
-        let signedTx = try account.signV1(calls: [call1, call2, call3], params: params)
+        let signedTx = try await account.signV1(calls: [call1, call2, call3], params: params)
         let expectedCalldata = [
             Felt(3),
             balanceContractAddress,
@@ -78,7 +78,7 @@ final class ExecutionTests: XCTestCase {
 
         XCTAssertEqual(expectedCalldata, signedTx.calldata)
 
-        let signedEmptyTx = try account.signV1(calls: [], params: params)
+        let signedEmptyTx = try await account.signV1(calls: [], params: params)
 
         XCTAssertEqual([.zero], signedEmptyTx.calldata)
     }
