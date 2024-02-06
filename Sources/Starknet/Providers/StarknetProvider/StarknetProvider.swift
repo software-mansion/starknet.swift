@@ -178,10 +178,10 @@ public class StarknetProvider: StarknetProviderProtocol {
         return result
     }
 
-    public func getChainId() async throws -> StarknetChainId {
+    public func getChainId() async throws -> Felt {
         let params = EmptySequence()
 
-        let result = try await makeRequest(method: .getChainId, params: params, receive: StarknetChainId.self)
+        let result = try await makeRequest(method: .getChainId, params: params, receive: Felt.self)
 
         return result
     }
