@@ -59,6 +59,11 @@ final class JsonRpcResponseTests: XCTestCase {
         XCTAssertNil(response.result)
         XCTAssertNotNil(response.error)
         XCTAssertNotNil(response.error!.data)
+        let data = response.error!.data!
+        XCTAssertTrue(data.contains("\"error\":\"Invalid message selector\""))
+        XCTAssertTrue(data.contains("\"details\""))
+        XCTAssertTrue(data.contains("\"selector\":\"0x1234\""))
+        XCTAssertTrue(data.contains("\"number\":123"))
     }
 
     func testErrorWithStringData() async throws {
@@ -80,6 +85,8 @@ final class JsonRpcResponseTests: XCTestCase {
         XCTAssertNil(response.result)
         XCTAssertNotNil(response.error)
         XCTAssertNotNil(response.error!.data)
+        let data = response.error!.data!
+        XCTAssertEqual(data, "More data about the execution failure.")
     }
 
     func testErrorWithSequenceData() async throws {
@@ -104,5 +111,7 @@ final class JsonRpcResponseTests: XCTestCase {
         XCTAssertNil(response.result)
         XCTAssertNotNil(response.error)
         XCTAssertNotNil(response.error!.data)
+        let data = response.error!.data!
+        XCTAssertEqual(data, "[\"More data about the execution failure.\",\"And even more data.\"]")
     }
 }
