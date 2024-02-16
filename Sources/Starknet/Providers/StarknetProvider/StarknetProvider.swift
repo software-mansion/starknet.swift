@@ -9,29 +9,32 @@ public enum StarknetProviderError: Error {
 public class StarknetProvider: StarknetProviderProtocol {
     private let url: URL
     private let networkProvider: HttpNetworkProvider
+    private let chainId: Felt?
 
-    public init(url: URL) {
+    public init(url: URL, chainId: Felt? = nil) {
         self.url = url
         self.networkProvider = HttpNetworkProvider()
+        self.chainId = chainId
     }
 
-    public convenience init?(url: String) {
+    public convenience init?(url: String, chainId: Felt? = nil) {
         guard let url = URL(string: url) else {
             return nil
         }
-        self.init(url: url)
+        self.init(url: url, chainId: chainId)
     }
 
-    public init(url: URL, urlSession: URLSession) {
+    public init(url: URL, urlSession: URLSession, chainId: Felt? = nil) {
         self.url = url
         self.networkProvider = HttpNetworkProvider(session: urlSession)
+        self.chainId = chainId
     }
 
-    public convenience init?(url: String, urlSession: URLSession) {
+    public convenience init?(url: String, urlSession: URLSession, chainId: Felt? = nil) {
         guard let url = URL(string: url) else {
             return nil
         }
-        self.init(url: url, urlSession: urlSession)
+        self.init(url: url, urlSession: urlSession, chainId: chainId)
     }
 
     private func makeRequest<U>(method: JsonRpcMethod, params: some Encodable = EmptyParams(), receive _: U.Type) async throws -> U where U: Decodable {
@@ -179,6 +182,10 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 
     public func getChainId() async throws -> Felt {
+        if let chainId {
+            return chainId
+        }
+
         let params = EmptySequence()
 
         let result = try await makeRequest(method: .getChainId, params: params, receive: Felt.self)
