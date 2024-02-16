@@ -51,7 +51,7 @@ final class ProviderTests: XCTestCase {
     func testGetChainId() async throws {
         let chainId = try await provider.getChainId()
 
-        XCTAssertEqual(chainId.toShortString(), "SN_GOERLI")
+        XCTAssertEqual(chainId, .goerli)
     }
 
     func testSpecVersion() async throws {
