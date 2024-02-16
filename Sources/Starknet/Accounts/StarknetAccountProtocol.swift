@@ -3,6 +3,8 @@ import Foundation
 public protocol StarknetAccountProtocol {
     /// Address of starknet account.
     var address: Felt { get }
+    /// Chain id of the Starknet provider.
+    var chainId: StarknetChainId { get }
 
     /// Sign list of calls as invoke transaction v1
     ///
