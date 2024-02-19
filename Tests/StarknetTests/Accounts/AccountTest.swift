@@ -24,6 +24,7 @@ final class AccountTests: XCTestCase {
         ethContractAddress = Self.devnetClient.constants.ethErc20ContractAddress
         let accountDetails = Self.devnetClient.constants.predeployedAccount1
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
+        chainId = try await provider.getChainId()
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .zero)
     }
 
