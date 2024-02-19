@@ -13,14 +13,16 @@ public enum CairoVersion: String, Encodable {
 public class StarknetAccount: StarknetAccountProtocol {
     private let cairoVersion: CairoVersion
     public let address: Felt
+    public let chainId: StarknetChainId
 
     private let signer: StarknetSignerProtocol
     private let provider: StarknetProviderProtocol
 
-    public init(address: Felt, signer: StarknetSignerProtocol, provider: StarknetProviderProtocol, cairoVersion: CairoVersion) {
+    public init(address: Felt, signer: StarknetSignerProtocol, provider: StarknetProviderProtocol, chainId: StarknetChainId, cairoVersion: CairoVersion) {
         self.address = address
         self.signer = signer
         self.provider = provider
+        self.chainId = chainId
         self.cairoVersion = cairoVersion
     }
 
@@ -45,7 +47,6 @@ public class StarknetAccount: StarknetAccountProtocol {
 
         let transaction = makeInvokeTransactionV1(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let chainId = try await provider.getChainId()
         let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)
@@ -58,7 +59,6 @@ public class StarknetAccount: StarknetAccountProtocol {
 
         let transaction = makeInvokeTransactionV3(calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let chainId = try await provider.getChainId()
         let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)
@@ -69,7 +69,6 @@ public class StarknetAccount: StarknetAccountProtocol {
     public func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV1, forFeeEstimation: Bool) async throws -> StarknetDeployAccountTransactionV1 {
         let transaction = makeDeployAccountTransactionV1(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let chainId = try await provider.getChainId()
         let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)
@@ -80,7 +79,6 @@ public class StarknetAccount: StarknetAccountProtocol {
     public func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) async throws -> StarknetDeployAccountTransactionV3 {
         let transaction = makeDeployAccountTransactionV3(classHash: classHash, salt: salt, calldata: calldata, signature: [], params: params, forFeeEstimation: forFeeEstimation)
 
-        let chainId = try await provider.getChainId()
         let hash = StarknetTransactionHashCalculator.computeHash(of: transaction, chainId: chainId)
 
         let signature = try signer.sign(transactionHash: hash)

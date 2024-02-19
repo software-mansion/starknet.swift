@@ -6,6 +6,7 @@ final class ProviderTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
     var provider: StarknetProviderProtocol!
+    var chainId: StarknetChainId!
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
     var accountContractClassHash: Felt!
@@ -33,7 +34,9 @@ final class ProviderTests: XCTestCase {
         accountContractClassHash = Self.devnetClient.constants.accountContractClassHash
         let accountDetails = Self.devnetClient.constants.predeployedAccount2
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
-        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, cairoVersion: .zero)
+
+        chainId = try await provider.getChainId()
+        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .zero)
     }
 
     func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
@@ -246,7 +249,7 @@ final class ProviderTests: XCTestCase {
         let newSigner = StarkCurveSigner(privateKey: 1111)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
-        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
@@ -267,7 +270,7 @@ final class ProviderTests: XCTestCase {
         let newSigner = StarkCurveSigner(privateKey: 3333)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
-        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
@@ -322,7 +325,7 @@ final class ProviderTests: XCTestCase {
         let newSigner = StarkCurveSigner(privateKey: 1001)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
-        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
@@ -363,7 +366,7 @@ final class ProviderTests: XCTestCase {
         let newSigner = StarkCurveSigner(privateKey: 3003)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
-        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, cairoVersion: .zero)
+        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress, amount: 5_000_000_000_000_000_000, unit: .fri)
 
