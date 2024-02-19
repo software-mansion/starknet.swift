@@ -21,7 +21,7 @@ public class StarknetTransactionHashCalculator {
             entryPointSelector,
             StarknetCurve.pedersenOn(calldata),
             maxFee,
-            chainId.feltValue,
+            chainId.value,
             nonce
         )
     }
@@ -45,7 +45,7 @@ public class StarknetTransactionHashCalculator {
                     + StarknetTransactionHashCalculator.resourceBoundsForFee(resourceBounds)
             ),
             StarknetPoseidon.poseidonHash(paymasterData),
-            chainId.feltValue,
+            chainId.value,
             nonce,
             StarknetTransactionHashCalculator.dataAvailabilityModes(
                 feeDataAvailabilityMode: feeDataAvailabilityMode,
