@@ -127,7 +127,7 @@ public protocol StarknetProviderProtocol {
     /// Get the currently configured Starknet chain id
     ///
     /// - Returns: The Starknet chain id
-    func getChainId() async throws -> Felt
+    func getChainId() async throws -> StarknetChainId
 
     /// Simulate running a given list of transactions, and generate the execution trace
     ///
