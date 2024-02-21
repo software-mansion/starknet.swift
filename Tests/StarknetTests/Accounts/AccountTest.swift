@@ -159,7 +159,7 @@ final class AccountTests: XCTestCase {
 
         let params = StarknetDeployAccountParamsV1(nonce: nonce, maxFee: maxFee)
 
-        let deployAccountTransaction = try await newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
+        let deployAccountTransaction = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
@@ -184,7 +184,7 @@ final class AccountTests: XCTestCase {
 
         let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: feeEstimate.toResourceBounds().l1Gas)
 
-        let deployAccountTransaction = try await newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
+        let deployAccountTransaction = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
         let response = try await provider.addDeployAccountTransaction(deployAccountTransaction)
 
@@ -198,7 +198,7 @@ final class AccountTests: XCTestCase {
     func testSignTypedData() async throws {
         let typedData = loadTypedDataFromFile(name: "typed_data_struct_array_example")!
 
-        let signature = try await account.sign(typedData: typedData)
+        let signature = try account.sign(typedData: typedData)
         XCTAssertTrue(signature.count > 0)
 
         let successResult = try await account.verify(signature: signature, for: typedData)
