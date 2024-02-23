@@ -63,8 +63,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let message: [String: Element]
 
     private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: [String: Element], message: [String: Element]) {
-        if types.keys.contains("felt") || types.keys.contains("felt*") {
-            return nil
+        let reservedTypeNames = ["felt", "felt*", "string", "selector"]
+        for typeName in reservedTypeNames {
+            if types.keys.contains(typeName) {
+                return nil
+            }
         }
 
         self.types = types
@@ -151,23 +154,21 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return hash
         }
 
-        if typeName == "felt*" {
+        switch typeName {
+        case "felt*":
             let array = try unwrapArray(from: element)
-
             let hashes = try array.map {
                 try unwrapFelt(from: $0)
             }
-
             let hash = StarknetCurve.pedersenOn(hashes)
-
             return hash
-        }
-
-        if typeName == "felt" {
+        case "felt", "string":
             return try unwrapFelt(from: element)
+        case "selector":
+            return try unwrapSelector(from: element)
+        default:
+            throw StarknetTypedDataError.decodingError
         }
-
-        throw StarknetTypedDataError.decodingError
     }
 
     private func encode(data: [String: Element], forType typeName: String) throws -> [Felt] {
@@ -305,6 +306,17 @@ private extension StarknetTypedData {
                 throw StarknetTypedDataError.decodingError
             }
             return felt
+        default:
+            throw StarknetTypedDataError.decodingError
+        }
+    }
+
+    func unwrapSelector(from element: Element) throws -> Felt {
+        switch element {
+        case let .felt(felt):
+            return felt
+        case let .string(string):
+            return starknetSelector(from: string)
         default:
             throw StarknetTypedDataError.decodingError
         }
