@@ -13,15 +13,19 @@ final class TypedDataTests: XCTestCase {
     static let tdFeltArr = loadTypedDataFromFile(name: "typed_data_felt_array_example")!
     static let tdString = loadTypedDataFromFile(name: "typed_data_long_string_example")!
     static let tdStructArr = loadTypedDataFromFile(name: "typed_data_struct_array_example")!
+    static let tdValidate = loadTypedDataFromFile(name: "typed_data_validate_example")!
 
     func testInvalidTypes() {
-        XCTAssertNil(
-            StarknetTypedData(types: ["felt": []], primaryType: "felt", domain: "{}", message: "{\"felt\": 1}")
-        )
+        func testInvalidType(_ type: String) {
+            XCTAssertNil(
+                StarknetTypedData(types: [type: []], primaryType: type, domain: "{}", message: "{\"\(type)\": 1}")
+            )
+        }
 
-        XCTAssertNil(
-            StarknetTypedData(types: ["felt*": []], primaryType: "felt*", domain: "{}", message: "{\"felt*\": 1}")
-        )
+        testInvalidType("felt")
+        testInvalidType("felt*")
+        testInvalidType("string")
+        testInvalidType("selector")
     }
 
     func testMissingDependency() {
@@ -47,6 +51,7 @@ final class TypedDataTests: XCTestCase {
             (Self.tdFeltArr, "Mail", "0x5b03497592c0d1fe2f3667b63099761714a895c7df96ec90a85d17bfc7a7a0"),
             (Self.tdStructArr, "Post", "0x1d71e69bf476486b43cdcfaf5a85c00bb2d954c042b281040e513080388356d"),
             (Self.tdStructArr, "Mail", "0x873b878e35e258fc99e3085d5aaad3a81a0c821f189c08b30def2cde55ff27"),
+            (Self.tdValidate, "Validate", "0x2e86ac4735e6012fbeaa68cbd0e5a089014d0da150fa915769a35d5eba30593"),
         ]
 
         try cases.forEach { data, typeName, expectedResult in
@@ -83,6 +88,12 @@ final class TypedDataTests: XCTestCase {
                 "message",
                 "0x5650ec45a42c4776a182159b9d33118a46860a6e6639bb8166ff71f3c41eaef"
             ),
+            (
+                Self.tdValidate,
+                "Validate",
+                "message",
+                "0x87ecd5622070667d2534fa83dd9b16f6cb497b42998d301e8df0ed5875d02d"
+            ),
         ]
 
         try cases.forEach { data, typeName, dataSource, expectedResult in
@@ -115,6 +126,11 @@ final class TypedDataTests: XCTestCase {
                 Self.tdStructArr,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
                 "0x5914ed2764eca2e6a41eb037feefd3d2e33d9af6225a9e7fe31ac943ff712c"
+            ),
+            (
+                Self.tdValidate,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x28e38c1c65783abb40b871705095584b96bcbf1f80c8268a0659d074b3afd92"
             ),
         ]
 
