@@ -211,10 +211,10 @@ final class ProviderTests: XCTestCase {
         let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
         let params1 = StarknetInvokeParamsV1(nonce: nonce, maxFee: 0)
-        let tx1 = try await account.signV1(calls: [call], params: params1, forFeeEstimation: true)
+        let tx1 = try account.signV1(calls: [call], params: params1, forFeeEstimation: true)
 
         let params2 = StarknetInvokeParamsV1(nonce: Felt(nonce.value + 1)!, maxFee: 0)
-        let tx2 = try await account.signV1(calls: [call, call2], params: params2, forFeeEstimation: true)
+        let tx2 = try account.signV1(calls: [call, call2], params: params2, forFeeEstimation: true)
 
         let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: [])
 
@@ -232,10 +232,10 @@ final class ProviderTests: XCTestCase {
         let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
         let params1 = StarknetInvokeParamsV3(nonce: nonce, l1ResourceBounds: .zero)
-        let tx1 = try await account.signV3(calls: [call], params: params1, forFeeEstimation: true)
+        let tx1 = try account.signV3(calls: [call], params: params1, forFeeEstimation: true)
 
         let params2 = StarknetInvokeParamsV3(nonce: Felt(nonce.value + 1)!, l1ResourceBounds: .zero)
-        let tx2 = try await account.signV3(calls: [call, call2], params: params2, forFeeEstimation: true)
+        let tx2 = try account.signV3(calls: [call, call2], params: params2, forFeeEstimation: true)
 
         let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: [])
 
@@ -257,7 +257,7 @@ final class ProviderTests: XCTestCase {
 
         let params = StarknetDeployAccountParamsV1(nonce: nonce, maxFee: .zero)
 
-        let tx = try await newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
+        let tx = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
 
         let _ = try await provider.estimateFee(for: tx, simulationFlags: [])
 
@@ -278,7 +278,7 @@ final class ProviderTests: XCTestCase {
 
         let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: .zero)
 
-        let tx = try await newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
+        let tx = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
 
         let _ = try await provider.estimateFee(for: tx)
 
@@ -319,7 +319,7 @@ final class ProviderTests: XCTestCase {
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let params = StarknetInvokeParamsV1(nonce: nonce, maxFee: 500_000_000_000_000)
 
-        let invokeTx = try await account.signV1(calls: [call], params: params, forFeeEstimation: false)
+        let invokeTx = try account.signV1(calls: [call], params: params, forFeeEstimation: false)
 
         let accountClassHash = try await provider.getClassHashAt(account.address)
         let newSigner = StarkCurveSigner(privateKey: 1001)!
@@ -330,7 +330,7 @@ final class ProviderTests: XCTestCase {
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
         let newAccountParams = StarknetDeployAccountParamsV1(nonce: .zero, maxFee: 500_000_000_000_000)
-        let deployAccountTx = try await newAccount.signDeployAccountV1(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
+        let deployAccountTx = try newAccount.signDeployAccountV1(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
         let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: [])
 
@@ -360,7 +360,7 @@ final class ProviderTests: XCTestCase {
         let invokeL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
         let params = StarknetInvokeParamsV3(nonce: nonce, l1ResourceBounds: invokeL1Gas)
 
-        let invokeTx = try await account.signV3(calls: [call], params: params, forFeeEstimation: false)
+        let invokeTx = try account.signV3(calls: [call], params: params, forFeeEstimation: false)
 
         let accountClassHash = try await provider.getClassHashAt(account.address)
         let newSigner = StarkCurveSigner(privateKey: 3003)!
@@ -372,7 +372,7 @@ final class ProviderTests: XCTestCase {
 
         let deployAccountL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
         let newAccountParams = StarknetDeployAccountParamsV3(nonce: 0, l1ResourceBounds: deployAccountL1Gas)
-        let deployAccountTx = try await newAccount.signDeployAccountV3(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
+        let deployAccountTx = try newAccount.signDeployAccountV3(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
         let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: [])
 
