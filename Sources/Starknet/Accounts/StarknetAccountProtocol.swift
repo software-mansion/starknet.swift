@@ -14,7 +14,7 @@ public protocol StarknetAccountProtocol {
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed invoke v1 transaction
-    func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1, forFeeEstimation: Bool) async throws -> StarknetInvokeTransactionV1
+    func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1
 
     /// Sign list of calls as invoke transaction v3
     ///
@@ -24,7 +24,7 @@ public protocol StarknetAccountProtocol {
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed invoke v3 transaction
-    func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) async throws -> StarknetInvokeTransactionV3
+    func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3
 
     /// Create and sign deploy account transaction v1
     ///
@@ -36,7 +36,7 @@ public protocol StarknetAccountProtocol {
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed deploy account transaction v1
-    func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV1, forFeeEstimation: Bool) async throws -> StarknetDeployAccountTransactionV1
+    func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV1, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV1
 
     /// Create and sign deploy account transaction v3
     ///
@@ -48,7 +48,7 @@ public protocol StarknetAccountProtocol {
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed deploy account transaction v3
-    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) async throws -> StarknetDeployAccountTransactionV3
+    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV3
 
     /// Sign TypedData for off-chain usage with this account's privateKey.
     ///
@@ -56,7 +56,7 @@ public protocol StarknetAccountProtocol {
     ///  - typedData: a TypedData object to sign
     ///
     /// - Returns: a signature for provided TypedData object.
-    func sign(typedData: StarknetTypedData) async throws -> StarknetSignature
+    func sign(typedData: StarknetTypedData) throws -> StarknetSignature
 
     /// Verify a signature of TypedData on Starknet.
     ///
@@ -160,8 +160,8 @@ public extension StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///
     /// - Returns: Signed invoke transaction v1
-    func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1) async throws -> StarknetInvokeTransactionV1 {
-        try await signV1(calls: calls, params: params, forFeeEstimation: false)
+    func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1) throws -> StarknetInvokeTransactionV1 {
+        try signV1(calls: calls, params: params, forFeeEstimation: false)
     }
 
     /// Sign list of calls for execution as invoke transaction v3.
@@ -172,8 +172,8 @@ public extension StarknetAccountProtocol {
     ///  - params: additional params for a given transaction
     ///
     /// - Returns: Signed invoke transaction v3
-    func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3) async throws -> StarknetInvokeTransactionV3 {
-        try await signV3(calls: calls, params: params, forFeeEstimation: false)
+    func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3) throws -> StarknetInvokeTransactionV3 {
+        try signV3(calls: calls, params: params, forFeeEstimation: false)
     }
 
     /// Create and sign deploy account transaction v1
@@ -186,8 +186,8 @@ public extension StarknetAccountProtocol {
     ///  - maxFee: max acceptable fee for the transaction
     ///
     /// - Returns: Signed deploy account transaction v1
-    func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) async throws -> StarknetDeployAccountTransactionV1 {
-        try await signDeployAccountV1(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV1(nonce: .zero, maxFee: maxFee), forFeeEstimation: false)
+    func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetDeployAccountTransactionV1 {
+        try signDeployAccountV1(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV1(nonce: .zero, maxFee: maxFee), forFeeEstimation: false)
     }
 
     /// Create and sign deploy account transaction v3
@@ -200,8 +200,8 @@ public extension StarknetAccountProtocol {
     ///  - l1ResourceBounds: max acceptable l1 resource bounds
     ///
     /// - Returns: Signed deploy account transaction v3
-    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, l1ResourceBounds: StarknetResourceBounds) async throws -> StarknetDeployAccountTransactionV3 {
-        try await signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV3(nonce: .zero, l1ResourceBounds: l1ResourceBounds), forFeeEstimation: false)
+    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, l1ResourceBounds: StarknetResourceBounds) throws -> StarknetDeployAccountTransactionV3 {
+        try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV3(nonce: .zero, l1ResourceBounds: l1ResourceBounds), forFeeEstimation: false)
     }
 
     /// Sign a call as invoke transaction v1
@@ -213,7 +213,7 @@ public extension StarknetAccountProtocol {
     ///
     /// - Returns: Signed invoke transaction v1
     func signV1(call: StarknetCall, params: StarknetInvokeParamsV1, forFeeEstimation: Bool = false) async throws -> StarknetInvokeTransactionV1 {
-        try await signV1(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
+        try signV1(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
     }
 
     /// Sign a call as invoke transaction v3
@@ -223,8 +223,8 @@ public extension StarknetAccountProtocol {
     ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
     ///
     /// - Returns: Signed invoke transaction v3
-    func signV3(call: StarknetCall, params: StarknetInvokeParamsV3, forFeeEstimation: Bool = false) async throws -> StarknetInvokeTransactionV3 {
-        try await signV3(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
+    func signV3(call: StarknetCall, params: StarknetInvokeParamsV3, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV3 {
+        try signV3(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
     }
 
     /// Execute list of calls as invoke transaction v1
