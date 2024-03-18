@@ -16,7 +16,7 @@ let invokeReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1}
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
 }
 """
 let pendingInvokeReceipt = """
@@ -31,7 +31,7 @@ let pendingInvokeReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1}
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
 }
 """
 let declareReceipt = """
@@ -48,7 +48,7 @@ let declareReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1}
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
 }
 """
 let pendingDeclareReceipt = """
@@ -63,7 +63,7 @@ let pendingDeclareReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1}
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
 }
 """
 let deployAccountReceipt = """
@@ -80,7 +80,7 @@ let deployAccountReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1},
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}},
     "contract_address": "0x789"
 }
 """
@@ -96,7 +96,7 @@ let pendingDeployAccountReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1},
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}},
     "contract_address": "0x789"
 }
 """
@@ -114,7 +114,7 @@ let deployReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1},
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}},
     "contract_address": "0x789"
 }
 """
@@ -132,7 +132,7 @@ let l1HandlerReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1},
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}},
     "message_hash":"0x2137"
 }
 """
@@ -148,7 +148,7 @@ let pendingL1HandlerReceipt = """
     "events": [],
     "execution_status": "SUCCEEDED",
     "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1},
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}},
     "message_hash":"0x2137"
 }
 """
@@ -236,7 +236,7 @@ final class TransactionReceiptTests: XCTestCase {
             ],
             "execution_status": "SUCCEEDED",
             "finality_status": "ACCEPTED_ON_L1",
-            "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1}
+            "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
         }
         """.data(using: .utf8)!
 
@@ -266,7 +266,7 @@ final class TransactionReceiptTests: XCTestCase {
             "revert_reason": "Error in the called contract (0x03b1b7a7ae9a136a327b01b89ddfee24a474c74bf76032876b5754e44cd7040b):\\nError at pc=0:32:\\nGot an exception while executing a hint: Custom Hint Error: Requested contract address ContractAddress(PatriciaKey(StarkFelt(\\"0x0000000000000000000000000000000000000000000000000000000000000042\\"))) is not deployed.\\nCairo traceback (most recent call last):\\nUnknown location (pc=0:557)\\nUnknown location (pc=0:519)\\nUnknown location (pc=0:625)\\n",
             "execution_status": "REVERTED",
             "finality_status": "ACCEPTED_ON_L1",
-            "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1}
+            "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
         }
         """.data(using: .utf8)!
 
