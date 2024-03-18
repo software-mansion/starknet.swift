@@ -8,7 +8,7 @@ public extension StarknetFeeEstimate {
     /// Then multiplies fee by m and does integer division by 100.
     ///
     /// - Parameters:
-    ///  - amountOverhead: how big overhead should be added (as a fraction of amount) to the amount, defaults to 0.1
+    ///  - amountOverhead: how big overhead should be added (as a fraction of amount) to the amount, defaults to 0.5
     ///  - unitPriceOverhead: how big overhead should be added (as a fraction of unit price) to the unit price, defaults to 0.5
     ///
     /// - Returns: resource bounds with added overhead
