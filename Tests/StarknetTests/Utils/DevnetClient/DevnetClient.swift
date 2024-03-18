@@ -90,7 +90,7 @@ extension DevnetClientProtocol {
         try await deployAccount(name: name, classHash: classHash, maxFee: maxFee, prefund: prefund)
     }
 
-    func declareContract(contractName: String, maxFee: Felt = 5_000_000_000_000_000) async throws -> DeclareContractResult {
+    func declareContract(contractName: String, maxFee: Felt = 10_000_000_000_000_000) async throws -> DeclareContractResult {
         try await declareContract(contractName: contractName, maxFee: maxFee)
     }
 
