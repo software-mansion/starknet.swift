@@ -33,6 +33,7 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let calls: [StarknetFunctionInvocation]
     public let events: [StarknetOrderedEvent]
     public let messages: [StarknetOrderedMessageToL1]
+    public let computationResources: StarknetComputationResources
 
     private enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
@@ -46,6 +47,7 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
         case calls
         case events
         case messages
+        case computationResources = "execution_resources"
     }
 }
 
@@ -66,6 +68,7 @@ public protocol StarknetInvokeTransactionTraceProtocol: StarknetTransactionTrace
     var validateInvocation: StarknetFunctionInvocation? { get }
     var feeTransferInvocation: StarknetFunctionInvocation? { get }
     var stateDiff: StarknetStateDiff? { get }
+    var executionResources: StarknetExecutionResources { get }
     var type: StarknetTransactionType { get }
 }
 
@@ -74,6 +77,7 @@ public struct StarknetInvokeTransactionTrace: StarknetInvokeTransactionTraceProt
     public let executeInvocation: StarknetFunctionInvocation
     public let feeTransferInvocation: StarknetFunctionInvocation?
     public let stateDiff: StarknetStateDiff?
+    public let executionResources: StarknetExecutionResources
     public let type: StarknetTransactionType = .invoke
 
     private enum CodingKeys: String, CodingKey {
@@ -81,6 +85,7 @@ public struct StarknetInvokeTransactionTrace: StarknetInvokeTransactionTraceProt
         case executeInvocation = "execute_invocation"
         case feeTransferInvocation = "fee_transfer_invocation"
         case stateDiff = "state_diff"
+        case executionResources = "execution_resources"
     }
 }
 
@@ -89,6 +94,7 @@ public struct StarknetRevertedInvokeTransactionTrace: StarknetInvokeTransactionT
     public let executeInvocation: StarknetRevertedFunctionInvocation
     public let feeTransferInvocation: StarknetFunctionInvocation?
     public let stateDiff: StarknetStateDiff?
+    public let executionResources: StarknetExecutionResources
     public let type: StarknetTransactionType = .invoke
 
     private enum CodingKeys: String, CodingKey {
@@ -96,6 +102,7 @@ public struct StarknetRevertedInvokeTransactionTrace: StarknetInvokeTransactionT
         case executeInvocation = "execute_invocation"
         case feeTransferInvocation = "fee_transfer_invocation"
         case stateDiff = "state_diff"
+        case executionResources = "execution_resources"
     }
 }
 
@@ -104,6 +111,7 @@ public struct StarknetDeployAccountTransactionTrace: StarknetTransactionTrace {
     public let constructorInvocation: StarknetFunctionInvocation
     public let feeTransferInvocation: StarknetFunctionInvocation?
     public let stateDiff: StarknetStateDiff?
+    public let executionResources: StarknetExecutionResources
     public let type: StarknetTransactionType = .deployAccount
 
     private enum CodingKeys: String, CodingKey {
@@ -111,6 +119,7 @@ public struct StarknetDeployAccountTransactionTrace: StarknetTransactionTrace {
         case constructorInvocation = "constructor_invocation"
         case feeTransferInvocation = "fee_transfer_invocation"
         case stateDiff = "state_diff"
+        case executionResources = "execution_resources"
     }
 }
 
