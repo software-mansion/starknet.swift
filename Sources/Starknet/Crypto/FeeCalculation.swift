@@ -2,41 +2,43 @@ import BigInt
 import Foundation
 
 public extension StarknetFeeEstimate {
-    /// Convert estimated fee to resource bounds with added overhead
+    /// Convert estimated fee to resource bounds with applied multipliers
     ///
-    /// Add overhead to estimated fee. Calculates multiplier as m = round((1 + ovehead) \* 100%).
-    /// Then multiplies fee by m and does integer division by 100.
+    /// Calculates `maxAmount = overallFee / gasPrice`, unless `gasPrice` is 0, then `maxAmount` is 0.
+    /// Calculates `maxPricePerUnit = gasPrice`.
+    /// Then multiplies `maxAmount` by **round((amountMultiplier) \* 100%)** and `maxPricePerUnit` by **round((unitPriceMultiplier) \* 100%)** and performs integer division by 100 on both.
     ///
     /// - Parameters:
-    ///  - amountOverhead: how big overhead should be added (as a fraction of amount) to the amount, defaults to 0.5
-    ///  - unitPriceOverhead: how big overhead should be added (as a fraction of unit price) to the unit price, defaults to 0.5
+    ///  - amountMultiplier: Multiplier for max amount, defaults to 1.5.
+    ///  - unitPriceMultiplier: Multiplier for max price per unit, defaults to 1.5.
     ///
-    /// - Returns: resource bounds with added overhead
-    func toResourceBounds(amountOverhead: Double = 0.5, unitPriceOverhead: Double = 0.5) -> StarknetResourceBoundsMapping {
-        let maxAmount = self.gasPrice == .zero ? UInt64AsHex.zero : addOverhead(self.overallFee.value / self.gasPrice.value, amountOverhead).toUInt64AsHexClamped()
+    /// - Returns: Resource bounds with applied multipliers
+    func toResourceBounds(amountMultiplier: Double = 1.5, unitPriceMultiplier: Double = 1.5) -> StarknetResourceBoundsMapping {
+        let maxAmount = self.gasPrice == .zero ? UInt64AsHex.zero : (self.overallFee.value / self.gasPrice.value).applyMultiplier(amountMultiplier).toUInt64AsHexClamped()
 
-        let maxUnitPrice = addOverhead(self.gasPrice.value, unitPriceOverhead).toUInt128AsHexClamped()
+        let maxUnitPrice = self.gasPrice.value.applyMultiplier(unitPriceMultiplier).toUInt128AsHexClamped()
 
         let l1Gas = StarknetResourceBounds(maxAmount: maxAmount, maxPricePerUnit: maxUnitPrice)
         return StarknetResourceBoundsMapping(l1Gas: l1Gas)
     }
 
-    /// Add overhead to estimated fee
+    /// Convert estimated fee to max fee with applied multiplier.
     ///
-    /// Add overhead to estimated fee. Calculates multiplier as m = round((1 + ovehead) \* 100%).
-    /// Then multiplies fee by m and does integer division by 100.
+    /// Multiplies `overallFee` by **round(multiplier] \* 100%)** and performs integer division by 100.
     ///
     /// - Parameters:
-    ///  - overhead: how big overhead should be added (as a fraction of fee) to the fee, defaults to 0.1
+    ///  - multiplier: Multiplier for max fee, defaults to 1.5.
     ///
-    /// - Returns: fee with added overhead
-    func toMaxFee(overhead: Double = 0.5) -> Felt {
-        addOverhead(self.overallFee.value, overhead).toFeltClamped()
+    /// - Returns: Fee with added overhead
+    func toMaxFee(multiplier: Double = 1.5) -> Felt {
+        self.overallFee.value.applyMultiplier(multiplier).toFeltClamped()
     }
 }
 
-private func addOverhead(_ value: BigUInt, _ overhead: Double) -> BigUInt {
-    let multiplier = BigUInt(Int((1.0 + overhead) * 100))
+private extension BigUInt {
+    func applyMultiplier(_ multiplier: Double) -> BigUInt {
+        let multiplier = BigUInt(Int(multiplier * 100))
 
-    return value.multiplied(by: multiplier).quotientAndRemainder(dividingBy: 100).quotient
+        return self.multiplied(by: multiplier).quotientAndRemainder(dividingBy: 100).quotient
+    }
 }
