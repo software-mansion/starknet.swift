@@ -11,12 +11,16 @@ public struct StarknetInvokeTransactionResponse: Decodable, Equatable {
 public struct StarknetFeeEstimate: Decodable, Equatable {
     public let gasConsumed: Felt
     public let gasPrice: Felt
+    public let dataGasConsumed: Felt
+    public let dataGasPrice: Felt
     public let overallFee: Felt
     public let feeUnit: StarknetPriceUnit
 
     enum CodingKeys: String, CodingKey {
         case gasConsumed = "gas_consumed"
         case gasPrice = "gas_price"
+        case dataGasConsumed = "data_gas_consumed"
+        case dataGasPrice = "data_gas_price"
         case overallFee = "overall_fee"
         case feeUnit = "unit"
     }

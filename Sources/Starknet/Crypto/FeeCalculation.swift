@@ -12,8 +12,13 @@ public extension StarknetFeeEstimate {
     ///  - unitPriceOverhead: how big overhead should be added (as a fraction of unit price) to the unit price, defaults to 0.5
     ///
     /// - Returns: resource bounds with added overhead
-    func toResourceBounds(amountOverhead: Double = 0.1, unitPriceOverhead: Double = 0.5) -> StarknetResourceBoundsMapping {
-        let maxAmount = addOverhead(self.gasConsumed.value, amountOverhead).toUInt64AsHexClamped()
+    func toResourceBounds(amountOverhead: Double = 0.5, unitPriceOverhead: Double = 0.5) -> StarknetResourceBoundsMapping {
+        let maxAmount = switch self.gasPrice {
+        case .zero:
+            UInt64AsHex.zero
+        default:
+            addOverhead(self.overallFee.value / self.gasPrice.value, amountOverhead).toUInt64AsHexClamped()
+        }
         let maxUnitPrice = addOverhead(self.gasPrice.value, unitPriceOverhead).toUInt128AsHexClamped()
 
         let l1Gas = StarknetResourceBounds(maxAmount: maxAmount, maxPricePerUnit: maxUnitPrice)

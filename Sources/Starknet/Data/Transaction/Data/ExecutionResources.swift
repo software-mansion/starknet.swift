@@ -71,4 +71,3 @@ public struct StarknetDataAvailability: Decodable, Equatable {
         case l1DataGas = "l1_data_gas"
     }
 }
-

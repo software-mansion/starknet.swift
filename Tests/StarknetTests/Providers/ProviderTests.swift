@@ -308,7 +308,7 @@ final class ProviderTests: XCTestCase {
         XCTAssertNotEqual(Felt.zero, feeEstimate.gasPrice)
         XCTAssertNotEqual(Felt.zero, feeEstimate.gasConsumed)
         XCTAssertNotEqual(Felt.zero, feeEstimate.overallFee)
-        XCTAssertEqual(feeEstimate.gasPrice.value * feeEstimate.gasConsumed.value, feeEstimate.overallFee.value)
+        XCTAssertEqual(feeEstimate.gasPrice.value * feeEstimate.gasConsumed.value + feeEstimate.dataGasPrice.value * feeEstimate.dataGasConsumed.value, feeEstimate.overallFee.value)
     }
 
     func testSimulateTransactionsV1() async throws {
