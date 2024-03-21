@@ -110,6 +110,8 @@ public protocol StarknetAccountProtocol {
 
     /// Execute list of calls as invoke transaction v1
     ///
+    /// Execute list of calls as invoke transaction v1 with automatically estimated fee
+    ///
     /// - Parameters:
     ///  - calls: list of calls to be executed.
     ///
@@ -117,6 +119,8 @@ public protocol StarknetAccountProtocol {
     func executeV1(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse
 
     /// Execute list of calls as invoke transaction v3
+    ///
+    /// Execute list of calls as invoke transaction v1 with automatically estimated fee
     ///
     /// - Parameters:
     ///  - calls: list of calls to be executed.
@@ -321,6 +325,8 @@ public extension StarknetAccountProtocol {
 
     /// Execute a call as invoke transaction v1
     ///
+    /// Execute a call as invoke transaction v1 with automatically estimated fee
+    ///
     /// - Parameters:
     ///  - call: a call to be executed.
     ///
@@ -330,6 +336,8 @@ public extension StarknetAccountProtocol {
     }
 
     /// Execute a call as invoke transaction v3
+    ///
+    /// Execute a call as invoke transaction v1 with automatically estimated fee
     ///
     /// - Parameters:
     ///  - call: a call to be executed.
