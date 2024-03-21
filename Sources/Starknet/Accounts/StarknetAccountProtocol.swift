@@ -85,6 +85,8 @@ public protocol StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(calls: [StarknetCall], params: StarknetOptionalInvokeParamsV3) async throws -> StarknetInvokeTransactionResponse
 
+    func executeV1(calls: [StarknetCall], estimateFeeMultiplier: Double) async throws -> StarknetInvokeTransactionResponse
+    func executeV3(calls: [StarknetCall], estimateAmountMultiplier: Double, estimateUnitPriceMultiplier: Double) async throws -> StarknetInvokeTransactionResponse
     /// Execute list of calls as invoke transaction v1
     ///
     /// - Parameters:
@@ -268,6 +270,33 @@ public extension StarknetAccountProtocol {
     func executeV3(call: StarknetCall, params: StarknetOptionalInvokeParamsV3) async throws -> StarknetInvokeTransactionResponse {
         try await executeV3(calls: [call], params: params)
     }
+
+    /// Execute a call as invoke transaction v1
+        ///
+        /// Execute a call as invoke transaction v1 with automatically estimated fee that will be multiplied by the specified multiplier when max fee is calculated.
+        ///
+        /// - Parameters:
+        ///  - call: a call to be executed.
+        ///  - estimateFeeMultiplier: multiplier for the estimated fee.
+        ///
+        /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+        func executeV1(call: StarknetCall, estimateFeeMultiplier: Double) async throws -> StarknetInvokeTransactionResponse {
+            try await executeV1(calls: [call], estimateFeeMultiplier: estimateFeeMultiplier)
+        }
+
+        /// Execute a call as invoke transaction v3
+        ///
+        /// Execute a call as invoke transaction v3 with automatically estimated fee that will be multiplied by the specified multipliers when resource bounds are calculated.
+        ///
+        /// - Parameters:
+        ///  - call: a call to be executed.
+        ///  - estimateAmountMultiplier: multiplier for the estimated amount.
+        ///  - estimateUnitPriceMultiplier: multiplier for the estimated unit price.
+        ///
+        ///  - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
+        func executeV3(call: StarknetCall, estimateAmountMultiplier: Double, estimateUnitPriceMultiplier: Double) async throws -> StarknetInvokeTransactionResponse {
+            try await executeV3(calls: [call], estimateAmountMultiplier: estimateAmountMultiplier, estimateUnitPriceMultiplier: estimateUnitPriceMultiplier)
+        }
 
     /// Execute a call as invoke transaction v1
     ///
