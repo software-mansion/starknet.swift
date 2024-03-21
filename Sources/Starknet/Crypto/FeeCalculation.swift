@@ -27,7 +27,7 @@ public extension StarknetFeeEstimate {
     /// Multiplies `overallFee` by **round(multiplier] \* 100%)** and performs integer division by 100.
     ///
     /// - Parameters:
-    ///  - multiplier: multiplier for max fee, defaults to 1.5.
+    ///  - multiplier: multiplier for estimated fee, defaults to 1.5.
     ///
     /// - Returns: fee with applied multiplier
     func toMaxFee(multiplier: Double = 1.5) -> Felt {
