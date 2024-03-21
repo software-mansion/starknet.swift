@@ -90,7 +90,7 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionFailed(transactionHash: result2.transactionHash)
     }
 
-    func testExecuteV3FeeMultiplier() async throws {
+    func testExecuteV3FeeMultipliers() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata: [Felt] = [recipientAddress, 1000, 0]
