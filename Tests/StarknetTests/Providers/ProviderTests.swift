@@ -36,7 +36,7 @@ final class ProviderTests: XCTestCase {
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
 
         chainId = try await provider.getChainId()
-        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .zero)
+        account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .one)
     }
 
     func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
@@ -83,7 +83,7 @@ final class ProviderTests: XCTestCase {
     func testCallWithArguments() async throws {
         let call = StarknetCall(
             contractAddress: ProviderTests.devnetClient.constants.predeployedAccount1.address,
-            entrypoint: starknetSelector(from: "supportsInterface"),
+            entrypoint: starknetSelector(from: "supports_interface"),
             calldata: [Felt(2138)]
         )
 
