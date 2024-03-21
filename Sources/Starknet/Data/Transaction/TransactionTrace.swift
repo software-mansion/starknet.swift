@@ -126,11 +126,13 @@ public struct StarknetDeployAccountTransactionTrace: StarknetTransactionTrace {
 public struct StarknetL1HandlerTransactionTrace: StarknetTransactionTrace {
     public let functionInvocation: StarknetFunctionInvocation
     public let stateDiff: StarknetStateDiff?
+    public let executionResources: StarknetExecutionResources?
     public let type: StarknetTransactionType = .l1Handler
 
     private enum CodingKeys: String, CodingKey {
         case functionInvocation = "function_invocation"
         case stateDiff = "state_diff"
+        case executionResources = "execution_resources"
     }
 }
 
