@@ -172,16 +172,16 @@ let l1HandlerReceipt = """
 final class TransactionReceiptTests: XCTestCase {
     func testTransactionReceiptWrapperDecoding() throws {
         let cases: [(String, StarknetTransactionType, Bool, any StarknetTransactionReceipt.Type)] = [
-            (invokeReceiptWithBlockInfo, .invoke, true, StarknetInvokeTransactionReceiptWithBlockInfo.self),
-            (declareReceiptWithBlockInfo, .declare, true, StarknetDeclareTransactionReceiptWithBlockInfo.self),
-            (deployAccountReceiptWithBlockInfo, .deployAccount, true, StarknetDeployAccountTransactionReceiptWithBlockInfo.self),
-            (l1HandlerReceiptWithBlockInfo, .l1Handler, true, StarknetL1HandlerTransactionReceiptWithBlockInfo.self),
-            (deployReceiptWithBlockInfo, .deploy, true, StarknetDeployTransactionReceiptWithBlockInfo.self),
+            (invokeReceiptWithBlockInfo, .invoke, true, StarknetInvokeTransactionReceipt.self),
+            (declareReceiptWithBlockInfo, .declare, true, StarknetDeclareTransactionReceipt.self),
+            (deployAccountReceiptWithBlockInfo, .deployAccount, true, StarknetDeployAccountTransactionReceipt.self),
+            (l1HandlerReceiptWithBlockInfo, .l1Handler, true, StarknetL1HandlerTransactionReceipt.self),
+            (deployReceiptWithBlockInfo, .deploy, true, StarknetDeployTransactionReceipt.self),
             (invokeReceipt, .invoke, false, StarknetInvokeTransactionReceipt.self),
             (declareReceipt, .declare, false, StarknetDeclareTransactionReceipt.self),
             (deployAccountReceipt, .deployAccount, false, StarknetDeployAccountTransactionReceipt.self),
             (l1HandlerReceipt, .l1Handler, false, StarknetL1HandlerTransactionReceipt.self),
-            (deployReceipt, .deploy, false, StarknetDeployTransactionReceipt.self)
+            (deployReceipt, .deploy, false, StarknetDeployTransactionReceipt.self),
         ]
         try cases.forEach { (string: String, txType: StarknetTransactionType, hasBlockInfo: Bool, receiptType: StarknetTransactionReceipt.Type) in
             let data = string.data(using: .utf8)!
@@ -191,9 +191,11 @@ final class TransactionReceiptTests: XCTestCase {
             let receipt = receiptWrapper.transactionReceipt
 
             if hasBlockInfo {
-                XCTAssertTrue(receipt is (any StarknetTransactionReceiptWithBlockInfo))
+                XCTAssertNotNil(receipt.blockNumber)
+                XCTAssertNotNil(receipt.blockHash)
             } else {
-                XCTAssertFalse(receipt is (any StarknetTransactionReceiptWithBlockInfo))
+                XCTAssertNil(receipt.blockNumber)
+                XCTAssertNil(receipt.blockHash)
             }
 
             XCTAssertTrue(type(of: receipt) == receiptType)

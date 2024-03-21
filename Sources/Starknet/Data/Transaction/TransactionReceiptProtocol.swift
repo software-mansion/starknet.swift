@@ -16,11 +16,6 @@ public protocol StarknetL1HandlerTransactionReceiptProtocol: StarknetTransaction
     var messageHash: NumAsHex { get }
 }
 
-public protocol StarknetTransactionReceiptWithBlockInfo: StarknetTransactionReceipt {
-    var blockHash: Felt { get }
-    var blockNumber: UInt64 { get }
-}
-
 public protocol StarknetTransactionReceipt: Decodable, Equatable {
     var transactionHash: Felt { get }
     var actualFee: StarknetFeePayment { get }
@@ -31,6 +26,9 @@ public protocol StarknetTransactionReceipt: Decodable, Equatable {
     var executionResources: StarknetExecutionResources { get }
     var revertReason: String? { get }
     var type: StarknetTransactionType { get }
+    // Block info
+    var blockHash: Felt? { get }
+    var blockNumber: UInt64? { get }
 
     var isSuccessful: Bool { get }
 }
