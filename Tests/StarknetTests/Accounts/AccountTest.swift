@@ -45,7 +45,7 @@ final class AccountTests: XCTestCase {
         let _ = try await account.getNonce()
     }
 
-    func testExecute() async throws {
+    func testExecuteV1() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata: [Felt] = [
@@ -77,7 +77,7 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
-    func testExecuteCustomParams() async throws {
+    func testExecuteV1CustomParams() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata: [Felt] = [
@@ -121,7 +121,7 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
-    func testExecuteMultipleCalls() async throws {
+    func testExecuteV1MultipleCalls() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata1: [Felt] = [
@@ -144,7 +144,7 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
-    func testDeployAccount() async throws {
+    func testDeployAccountV1() async throws {
         let newSigner = StarkCurveSigner(privateKey: 1234)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
