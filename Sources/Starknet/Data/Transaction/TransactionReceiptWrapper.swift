@@ -7,18 +7,29 @@ enum TransactionReceiptWrapper: Decodable {
         case type
     }
 
-    case invoke(StarknetProcessedInvokeTransactionReceipt)
-    case declare(StarknetProcessedDeclareTransactionReceipt)
-    case deployAccount(StarknetProcessedDeployAccountTransactionReceipt)
-    case l1Handler(StarknetProcessedL1HandlerTransactionReceipt)
-    case deploy(StarknetProcessedDeployTransactionReceipt)
-    case pendingInvoke(StarknetPendingInvokeTransactionReceipt)
-    case pendingDeclare(StarknetPendingDeclareTransactionReceipt)
-    case pendingDeployAccount(StarknetPendingDeployAccountTransactionReceipt)
-    case pendingL1Handler(StarknetPendingL1HandlerTransactionReceipt)
+    case invokeBlockInfo(StarknetInvokeTransactionReceiptWithBlockInfo)
+    case declareBlockInfo(StarknetDeclareTransactionReceiptWithBlockInfo)
+    case deployAccountBlockInfo(StarknetDeployAccountTransactionReceiptWithBlockInfo)
+    case l1HandlerBlockInfo(StarknetL1HandlerTransactionReceiptWithBlockInfo)
+    case deployBlockInfo(StarknetDeployTransactionReceiptWithBlockInfo)
+    case invoke(StarknetInvokeTransactionReceipt)
+    case declare(StarknetDeclareTransactionReceipt)
+    case deployAccount(StarknetDeployAccountTransactionReceipt)
+    case l1Handler(StarknetL1HandlerTransactionReceipt)
+    case deploy(StarknetDeployTransactionReceipt)
 
     public var transactionReceipt: any StarknetTransactionReceipt {
         switch self {
+        case let .invokeBlockInfo(tx):
+            return tx
+        case let .declareBlockInfo(tx):
+            return tx
+        case let .deployAccountBlockInfo(tx):
+            return tx
+        case let .l1HandlerBlockInfo(tx):
+            return tx
+        case let .deployBlockInfo(tx):
+            return tx
         case let .invoke(tx):
             return tx
         case let .declare(tx):
@@ -28,14 +39,6 @@ enum TransactionReceiptWrapper: Decodable {
         case let .l1Handler(tx):
             return tx
         case let .deploy(tx):
-            return tx
-        case let .pendingInvoke(tx):
-            return tx
-        case let .pendingDeclare(tx):
-            return tx
-        case let .pendingDeployAccount(tx):
-            return tx
-        case let .pendingL1Handler(tx):
             return tx
         }
     }
@@ -47,29 +50,29 @@ enum TransactionReceiptWrapper: Decodable {
         let blockHash = try container.decodeIfPresent(Felt.self, forKey: Keys.blockHash)
         let blockNumber = try container.decodeIfPresent(Felt.self, forKey: Keys.blockHash)
 
-        let isPending = blockHash == nil || blockNumber == nil
+        let hasBlockInfo = blockHash != nil && blockNumber != nil
 
-        switch (type, isPending) {
-        case (.invoke, false):
-            self = try .invoke(StarknetProcessedInvokeTransactionReceipt(from: decoder))
-        case (.declare, false):
-            self = try .declare(StarknetProcessedDeclareTransactionReceipt(from: decoder))
-        case (.deployAccount, false):
-            self = try .deployAccount(StarknetProcessedDeployAccountTransactionReceipt(from: decoder))
-        case (.l1Handler, false):
-            self = try .l1Handler(StarknetProcessedL1HandlerTransactionReceipt(from: decoder))
-        case (.deploy, false):
-            self = try .deploy(StarknetProcessedDeployTransactionReceipt(from: decoder))
+        switch (type, hasBlockInfo) {
         case (.invoke, true):
-            self = try .pendingInvoke(StarknetPendingInvokeTransactionReceipt(from: decoder))
+            self = try .invokeBlockInfo(StarknetInvokeTransactionReceiptWithBlockInfo(from: decoder))
         case (.declare, true):
-            self = try .pendingDeclare(StarknetPendingDeclareTransactionReceipt(from: decoder))
+            self = try .declareBlockInfo(StarknetDeclareTransactionReceiptWithBlockInfo(from: decoder))
         case (.deployAccount, true):
-            self = try .pendingDeployAccount(StarknetPendingDeployAccountTransactionReceipt(from: decoder))
+            self = try .deployAccountBlockInfo(StarknetDeployAccountTransactionReceiptWithBlockInfo(from: decoder))
         case (.l1Handler, true):
-            self = try .pendingL1Handler(StarknetPendingL1HandlerTransactionReceipt(from: decoder))
-        default:
-            throw DecodingError.dataCorruptedError(forKey: Keys.type, in: container, debugDescription: "Invalid transaction receipt type (\(isPending ? "pending" : "") \(type))")
+            self = try .l1HandlerBlockInfo(StarknetL1HandlerTransactionReceiptWithBlockInfo(from: decoder))
+        case (.deploy, true):
+            self = try .deployBlockInfo(StarknetDeployTransactionReceiptWithBlockInfo(from: decoder))
+        case (.invoke, false):
+            self = try .invoke(StarknetInvokeTransactionReceipt(from: decoder))
+        case (.declare, false):
+            self = try .declare(StarknetDeclareTransactionReceipt(from: decoder))
+        case (.deployAccount, false):
+            self = try .deployAccount(StarknetDeployAccountTransactionReceipt(from: decoder))
+        case (.l1Handler, false):
+            self = try .l1Handler(StarknetL1HandlerTransactionReceipt(from: decoder))
+        case (.deploy, false):
+            self = try .deploy(StarknetDeployTransactionReceipt(from: decoder))
         }
     }
 }

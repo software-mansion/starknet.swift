@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StarknetProcessedInvokeTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetInvokeTransactionReceipt {
+public struct StarknetInvokeTransactionReceiptWithBlockInfo: StarknetTransactionReceiptWithBlockInfo, StarknetInvokeTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let blockHash: Felt
@@ -31,7 +31,7 @@ public struct StarknetProcessedInvokeTransactionReceipt: StarknetProcessedTransa
     }
 }
 
-public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactionReceipt, StarknetInvokeTransactionReceipt {
+public struct StarknetInvokeTransactionReceipt: StarknetInvokeTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
@@ -58,7 +58,7 @@ public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactio
     }
 }
 
-public struct StarknetProcessedDeclareTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeclareTransactionReceipt {
+public struct StarknetDeclareTransactionReceiptWithBlockInfo: StarknetTransactionReceiptWithBlockInfo, StarknetDeclareTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let blockHash: Felt
@@ -89,7 +89,7 @@ public struct StarknetProcessedDeclareTransactionReceipt: StarknetProcessedTrans
     }
 }
 
-public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeclareTransactionReceipt {
+public struct StarknetDeclareTransactionReceipt: StarknetDeclareTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
@@ -116,7 +116,7 @@ public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransacti
     }
 }
 
-public struct StarknetProcessedDeployAccountTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeployAccountTransactionReceipt {
+public struct StarknetDeployAccountTransactionReceiptWithBlockInfo: StarknetTransactionReceiptWithBlockInfo, StarknetDeployAccountTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let blockHash: Felt
@@ -149,7 +149,7 @@ public struct StarknetProcessedDeployAccountTransactionReceipt: StarknetProcesse
     }
 }
 
-public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeployAccountTransactionReceipt {
+public struct StarknetDeployAccountTransactionReceipt: StarknetDeployAccountTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
@@ -178,7 +178,36 @@ public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTra
     }
 }
 
-public struct StarknetProcessedDeployTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeployTransactionReceipt {
+public struct StarknetDeployTransactionReceipt: StarknetDeployTransactionReceiptProtocol {
+    public let transactionHash: Felt
+    public let actualFee: StarknetFeePayment
+    public let messagesSent: [StarknetMessageToL1]
+    public let events: [StarknetEvent]
+    public let revertReason: String?
+    public let finalityStatus: StarknetTransactionFinalityStatus
+    public let executionStatus: StarknetTransactionExecutionStatus
+    public let executionResources: StarknetExecutionResources
+    public let contractAddress: Felt
+    public let type: StarknetTransactionType = .deploy
+
+    public var isSuccessful: Bool {
+        executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case transactionHash = "transaction_hash"
+        case actualFee = "actual_fee"
+        case messagesSent = "messages_sent"
+        case events
+        case finalityStatus = "finality_status"
+        case executionStatus = "execution_status"
+        case revertReason = "revert_reason"
+        case executionResources = "execution_resources"
+        case contractAddress = "contract_address"
+    }
+}
+
+public struct StarknetDeployTransactionReceiptWithBlockInfo: StarknetTransactionReceiptWithBlockInfo, StarknetDeployTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let blockHash: Felt
@@ -211,7 +240,7 @@ public struct StarknetProcessedDeployTransactionReceipt: StarknetProcessedTransa
     }
 }
 
-public struct StarknetProcessedL1HandlerTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetL1HandlerTransactionReceipt {
+public struct StarknetL1HandlerTransactionReceiptWithBlockInfo: StarknetTransactionReceiptWithBlockInfo, StarknetL1HandlerTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let blockHash: Felt
@@ -244,7 +273,7 @@ public struct StarknetProcessedL1HandlerTransactionReceipt: StarknetProcessedTra
     }
 }
 
-public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransactionReceipt, StarknetL1HandlerTransactionReceipt {
+public struct StarknetL1HandlerTransactionReceipt: StarknetL1HandlerTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
     public let messagesSent: [StarknetMessageToL1]
