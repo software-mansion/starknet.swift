@@ -7,9 +7,9 @@ enum TransactionWrapper: Decodable {
         case version
     }
 
+    case invokeV3(StarknetInvokeTransactionV3)
     case invokeV1(StarknetInvokeTransactionV1)
     case invokeV0(StarknetInvokeTransactionV0)
-    case invokeV3(StarknetInvokeTransactionV3)
     case deployAccountV3(StarknetDeployAccountTransactionV3)
     case deployAccountV1(StarknetDeployAccountTransactionV1)
     case deploy(StarknetDeployTransaction)
