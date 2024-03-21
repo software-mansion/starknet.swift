@@ -49,30 +49,30 @@ enum TransactionWrapper: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
         let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
-        let version = try container.decode(Felt.self, forKey: Keys.version)
+        let version = try container.decode(StarknetTransactionVersion.self, forKey: Keys.version)
 
         switch (type, version) {
-        case (.invoke, 3):
+        case (.invoke, .v3):
             self = try .invokeV3(StarknetInvokeTransactionV3(from: decoder))
-        case (.invoke, .one):
+        case (.invoke, .v1):
             self = try .invokeV1(StarknetInvokeTransactionV1(from: decoder))
-        case (.invoke, .zero):
+        case (.invoke, .v0):
             self = try .invokeV0(StarknetInvokeTransactionV0(from: decoder))
-        case (.deployAccount, 3):
+        case (.deployAccount, .v3):
             self = try .deployAccountV3(StarknetDeployAccountTransactionV3(from: decoder))
-        case (.deployAccount, .one):
+        case (.deployAccount, .v1):
             self = try .deployAccountV1(StarknetDeployAccountTransactionV1(from: decoder))
-        case (.declare, 3):
+        case (.declare, .v3):
             self = try .declareV3(StarknetDeclareTransactionV3(from: decoder))
-        case (.declare, 2):
+        case (.declare, .v2):
             self = try .declareV2(StarknetDeclareTransactionV2(from: decoder))
-        case (.declare, .one):
+        case (.declare, .v1):
             self = try .declareV1(StarknetDeclareTransactionV1(from: decoder))
-        case (.declare, .zero):
+        case (.declare, .v0):
             self = try .declareV0(StarknetDeclareTransactionV0(from: decoder))
-        case (.deploy, .zero):
+        case (.deploy, .v0):
             self = try .deploy(StarknetDeployTransaction(from: decoder))
-        case (.l1Handler, .zero):
+        case (.l1Handler, .v0):
             self = try .l1Handler(StarknetL1HandlerTransaction(from: decoder))
         default:
             throw DecodingError.dataCorruptedError(forKey: Keys.version, in: container, debugDescription: "Invalid transaction version (\(version) for transaction type (\(type))")
