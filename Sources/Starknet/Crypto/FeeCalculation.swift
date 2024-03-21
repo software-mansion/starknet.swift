@@ -29,7 +29,7 @@ public extension StarknetFeeEstimate {
     /// - Parameters:
     ///  - multiplier: Multiplier for max fee, defaults to 1.5.
     ///
-    /// - Returns: Fee with added overhead
+    /// - Returns: Fee with applied multiplier
     func toMaxFee(multiplier: Double = 1.5) -> Felt {
         self.overallFee.value.applyMultiplier(multiplier).toFeltClamped()
     }
