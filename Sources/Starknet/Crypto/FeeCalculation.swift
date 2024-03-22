@@ -6,7 +6,7 @@ public extension StarknetFeeEstimate {
     ///
     /// Calculates `maxAmount = overallFee / gasPrice`, unless `gasPrice` is 0, then `maxAmount` is 0.
     /// Calculates `maxPricePerUnit = gasPrice`.
-    /// Then multiplies `maxAmount` by **round((amountMultiplier) \* 100%)** and `maxPricePerUnit` by **round((unitPriceMultiplier) \* 100%)** and performs integer division by 100 on both.
+    /// Then multiplies `maxAmount` by **round((amountMultiplier) \* 100)** and `maxPricePerUnit` by **round((unitPriceMultiplier) \* 100)** and performs integer division by 100 on both.
     ///
     /// - Parameters:
     ///  - amountMultiplier: multiplier for max amount, defaults to 1.5.
@@ -24,7 +24,7 @@ public extension StarknetFeeEstimate {
 
     /// Convert estimated fee to max fee with applied multiplier.
     ///
-    /// Multiplies `overallFee` by **round(multiplier] \* 100%)** and performs integer division by 100.
+    /// Multiplies `overallFee` by **round(multiplier \* 100)** and performs integer division by 100.
     ///
     /// - Parameters:
     ///  - multiplier: multiplier for estimated fee, defaults to 1.5.
