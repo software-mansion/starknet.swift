@@ -175,21 +175,25 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return hash
         }
 
-        switch typeName {
-        case "felt*":
+        switch (typeName, revision) {
+        case ("felt*", _):
             let array = try unwrapArray(from: element)
             let hashes = try array.map {
                 try unwrapFelt(from: $0)
             }
-            let hash = StarknetCurve.pedersenOn(hashes)
-            return hash
-        case "felt", "string":
             return hash(hashes)
+        case ("felt", _):
             return try unwrapFelt(from: element)
-        case "selector":
+        case ("string", .v0):
+            return try unwrapFelt(from: element)
+        case ("string", .v1):
+            fatalError("This function is not yet implemented")
+        case ("shortstring", .v1):
+            return try unwrapFelt(from: element)
+        case ("selector", _):
             return try unwrapSelector(from: element)
         default:
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.dependencyNotDefined(typeName)
         }
     }
 
