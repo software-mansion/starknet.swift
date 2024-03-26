@@ -4,8 +4,7 @@
 //
 //  Created by Bartosz Rybarski on 14/02/2023.
 //
-
-import Starknet
+@testable import Starknet
 import XCTest
 
 final class TypedDataTests: XCTestCase {
