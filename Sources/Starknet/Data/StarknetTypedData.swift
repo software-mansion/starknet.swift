@@ -65,14 +65,14 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     var revision: Revision {
         domain.resolveRevision()!
     }
-    
+
     var hashMethod: HashMethod {
         switch revision {
         case .v0: return HashMethod.pedersen
         case .v1: return HashMethod.poseidon
         }
     }
-    
+
     func hash(_ array: [Felt]) -> Felt {
         hashMethod.hash(values: array)
     }
@@ -258,7 +258,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             Felt.fromShortString("StarkNet Message")!,
             getStructHash(domain: domain),
             accountAddress,
-            getStructHash(typeName: primaryType, data: message)
+            getStructHash(typeName: primaryType, data: message),
         ])
     }
 }
