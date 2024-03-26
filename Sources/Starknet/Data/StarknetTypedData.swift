@@ -227,11 +227,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     private func getStructHash(typeName: String, data: Data) throws -> Felt {
-        guard let dataDecoded = try? JSONDecoder().decode([String: Element].self, from: data) else {
+        guard let decodedData = try? JSONDecoder().decode([String: Element].self, from: data) else {
             throw StarknetTypedDataError.decodingError
         }
 
-        return try getStructHash(typeName: typeName, data: dataDecoded)
+        return try getStructHash(typeName: typeName, data: decodedData)
     }
 
     public func getStructHash(typeName: String, data: String) throws -> Felt {
@@ -286,7 +286,7 @@ public extension StarknetTypedData {
             }
             switch revision {
             case let .felt(felt):
-                return Revision(rawValue: felt) ?? .v0
+                return Revision(rawValue: felt)
             default:
                 return nil
             }
