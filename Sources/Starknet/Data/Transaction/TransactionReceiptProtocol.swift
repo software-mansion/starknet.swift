@@ -1,27 +1,20 @@
 import Foundation
 
-public protocol StarknetInvokeTransactionReceipt: StarknetTransactionReceipt {}
+public protocol StarknetInvokeTransactionReceiptProtocol: StarknetTransactionReceipt {}
 
-public protocol StarknetDeclareTransactionReceipt: StarknetTransactionReceipt {}
+public protocol StarknetDeclareTransactionReceiptProtocol: StarknetTransactionReceipt {}
 
-public protocol StarknetDeployTransactionReceipt: StarknetTransactionReceipt {
+public protocol StarknetDeployTransactionReceiptProtocol: StarknetTransactionReceipt {
     var contractAddress: Felt { get }
 }
 
-public protocol StarknetDeployAccountTransactionReceipt: StarknetTransactionReceipt {
+public protocol StarknetDeployAccountTransactionReceiptProtocol: StarknetTransactionReceipt {
     var contractAddress: Felt { get }
 }
 
-public protocol StarknetL1HandlerTransactionReceipt: StarknetTransactionReceipt {
+public protocol StarknetL1HandlerTransactionReceiptProtocol: StarknetTransactionReceipt {
     var messageHash: NumAsHex { get }
 }
-
-public protocol StarknetProcessedTransactionReceipt: StarknetTransactionReceipt {
-    var blockHash: Felt { get }
-    var blockNumber: UInt64 { get }
-}
-
-public protocol StarknetPendingTransactionReceipt: StarknetTransactionReceipt {}
 
 public protocol StarknetTransactionReceipt: Decodable, Equatable {
     var transactionHash: Felt { get }
@@ -33,6 +26,9 @@ public protocol StarknetTransactionReceipt: Decodable, Equatable {
     var executionResources: StarknetExecutionResources { get }
     var revertReason: String? { get }
     var type: StarknetTransactionType { get }
+    // Block info
+    var blockHash: Felt? { get }
+    var blockNumber: UInt64? { get }
 
     var isSuccessful: Bool { get }
 }
