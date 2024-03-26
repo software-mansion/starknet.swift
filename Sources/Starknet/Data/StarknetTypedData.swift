@@ -132,12 +132,18 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         guard let params = types[dependency] else {
             throw StarknetTypedDataError.dependencyNotDefined(dependency)
         }
+        func escape(_ string: String) -> String {
+            switch revision {
+            case .v0: string
+            case .v1: "\"\(string)\""
+            }
+        }
 
         let encodedParams = params.map {
-            "\($0.name):\($0.type)"
+            "\(escape($0.name)):\(escape($0.type))"
         }.joined(separator: ",")
 
-        return "\(dependency)(\(encodedParams))"
+        return "\(escape(dependency))(\(encodedParams))"
     }
 
     private func encode(type: String) throws -> String {
