@@ -65,6 +65,17 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     var revision: Revision {
         domain.resolveRevision()!
     }
+    
+    var hashMethod: HashMethod {
+        switch revision {
+        case .v0: return HashMethod.pedersen
+        case .v1: return HashMethod.poseidon
+        }
+    }
+    
+    func hash(_ array: [Felt]) -> Felt {
+        hashMethod.hash(values: array)
+    }
 
     private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
         let reservedTypeNames = ["felt", "felt*", "string", "selector"]
@@ -153,7 +164,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
                 return try getStructHash(typeName: typeName.strippingPointer(), data: object)
             }
 
-            let hash = StarknetCurve.pedersenOn(hashes)
+            let hash = hash(hashes)
 
             return hash
         }
@@ -167,6 +178,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             let hash = StarknetCurve.pedersenOn(hashes)
             return hash
         case "felt", "string":
+            return hash(hashes)
             return try unwrapFelt(from: element)
         case "selector":
             return try unwrapSelector(from: element)
@@ -201,7 +213,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public func getStructHash(typeName: String, data: [String: Element]) throws -> Felt {
         let encodedData = try encode(data: data, forType: typeName)
 
-        return try StarknetCurve.pedersenOn([getTypeHash(typeName: typeName)] + encodedData)
+        return try hash([getTypeHash(typeName: typeName)] + encodedData)
     }
 
     private func getStructHash(typeName: String, data: Data) throws -> Felt {
@@ -232,12 +244,12 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
-        try StarknetCurve.pedersenOn(
+        try hash([
             Felt.fromShortString("StarkNet Message")!,
             getStructHash(domain: domain),
             accountAddress,
             getStructHash(typeName: primaryType, data: message)
-        )
+        ])
     }
 }
 
