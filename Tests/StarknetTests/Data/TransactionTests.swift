@@ -71,21 +71,21 @@ final class TransactionTests: XCTestCase {
     }
 
     func testTransactionWrapperDecoding() throws {
-        let cases: [(String, StarknetTransactionType, Felt)] = [
-            (invokeTransactionV3, .invoke, 3),
-            (invokeTransactionV1, .invoke, 1),
-            (invokeTransactionV0, .invoke, 0),
-            (declareTransactinoV0, .declare, 0),
-            (declareTransactionV1, .declare, 1),
-            (declareTransactionV2, .declare, 2),
-            (declareTransactionV3, .declare, 3),
-            (deployTransaction, .deploy, 0),
-            (deployAccountTransactionV1, .deployAccount, 1),
-            (deployAccountTransactionV3, .deployAccount, 3),
-            (l1HandlerTransaction, .l1Handler, 0),
+        let cases: [(String, StarknetTransactionType, StarknetTransactionVersion)] = [
+            (invokeTransactionV3, .invoke, .v3),
+            (invokeTransactionV1, .invoke, .v1),
+            (invokeTransactionV0, .invoke, .v0),
+            (declareTransactinoV0, .declare, .v0),
+            (declareTransactionV1, .declare, .v1),
+            (declareTransactionV2, .declare, .v2),
+            (declareTransactionV3, .declare, .v3),
+            (deployTransaction, .deploy, .v0),
+            (deployAccountTransactionV1, .deployAccount, .v1),
+            (deployAccountTransactionV3, .deployAccount, .v3),
+            (l1HandlerTransaction, .l1Handler, .v0),
         ]
 
-        try cases.forEach { (string: String, type: StarknetTransactionType, version: Felt) in
+        try cases.forEach { (string: String, type: StarknetTransactionType, version: StarknetTransactionVersion) in
             let data = string.data(using: .utf8)!
 
             let decoder = JSONDecoder()
