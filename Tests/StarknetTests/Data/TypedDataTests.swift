@@ -14,30 +14,45 @@ final class TypedDataTests: XCTestCase {
     static let tdString = loadTypedDataFromFile(name: "typed_data_long_string_example")!
     static let tdStructArr = loadTypedDataFromFile(name: "typed_data_struct_array_example")!
     static let tdValidate = loadTypedDataFromFile(name: "typed_data_validate_example")!
+    static let exampleDomainV0 = """
+    {
+        "name": "DomainV0",
+        "version": 1,
+        "chainId": 2137,
+    }
+    """
+    static let exampleDomainV1 = """
+    {
+        "name": "DomainV1",
+        "version": 2,
+        "chainId": "2137",
+        "revision": 1
+    }
+    """
 
     func testInvalidTypes() {
-        func testInvalidType(_ type: String) {
-            XCTAssertNil(
-                StarknetTypedData(types: [type: []], primaryType: type, domain: "{}", message: "{\"\(type)\": 1}")
-            )
+        func makeTypedData(_ type: String) -> StarknetTypedData? {
+            StarknetTypedData(types: [type: []], primaryType: type, domain: Self.exampleDomainV0, message: "{\"\(type)\": 1}")
         }
 
-        testInvalidType("felt")
-        testInvalidType("felt*")
-        testInvalidType("string")
-        testInvalidType("selector")
+        XCTAssertNotNil(makeTypedData("myType"))
+        XCTAssertNil(makeTypedData("felt"))
+        XCTAssertNil(makeTypedData("felt*"))
+        XCTAssertNil(makeTypedData("string"))
+        XCTAssertNil(makeTypedData("selector"))
     }
 
     func testMissingDependency() {
         let typedData = StarknetTypedData(
             types: ["house": [StarknetTypedData.TypeDeclaration(name: "fridge", type: "ice cream")]],
             primaryType: "felt",
-            domain: "{}",
+            domain: Self.exampleDomainV1,
             message: "{}"
         )
+        XCTAssertNotNil(typedData)
 
         XCTAssertThrowsError(
-            try typedData?.getStructHash(typeName: "house", data: "{\"fridge\": 1}")
+            try typedData!.getStructHash(typeName: "house", data: "{\"fridge\": 1}")
         )
     }
 
@@ -97,9 +112,11 @@ final class TypedDataTests: XCTestCase {
         ]
 
         try cases.forEach { data, typeName, dataSource, expectedResult in
-            let dataStruct = dataSource == "domain" ? data.domain : data.message
-
-            let hash = try data.getStructHash(typeName: typeName, data: dataStruct)
+            let hash = if dataSource == "domain" {
+                try data.getStructHash(domain: data.domain)
+            } else {
+                try data.getStructHash(typeName: typeName, data: data.message)
+            }
 
             XCTAssertEqual(hash, expectedResult)
         }

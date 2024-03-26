@@ -59,10 +59,14 @@ public enum StarknetTypedDataError: Error {
 public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let types: [String: [TypeDeclaration]]
     public let primaryType: String
-    public let domain: [String: Element]
+    public let domain: Domain
     public let message: [String: Element]
 
-    private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: [String: Element], message: [String: Element]) {
+    var revision: Revision {
+        domain.resolveRevision()!
+    }
+
+    private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
         let reservedTypeNames = ["felt", "felt*", "string", "selector"]
         for typeName in reservedTypeNames {
             if types.keys.contains(typeName) {
@@ -81,7 +85,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return nil
         }
 
-        guard let domain = try? JSONDecoder().decode([String: Element].self, from: domainData),
+        guard let domain = try? JSONDecoder().decode(Domain.self, from: domainData),
               let message = try? JSONDecoder().decode([String: Element].self, from: messageData)
         else {
             return nil
@@ -200,11 +204,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         return try StarknetCurve.pedersenOn([getTypeHash(typeName: typeName)] + encodedData)
     }
 
-    public func getStructHash(typeName: String, data: String) throws -> Felt {
-        guard let data = data.data(using: .utf8) else {
-            throw StarknetTypedDataError.decodingError
-        }
-
+    private func getStructHash(typeName: String, data: Data) throws -> Felt {
         guard let dataDecoded = try? JSONDecoder().decode([String: Element].self, from: data) else {
             throw StarknetTypedDataError.decodingError
         }
@@ -212,10 +212,29 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         return try getStructHash(typeName: typeName, data: dataDecoded)
     }
 
+    public func getStructHash(typeName: String, data: String) throws -> Felt {
+        guard let data = data.data(using: .utf8) else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        return try getStructHash(typeName: typeName, data: data)
+    }
+
+    public func getStructHash(domain: Domain) throws -> Felt {
+        guard let domain = try? JSONEncoder().encode(domain) else {
+            throw StarknetTypedDataError.encodingError
+        }
+        let separatorName = switch revision {
+        case .v0: "StarkNetDomain"
+        case .v1: "StarknetDomain"
+        }
+        return try getStructHash(typeName: separatorName, data: domain)
+    }
+
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
         try StarknetCurve.pedersenOn(
             Felt.fromShortString("StarkNet Message")!,
-            getStructHash(typeName: "StarkNetDomain", data: domain),
+            getStructHash(domain: domain),
             accountAddress,
             getStructHash(typeName: primaryType, data: message)
         )
@@ -231,6 +250,30 @@ public extension StarknetTypedData {
             self.name = name
             self.type = type
         }
+    }
+
+    struct Domain: Codable, Equatable, Hashable {
+        public let name: Element
+        public let version: Element
+        public let chainId: Element
+        public let revision: Element?
+
+        public func resolveRevision() -> Revision? {
+            guard let revision else {
+                return .v0
+            }
+            switch revision {
+            case let .felt(felt):
+                return Revision(rawValue: felt) ?? .v0
+            default:
+                return nil
+            }
+        }
+    }
+
+    enum Revision: Felt, Codable, Equatable {
+        case v0 = 0
+        case v1 = 1
     }
 
     enum Element: Codable, Hashable, Equatable {
