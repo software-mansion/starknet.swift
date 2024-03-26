@@ -10,6 +10,7 @@ public protocol StarknetResources: Decodable, Equatable {
     var ecdsaApplications: Int? { get }
     var bitwiseApplications: Int? { get }
     var keccakApplications: Int? { get }
+    var segmentArena: Int? { get }
 }
 
 public struct StarknetComputationResources: StarknetResources {
@@ -22,6 +23,7 @@ public struct StarknetComputationResources: StarknetResources {
     public let ecdsaApplications: Int?
     public let bitwiseApplications: Int?
     public let keccakApplications: Int?
+    public let segmentArena: Int?
 
     enum CodingKeys: String, CodingKey {
         case steps
@@ -33,6 +35,7 @@ public struct StarknetComputationResources: StarknetResources {
         case ecdsaApplications = "ecdsa_builtin_applications"
         case bitwiseApplications = "bitwise_builtin_applications"
         case keccakApplications = "keccak_builtin_applications"
+        case segmentArena = "segment_arena_builtin"
     }
 }
 
@@ -46,6 +49,7 @@ public struct StarknetExecutionResources: StarknetResources {
     public let ecdsaApplications: Int?
     public let bitwiseApplications: Int?
     public let keccakApplications: Int?
+    public let segmentArena: Int?
     public let dataAvailability: StarknetDataAvailability
 
     enum CodingKeys: String, CodingKey {
@@ -58,6 +62,7 @@ public struct StarknetExecutionResources: StarknetResources {
         case ecdsaApplications = "ecdsa_builtin_applications"
         case bitwiseApplications = "bitwise_builtin_applications"
         case keccakApplications = "keccak_builtin_applications"
+        case segmentArena = "segment_arena_builtin"
         case dataAvailability = "data_availability"
     }
 }

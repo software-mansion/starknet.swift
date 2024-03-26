@@ -6,7 +6,7 @@ public class StarknetTransactionHashCalculator {
 
     private class func computeCommonDeprecatedTransactionHash(
         transactionType: StarknetTransactionType,
-        version: Felt,
+        version: StarknetTransactionVersion,
         contractAddress: Felt,
         entryPointSelector: Felt,
         calldata: StarknetCalldata,
@@ -16,7 +16,7 @@ public class StarknetTransactionHashCalculator {
     ) -> Felt {
         StarknetCurve.pedersenOn(
             transactionType.encodedValue,
-            version,
+            version.value,
             contractAddress,
             entryPointSelector,
             StarknetCurve.pedersenOn(calldata),
@@ -38,7 +38,7 @@ public class StarknetTransactionHashCalculator {
 
         return [
             transactionType.encodedValue,
-            version,
+            version.value,
             address,
             StarknetPoseidon.poseidonHash(
                 [tip.value.toFelt()!]
