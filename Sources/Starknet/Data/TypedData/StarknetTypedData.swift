@@ -11,6 +11,10 @@ import Foundation
 public enum StarknetTypedDataError: Error {
     case decodingError
     case dependencyNotDefined(String)
+    case contextNotDefined
+    case parentNotDefined
+    case keyNotDefined
+    case invalidMerkleTree
     case invalidShortString
     case encodingError
 }
@@ -156,7 +160,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }.joined()
     }
 
-    private func encode(element: Element, forType typeName: String) throws -> Felt {
+    private func encode(element: Element, forType typeName: String, context: Context? = nil) throws -> Felt {
         if types.keys.contains(typeName) {
             let object = try unwrapObject(from: element)
 
@@ -194,6 +198,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return try unwrapFelt(from: element)
         case ("selector", _):
             return try unwrapSelector(from: element)
+        case ("merkletree", _):
+            guard let context else {
+                throw StarknetTypedDataError.decodingError
+            }
+            return try prepareMerkleTreeRoot(from: element, context: context)
         default:
             throw StarknetTypedDataError.dependencyNotDefined(typeName)
         }
@@ -211,7 +220,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
                 throw StarknetTypedDataError.encodingError
             }
 
-            let encodedElement = try encode(element: element, forType: param.type.type)
+            let encodedElement = try encode(element: element, forType: param.type.type, context: Context(parent: typeName, key: param.type.name))
             values.append(encodedElement)
         }
 
@@ -338,6 +347,11 @@ public extension StarknetTypedData {
 }
 
 private extension StarknetTypedData {
+    struct Context: Equatable {
+        let parent: String
+        let key: String
+    }
+
     func unwrapArray(from element: Element) throws -> [Element] {
         guard case let .array(array) = element else {
             throw StarknetTypedDataError.decodingError
@@ -377,6 +391,37 @@ private extension StarknetTypedData {
         default:
             throw StarknetTypedDataError.decodingError
         }
+    }
+
+    func prepareMerkleTreeRoot(from element: Element, context: Context) throws -> Felt {
+        let leavesType = try getMerkleTreeLeavesType(context: context)
+
+        let elements = try unwrapArray(from: element)
+        let structHashes = try elements.map { element in
+            try encode(element: element, forType: leavesType)
+        }
+
+        guard let merkleTree = MerkleTree(leafHashes: structHashes, hashMethod: hashMethod) else {
+            throw StarknetTypedDataError.invalidMerkleTree
+        }
+
+        return merkleTree.rootHash
+    }
+
+    func getMerkleTreeLeavesType(context: Context) throws -> String {
+        let (parent, key) = (context.parent, context.key)
+
+        guard let parentType = types[parent] else {
+            throw StarknetTypedDataError.parentNotDefined
+        }
+        guard let targetType = parentType.first(where: { $0.type.name == key }) else {
+            throw StarknetTypedDataError.keyNotDefined
+        }
+        guard let merkleType = targetType.type as? MerkleTreeType else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        return merkleType.contains
     }
 }
 

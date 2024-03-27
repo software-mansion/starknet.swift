@@ -13,11 +13,13 @@ final class TypedDataTests: XCTestCase {
         static let tdFeltArr = loadTypedDataFromFile(name: "typed_data_rev_0_felt_array_example")!
         static let tdString = loadTypedDataFromFile(name: "typed_data_rev_0_long_string_example")!
         static let tdStructArr = loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")!
+        static let tdStructMerkleTree = loadTypedDataFromFile(name: "typed_data_rev_0_struct_merkletree_example")!
         static let tdValidate = loadTypedDataFromFile(name: "typed_data_rev_0_validate_example")!
     }
 
     enum CasesRev1 {
         static let td = loadTypedDataFromFile(name: "typed_data_rev_1_example")!
+        static let tdFeltMerkleTree = loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")!
     }
 
     static let exampleDomainV0 = """
@@ -73,10 +75,14 @@ final class TypedDataTests: XCTestCase {
             (Self.CasesRev0.tdFeltArr, "Mail", "0x5b03497592c0d1fe2f3667b63099761714a895c7df96ec90a85d17bfc7a7a0"),
             (Self.CasesRev0.tdStructArr, "Post", "0x1d71e69bf476486b43cdcfaf5a85c00bb2d954c042b281040e513080388356d"),
             (Self.CasesRev0.tdStructArr, "Mail", "0x873b878e35e258fc99e3085d5aaad3a81a0c821f189c08b30def2cde55ff27"),
-            (Self.CasesRev0.tdValidate, "Validate", "0x2e86ac4735e6012fbeaa68cbd0e5a089014d0da150fa915769a35d5eba30593"),
+            (Self.CasesRev0.tdStructMerkleTree, "Session", "0x1aa0e1c56b45cf06a54534fa1707c54e520b842feb21d03b7deddb6f1e340c"),
+            (Self.CasesRev0.tdStructMerkleTree, "Policy", "0x2f0026e78543f036f33e26a8f5891b88c58dc1e20cbbfaf0bb53274da6fa568"),
+            (Self.CasesRev0.tdValidate, "Validate", "0x1fc17ee4903c000b1c8c6c1424136d4efc4759d1e83915e981b18bc1074a72d"),
+            (Self.CasesRev0.tdValidate, "Airdrop", "0x37dcb14df3270824843bbbf50c72a724bcb303179dfcce56b653262cbb6957c"),
             (Self.CasesRev1.td, "StarknetDomain", "0x1ff2f602e42168014d405a94f75e8a93d640751d71d16311266e140d8b0a210"),
             (Self.CasesRev1.td, "Person", "0x30f7aa21b8d67cb04c30f962dd29b95ab320cb929c07d1605f5ace304dadf34"),
             (Self.CasesRev1.td, "Mail", "0x560430bf7a02939edd1a5c104e7b7a55bbab9f35928b1cf5c7c97de3a907bd"),
+            (Self.CasesRev1.tdFeltMerkleTree, "Example", "0x160b9c0e8a7c561f9c5d9e3cc2990a1b4d26e94aa319e9eb53e163cd06c71be"),
         ]
 
         try cases.forEach { data, typeName, expectedResult in
@@ -114,16 +120,28 @@ final class TypedDataTests: XCTestCase {
                 "0x5650ec45a42c4776a182159b9d33118a46860a6e6639bb8166ff71f3c41eaef"
             ),
             (
+                Self.CasesRev0.tdStructMerkleTree,
+                "Session",
+                "message",
+                "0x73602062421caf6ad2e942253debfad4584bff58930981364dcd378021defe8"
+            ),
+            (
                 Self.CasesRev0.tdValidate,
                 "Validate",
                 "message",
-                "0x87ecd5622070667d2534fa83dd9b16f6cb497b42998d301e8df0ed5875d02d"
+                "0x389e55e4a3d36c6ba04f46f1021a695c934d6782eaf64e47ac059a06a2520c2"
             ),
             (
                 Self.CasesRev1.td,
                 "StarknetDomain",
                 "domain",
                 "0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"
+            ),
+            (
+                Self.CasesRev1.tdFeltMerkleTree,
+                "Example",
+                "message",
+                "0x40ef40c56c0469799a916f0b7e3bc4f1bbf28bf659c53fb8c5ee4d8d1b4f5f0"
             ),
         ]
 
@@ -161,14 +179,24 @@ final class TypedDataTests: XCTestCase {
                 "0x5914ed2764eca2e6a41eb037feefd3d2e33d9af6225a9e7fe31ac943ff712c"
             ),
             (
+                Self.CasesRev0.tdStructMerkleTree,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x5d28fa1b31f92e63022f7d85271606e52bed89c046c925f16b09e644dc99794"
+            ),
+            (
                 Self.CasesRev0.tdValidate,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x28e38c1c65783abb40b871705095584b96bcbf1f80c8268a0659d074b3afd92"
+                "0x6038f35de58f40a6afa9d359859b2f930e5eb987580ba6875324cc4dbfcee"
             ),
             (
                 Self.CasesRev1.td,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
                 "0x7f6e8c3d8965b5535f5cc68f837c04e3bbe568535b71aa6c621ddfb188932b8"
+            ),
+            (
+                Self.CasesRev1.tdFeltMerkleTree,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x4f706783e0d7d0e61433d41343a248a213e9ab341d50ba978dfc055f26484c9"
             ),
         ]
 
