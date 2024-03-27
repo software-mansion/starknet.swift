@@ -34,7 +34,7 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
+    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
@@ -90,7 +90,7 @@ extension DevnetClientProtocol {
         try await deployAccount(name: name, classHash: classHash, maxFee: maxFee, prefund: prefund)
     }
 
-    func declareContract(contractName: String, maxFee: Felt = 1_000_000_000_000_000) async throws -> DeclareContractResult {
+    func declareContract(contractName: String, maxFee: Felt = 10_000_000_000_000_000) async throws -> DeclareContractResult {
         try await declareContract(contractName: contractName, maxFee: maxFee)
     }
 
@@ -99,7 +99,7 @@ extension DevnetClientProtocol {
         constructorCalldata: [Felt] = [],
         salt: Felt? = .zero,
         unique: Bool = false,
-        maxFeeDeclare: Felt = 1_000_000_000_000_000,
+        maxFeeDeclare: Felt = 10_000_000_000_000_000,
         maxFeeDeploy: Felt = 1_000_000_000_000_000
     ) async throws -> DeclareDeployContractResult {
         try await declareDeployContract(
@@ -432,7 +432,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             constructorCalldata: [Felt] = [],
             salt: Felt? = nil,
             unique: Bool = false,
-            maxFeeDeclare: Felt = 1_000_000_000_000_000,
+            maxFeeDeclare: Felt = 10_000_000_000_000_000,
             maxFeeDeploy: Felt = 1_000_000_000_000_000
         ) async throws -> DeclareDeployContractResult {
             try guardDevnetIsRunning()
