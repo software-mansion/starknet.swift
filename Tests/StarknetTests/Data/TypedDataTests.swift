@@ -46,6 +46,7 @@ final class TypedDataTests: XCTestCase {
         XCTAssertNil(makeTypedData("felt*"))
         XCTAssertNil(makeTypedData("string"))
         XCTAssertNil(makeTypedData("selector"))
+        XCTAssertNil(makeTypedData("merkletree"))
     }
 
     func testMissingDependency() {

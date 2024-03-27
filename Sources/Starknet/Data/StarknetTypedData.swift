@@ -78,7 +78,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
-        let reservedTypeNames = ["felt", "felt*", "string", "selector"]
+        let reservedTypeNames = ["felt", "felt*", "string", "selector", "merkletree"]
         for typeName in reservedTypeNames {
             if types.keys.contains(typeName) {
                 return nil
