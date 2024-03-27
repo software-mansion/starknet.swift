@@ -63,7 +63,7 @@ public extension StarknetTypedData {
             let type = try container.decode(String.self, forKey: Keys.type)
 
             switch type {
-            case "merkleTree":
+            case "merkletree":
                 self = try .merkletree(MerkleTreeType(from: decoder))
             default:
                 self = try .standard(StandardType(from: decoder))
