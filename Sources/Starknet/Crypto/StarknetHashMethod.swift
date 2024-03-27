@@ -1,6 +1,6 @@
 import Foundation
 
-enum HashMethod {
+enum StarknetHashMethod {
     case pedersen
     case poseidon
 

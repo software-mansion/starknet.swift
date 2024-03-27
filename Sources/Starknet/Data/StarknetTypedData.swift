@@ -66,10 +66,10 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         domain.resolveRevision()!
     }
 
-    var hashMethod: HashMethod {
+    var hashMethod: StarknetHashMethod {
         switch revision {
-        case .v0: return HashMethod.pedersen
-        case .v1: return HashMethod.poseidon
+        case .v0: return StarknetHashMethod.pedersen
+        case .v1: return StarknetHashMethod.poseidon
         }
     }
 
