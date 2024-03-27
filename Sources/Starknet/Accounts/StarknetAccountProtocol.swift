@@ -288,8 +288,6 @@ public extension StarknetAccountProtocol {
         try await executeV3(calls: [call], params: params)
     }
 
-    /// Execute a call as invoke transaction v1
-    ///
     /// Execute a call as invoke transaction v1 with automatically estimated fee that will be multiplied by the specified multiplier when max fee is calculated.
     ///
     /// - Parameters:
@@ -301,8 +299,6 @@ public extension StarknetAccountProtocol {
         try await executeV1(calls: [call], estimateFeeMultiplier: estimateFeeMultiplier)
     }
 
-    /// Execute a call as invoke transaction v3
-    ///
     /// Execute a call as invoke transaction v3 with automatically estimated fee that will be multiplied by the specified multipliers when resource bounds are calculated.
     ///
     /// - Parameters:
@@ -315,8 +311,6 @@ public extension StarknetAccountProtocol {
         try await executeV3(calls: [call], estimateAmountMultiplier: estimateAmountMultiplier, estimateUnitPriceMultiplier: estimateUnitPriceMultiplier)
     }
 
-    /// Execute a call as invoke transaction v1
-    ///
     /// Execute a call as invoke transaction v1 with automatically estimated fee
     ///
     /// - Parameters:
@@ -327,8 +321,6 @@ public extension StarknetAccountProtocol {
         try await executeV1(calls: [call])
     }
 
-    /// Execute a call as invoke transaction v3
-    ///
     /// Execute a call as invoke transaction v3 with automatically estimated fee
     ///
     /// - Parameters:
