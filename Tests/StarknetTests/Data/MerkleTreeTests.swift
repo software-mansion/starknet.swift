@@ -93,7 +93,7 @@ final class MerkleTreeTest: XCTestCase {
             testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 2)
         }
 
-        func testBuild(_ leaves: [Felt], _ hashMethod: HashMethod, expectedRoot: Felt,  expectedBranchCount: Int) {
+        func testBuild(_ leaves: [Felt], _ hashMethod: HashMethod, expectedRoot: Felt, expectedBranchCount: Int) {
             let tree = MerkleTree(leafHashes: leaves, hashMethod: hashMethod)
 
             XCTAssertNotNil(tree)
