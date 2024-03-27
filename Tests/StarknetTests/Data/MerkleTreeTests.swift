@@ -38,13 +38,13 @@ final class MerkleTreeTest: XCTestCase {
         func testBuildFrom1(_ hashMethod: HashMethod) {
             let leaves: [Felt] = [1]
             let manualRootHash = leaves[0]
-            testBuild(leaves, hashMethod, manualRootHash, 0)
+            testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 0)
         }
 
         func testBuildFrom2(_ hashMethod: HashMethod) {
             let leaves: [Felt] = [1, 2]
             let manualRootHash = MerkleTree.hash(leaves[0], leaves[1], hashMethod)
-            testBuild(leaves, hashMethod, manualRootHash, 0)
+            testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 0)
         }
 
         func testBuildFrom4(_ hashMethod: HashMethod) {
