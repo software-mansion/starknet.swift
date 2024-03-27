@@ -77,6 +77,32 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
+    func testExecuteV1FeeMultiplier() async throws {
+        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
+
+        let calldata: [Felt] = [recipientAddress, 1000, 0]
+        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+
+        let result = try await account.executeV1(call: call, estimateFeeMultiplier: 1.8)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
+
+        let result2 = try await account.executeV1(call: call, estimateFeeMultiplier: 0.9)
+        try await Self.devnetClient.assertTransactionFailed(transactionHash: result2.transactionHash)
+    }
+
+    func testExecuteV3FeeMultipliers() async throws {
+        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
+
+        let calldata: [Felt] = [recipientAddress, 1000, 0]
+        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
+
+        let result = try await account.executeV3(call: call, estimateAmountMultiplier: 1.8, estimateUnitPriceMultiplier: 1.8)
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
+
+        let result2 = try await account.executeV3(call: call, estimateAmountMultiplier: 0.9, estimateUnitPriceMultiplier: 1.0)
+        try await Self.devnetClient.assertTransactionFailed(transactionHash: result2.transactionHash)
+    }
+
     func testExecuteV1CustomParams() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 

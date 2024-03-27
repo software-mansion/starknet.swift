@@ -132,6 +132,28 @@ public class StarknetAccount: StarknetAccountProtocol {
         return try await provider.addInvokeTransaction(signedTransaction)
     }
 
+    public func executeV1(calls: [StarknetCall], estimateFeeMultiplier: Double) async throws -> StarknetInvokeTransactionResponse {
+        let nonce = try await getNonce()
+        let feeEstimate = try await estimateFeeV1(calls: calls, nonce: nonce)
+        let maxFee = feeEstimate.toMaxFee(multiplier: estimateFeeMultiplier)
+
+        let params = StarknetInvokeParamsV1(nonce: nonce, maxFee: maxFee)
+        let signedTransaction = try signV1(calls: calls, params: params, forFeeEstimation: false)
+
+        return try await provider.addInvokeTransaction(signedTransaction)
+    }
+
+    public func executeV3(calls: [StarknetCall], estimateAmountMultiplier: Double, estimateUnitPriceMultiplier: Double) async throws -> StarknetInvokeTransactionResponse {
+        let nonce = try await getNonce()
+        let feeEstimate = try await estimateFeeV3(calls: calls, nonce: nonce)
+        let resourceBounds = feeEstimate.toResourceBounds(amountMultiplier: estimateAmountMultiplier, unitPriceMultiplier: estimateUnitPriceMultiplier)
+
+        let params = StarknetInvokeParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
+        let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: false)
+
+        return try await provider.addInvokeTransaction(signedTransaction)
+    }
+
     public func estimateFeeV1(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetFeeEstimate {
         let params = StarknetInvokeParamsV1(nonce: nonce, maxFee: .zero)
         let signedTransaction = try signV1(calls: calls, params: params, forFeeEstimation: true)
