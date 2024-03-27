@@ -85,8 +85,6 @@ public protocol StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(calls: [StarknetCall], params: StarknetOptionalInvokeParamsV3) async throws -> StarknetInvokeTransactionResponse
 
-    /// Execute list of calls as invoke transaction v1
-    ///
     /// Execute list of calls as invoke transaction v1 with automatically estimated fee that will be multiplied by the specified multiplier when max fee is calculated.
     ///
     /// - Parameters:
@@ -96,8 +94,6 @@ public protocol StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV1(calls: [StarknetCall], estimateFeeMultiplier: Double) async throws -> StarknetInvokeTransactionResponse
 
-    /// Execute list of calls as invoke transaction v3
-    ///
     /// Execute list of calls as invoke transaction v3 with automatically estimated fee that will be multiplied by the specified multipliers when resource bounds are calculated.
     ///
     /// - Parameters:
@@ -108,8 +104,6 @@ public protocol StarknetAccountProtocol {
     ///  - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(calls: [StarknetCall], estimateAmountMultiplier: Double, estimateUnitPriceMultiplier: Double) async throws -> StarknetInvokeTransactionResponse
 
-    /// Execute list of calls as invoke transaction v1
-    ///
     /// Execute list of calls as invoke transaction v1 with automatically estimated fee
     ///
     /// - Parameters:
@@ -118,8 +112,6 @@ public protocol StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV1(calls: [StarknetCall]) async throws -> StarknetInvokeTransactionResponse
 
-    /// Execute list of calls as invoke transaction v3
-    ///
     /// Execute list of calls as invoke transaction v3 with automatically estimated fee
     ///
     /// - Parameters:
