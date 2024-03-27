@@ -200,7 +200,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return try unwrapSelector(from: element)
         case ("merkletree", _):
             guard let context else {
-                throw StarknetTypedDataError.decodingError
+                throw StarknetTypedDataError.contextNotDefined
             }
             return try prepareMerkleTreeRoot(from: element, context: context)
         default:
