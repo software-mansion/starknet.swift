@@ -51,7 +51,7 @@ final class TypedDataTests: XCTestCase {
 
     func testMissingDependency() {
         let typedData = StarknetTypedData(
-            types: ["house": [StarknetTypedData.TypeDeclaration(name: "fridge", type: "ice cream")]],
+            types: ["house": [StarknetTypedData.StandardType(name: "fridge", type: "ice cream")]],
             primaryType: "felt",
             domain: Self.exampleDomainV1,
             message: "{}"
