@@ -1,0 +1,62 @@
+name: Checks
+
+on:
+  pull_request:
+    branches: "*"
+
+jobs:
+  test_and_lint:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache/Restore Mint packages
+        id: mint-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          restore-keys: ${{ runner.os }}-mint-
+
+      - name: Check if Mint is installed
+        id: mint-installed
+        run: brew list | grep mint
+        continue-on-error: true
+
+      - name: Upgrade package manager "Mint"
+        if: steps.mint-installed.outcome == 'success'
+        run: |
+          brew upgrade mint
+
+      - name: Install package manager "Mint"
+        if: steps.mint-installed.outcome != 'success'
+        run: |
+          brew install mint
+
+      - name: Install command line tool (if not yet cached)
+        if: steps.mint-cache.outputs.cache-hit != 'true'
+        run: mint bootstrap
+
+      - name: Run SwiftFormat lint
+        run: mint run swiftformat --lint .
+
+      - name: Set up Python 3.9.12
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.12
+
+      - name: Install devnet
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile resource contracts
+        run: |
+          chmod +x ./Tests/StarknetTests/Resources/compileContracts.sh
+          ./Tests/StarknetTests/Resources/compileContracts.sh
+
+      - name: Run tests
+        run: |
+          export DEVNET_PATH="$(which starknet-devnet)"
+          export STARKNET_PATH="$(which starknet)"
+          swift test --disable-sandbox
