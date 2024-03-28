@@ -22,27 +22,27 @@ enum TransactionWrapper: Decodable {
     public var transaction: any StarknetTransaction {
         switch self {
         case let .invokeV3(tx):
-            return tx
+            tx
         case let .invokeV1(tx):
-            return tx
+            tx
         case let .invokeV0(tx):
-            return tx
+            tx
         case let .deployAccountV3(tx):
-            return tx
+            tx
         case let .deployAccountV1(tx):
-            return tx
+            tx
         case let .deploy(tx):
-            return tx
+            tx
         case let .declareV3(tx):
-            return tx
+            tx
         case let .declareV2(tx):
-            return tx
+            tx
         case let .declareV1(tx):
-            return tx
+            tx
         case let .declareV0(tx):
-            return tx
+            tx
         case let .l1Handler(tx):
-            return tx
+            tx
         }
     }
 
