@@ -13,6 +13,7 @@ public enum StarknetTypedDataError: Error, Equatable {
     case invalidRevision
     case basicTypeRedefinition
     case invalidTypeName
+    case domainNotDefined
     case dependencyNotDefined(String)
     case contextNotDefined
     case parentNotDefined
@@ -120,6 +121,10 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     private func verifyTypes() throws {
+        guard types.keys.contains(domain.separatorName) else {
+            throw StarknetTypedDataError.domainNotDefined
+        }
+
         let reservedTypeNames = ["felt", "string", "selector", "merkletree"]
         for typeName in reservedTypeNames {
             guard !types.keys.contains(typeName) else {
@@ -280,14 +285,10 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     public func getStructHash(domain: Domain) throws -> Felt {
-        guard let domain = try? JSONEncoder().encode(domain) else {
+        guard let domainData = try? JSONEncoder().encode(domain) else {
             throw StarknetTypedDataError.encodingError
         }
-        let separatorName = switch revision {
-        case .v0: "StarkNetDomain"
-        case .v1: "StarknetDomain"
-        }
-        return try getStructHash(typeName: separatorName, data: domain)
+        return try getStructHash(typeName: domain.separatorName, data: domainData)
     }
 
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
@@ -319,6 +320,13 @@ public extension StarknetTypedData {
                 return revision
             default:
                 throw StarknetTypedDataError.invalidRevision
+            }
+        }
+
+        public var separatorName: String {
+            switch try! resolveRevision() {
+            case .v0: "StarkNetDomain"
+            case .v1: "StarknetDomain"
             }
         }
     }
