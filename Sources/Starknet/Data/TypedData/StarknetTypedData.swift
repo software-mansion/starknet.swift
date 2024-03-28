@@ -10,6 +10,7 @@ import Foundation
 
 public enum StarknetTypedDataError: Error, Equatable {
     case decodingError
+    case invalidRevision
     case basicTypeRedefinition
     case invalidTypeName
     case dependencyNotDefined(String)
@@ -69,7 +70,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let message: [String: Element]
 
     var revision: Revision {
-        domain.resolveRevision()!
+        try! domain.resolveRevision()
     }
 
     var hashMethod: StarknetHashMethod {
@@ -306,15 +307,18 @@ public extension StarknetTypedData {
         public let chainId: Element
         public let revision: Element?
 
-        public func resolveRevision() -> Revision? {
+        public func resolveRevision() throws -> Revision {
             guard let revision else {
                 return .v0
             }
             switch revision {
             case let .felt(felt):
-                return Revision(rawValue: felt)
+                guard let revision = Revision(rawValue: felt) else {
+                    throw StarknetTypedDataError.invalidRevision
+                }
+                return revision
             default:
-                return nil
+                throw StarknetTypedDataError.invalidRevision
             }
         }
     }
