@@ -8,7 +8,7 @@
 import BigInt
 import Foundation
 
-public enum StarknetTypedDataError: Error {
+public enum StarknetTypedDataError: Error, Equatable {
     case decodingError
     case basicTypeRedefinition
     case invalidTypeName
@@ -127,6 +127,9 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         try self.types.keys.forEach { typeName in
+            guard !typeName.isEmpty else {
+                throw StarknetTypedDataError.invalidTypeName
+            }
             guard !typeName.isArray() else {
                 throw StarknetTypedDataError.invalidTypeName
             }

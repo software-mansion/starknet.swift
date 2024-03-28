@@ -38,18 +38,34 @@ final class TypedDataTests: XCTestCase {
     }
     """
 
-    func testInvalidTypes() {
-        func makeTypedData(_ type: String) throws -> StarknetTypedData {
-            try StarknetTypedData(types: [type: []], primaryType: type, domain: Self.exampleDomainV0, message: "{\"\(type)\": 1}")
+    private func makeTypedData(_ type: String) throws -> StarknetTypedData {
+        try StarknetTypedData(types: [type: []], primaryType: type, domain: Self.exampleDomainV0, message: "{\"\(type)\": 1}")
+    }
+
+    func testInvalidTypeNames() {
+        try XCTAssertThrowsError(makeTypedData("")) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName)
+        }
+        try XCTAssertThrowsError(makeTypedData("myType*")) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName)
+        }
+        try XCTAssertThrowsError(makeTypedData("*")) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName)
+        }
+    }
+
+    func testTypesRedifintion() throws {
+        func testTypeRedifintion(_ type: String) throws {
+            try XCTAssertThrowsError(StarknetTypedData(types: [type: [], type: []], primaryType: type, domain: Self.exampleDomainV0, message: "{\"\(type)\": 1}")) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition)
+            }
         }
 
-        XCTAssertNoThrow(try makeTypedData("myType"))
-        XCTAssertThrowsError(try makeTypedData("myType*"))
-        XCTAssertThrowsError(try makeTypedData("felt"))
-        XCTAssertThrowsError(try makeTypedData("felt*"))
-        XCTAssertThrowsError(try makeTypedData("string"))
-        XCTAssertThrowsError(try makeTypedData("selector"))
-        XCTAssertThrowsError(try makeTypedData("merkletree"))
+        try XCTAssertNoThrow(makeTypedData("myType"))
+        try testTypeRedifintion("felt")
+        try testTypeRedifintion("string")
+        try testTypeRedifintion("selector")
+        try testTypeRedifintion("merkletree")
     }
 
     func testMissingDependency() throws {
