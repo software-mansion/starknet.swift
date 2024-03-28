@@ -13,6 +13,7 @@ public enum StarknetTypedDataError: Error, Equatable {
     case invalidRevision
     case basicTypeRedefinition
     case invalidTypeName
+    case danglingType(String)
     case dependencyNotDefined(String)
     case contextNotDefined
     case parentNotDefined
@@ -131,12 +132,26 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             }
         }
 
+        let referencedTypes = Set(types.values.flatMap { type in
+            type.map { param in
+                switch param {
+                case let .merkletree(merkle):
+                    merkle.contains
+                case let .standard(standard):
+                    standard.type.strippingPointer()
+                }
+            }
+        } + [domain.separatorName, primaryType])
+
         try self.types.keys.forEach { typeName in
             guard !typeName.isEmpty else {
                 throw StarknetTypedDataError.invalidTypeName
             }
             guard !typeName.isArray() else {
                 throw StarknetTypedDataError.invalidTypeName
+            }
+            guard referencedTypes.contains(typeName) else {
+                throw StarknetTypedDataError.danglingType(typeName)
             }
         }
     }

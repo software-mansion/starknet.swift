@@ -105,10 +105,18 @@ final class TypedDataTests: XCTestCase {
             case .v0: (Self.domainTypeV0.0, Self.exampleDomainV0)
             case .v1: (Self.domainTypeV1.0, Self.exampleDomainV1)
             }
-            
+
             try XCTAssertThrowsError(StarknetTypedData(types: [:], primaryType: "felt", domain: domain, message: "{}")) { error in
                 XCTAssertEqual(error as? StarknetTypedDataError, .dependencyNotDefined(separatorName))
             }
+        }
+    }
+
+    func testDanglingTypes() throws {
+        try XCTAssertThrowsError(
+            StarknetTypedData(types: [Self.domainTypeV1.0: Self.domainTypeV1.1, "danglingType": []], primaryType: "felt", domain: Self.exampleDomainV1, message: "{}")
+        ) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .danglingType("danglingType"))
         }
     }
 
