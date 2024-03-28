@@ -21,7 +21,7 @@ public struct MerkleTree {
         var branches: [[Felt]] = []
 
         while leaves.count > 1 {
-            if leaves.count != leaves.count {
+            if leaves.count != leafHashes.count {
                 branches.append(leaves)
             }
             leaves = stride(from: 0, to: leaves.count, by: 2).map {
