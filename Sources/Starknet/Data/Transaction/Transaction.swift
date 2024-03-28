@@ -4,7 +4,7 @@ import Foundation
 public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTransactionV3, StarknetExecutableTransaction {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt
+    public let version: StarknetTransactionVersion
 
     public let senderAddress: Felt
 
@@ -33,7 +33,7 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         self.calldata = calldata
         self.signature = signature
         self.nonce = nonce
-        self.version = StarknetInvokeTransactionV3.computeVersion(3, forFeeEstimation: forFeeEstimation)
+        self.version = forFeeEstimation ? .v3Query : .v3
         self.hash = hash
         // As of Starknet 0.13, most of v3 fields have hardcoded values.
         self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
@@ -66,7 +66,7 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         self.calldata = try container.decode(StarknetCalldata.self, forKey: .calldata)
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
-        self.version = try container.decode(Felt.self, forKey: .version)
+        self.version = try container.decode(StarknetTransactionVersion.self, forKey: .version)
         self.resourceBounds = try container.decode(StarknetResourceBoundsMapping.self, forKey: .resourceBounds)
         self.tip = try container.decode(UInt64AsHex.self, forKey: .tip)
         self.paymasterData = try container.decode(StarknetPaymasterData.self, forKey: .paymasterData)
@@ -82,7 +82,7 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
 public struct StarknetInvokeTransactionV1: StarknetInvokeTransaction, StarknetDeprecatedTransaction, StarknetExecutableTransaction {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt
+    public let version: StarknetTransactionVersion
 
     public let senderAddress: Felt
 
@@ -102,7 +102,7 @@ public struct StarknetInvokeTransactionV1: StarknetInvokeTransaction, StarknetDe
         self.signature = signature
         self.maxFee = maxFee
         self.nonce = nonce
-        self.version = StarknetInvokeTransactionV1.computeVersion(1, forFeeEstimation: forFeeEstimation)
+        self.version = forFeeEstimation ? .v1Query : .v1
         self.hash = hash
     }
 
@@ -124,7 +124,7 @@ public struct StarknetInvokeTransactionV1: StarknetInvokeTransaction, StarknetDe
         self.signature = try container.decode(StarknetSignature.self, forKey: .signature)
         self.maxFee = try container.decode(Felt.self, forKey: .maxFee)
         self.nonce = try container.decode(Felt.self, forKey: .nonce)
-        self.version = try container.decode(Felt.self, forKey: .version)
+        self.version = try container.decode(StarknetTransactionVersion.self, forKey: .version)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
@@ -134,7 +134,7 @@ public struct StarknetInvokeTransactionV1: StarknetInvokeTransaction, StarknetDe
 public struct StarknetInvokeTransactionV0: StarknetInvokeTransaction, StarknetDeprecatedTransaction {
     public let type: StarknetTransactionType = .invoke
 
-    public let version: Felt = .zero
+    public let version: StarknetTransactionVersion = .v0
 
     public let contractAddress: Felt
 
@@ -185,7 +185,7 @@ public struct StarknetInvokeTransactionV0: StarknetInvokeTransaction, StarknetDe
 public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransaction, StarknetTransactionV3, StarknetExecutableTransaction {
     public let type: StarknetTransactionType = .deployAccount
 
-    public let version: Felt
+    public let version: StarknetTransactionVersion
 
     public let signature: StarknetSignature
 
@@ -215,7 +215,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
         self.contractAddressSalt = contractAddressSalt
         self.constructorCalldata = constructorCalldata
         self.classHash = classHash
-        self.version = StarknetDeployAccountTransactionV3.computeVersion(3, forFeeEstimation: forFeeEstimation)
+        self.version = forFeeEstimation ? .v3Query : .v3
         self.hash = hash
         // As of Starknet 0.13, most of v3 fields have hardcoded values.
         self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
@@ -237,7 +237,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
         self.paymasterData = try container.decode([Felt].self, forKey: .paymasterData)
         self.nonceDataAvailabilityMode = try container.decode(StarknetDAMode.self, forKey: .nonceDataAvailabilityMode)
         self.feeDataAvailabilityMode = try container.decode(StarknetDAMode.self, forKey: .feeDataAvailabilityMode)
-        self.version = try container.decode(Felt.self, forKey: .version)
+        self.version = try container.decode(StarknetTransactionVersion.self, forKey: .version)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionVersion(container: container, codingKeysType: CodingKeys.self)
@@ -263,7 +263,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
 public struct StarknetDeployAccountTransactionV1: StarknetDeployAccountTransaction, StarknetDeprecatedTransaction, StarknetExecutableTransaction {
     public let type: StarknetTransactionType = .deployAccount
 
-    public let version: Felt
+    public let version: StarknetTransactionVersion
 
     public let signature: StarknetSignature
 
@@ -286,7 +286,7 @@ public struct StarknetDeployAccountTransactionV1: StarknetDeployAccountTransacti
         self.contractAddressSalt = contractAddressSalt
         self.constructorCalldata = constructorCalldata
         self.classHash = classHash
-        self.version = StarknetDeployAccountTransactionV1.computeVersion(1, forFeeEstimation: forFeeEstimation)
+        self.version = forFeeEstimation ? .v1Query : .v1
         self.hash = hash
     }
 
@@ -298,7 +298,7 @@ public struct StarknetDeployAccountTransactionV1: StarknetDeployAccountTransacti
         self.contractAddressSalt = try container.decode(Felt.self, forKey: .contractAddressSalt)
         self.constructorCalldata = try container.decode(StarknetCalldata.self, forKey: .constructorCalldata)
         self.classHash = try container.decode(Felt.self, forKey: .classHash)
-        self.version = try container.decode(Felt.self, forKey: .version)
+        self.version = try container.decode(StarknetTransactionVersion.self, forKey: .version)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
@@ -320,7 +320,7 @@ public struct StarknetDeployAccountTransactionV1: StarknetDeployAccountTransacti
 public struct StarknetL1HandlerTransaction: StarknetTransaction {
     public let type: StarknetTransactionType = .l1Handler
 
-    public let version: Felt = .zero
+    public let version: StarknetTransactionVersion = .v0
 
     public let nonce: Felt
 
@@ -366,7 +366,7 @@ public struct StarknetL1HandlerTransaction: StarknetTransaction {
 public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, StarknetTransactionV3 {
     public let type: StarknetTransactionType = .declare
 
-    public let version: Felt = 3
+    public let version: StarknetTransactionVersion = .v3
 
     public let signature: StarknetSignature
 
@@ -452,7 +452,7 @@ public struct StarknetDeclareTransactionV0: StarknetDeclareTransaction, Starknet
 
     public let maxFee: Felt
 
-    public let version: Felt = .zero
+    public let version: StarknetTransactionVersion = .v0
 
     public let signature: StarknetSignature
 
@@ -498,7 +498,7 @@ public struct StarknetDeclareTransactionV1: StarknetDeclareTransaction, Starknet
 
     public let maxFee: Felt
 
-    public let version: Felt = .one
+    public let version: StarknetTransactionVersion = .v1
 
     public let signature: StarknetSignature
 
@@ -549,7 +549,7 @@ public struct StarknetDeclareTransactionV2: StarknetTransaction {
 
     public let maxFee: Felt
 
-    public let version: Felt = 2
+    public let version: StarknetTransactionVersion = .v2
 
     public let signature: StarknetSignature
 
@@ -603,7 +603,7 @@ public struct StarknetDeclareTransactionV2: StarknetTransaction {
 public struct StarknetDeployTransaction: StarknetTransaction {
     public let type: StarknetTransactionType = .deploy
 
-    public let version: Felt = .zero
+    public let version: StarknetTransactionVersion = .v0
 
     public let contractAddressSalt: Felt
 
@@ -650,10 +650,6 @@ extension StarknetExecutableTransaction {
     private static func estimateVersion(_ version: Felt) -> Felt {
         Felt(BigUInt(2).power(128).advanced(by: BigInt(version.value)))!
     }
-
-    static func computeVersion(_ version: Felt, forFeeEstimation: Bool) -> Felt {
-        forFeeEstimation ? estimateVersion(version) : version
-    }
 }
 
 // Default deserializer doesn't check if the fields with default values match what is deserialized.
@@ -668,7 +664,7 @@ extension StarknetTransaction {
     }
 
     func verifyTransactionVersion<T>(container: KeyedDecodingContainer<T>, codingKeysType _: T.Type) throws where T: CodingKey {
-        let version = try container.decode(Felt.self, forKey: T(stringValue: "version")!)
+        let version = try container.decode(StarknetTransactionVersion.self, forKey: T(stringValue: "version")!)
 
         guard version == self.version else {
             throw StarknetTransactionDecodingError.invalidVersion
