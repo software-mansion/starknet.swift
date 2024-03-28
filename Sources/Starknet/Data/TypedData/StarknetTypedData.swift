@@ -82,19 +82,16 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     private init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
-        let reservedTypeNames = ["felt", "felt*", "string", "selector", "merkletree"]
-        for typeName in reservedTypeNames {
-            if types.keys.contains(typeName) {
-                return nil
-            }
-        }
-
         self.types = types.mapValues { value in
             value.map { TypeDeclarationWrapper($0) }
         }
         self.primaryType = primaryType
         self.domain = domain
         self.message = message
+
+        guard verifyTypes() else {
+            return nil
+        }
     }
 
     public init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: String, message _: String) {
@@ -109,6 +106,17 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         self.init(types: types, primaryType: primaryType, domain: domain, message: message)
+    }
+
+    private func verifyTypes() -> Bool {
+        let reservedTypeNames = ["felt", "felt*", "string", "selector", "merkletree"]
+        for typeName in reservedTypeNames {
+            if types.keys.contains(typeName) {
+                return false
+            }
+        }
+
+        return true
     }
 
     private func getDependencies(of type: String) -> [String] {
@@ -433,7 +441,7 @@ private extension String {
 
         return self
     }
-    
+
     func isArray() -> Bool {
         self.hasSuffix("*")
     }
