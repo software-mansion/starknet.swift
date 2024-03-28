@@ -13,7 +13,6 @@ public enum StarknetTypedDataError: Error, Equatable {
     case invalidRevision
     case basicTypeRedefinition
     case invalidTypeName
-    case domainNotDefined
     case dependencyNotDefined(String)
     case contextNotDefined
     case parentNotDefined
@@ -122,7 +121,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 
     private func verifyTypes() throws {
         guard types.keys.contains(domain.separatorName) else {
-            throw StarknetTypedDataError.domainNotDefined
+            throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
         }
 
         let reservedTypeNames = ["felt", "string", "selector", "merkletree"]

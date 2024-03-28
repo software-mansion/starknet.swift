@@ -100,12 +100,16 @@ final class TypedDataTests: XCTestCase {
     }
 
     func testMissingDomainType() throws {
-        try [Self.exampleDomainV0, Self.exampleDomainV1].forEach { domain in
+        try [StarknetTypedData.Revision.v0, .v1].forEach { revision in
+            let (separatorName, domain) = switch revision {
+            case .v0: (Self.domainTypeV0.0, Self.exampleDomainV0)
+            case .v1: (Self.domainTypeV1.0, Self.exampleDomainV1)
+            }
+            
             try XCTAssertThrowsError(StarknetTypedData(types: [:], primaryType: "felt", domain: domain, message: "{}")) { error in
-                XCTAssertEqual(error as? StarknetTypedDataError, .domainNotDefined)
+                XCTAssertEqual(error as? StarknetTypedDataError, .dependencyNotDefined(separatorName))
             }
         }
-
     }
 
     func testMissingDependency() throws {
