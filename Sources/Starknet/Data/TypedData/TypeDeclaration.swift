@@ -41,9 +41,9 @@ public extension StarknetTypedData {
         public var type: any TypeDeclaration {
             switch self {
             case let .standard(type):
-                return type
+                type
             case let .merkletree(type):
-                return type
+                type
             }
         }
 
