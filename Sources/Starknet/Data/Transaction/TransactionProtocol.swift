@@ -35,6 +35,6 @@ public protocol StarknetExecutableTransaction: StarknetTransaction {}
 
 public protocol StarknetTransaction: Codable, Hashable, Equatable {
     var type: StarknetTransactionType { get }
-    var version: Felt { get }
+    var version: StarknetTransactionVersion { get }
     var hash: Felt? { get }
 }

@@ -2,7 +2,7 @@ import XCTest
 
 @testable import Starknet
 
-let invokeReceipt = """
+let invokeReceiptWithBlockInfo = """
 {
     "type": "INVOKE",
     "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
@@ -19,7 +19,7 @@ let invokeReceipt = """
     "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "segment_arena_builtin": 2, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
 }
 """
-let pendingInvokeReceipt = """
+let invokeReceipt = """
 {
     "type": "INVOKE",
     "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
@@ -27,6 +27,23 @@ let pendingInvokeReceipt = """
                     "amount": "0x244adfc7e22",
                     "unit": "FRI"
                 },
+    "messages_sent": [],
+    "events": [],
+    "execution_status": "SUCCEEDED",
+    "finality_status": "ACCEPTED_ON_L2",
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "segment_arena_builtin": 2, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
+}
+"""
+let declareReceiptWithBlockInfo = """
+{
+    "type": "DECLARE",
+    "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
+    "actual_fee": {
+                    "amount": "0x244adfc7e22",
+                    "unit": "FRI"
+                },
+    "block_hash": "0x3e1833c6f0bd56a041e150f74e2f5026157d8d3d890ab386eac58c9776da284",
+    "block_number": 308391,
     "messages_sent": [],
     "events": [],
     "execution_status": "SUCCEEDED",
@@ -42,23 +59,6 @@ let declareReceipt = """
                     "amount": "0x244adfc7e22",
                     "unit": "FRI"
                 },
-    "block_hash": "0x3e1833c6f0bd56a041e150f74e2f5026157d8d3d890ab386eac58c9776da284",
-    "block_number": 308391,
-    "messages_sent": [],
-    "events": [],
-    "execution_status": "SUCCEEDED",
-    "finality_status": "ACCEPTED_ON_L2",
-    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "segment_arena_builtin": 2, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
-}
-"""
-let pendingDeclareReceipt = """
-{
-    "type": "DECLARE",
-    "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
-    "actual_fee": {
-                    "amount": "0x244adfc7e22",
-                    "unit": "FRI"
-                },
 	"messages_sent": [],
     "events": [],
     "execution_status": "SUCCEEDED",
@@ -66,7 +66,7 @@ let pendingDeclareReceipt = """
     "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "segment_arena_builtin": 2, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}}
 }
 """
-let deployAccountReceipt = """
+let deployAccountReceiptWithBlockInfo = """
 {
     "type": "DEPLOY_ACCOUNT",
     "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
@@ -84,7 +84,7 @@ let deployAccountReceipt = """
     "contract_address": "0x789"
 }
 """
-let pendingDeployAccountReceipt = """
+let deployAccountReceipt = """
 {
     "type": "DEPLOY_ACCOUNT",
     "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
@@ -100,7 +100,7 @@ let pendingDeployAccountReceipt = """
     "contract_address": "0x789"
 }
 """
-let deployReceipt = """
+let deployReceiptWithBlockInfo = """
 {
     "type": "DEPLOY",
     "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
@@ -118,7 +118,23 @@ let deployReceipt = """
     "contract_address": "0x789"
 }
 """
-let l1HandlerReceipt = """
+let deployReceipt = """
+{
+    "type": "DEPLOY",
+    "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
+    "actual_fee": {
+                    "amount": "0x244adfc7e22",
+                    "unit": "FRI"
+                },
+    "messages_sent": [],
+    "events": [],
+    "execution_status": "SUCCEEDED",
+    "finality_status": "ACCEPTED_ON_L2",
+    "execution_resources": {"steps": 999, "memory_holes" : 1, "range_check_builtin_applications": 21, "pedersen_builtin_applications": 37, "poseidon_builtin_applications": 451, "ec_op_builtin_applications": 123, "ecdsa_builtin_applications": 789, "bitwise_builtin_applications": 1, "keccak_builtin_applications": 1, "data_availability": {"l1_gas": 123, "l1_data_gas": 456}},
+    "contract_address": "0x789"
+}
+"""
+let l1HandlerReceiptWithBlockInfo = """
 {
     "type": "L1_HANDLER",
     "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
@@ -136,7 +152,7 @@ let l1HandlerReceipt = """
     "message_hash":"0x2137"
 }
 """
-let pendingL1HandlerReceipt = """
+let l1HandlerReceipt = """
 {
     "type": "L1_HANDLER",
     "transaction_hash": "0x333198614194ae5b5ef921e63898a592de5e9f4d7b6e04745093da88b429f2a",
@@ -156,27 +172,30 @@ let pendingL1HandlerReceipt = """
 final class TransactionReceiptTests: XCTestCase {
     func testTransactionReceiptWrapperDecoding() throws {
         let cases: [(String, StarknetTransactionType, Bool, any StarknetTransactionReceipt.Type)] = [
-            (invokeReceipt, .invoke, false, StarknetProcessedInvokeTransactionReceipt.self),
-            (declareReceipt, .declare, false, StarknetProcessedDeclareTransactionReceipt.self),
-            (deployAccountReceipt, .deployAccount, false, StarknetProcessedDeployAccountTransactionReceipt.self),
-            (l1HandlerReceipt, .l1Handler, false, StarknetProcessedL1HandlerTransactionReceipt.self),
-            (deployReceipt, .deploy, false, StarknetProcessedDeployTransactionReceipt.self),
-            (pendingInvokeReceipt, .invoke, true, StarknetPendingInvokeTransactionReceipt.self),
-            (pendingDeclareReceipt, .declare, true, StarknetPendingDeclareTransactionReceipt.self),
-            (pendingDeployAccountReceipt, .deployAccount, true, StarknetPendingDeployAccountTransactionReceipt.self),
-            (pendingL1HandlerReceipt, .l1Handler, true, StarknetPendingL1HandlerTransactionReceipt.self),
+            (invokeReceiptWithBlockInfo, .invoke, true, StarknetInvokeTransactionReceipt.self),
+            (declareReceiptWithBlockInfo, .declare, true, StarknetDeclareTransactionReceipt.self),
+            (deployAccountReceiptWithBlockInfo, .deployAccount, true, StarknetDeployAccountTransactionReceipt.self),
+            (l1HandlerReceiptWithBlockInfo, .l1Handler, true, StarknetL1HandlerTransactionReceipt.self),
+            (deployReceiptWithBlockInfo, .deploy, true, StarknetDeployTransactionReceipt.self),
+            (invokeReceipt, .invoke, false, StarknetInvokeTransactionReceipt.self),
+            (declareReceipt, .declare, false, StarknetDeclareTransactionReceipt.self),
+            (deployAccountReceipt, .deployAccount, false, StarknetDeployAccountTransactionReceipt.self),
+            (l1HandlerReceipt, .l1Handler, false, StarknetL1HandlerTransactionReceipt.self),
+            (deployReceipt, .deploy, false, StarknetDeployTransactionReceipt.self),
         ]
-        try cases.forEach { (string: String, txType: StarknetTransactionType, isPending: Bool, receiptType: StarknetTransactionReceipt.Type) in
+        try cases.forEach { (string: String, txType: StarknetTransactionType, hasBlockInfo: Bool, receiptType: StarknetTransactionReceipt.Type) in
             let data = string.data(using: .utf8)!
             let decoder = JSONDecoder()
 
             let receiptWrapper = try decoder.decode(TransactionReceiptWrapper.self, from: data)
             let receipt = receiptWrapper.transactionReceipt
 
-            if isPending {
-                XCTAssertTrue(receipt is (any StarknetPendingTransactionReceipt))
+            if hasBlockInfo {
+                XCTAssertNotNil(receipt.blockNumber)
+                XCTAssertNotNil(receipt.blockHash)
             } else {
-                XCTAssertTrue(receipt is (any StarknetProcessedTransactionReceipt))
+                XCTAssertNil(receipt.blockNumber)
+                XCTAssertNil(receipt.blockHash)
             }
 
             XCTAssertTrue(type(of: receipt) == receiptType)

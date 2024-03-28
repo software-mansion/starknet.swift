@@ -1,10 +1,10 @@
 import Foundation
 
-public struct StarknetProcessedInvokeTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetInvokeTransactionReceipt {
+public struct StarknetInvokeTransactionReceipt: StarknetInvokeTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
-    public let blockHash: Felt
-    public let blockNumber: UInt64
+    public let blockHash: Felt?
+    public let blockNumber: UInt64?
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
@@ -31,38 +31,11 @@ public struct StarknetProcessedInvokeTransactionReceipt: StarknetProcessedTransa
     }
 }
 
-public struct StarknetPendingInvokeTransactionReceipt: StarknetPendingTransactionReceipt, StarknetInvokeTransactionReceipt {
+public struct StarknetDeclareTransactionReceipt: StarknetDeclareTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
-    public let messagesSent: [StarknetMessageToL1]
-    public let events: [StarknetEvent]
-    public let executionStatus: StarknetTransactionExecutionStatus
-    public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: StarknetExecutionResources
-    public let revertReason: String?
-    public let type: StarknetTransactionType = .invoke
-
-    public var isSuccessful: Bool {
-        executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case transactionHash = "transaction_hash"
-        case actualFee = "actual_fee"
-        case messagesSent = "messages_sent"
-        case events
-        case finalityStatus = "finality_status"
-        case executionStatus = "execution_status"
-        case executionResources = "execution_resources"
-        case revertReason = "revert_reason"
-    }
-}
-
-public struct StarknetProcessedDeclareTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeclareTransactionReceipt {
-    public let transactionHash: Felt
-    public let actualFee: StarknetFeePayment
-    public let blockHash: Felt
-    public let blockNumber: UInt64
+    public let blockHash: Felt?
+    public let blockNumber: UInt64?
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
@@ -89,38 +62,11 @@ public struct StarknetProcessedDeclareTransactionReceipt: StarknetProcessedTrans
     }
 }
 
-public struct StarknetPendingDeclareTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeclareTransactionReceipt {
+public struct StarknetDeployAccountTransactionReceipt: StarknetDeployAccountTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
-    public let messagesSent: [StarknetMessageToL1]
-    public let events: [StarknetEvent]
-    public let executionStatus: StarknetTransactionExecutionStatus
-    public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: StarknetExecutionResources
-    public let revertReason: String?
-    public let type: StarknetTransactionType = .declare
-
-    public var isSuccessful: Bool {
-        executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case transactionHash = "transaction_hash"
-        case actualFee = "actual_fee"
-        case messagesSent = "messages_sent"
-        case events
-        case finalityStatus = "finality_status"
-        case executionStatus = "execution_status"
-        case executionResources = "execution_resources"
-        case revertReason = "revert_reason"
-    }
-}
-
-public struct StarknetProcessedDeployAccountTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeployAccountTransactionReceipt {
-    public let transactionHash: Felt
-    public let actualFee: StarknetFeePayment
-    public let blockHash: Felt
-    public let blockNumber: UInt64
+    public let blockHash: Felt?
+    public let blockNumber: UInt64?
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
@@ -149,40 +95,11 @@ public struct StarknetProcessedDeployAccountTransactionReceipt: StarknetProcesse
     }
 }
 
-public struct StarknetPendingDeployAccountTransactionReceipt: StarknetPendingTransactionReceipt, StarknetDeployAccountTransactionReceipt {
+public struct StarknetDeployTransactionReceipt: StarknetDeployTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
-    public let messagesSent: [StarknetMessageToL1]
-    public let events: [StarknetEvent]
-    public let executionStatus: StarknetTransactionExecutionStatus
-    public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: StarknetExecutionResources
-    public let revertReason: String?
-    public let contractAddress: Felt
-    public let type: StarknetTransactionType = .deployAccount
-
-    public var isSuccessful: Bool {
-        executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case transactionHash = "transaction_hash"
-        case actualFee = "actual_fee"
-        case messagesSent = "messages_sent"
-        case events
-        case finalityStatus = "finality_status"
-        case executionStatus = "execution_status"
-        case executionResources = "execution_resources"
-        case revertReason = "revert_reason"
-        case contractAddress = "contract_address"
-    }
-}
-
-public struct StarknetProcessedDeployTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetDeployTransactionReceipt {
-    public let transactionHash: Felt
-    public let actualFee: StarknetFeePayment
-    public let blockHash: Felt
-    public let blockNumber: UInt64
+    public let blockHash: Felt?
+    public let blockNumber: UInt64?
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
@@ -211,11 +128,11 @@ public struct StarknetProcessedDeployTransactionReceipt: StarknetProcessedTransa
     }
 }
 
-public struct StarknetProcessedL1HandlerTransactionReceipt: StarknetProcessedTransactionReceipt, StarknetL1HandlerTransactionReceipt {
+public struct StarknetL1HandlerTransactionReceipt: StarknetL1HandlerTransactionReceiptProtocol {
     public let transactionHash: Felt
     public let actualFee: StarknetFeePayment
-    public let blockHash: Felt
-    public let blockNumber: UInt64
+    public let blockHash: Felt?
+    public let blockNumber: UInt64?
     public let messagesSent: [StarknetMessageToL1]
     public let events: [StarknetEvent]
     public let revertReason: String?
@@ -240,35 +157,6 @@ public struct StarknetProcessedL1HandlerTransactionReceipt: StarknetProcessedTra
         case executionStatus = "execution_status"
         case revertReason = "revert_reason"
         case executionResources = "execution_resources"
-        case messageHash = "message_hash"
-    }
-}
-
-public struct StarknetPendingL1HandlerTransactionReceipt: StarknetPendingTransactionReceipt, StarknetL1HandlerTransactionReceipt {
-    public let transactionHash: Felt
-    public let actualFee: StarknetFeePayment
-    public let messagesSent: [StarknetMessageToL1]
-    public let events: [StarknetEvent]
-    public let executionStatus: StarknetTransactionExecutionStatus
-    public let finalityStatus: StarknetTransactionFinalityStatus
-    public var executionResources: StarknetExecutionResources
-    public let revertReason: String?
-    public let messageHash: NumAsHex
-    public let type: StarknetTransactionType = .l1Handler
-
-    public var isSuccessful: Bool {
-        executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case transactionHash = "transaction_hash"
-        case actualFee = "actual_fee"
-        case messagesSent = "messages_sent"
-        case events
-        case finalityStatus = "finality_status"
-        case executionStatus = "execution_status"
-        case executionResources = "execution_resources"
-        case revertReason = "revert_reason"
         case messageHash = "message_hash"
     }
 }
