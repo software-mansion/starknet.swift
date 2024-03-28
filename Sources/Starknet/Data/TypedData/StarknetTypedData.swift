@@ -427,14 +427,14 @@ private extension StarknetTypedData {
 
 private extension String {
     func strippingPointer() -> String {
-        if self.count == 0 {
-            return self
-        }
-
-        if self.last == "*" {
+        if self.isArray() {
             return String(self.dropLast(1))
         }
 
         return self
+    }
+    
+    func isArray() -> Bool {
+        self.hasSuffix("*")
     }
 }
