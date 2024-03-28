@@ -68,8 +68,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 
     var hashMethod: StarknetHashMethod {
         switch revision {
-        case .v0: return StarknetHashMethod.pedersen
-        case .v1: return StarknetHashMethod.poseidon
+        case .v0: .pedersen
+        case .v1: .poseidon
         }
     }
 
