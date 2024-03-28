@@ -150,13 +150,13 @@ enum StarknetTransactionTraceWrapper: Decodable {
     public var transactionTrace: any StarknetTransactionTrace {
         switch self {
         case let .invoke(txTrace):
-            return txTrace
+            txTrace
         case let .revertedInvoke(txTrace):
-            return txTrace
+            txTrace
         case let .deployAccount(txTrace):
-            return txTrace
+            txTrace
         case let .l1Handler(txTrace):
-            return txTrace
+            txTrace
         }
     }
 

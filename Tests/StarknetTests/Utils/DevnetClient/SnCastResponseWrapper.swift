@@ -17,15 +17,15 @@ enum SnCastResponseWrapper: Decodable {
     public var response: any SnCastResponse {
         switch self {
         case let .accountCreate(res):
-            return res
+            res
         case let .accountDeploy(res):
-            return res
+            res
         case let .declare(res):
-            return res
+            res
         case let .deploy(res):
-            return res
+            res
         case let .invoke(res):
-            return res
+            res
         }
     }
 

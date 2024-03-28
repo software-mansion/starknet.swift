@@ -99,9 +99,9 @@ struct DevnetReceipt: Decodable {
     public var isSuccessful: Bool {
         switch status {
         case nil:
-            return executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
+            executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
         default:
-            return status == .acceptedL1 || status == .acceptedL2
+            status == .acceptedL1 || status == .acceptedL2
         }
     }
 

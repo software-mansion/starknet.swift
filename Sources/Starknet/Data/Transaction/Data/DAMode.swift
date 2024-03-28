@@ -8,9 +8,9 @@ public enum StarknetDAMode: String, Codable {
     public var value: BigUInt {
         switch self {
         case .l1:
-            return 0
+            0
         case .l2:
-            return 1
+            1
         }
     }
 }
