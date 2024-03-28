@@ -126,7 +126,7 @@ final class TypedDataTests: XCTestCase {
                 Self.domainTypeV1.0: Self.domainTypeV1.1,
                 "house": [StarknetTypedData.StandardType(name: "fridge", type: "ice cream")],
             ],
-            primaryType: "felt",
+            primaryType: "house",
             domain: Self.exampleDomainV1,
             message: "{}"
         )
