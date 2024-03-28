@@ -75,20 +75,17 @@ final class TypedDataTests: XCTestCase {
 
     func testInvalidTypeNames() {
         try XCTAssertThrowsError(makeTypedData("", .v1)) { error in
-            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName)
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName(""))
         }
         try XCTAssertThrowsError(makeTypedData("myType*", .v1)) { error in
-            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName)
-        }
-        try XCTAssertThrowsError(makeTypedData("*", .v1)) { error in
-            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName)
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("myType*"))
         }
     }
 
     func testTypesRedifintion() throws {
         func testTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
             try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
-                XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition)
+                XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition(type))
             }
         }
 

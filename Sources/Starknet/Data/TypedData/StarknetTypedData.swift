@@ -10,9 +10,9 @@ import Foundation
 
 public enum StarknetTypedDataError: Error, Equatable {
     case decodingError
-    case invalidRevision
-    case basicTypeRedefinition
-    case invalidTypeName
+    case invalidRevision(Felt)
+    case basicTypeRedefinition(String)
+    case invalidTypeName(String)
     case danglingType(String)
     case dependencyNotDefined(String)
     case contextNotDefined
@@ -128,7 +128,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         let reservedTypeNames = ["felt", "string", "selector", "merkletree"]
         for typeName in reservedTypeNames {
             guard !types.keys.contains(typeName) else {
-                throw StarknetTypedDataError.basicTypeRedefinition
+                throw StarknetTypedDataError.basicTypeRedefinition(typeName)
             }
         }
 
@@ -144,11 +144,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         } + [domain.separatorName, primaryType])
 
         try self.types.keys.forEach { typeName in
-            guard !typeName.isEmpty else {
-                throw StarknetTypedDataError.invalidTypeName
-            }
-            guard !typeName.isArray() else {
-                throw StarknetTypedDataError.invalidTypeName
+            guard !typeName.isEmpty, !typeName.isArray() else {
+                throw StarknetTypedDataError.invalidTypeName(typeName)
             }
             guard referencedTypes.contains(typeName) else {
                 throw StarknetTypedDataError.danglingType(typeName)
@@ -329,11 +326,11 @@ public extension StarknetTypedData {
             switch revision {
             case let .felt(felt):
                 guard let revision = Revision(rawValue: felt) else {
-                    throw StarknetTypedDataError.invalidRevision
+                    throw StarknetTypedDataError.invalidRevision(felt)
                 }
                 return revision
             default:
-                throw StarknetTypedDataError.invalidRevision
+                throw StarknetTypedDataError.decodingError
             }
         }
 
