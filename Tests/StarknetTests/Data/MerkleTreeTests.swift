@@ -3,7 +3,7 @@ import XCTest
 
 final class MerkleTreeTest: XCTestCase {
     func testCalculateHashes() {
-        func testCalculateHash(_ leaves: [Felt], _ hashMethod: HashMethod, _ expectedHash: Felt) {
+        func testCalculateHash(_ leaves: [Felt], _ hashMethod: StarknetHashMethod, _ expectedHash: Felt) {
             let applyHash: (Felt, Felt) -> Felt = { a, b in
                 switch hashMethod {
                 case .pedersen:
@@ -35,19 +35,19 @@ final class MerkleTreeTest: XCTestCase {
     }
 
     func testBuildFromElements() {
-        func testBuildFrom1(_ hashMethod: HashMethod) {
+        func testBuildFrom1(_ hashMethod: StarknetHashMethod) {
             let leaves: [Felt] = [1]
             let manualRootHash = leaves[0]
             testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 0)
         }
 
-        func testBuildFrom2(_ hashMethod: HashMethod) {
+        func testBuildFrom2(_ hashMethod: StarknetHashMethod) {
             let leaves: [Felt] = [1, 2]
             let manualRootHash = MerkleTree.hash(leaves[0], leaves[1], hashMethod)
             testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 0)
         }
 
-        func testBuildFrom4(_ hashMethod: HashMethod) {
+        func testBuildFrom4(_ hashMethod: StarknetHashMethod) {
             let leaves: [Felt] = [1, 2, 3, 4]
             let manualRootHash = MerkleTree.hash(
                 MerkleTree.hash(leaves[0], leaves[1], hashMethod),
@@ -57,7 +57,7 @@ final class MerkleTreeTest: XCTestCase {
             testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 1)
         }
 
-        func testBuildFrom6(_ hashMethod: HashMethod) {
+        func testBuildFrom6(_ hashMethod: StarknetHashMethod) {
             let leaves: [Felt] = [1, 2, 3, 4, 5, 6]
             let manualRootHash = MerkleTree.hash(
                 MerkleTree.hash(
@@ -75,7 +75,7 @@ final class MerkleTreeTest: XCTestCase {
             testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 2)
         }
 
-        func testBuildFrom7(_ hashMethod: HashMethod) {
+        func testBuildFrom7(_ hashMethod: StarknetHashMethod) {
             let leaves: [Felt] = [1, 2, 3, 4, 5, 6, 7]
             let manualRootHash = MerkleTree.hash(
                 MerkleTree.hash(
@@ -93,7 +93,7 @@ final class MerkleTreeTest: XCTestCase {
             testBuild(leaves, hashMethod, expectedRoot: manualRootHash, expectedBranchCount: 2)
         }
 
-        func testBuild(_ leaves: [Felt], _ hashMethod: HashMethod, expectedRoot: Felt, expectedBranchCount: Int) {
+        func testBuild(_ leaves: [Felt], _ hashMethod: StarknetHashMethod, expectedRoot: Felt, expectedBranchCount: Int) {
             let tree = MerkleTree(leafHashes: leaves, hashMethod: hashMethod)
 
             XCTAssertNotNil(tree)
@@ -101,7 +101,7 @@ final class MerkleTreeTest: XCTestCase {
             XCTAssertEqual(tree!.branches.count, expectedBranchCount)
         }
 
-        [HashMethod.pedersen, .poseidon].forEach { hashMethod in
+        [StarknetHashMethod.pedersen, .poseidon].forEach { hashMethod in
             testBuildFrom1(hashMethod)
             testBuildFrom2(hashMethod)
             testBuildFrom4(hashMethod)

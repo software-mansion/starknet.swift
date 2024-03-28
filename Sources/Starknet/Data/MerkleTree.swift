@@ -2,11 +2,11 @@ import Foundation
 
 public struct MerkleTree {
     public let leaves: [Felt]
-    public let hashMethod: HashMethod
+    public let hashMethod: StarknetHashMethod
     public let rootHash: Felt
     public let branches: [[Felt]]
 
-    public init?(leafHashes: [Felt], hashMethod: HashMethod) {
+    public init?(leafHashes: [Felt], hashMethod: StarknetHashMethod) {
         self.leaves = leafHashes
         self.hashMethod = hashMethod
 
@@ -16,7 +16,7 @@ public struct MerkleTree {
         (self.rootHash, self.branches) = Self.build(leafHashes: leafHashes, hashMethod: hashMethod)
     }
 
-    private static func build(leafHashes: [Felt], hashMethod: HashMethod) -> (Felt, [[Felt]]) {
+    private static func build(leafHashes: [Felt], hashMethod: StarknetHashMethod) -> (Felt, [[Felt]]) {
         var leaves = leafHashes
         var branches: [[Felt]] = []
 
@@ -32,7 +32,7 @@ public struct MerkleTree {
         return (leaves[0], branches)
     }
 
-    public static func hash(_ a: Felt, _ b: Felt, _ hashMethod: HashMethod) -> Felt {
+    public static func hash(_ a: Felt, _ b: Felt, _ hashMethod: StarknetHashMethod) -> Felt {
         let (aSorted, bSorted) = a < b ? (a, b) : (b, a)
 
         return hashMethod.hash(first: aSorted, second: bSorted)
