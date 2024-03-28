@@ -10,6 +10,8 @@ import Foundation
 
 public enum StarknetTypedDataError: Error {
     case decodingError
+    case basicTypeRedefinition
+    case invalidTypeName
     case dependencyNotDefined(String)
     case contextNotDefined
     case parentNotDefined
@@ -81,7 +83,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         hashMethod.hash(values: array)
     }
 
-    private init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
+    private init(types: [String: [any TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) throws {
         self.types = types.mapValues { value in
             value.map { TypeDeclarationWrapper($0) }
         }
@@ -89,34 +91,46 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         self.domain = domain
         self.message = message
 
-        guard verifyTypes() else {
-            return nil
-        }
+        try self.verifyTypes()
     }
 
-    public init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: String, message _: String) {
+    public init(types: [String: [any TypeDeclaration]], primaryType: String, domain: String, message _: String) throws {
         guard let domainData = domain.data(using: .utf8), let messageData = domain.data(using: .utf8) else {
-            return nil
+            throw StarknetTypedDataError.decodingError
         }
 
         guard let domain = try? JSONDecoder().decode(Domain.self, from: domainData),
               let message = try? JSONDecoder().decode([String: Element].self, from: messageData)
         else {
-            return nil
+            throw StarknetTypedDataError.decodingError
         }
 
-        self.init(types: types, primaryType: primaryType, domain: domain, message: message)
+        try self.init(types: types, primaryType: primaryType, domain: domain, message: message)
     }
 
-    private func verifyTypes() -> Bool {
-        let reservedTypeNames = ["felt", "felt*", "string", "selector", "merkletree"]
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let types = try container.decode([String: [TypeDeclarationWrapper]].self, forKey: .types)
+        let primaryType = try container.decode(String.self, forKey: .primaryType)
+        let domain = try container.decode(Domain.self, forKey: .domain)
+        let message = try container.decode([String: Element].self, forKey: .message)
+
+        try self.init(types: types.mapValues { $0.map(\.type) }, primaryType: primaryType, domain: domain, message: message)
+    }
+
+    private func verifyTypes() throws {
+        let reservedTypeNames = ["felt", "string", "selector", "merkletree"]
         for typeName in reservedTypeNames {
-            if types.keys.contains(typeName) {
-                return false
+            guard !types.keys.contains(typeName) else {
+                throw StarknetTypedDataError.basicTypeRedefinition
             }
         }
 
-        return true
+        try self.types.keys.forEach { typeName in
+            guard !typeName.isArray() else {
+                throw StarknetTypedDataError.invalidTypeName
+            }
+        }
     }
 
     private func getDependencies(of type: String) -> [String] {

@@ -9,17 +9,17 @@ import XCTest
 
 final class TypedDataTests: XCTestCase {
     enum CasesRev0 {
-        static let td = loadTypedDataFromFile(name: "typed_data_rev_0_example")!
-        static let tdFeltArr = loadTypedDataFromFile(name: "typed_data_rev_0_felt_array_example")!
-        static let tdString = loadTypedDataFromFile(name: "typed_data_rev_0_long_string_example")!
-        static let tdStructArr = loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")!
-        static let tdStructMerkleTree = loadTypedDataFromFile(name: "typed_data_rev_0_struct_merkletree_example")!
-        static let tdValidate = loadTypedDataFromFile(name: "typed_data_rev_0_validate_example")!
+        static let td = try! loadTypedDataFromFile(name: "typed_data_rev_0_example")
+        static let tdFeltArr = try! loadTypedDataFromFile(name: "typed_data_rev_0_felt_array_example")
+        static let tdString = try! loadTypedDataFromFile(name: "typed_data_rev_0_long_string_example")
+        static let tdStructArr = try! loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")
+        static let tdStructMerkleTree = try! loadTypedDataFromFile(name: "typed_data_rev_0_struct_merkletree_example")
+        static let tdValidate = try! loadTypedDataFromFile(name: "typed_data_rev_0_validate_example")
     }
 
     enum CasesRev1 {
-        static let td = loadTypedDataFromFile(name: "typed_data_rev_1_example")!
-        static let tdFeltMerkleTree = loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")!
+        static let td = try! loadTypedDataFromFile(name: "typed_data_rev_1_example")
+        static let tdFeltMerkleTree = try! loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")
     }
 
     static let exampleDomainV0 = """
@@ -39,29 +39,29 @@ final class TypedDataTests: XCTestCase {
     """
 
     func testInvalidTypes() {
-        func makeTypedData(_ type: String) -> StarknetTypedData? {
-            StarknetTypedData(types: [type: []], primaryType: type, domain: Self.exampleDomainV0, message: "{\"\(type)\": 1}")
+        func makeTypedData(_ type: String) throws -> StarknetTypedData {
+            try StarknetTypedData(types: [type: []], primaryType: type, domain: Self.exampleDomainV0, message: "{\"\(type)\": 1}")
         }
 
-        XCTAssertNotNil(makeTypedData("myType"))
-        XCTAssertNil(makeTypedData("felt"))
-        XCTAssertNil(makeTypedData("felt*"))
-        XCTAssertNil(makeTypedData("string"))
-        XCTAssertNil(makeTypedData("selector"))
-        XCTAssertNil(makeTypedData("merkletree"))
+        XCTAssertNoThrow(try makeTypedData("myType"))
+        XCTAssertThrowsError(try makeTypedData("myType*"))
+        XCTAssertThrowsError(try makeTypedData("felt"))
+        XCTAssertThrowsError(try makeTypedData("felt*"))
+        XCTAssertThrowsError(try makeTypedData("string"))
+        XCTAssertThrowsError(try makeTypedData("selector"))
+        XCTAssertThrowsError(try makeTypedData("merkletree"))
     }
 
-    func testMissingDependency() {
-        let typedData = StarknetTypedData(
+    func testMissingDependency() throws {
+        let typedData = try StarknetTypedData(
             types: ["house": [StarknetTypedData.StandardType(name: "fridge", type: "ice cream")]],
             primaryType: "felt",
             domain: Self.exampleDomainV1,
             message: "{}"
         )
-        XCTAssertNotNil(typedData)
 
         XCTAssertThrowsError(
-            try typedData!.getStructHash(typeName: "house", data: "{\"fridge\": 1}")
+            try typedData.getStructHash(typeName: "house", data: "{\"fridge\": 1}")
         )
     }
 

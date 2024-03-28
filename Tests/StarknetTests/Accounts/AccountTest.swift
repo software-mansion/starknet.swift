@@ -196,7 +196,7 @@ final class AccountTests: XCTestCase {
     }
 
     func testSignTypedDataRev0() async throws {
-        let typedData = loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")!
+        let typedData = try loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")
 
         let signature = try account.sign(typedData: typedData)
         XCTAssertTrue(signature.count > 0)
@@ -209,7 +209,7 @@ final class AccountTests: XCTestCase {
     }
 
     func testSignTypedDataRev1() async throws {
-        let typedData = loadTypedDataFromFile(name: "typed_data_rev_1_example")!
+        let typedData = try loadTypedDataFromFile(name: "typed_data_rev_1_example")
 
         let signature = try account.sign(typedData: typedData)
         XCTAssertTrue(signature.count > 0)
