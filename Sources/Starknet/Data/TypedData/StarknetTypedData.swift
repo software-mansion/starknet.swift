@@ -403,7 +403,7 @@ public extension StarknetTypedData {
 
 private extension StarknetTypedData {
     static let basicTypesV0: Set = ["felt", "bool", "string", "selector", "merkletree"]
-    static let basicTypesV1: Set = basicTypesV0.union(["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"])
+    static let basicTypesV1: Set = basicTypesV0.union(["ContractAddress", "ClassHash", "shortstring"])
 
     func getBasicTypes() -> Set<String> {
         switch revision {
