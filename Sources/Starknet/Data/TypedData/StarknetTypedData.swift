@@ -209,27 +209,17 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return try getStructHash(typeName: typeName, data: object)
         }
 
-        if types.keys.contains(typeName.strippingPointer()) {
+        if typeName.isArray() {
             let array = try unwrapArray(from: element)
 
             let hashes = try array.map {
-                let object = try unwrapObject(from: $0)
-
-                return try getStructHash(typeName: typeName.strippingPointer(), data: object)
+                try encode(element: $0, forType: typeName.strippingPointer())
             }
 
-            let hash = hash(hashes)
-
-            return hash
+            return hash(hashes)
         }
 
         switch (typeName, revision) {
-        case ("felt*", _):
-            let array = try unwrapArray(from: element)
-            let hashes = try array.map {
-                try unwrapFelt(from: $0)
-            }
-            return hash(hashes)
         case ("felt", _):
             return try unwrapFelt(from: element)
         case ("string", .v0):
