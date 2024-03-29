@@ -81,8 +81,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
     }
 
-    func hash(_ array: [Felt]) -> Felt {
-        hashMethod.hash(values: array)
+    func hashArray(_ values: [Felt]) -> Felt {
+        hashMethod.hash(values: values)
     }
 
     private init(types: [String: [any TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) throws {
@@ -216,7 +216,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
                 try encode(element: $0, forType: typeName.strippingPointer())
             }
 
-            return hash(hashes)
+            return hashArray(hashes)
         }
 
         switch (typeName, revision) {
@@ -266,7 +266,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public func getStructHash(typeName: String, data: [String: Element]) throws -> Felt {
         let encodedData = try encode(data: data, forType: typeName)
 
-        return try hash([getTypeHash(typeName: typeName)] + encodedData)
+        return try hashArray([getTypeHash(typeName: typeName)] + encodedData)
     }
 
     private func getStructHash(typeName: String, data: Data) throws -> Felt {
@@ -293,7 +293,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
-        try hash([
+        try hashArray([
             Felt.fromShortString("StarkNet Message")!,
             getStructHash(domain: domain),
             accountAddress,
