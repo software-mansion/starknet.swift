@@ -125,12 +125,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
         }
 
-        let reservedTypeNames = ["felt", "string", "selector", "merkletree"]
-        for typeName in reservedTypeNames {
-            guard !types.keys.contains(typeName) else {
-                throw StarknetTypedDataError.basicTypeRedefinition(typeName)
-            }
-        }
+        let basicTypes = getBasicTypes()
 
         let referencedTypes = Set(types.values.flatMap { type in
             type.map { param in
@@ -144,6 +139,10 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         } + [domain.separatorName, primaryType])
 
         try self.types.keys.forEach { typeName in
+            guard !basicTypes.contains(typeName) else {
+                throw StarknetTypedDataError.basicTypeRedefinition(typeName)
+            }
+
             guard !typeName.isEmpty, !typeName.isArray() else {
                 throw StarknetTypedDataError.invalidTypeName(typeName)
             }
@@ -383,6 +382,20 @@ public extension StarknetTypedData {
             case let .bool(bool):
                 try bool.encode(to: encoder)
             }
+        }
+    }
+}
+
+private extension StarknetTypedData {
+    static let basicTypesV0: Set = ["felt", "bool", "string", "selector", "merkletree"]
+    static let basicTypesV1: Set = basicTypesV0.union(["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"])
+
+    func getBasicTypes() -> Set<String> {
+        switch revision {
+        case .v0:
+            Self.basicTypesV0
+        case .v1:
+            Self.basicTypesV1
         }
     }
 }

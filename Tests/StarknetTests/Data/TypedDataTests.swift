@@ -89,11 +89,18 @@ final class TypedDataTests: XCTestCase {
             }
         }
 
+        let basicTypesV0 = [
+            "felt", "bool", "string", "selector", "merkletree",
+        ]
+        let basicTypesV1 = basicTypesV0 + ["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
+
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
-        try testTypeRedifintion("felt", .v0)
-        try testTypeRedifintion("string", .v0)
-        try testTypeRedifintion("selector", .v0)
-        try testTypeRedifintion("merkletree", .v0)
+        try basicTypesV0.forEach { type in
+            try testTypeRedifintion(type, .v0)
+        }
+        try basicTypesV1.forEach { type in
+            try testTypeRedifintion(type, .v1)
+        }
     }
 
     func testMissingDomainType() throws {
