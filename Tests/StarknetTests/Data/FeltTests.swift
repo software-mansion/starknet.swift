@@ -27,6 +27,21 @@ final class FeltTests: XCTestCase {
         XCTAssertEqual(numAsHex4, NumAsHex(0))
     }
 
+    func testFromSigned() {
+        XCTAssertEqual(Felt(fromSigned: -1), Felt.max)
+        XCTAssertEqual(Felt(fromSigned: -BigInt(Felt.max.value)), Felt.one)
+        XCTAssertEqual(
+            Felt(fromSigned: -Int.max),
+            Felt(BigInt(Felt.prime) - BigInt(Int.max))
+        )
+        XCTAssertEqual(
+            Felt(fromSigned: -Int64.max),
+            Felt(BigInt(Felt.prime) - BigInt(Int64.max))
+        )
+        XCTAssertNil(Felt(fromSigned: Felt.prime))
+        XCTAssertNil(Felt(fromSigned: -BigInt(Felt.prime)))
+    }
+
     func testShortStringEncoding() {
         let encoded = Felt(fromHex: "0x68656c6c6f")!.toShortString()
 

@@ -28,6 +28,16 @@ public struct Felt: NumAsHexProtocol {
         self.value = value < Felt.prime ? value : Felt.prime - 1
     }
 
+    public init?(fromSigned exactly: some BinaryInteger) {
+        let value = BigInt(exactly: exactly)
+
+        guard let value, abs(value) < Felt.prime else {
+            return nil
+        }
+
+        self.value = BigUInt(value.modulus(BigInt(Felt.prime)))
+    }
+
     public init?(fromHex hex: String) {
         guard hex.hasPrefix("0x") else { return nil }
 
