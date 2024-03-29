@@ -219,7 +219,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         switch (typeName, revision) {
-        case ("felt", _), ("string", .v0), ("shortstring", .v1):
+        case ("felt", _), ("string", .v0), ("shortstring", .v1), ("ContractAddress", .v1), ("ClassHash", .v1):
             return try unwrapFelt(from: element)
         case ("bool", _):
             return try unwrapBool(from: element)
