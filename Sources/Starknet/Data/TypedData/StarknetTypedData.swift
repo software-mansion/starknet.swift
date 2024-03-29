@@ -7,7 +7,6 @@
 
 import BigInt
 import Foundation
-import UInt128
 
 public enum StarknetTypedDataError: Error, Equatable {
     case decodingError
