@@ -93,7 +93,7 @@ final class TypedDataTests: XCTestCase {
         let basicTypesV0 = [
             "felt", "bool", "string", "selector", "merkletree",
         ]
-        let basicTypesV1 = basicTypesV0 + ["ContractAddress", "ClassHash", "shortstring"]
+        let basicTypesV1 = basicTypesV0 + ["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
 
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
         try basicTypesV0.forEach { type in
