@@ -220,16 +220,12 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         switch (typeName, revision) {
-        case ("felt", _):
+        case ("felt", _), ("string", .v0), ("shortstring", .v1):
             return try unwrapFelt(from: element)
         case ("bool", _):
             return try unwrapBool(from: element)
-        case ("string", .v0):
-            return try unwrapFelt(from: element)
         case ("string", .v1):
             fatalError("This function is not yet implemented")
-        case ("shortstring", .v1):
-            return try unwrapFelt(from: element)
         case ("selector", _):
             return try unwrapSelector(from: element)
         case ("merkletree", _):
