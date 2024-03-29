@@ -202,7 +202,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }.joined()
     }
 
-    private func encode(element: Element, forType typeName: String, context: Context? = nil) throws -> Felt {
+    func encode(element: Element, forType typeName: String, context: Context? = nil) throws -> Felt {
         if types.keys.contains(typeName) {
             let object = try unwrapObject(from: element)
 
@@ -222,6 +222,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         switch (typeName, revision) {
         case ("felt", _):
             return try unwrapFelt(from: element)
+        case ("bool", _):
+            return try unwrapBool(from: element)
         case ("string", .v0):
             return try unwrapFelt(from: element)
         case ("string", .v1):
@@ -342,6 +344,7 @@ public extension StarknetTypedData {
         case array([Element])
         case string(String)
         case felt(Felt)
+        case bool(Bool)
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
@@ -356,6 +359,8 @@ public extension StarknetTypedData {
                       let felt = Felt(uint)
             {
                 self = .felt(felt)
+            } else if let bool = try? container.decode(Bool.self) {
+                self = .bool(bool)
             } else if let string = try? container.decode(String.self) {
                 if let uint = BigUInt(string),
                    let felt = Felt(uint)
@@ -379,12 +384,14 @@ public extension StarknetTypedData {
                 try object.encode(to: encoder)
             case let .array(array):
                 try array.encode(to: encoder)
+            case let .bool(bool):
+                try bool.encode(to: encoder)
             }
         }
     }
 }
 
-private extension StarknetTypedData {
+extension StarknetTypedData {
     struct Context: Equatable {
         let parent: String
         let key: String
@@ -426,6 +433,25 @@ private extension StarknetTypedData {
             return felt
         case let .string(string):
             return starknetSelector(from: string)
+        default:
+            throw StarknetTypedDataError.decodingError
+        }
+    }
+
+    func unwrapBool(from element: Element) throws -> Felt {
+        switch element {
+        case let .felt(felt):
+            guard felt == .zero || felt == .one else {
+                throw StarknetTypedDataError.decodingError
+            }
+            return felt
+        case let .bool(bool):
+            return bool ? .one : .zero
+        case let .string(string):
+            guard let bool = Bool(string) else {
+                throw StarknetTypedDataError.decodingError
+            }
+            return bool ? .one : .zero
         default:
             throw StarknetTypedDataError.decodingError
         }

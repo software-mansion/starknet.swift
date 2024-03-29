@@ -133,6 +133,17 @@ final class TypedDataTests: XCTestCase {
         )
     }
 
+    func testEncodeBool() throws {
+        let cases: [(Any: Encodable, Felt)] = [(true, .one), (false, .zero), ("true", .one), ("false", .zero), ("0x1", .one), ("0x0", .zero), ("1", .one), ("0", .zero), (1, .one), (0, .zero)]
+
+        for (input, expected) in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            let encodedValue = try CasesRev1.td.encode(element: element, forType: "bool")
+
+            XCTAssertEqual(encodedValue, expected)
+        }
+    }
+
     func testTypeHashCalculation() throws {
         let cases: [(StarknetTypedData, String, Felt)] = [
             (Self.CasesRev0.td, "StarkNetDomain", "0x1bfc207425a47a5dfa1a50a4f5241203f50624ca5fdf5e18755765416b8e288"),
