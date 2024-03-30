@@ -10,10 +10,10 @@ public struct StarknetByteArray: Equatable, Hashable, ExpressibleByStringLiteral
         self.pendingWord = pendingWord
         self.pendingWordLen = pendingWordLen
 
-        guard self.data.allSatisfy({ $0.byteLength == 31 }),
+        guard self.data.allSatisfy({ $0.byteWidth == 31 }),
               self.pendingWordLen >= 0,
               self.pendingWordLen < 31,
-              self.pendingWord.byteLength == self.pendingWordLen
+              self.pendingWord.byteWidth == self.pendingWordLen
         else {
             return nil
         }
@@ -55,7 +55,7 @@ public extension String {
 }
 
 private extension Felt {
-    var byteLength: Int {
+    var byteWidth: Int {
         (value.bitWidth + 7) / 8
     }
 }
