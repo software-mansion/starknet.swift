@@ -43,17 +43,6 @@ public extension StarknetByteArray {
     }
 }
 
-public extension String {
-    func splitToShortStrings() -> [String] {
-        let maxLen = 31
-        return stride(from: 0, to: count, by: maxLen).map { index in
-            let startIndex = self.index(self.startIndex, offsetBy: index)
-            let endIndex = self.index(startIndex, offsetBy: maxLen, limitedBy: self.endIndex) ?? self.endIndex
-            return String(self[startIndex ..< endIndex])
-        }
-    }
-}
-
 private extension Felt {
     var byteWidth: Int {
         (value.bitWidth + 7) / 8
