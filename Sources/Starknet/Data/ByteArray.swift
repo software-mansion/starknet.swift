@@ -1,5 +1,7 @@
 import Foundation
 
+private let shortStringMaxLen = 31
+
 public struct StarknetByteArray: Equatable, Hashable, ExpressibleByStringLiteral {
     let data: [Felt]
     let pendingWord: Felt
@@ -10,20 +12,20 @@ public struct StarknetByteArray: Equatable, Hashable, ExpressibleByStringLiteral
         self.pendingWord = pendingWord
         self.pendingWordLen = pendingWordLen
 
-        guard self.data.allSatisfy({ $0.byteWidth == 31 }),
+        guard self.data.allSatisfy({ $0.byteWidth == shortStringMaxLen }),
               self.pendingWordLen >= 0,
-              self.pendingWordLen < 31,
+              self.pendingWordLen < shortStringMaxLen,
               self.pendingWord.byteWidth == self.pendingWordLen
         else {
             return nil
         }
     }
 
-    public init(fromString: String) {
-        let shortStrings = fromString.splitToShortStrings()
+    public init(fromString string: String) {
+        let shortStrings = string.splitToShortStrings()
         let encodedShortStrings = shortStrings.map { Felt.fromShortString($0)! }
 
-        if shortStrings.isEmpty || shortStrings.last!.count == 31 {
+        if shortStrings.isEmpty || shortStrings.last!.count == shortStringMaxLen {
             self.data = encodedShortStrings
             self.pendingWord = .zero
             self.pendingWordLen = 0
