@@ -181,7 +181,6 @@ final class TypedDataTests: XCTestCase {
         ]
 
         for input in cases {
-            print(input)
             let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
             XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "u128")) { error in
                 XCTAssertEqual(error as? StarknetTypedDataError, .decodingError)
