@@ -25,8 +25,8 @@ let rpcEndpoint = "http://127.0.0.1:5050/rpc"
 // !!! Important !!!
 // These private keys are for demo only. Never publish a privateKey of your wallet, nor
 // store it in any repository as plain text.
-let account1PrivateKey: Felt = "0xa2ed22bb0cb0b49c69f6d6a8d24bc5ea"
-let account2PrivateKey: Felt = "0xc1c7db92d22ef773de96f8bde8e56c85"
+let account1PrivateKey: Felt = "0x71d7bb07b9a64f6f78ac4c816aff4da9"
+let account2PrivateKey: Felt = "0xe1406455b7d66b1690803be066cbe5e"
 
 // Addresses of accounts associated with above private keys.
 let account1Address: Felt = "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b"
