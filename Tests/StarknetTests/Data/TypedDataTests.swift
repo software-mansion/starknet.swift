@@ -82,6 +82,15 @@ final class TypedDataTests: XCTestCase {
         try XCTAssertThrowsError(makeTypedData("myType*", .v1)) { error in
             XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("myType*"))
         }
+        try XCTAssertThrowsError(makeTypedData("(myType)", .v1)) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("(myType)"))
+        }
+        try XCTAssertThrowsError(makeTypedData("()", .v1)) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("()"))
+        }
+        try XCTAssertThrowsError(StarknetTypedData(types: [Self.domainTypeV0.0: Self.domainTypeV1.1, "myType": [StarknetTypedData.StandardType(name: "value", type: "(u128)")]], primaryType: "myType", domain: Self.exampleDomainV0, message: "{}")) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("(u128)"))
+        }
     }
 
     func testTypesRedifintion() throws {
@@ -94,7 +103,7 @@ final class TypedDataTests: XCTestCase {
         let basicTypesV0 = [
             "felt", "bool", "string", "selector", "merkletree",
         ]
-        let basicTypesV1 = basicTypesV0 + ["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
+        let basicTypesV1 = basicTypesV0 + ["enum", "u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
 
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
         try basicTypesV0.forEach { type in

@@ -127,15 +127,22 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 
         let basicTypes = getBasicTypes()
 
-        let referencedTypes = Set(types.values.flatMap { type in
-            type.map { param in
+        let referencedTypes = try Set(types.values.flatMap { type in
+            try type.flatMap { param in
                 switch param {
                 case let .enum(enumType):
-                    enumType.contains
+                    return [enumType.contains]
                 case let .merkletree(merkle):
-                    merkle.contains
+                    return [merkle.contains]
                 case let .standard(standard):
-                    standard.type.strippingPointer()
+                    if standard.type.isEnum() {
+                        guard revision == .v1 else {
+                            throw StarknetTypedDataError.invalidTypeName(standard.type)
+                        }
+                        return try standard.type.extractEnumTypes()
+                    } else {
+                        return [standard.type.strippingPointer()]
+                    }
                 }
             }
         } + [domain.separatorName, primaryType])
@@ -144,8 +151,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             guard !basicTypes.contains(typeName) else {
                 throw StarknetTypedDataError.basicTypeRedefinition(typeName)
             }
-
-            guard !typeName.isEmpty, !typeName.isArray() else {
+            guard !typeName.isEmpty,
+                  !typeName.isArray(),
+                  !typeName.isEnum(),
+                  !typeName.contains(",")
+            else {
                 throw StarknetTypedDataError.invalidTypeName(typeName)
             }
             guard referencedTypes.contains(typeName) else {
@@ -405,7 +415,7 @@ public extension StarknetTypedData {
 
 private extension StarknetTypedData {
     static let basicTypesV0: Set = ["felt", "bool", "string", "selector", "merkletree"]
-    static let basicTypesV1: Set = basicTypesV0.union(["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"])
+    static let basicTypesV1: Set = basicTypesV0.union(["enum", "u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"])
 
     func getBasicTypes() -> Set<String> {
         switch revision {
