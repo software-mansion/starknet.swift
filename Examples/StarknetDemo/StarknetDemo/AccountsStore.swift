@@ -57,10 +57,10 @@ class AccountsStore: ObservableObject {
     }
 
     init() {
-            self.provider = StarknetProvider(url: rpcEndpoint)!
-            self.accounts = [] // Temporarily empty, will be populated in `setUpAccounts`.
-            self.accountBalances = [0, 0]
-        }
+        self.provider = StarknetProvider(url: rpcEndpoint)!
+        self.accounts = [] // Temporarily empty, will be populated in `setUpAccounts`.
+        self.accountBalances = [0, 0]
+    }
 
     func setUpAccounts() async {
         do {
@@ -96,11 +96,11 @@ class AccountsStore: ObservableObject {
             entrypoint: starknetSelector(from: "balanceOf"),
             calldata: [account.address]
         )
-        
+
         do {
             // Note that as it is a read only call, you can send it using provider.
             let result = try await provider.callContract(call)
-            
+
             // This erc20 contract uses uint256 instead of felt for balances, which is stored
             // as two felts - lower and upper 128 bits of the uint256.
             let balanceValue = result[0].value + result[1].value << 128
