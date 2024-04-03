@@ -38,7 +38,7 @@ class HttpNetworkProvider {
         var request = URLRequest(url: config.url, cachePolicy: .reloadIgnoringLocalCacheData)
         request.httpMethod = config.method
 
-        config.params.forEach { header, value in
+        for (header, value) in config.params {
             request.addValue(value, forHTTPHeaderField: header)
         }
 

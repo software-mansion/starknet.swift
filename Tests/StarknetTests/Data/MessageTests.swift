@@ -59,8 +59,8 @@ final class MessageTests: XCTestCase {
             "\"payload\":[\"0x2bf223f583a5940873cd804ef3333a8a9306e878b5d4a7d00881f1616894d4d\",\"0x16345785d8a0000\",\"0x0\"]",
         ]
 
-        pairs.forEach {
-            XCTAssertTrue(encodedString.localizedStandardContains($0))
+        for pair in pairs {
+            XCTAssertTrue(encodedString.localizedStandardContains(pair))
         }
     }
 }
