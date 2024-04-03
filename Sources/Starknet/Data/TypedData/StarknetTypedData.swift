@@ -565,7 +565,20 @@ private extension String {
         return self
     }
 
+    func extractEnumTypes() throws -> [String] {
+        guard self.isEnum() else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        let content = self[self.index(after: self.startIndex) ..< self.index(before: self.endIndex)]
+        return content.isEmpty ? [] : content.split(separator: ",").map { String($0) }
+    }
+
     func isArray() -> Bool {
         self.hasSuffix("*")
+    }
+
+    func isEnum() -> Bool {
+        self.hasPrefix("(") && self.hasSuffix(")")
     }
 }
