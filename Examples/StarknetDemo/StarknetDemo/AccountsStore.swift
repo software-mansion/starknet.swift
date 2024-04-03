@@ -29,8 +29,8 @@ let account1PrivateKey: Felt = "0x71d7bb07b9a64f6f78ac4c816aff4da9"
 let account2PrivateKey: Felt = "0xe1406455b7d66b1690803be066cbe5e"
 
 // Addresses of accounts associated with above private keys.
-let account1Address: Felt = "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b"
-let account2Address: Felt = "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35"
+let account1Address: Felt = "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691"
+let account2Address: Felt = "0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"
 
 class AccountsStore: ObservableObject {
     let accounts: [StarknetAccountProtocol]
