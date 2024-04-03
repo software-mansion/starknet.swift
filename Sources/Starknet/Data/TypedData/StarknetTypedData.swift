@@ -165,7 +165,27 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
     }
 
-    private func getDependencies(of type: String) -> [String] {
+    private func getDependencies(of type: String) throws -> [String] {
+        func extractTypes(from param: TypeDeclarationWrapper) throws -> [String] {
+            switch param {
+            case let .enum(enumType):
+                guard revision == .v1 else {
+                    throw StarknetTypedDataError.unsupportedType("enum")
+                }
+                return [enumType.contains]
+            default:
+                let paramType = param.type.type
+                if paramType.isEnum() {
+                    guard revision == .v1 else {
+                        throw StarknetTypedDataError.unsupportedType(paramType)
+                    }
+                    return try paramType.extractEnumTypes()
+                } else {
+                    return [paramType]
+                }
+            }
+        }
+
         var dependencies = [type]
         var toVisit = [type]
 
@@ -173,12 +193,14 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             let currentType = toVisit.removeFirst()
             let params = types[currentType] ?? []
 
-            params.forEach { param in
-                let typeStripped = param.type.type.strippingPointer()
+            try params.forEach { param in
+                let extractedTypes = try extractTypes(from: param).map { $0.strippingPointer() }
 
-                if types.keys.contains(typeStripped), !dependencies.contains(typeStripped) {
-                    dependencies.append(typeStripped)
-                    toVisit.append(typeStripped)
+                extractedTypes.forEach { extractedType in
+                    if types.keys.contains(extractedType), !dependencies.contains(extractedType) {
+                        dependencies.append(extractedType)
+                        toVisit.append(extractedType)
+                    }
                 }
             }
         }
@@ -189,25 +211,51 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     private func encode(dependency: String) throws -> String {
-        guard let params = types[dependency] else {
-            throw StarknetTypedDataError.dependencyNotDefined(dependency)
-        }
         func escape(_ string: String) -> String {
             switch revision {
             case .v0: string
             case .v1: "\"\(string)\""
             }
         }
+        func resolveTargetType(from param: TypeDeclarationWrapper) throws -> String {
+            switch param {
+            case let .enum(enumType):
+                guard revision == .v1 else {
+                    throw StarknetTypedDataError.unsupportedType("enum")
+                }
+                return enumType.contains
+            default:
+                return param.type.type
+            }
+        }
+        func encodeEnumTypes(from type: String) throws -> String {
+            guard revision == .v1 else {
+                throw StarknetTypedDataError.unsupportedType("enum")
+            }
 
-        let encodedParams = params.map {
-            "\(escape($0.type.name)):\(escape($0.type.type))"
+            let enumTypes = try type.extractEnumTypes().map(escape).joined(separator: ",")
+            return "(\(enumTypes))"
+        }
+
+        guard let params = types[dependency] else {
+            throw StarknetTypedDataError.dependencyNotDefined(dependency)
+        }
+
+        let encodedParams = try params.map {
+            let targetType = try resolveTargetType(from: $0)
+            let typeString = if targetType.isEnum() {
+                try encodeEnumTypes(from: targetType)
+            } else {
+                escape(targetType)
+            }
+            return "\(escape($0.type.name)):\(typeString)"
         }.joined(separator: ",")
 
         return "\(escape(dependency))(\(encodedParams))"
     }
 
     func encode(type: String) throws -> String {
-        let dependencies = getDependencies(of: type)
+        let dependencies = try getDependencies(of: type)
 
         return try dependencies.map {
             try encode(dependency: $0)
@@ -244,6 +292,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return try hashArray(unwrapLongString(from: element))
         case ("selector", _):
             return try unwrapSelector(from: element)
+        case ("enum", .v1):
+            guard let context else {
+                throw StarknetTypedDataError.contextNotDefined
+            }
+            return try unwrapEnum(from: element, context: context)
         case ("merkletree", _):
             guard let context else {
                 throw StarknetTypedDataError.contextNotDefined
@@ -535,6 +588,44 @@ extension StarknetTypedData {
         }
     }
 
+    func unwrapEnum(from element: Element, context: Context) throws -> Felt {
+        let object = try unwrapObject(from: element)
+
+        guard let variant = object.first else {
+            throw StarknetTypedDataError.decodingError
+        }
+        let variantName = variant.key
+        guard case let .array(variantData) = variant.value else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        let variants = try getEnumVariants(context: context)
+        let variantType = variants.first { $0.type.name == variantName }
+        guard let variantType else {
+            throw StarknetTypedDataError.decodingError
+        }
+        guard let variantIndex = variants.firstIndex(of: variantType) else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        let encodedSubtypes = try variantType.type.type.extractEnumTypes().enumerated().map { index, subtype in
+            let subtypeData = variantData[index]
+            return try encode(element: subtypeData, forType: subtype)
+        }
+
+        return hashArray([Felt(variantIndex)!] + encodedSubtypes)
+    }
+
+    private func getEnumVariants(context: Context) throws -> [TypeDeclarationWrapper] {
+        let enumType: EnumType = try resolveType(context)
+
+        guard let variants = types[enumType.contains] else {
+            throw StarknetTypedDataError.dependencyNotDefined(enumType.contains)
+        }
+
+        return variants
+    }
+
     func prepareMerkleTreeRoot(from element: Element, context: Context) throws -> Felt {
         let leavesType = try getMerkleTreeLeavesType(context: context)
 
@@ -550,7 +641,13 @@ extension StarknetTypedData {
         return merkleTree.rootHash
     }
 
-    func getMerkleTreeLeavesType(context: Context) throws -> String {
+    private func getMerkleTreeLeavesType(context: Context) throws -> String {
+        let merkleType: MerkleTreeType = try resolveType(context)
+
+        return merkleType.contains
+    }
+
+    private func resolveType<T: TypeDeclaration>(_ context: Context) throws -> T {
         let (parent, key) = (context.parent, context.key)
 
         guard let parentType = types[parent] else {
@@ -559,11 +656,11 @@ extension StarknetTypedData {
         guard let targetType = parentType.first(where: { $0.type.name == key }) else {
             throw StarknetTypedDataError.keyNotDefined
         }
-        guard let merkleType = targetType.type as? MerkleTreeType else {
+        guard let targetType = targetType.type as? T else {
             throw StarknetTypedDataError.decodingError
         }
 
-        return merkleType.contains
+        return targetType
     }
 }
 
