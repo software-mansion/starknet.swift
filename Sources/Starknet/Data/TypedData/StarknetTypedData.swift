@@ -11,6 +11,7 @@ import Foundation
 public enum StarknetTypedDataError: Error, Equatable {
     case decodingError
     case invalidRevision(Felt)
+    case presetTypeRedefinition(String)
     case basicTypeRedefinition(String)
     case invalidTypeName(String)
     case danglingType(String)
@@ -71,15 +72,15 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let domain: Domain
     public let message: [String: Element]
 
-    public var revision: Revision {
-        try! domain.resolveRevision()
-    }
+    public let revision: Revision
+    private let allTypes: [String: [TypeDeclarationWrapper]]
+    private let hashMethod: StarknetHashMethod
 
-    private var hashMethod: StarknetHashMethod {
-        switch revision {
-        case .v0: .pedersen
-        case .v1: .poseidon
-        }
+    fileprivate enum CodingKeys: CodingKey {
+        case types
+        case primaryType
+        case domain
+        case message
     }
 
     private func hashArray(_ values: [Felt]) -> Felt {
@@ -93,6 +94,18 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         self.primaryType = primaryType
         self.domain = domain
         self.message = message
+
+        self.revision = try domain.resolveRevision()
+
+        self.allTypes = self.types.merging(
+            Self.getPresetTypes(revision: self.revision),
+            uniquingKeysWith: { current, _ in current }
+        )
+
+        self.hashMethod = switch revision {
+        case .v0: .pedersen
+        case .v1: .poseidon
+        }
 
         try self.verifyTypes()
     }
@@ -127,6 +140,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         let basicTypes = getBasicTypes()
+        let presetTypes = Self.getPresetTypes(revision: revision)
 
         let referencedTypes = try Set(types.values.flatMap { type in
             try type.flatMap { param in
@@ -151,6 +165,9 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         try self.types.keys.forEach { typeName in
             guard !basicTypes.contains(typeName) else {
                 throw StarknetTypedDataError.basicTypeRedefinition(typeName)
+            }
+            guard presetTypes[typeName] == nil else {
+                throw StarknetTypedDataError.presetTypeRedefinition(typeName)
             }
             guard !typeName.isEmpty,
                   !typeName.isArray(),
@@ -191,13 +208,13 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 
         while !toVisit.isEmpty {
             let currentType = toVisit.removeFirst()
-            let params = types[currentType] ?? []
+            let params = allTypes[currentType] ?? []
 
             try params.forEach { param in
                 let extractedTypes = try extractTypes(from: param).map { $0.strippingPointer() }
 
                 extractedTypes.forEach { extractedType in
-                    if types.keys.contains(extractedType), !dependencies.contains(extractedType) {
+                    if allTypes.keys.contains(extractedType), !dependencies.contains(extractedType) {
                         dependencies.append(extractedType)
                         toVisit.append(extractedType)
                     }
@@ -237,7 +254,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return "(\(enumTypes))"
         }
 
-        guard let params = types[dependency] else {
+        guard let params = allTypes[dependency] else {
             throw StarknetTypedDataError.dependencyNotDefined(dependency)
         }
 
@@ -263,7 +280,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     func encode(element: Element, forType typeName: String, context: Context? = nil) throws -> Felt {
-        if types.keys.contains(typeName) {
+        if allTypes.keys.contains(typeName) {
             let object = try unwrapObject(from: element)
 
             return try getStructHash(typeName: typeName, data: object)
@@ -310,7 +327,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     private func encode(data: [String: Element], forType typeName: String) throws -> [Felt] {
         var values: [Felt] = []
 
-        guard let types = types[typeName] else {
+        guard let types = allTypes[typeName] else {
             throw StarknetTypedDataError.encodingError
         }
 
@@ -471,6 +488,29 @@ private extension StarknetTypedData {
     static let basicTypesV0: Set = ["felt", "bool", "string", "selector", "merkletree"]
     static let basicTypesV1: Set = basicTypesV0.union(["enum", "u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"])
 
+    static let presetTypesV1 = [
+        "u256": [
+            StandardType(name: "low", type: "u128"),
+            StandardType(name: "high", type: "u128"),
+        ],
+        "TokenAmount": [
+            StandardType(name: "token_address", type: "ContractAddress"),
+            StandardType(name: "amount", type: "u256"),
+        ],
+        "NftId": [
+            StandardType(name: "collection_address", type: "ContractAddress"),
+            StandardType(name: "token_id", type: "u256"),
+        ],
+    ]
+
+    static func getPresetTypes(revision: Revision) -> [String: [TypeDeclarationWrapper]] {
+        let types: [String: [any TypeDeclaration]] = switch revision {
+        case .v0: [:]
+        case .v1: Self.presetTypesV1
+        }
+        return types.mapValues { $0.map { TypeDeclarationWrapper($0) } }
+    }
+
     func getBasicTypes() -> Set<String> {
         switch revision {
         case .v0:
@@ -619,7 +659,7 @@ extension StarknetTypedData {
     private func getEnumVariants(context: Context) throws -> [TypeDeclarationWrapper] {
         let enumType: EnumType = try resolveType(context)
 
-        guard let variants = types[enumType.contains] else {
+        guard let variants = allTypes[enumType.contains] else {
             throw StarknetTypedDataError.dependencyNotDefined(enumType.contains)
         }
 
@@ -650,7 +690,7 @@ extension StarknetTypedData {
     private func resolveType<T: TypeDeclaration>(_ context: Context) throws -> T {
         let (parent, key) = (context.parent, context.key)
 
-        guard let parentType = types[parent] else {
+        guard let parentType = allTypes[parent] else {
             throw StarknetTypedDataError.parentNotDefined
         }
         guard let targetType = parentType.first(where: { $0.type.name == key }) else {
