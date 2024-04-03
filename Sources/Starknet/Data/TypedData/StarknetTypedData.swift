@@ -72,7 +72,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let domain: Domain
     public let message: [String: Element]
 
-    private let revision: Revision
+    public let revision: Revision
     private let allTypes: [String: [TypeDeclarationWrapper]]
     private let hashMethod: StarknetHashMethod
 
