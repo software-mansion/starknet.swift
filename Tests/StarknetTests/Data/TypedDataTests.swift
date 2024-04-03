@@ -69,8 +69,12 @@ final class TypedDataTests: XCTestCase {
         let cases: [(StarknetTypedData, String, String)] =
             [
                 (CasesRev0.td, "Mail", "Mail(from:Person,to:Person,contents:felt)Person(name:felt,wallet:felt)"),
+                (CasesRev0.tdStructMerkleTree, "Session", "Session(key:felt,expires:felt,root:merkletree)"),
                 (CasesRev1.td, "Mail", """
                 "Mail"("from":"Person","to":"Person","contents":"felt")"Person"("name":"felt","wallet":"felt")
+                """),
+                (CasesRev1.tdFeltMerkleTree, "Example", """
+                "Example"("value":"felt","root":"merkletree")
                 """),
             ]
         try cases.forEach { data, typeName, expectedResult in
