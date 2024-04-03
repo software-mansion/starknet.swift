@@ -130,6 +130,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         let referencedTypes = Set(types.values.flatMap { type in
             type.map { param in
                 switch param {
+                case let .enum(enumType):
+                    enumType.contains
                 case let .merkletree(merkle):
                     merkle.contains
                 case let .standard(standard):
