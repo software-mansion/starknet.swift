@@ -61,36 +61,35 @@ class AccountsStore: ObservableObject {
         // for example purpose we can simply hardcode it as .goerli
         let chainId = StarknetChainId.goerli
 
-            self.provider = StarknetProvider(url: rpcEndpoint)!
+        self.provider = StarknetProvider(url: rpcEndpoint)!
 
-            // Create a signer that will be used to sign starknet transactions with provided private key.
-            let account1Signer = StarkCurveSigner(privateKey: account1PrivateKey)!
+        // Create a signer that will be used to sign starknet transactions with provided private key.
+        let account1Signer = StarkCurveSigner(privateKey: account1PrivateKey)!
 
-            // With address, signer and provider you can create starknet account.
-            // Please note that it will only work if it's already deployed.
-            let account1 = StarknetAccount(
-                address: account1Address,
-                signer: account1Signer,
-                provider: provider,
-                chainId: chainId,
-                cairoVersion: .one
-            )
+        // With address, signer and provider you can create starknet account.
+        // Please note that it will only work if it's already deployed.
+        let account1 = StarknetAccount(
+            address: account1Address,
+            signer: account1Signer,
+            provider: provider,
+            chainId: chainId,
+            cairoVersion: .one
+        )
 
-            // And do the same for the second account.
-            let account2Signer = StarkCurveSigner(privateKey: account2PrivateKey)!
+        // And do the same for the second account.
+        let account2Signer = StarkCurveSigner(privateKey: account2PrivateKey)!
 
-            let account2 = StarknetAccount(
-                address: account2Address,
-                signer: account2Signer,
-                provider: provider,
-                chainId: chainId,
-                cairoVersion: .one
-            )
+        let account2 = StarknetAccount(
+            address: account2Address,
+            signer: account2Signer,
+            provider: provider,
+            chainId: chainId,
+            cairoVersion: .one
+        )
 
-            self.accounts = [account1, account2]
-            self.accountBalances = [0, 0]
-        }
-
+        self.accounts = [account1, account2]
+        self.accountBalances = [0, 0]
+    }
 
     func fetchBalance() async {
         let accountIndex = currentAccountIndex
