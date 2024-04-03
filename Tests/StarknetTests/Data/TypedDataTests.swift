@@ -233,6 +233,9 @@ final class TypedDataTests: XCTestCase {
                 (CasesRev1.td, "Mail", """
                 "Mail"("from":"Person","to":"Person","contents":"felt")"Person"("name":"felt","wallet":"felt")
                 """),
+                (CasesRev1.tdBasicTypes, "Example", """
+                "Example"("n0":"felt","n1":"bool","n2":"string","n3":"selector","n4":"u128","n5":"i128","n6":"ContractAddress","n7":"ClassHash","n8":"timestamp","n9":"shortstring")
+                """),
                 (CasesRev1.tdFeltMerkleTree, "Example", """
                 "Example"("value":"felt","root":"merkletree")
                 """),
