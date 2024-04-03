@@ -503,14 +503,6 @@ private extension StarknetTypedData {
         ],
     ]
 
-    static func getPresetTypes(revision: Revision) -> [String: [TypeDeclarationWrapper]] {
-        let types: [String: [any TypeDeclaration]] = switch revision {
-        case .v0: [:]
-        case .v1: Self.presetTypesV1
-        }
-        return types.mapValues { $0.map { TypeDeclarationWrapper($0) } }
-    }
-
     func getBasicTypes() -> Set<String> {
         switch revision {
         case .v0:
@@ -518,6 +510,14 @@ private extension StarknetTypedData {
         case .v1:
             Self.basicTypesV1
         }
+    }
+
+    static func getPresetTypes(revision: Revision) -> [String: [TypeDeclarationWrapper]] {
+        let types: [String: [any TypeDeclaration]] = switch revision {
+        case .v0: [:]
+        case .v1: Self.presetTypesV1
+        }
+        return types.mapValues { $0.map { TypeDeclarationWrapper($0) } }
     }
 }
 
