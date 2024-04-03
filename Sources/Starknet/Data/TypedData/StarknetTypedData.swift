@@ -193,7 +193,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         return "\(escape(dependency))(\(encodedParams))"
     }
 
-    private func encode(type: String) throws -> String {
+    func encode(type: String) throws -> String {
         let dependencies = getDependencies(of: type)
 
         return try dependencies.map {
