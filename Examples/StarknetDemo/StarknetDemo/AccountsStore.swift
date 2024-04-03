@@ -33,7 +33,7 @@ let account1Address: Felt = "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2
 let account2Address: Felt = "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35"
 
 class AccountsStore: ObservableObject {
-    var accounts: [StarknetAccountProtocol]
+    let accounts: [StarknetAccountProtocol]
     let provider: StarknetProviderProtocol
 
     @Published var currentAccountIndex = 0 {
@@ -57,15 +57,17 @@ class AccountsStore: ObservableObject {
     }
 
     init() {
-        self.provider = StarknetProvider(url: rpcEndpoint)!
-        self.accounts = [] // Temporarily empty, will be populated in `setUpAccounts`.
-        self.accountBalances = [0, 0]
-    }
+        // Normally we should use provider.getChainId()
+        // for example purpose we can simply hardcode it as .goerli
+        let chainId = StarknetChainId.goerli
 
-    func setUpAccounts() async {
-        do {
-            let chainId = try await provider.getChainId()
+            self.provider = StarknetProvider(url: rpcEndpoint)!
+
+            // Create a signer that will be used to sign starknet transactions with provided private key.
             let account1Signer = StarkCurveSigner(privateKey: account1PrivateKey)!
+
+            // With address, signer and provider you can create starknet account.
+            // Please note that it will only work if it's already deployed.
             let account1 = StarknetAccount(
                 address: account1Address,
                 signer: account1Signer,
@@ -73,7 +75,10 @@ class AccountsStore: ObservableObject {
                 chainId: chainId,
                 cairoVersion: .one
             )
+
+            // And do the same for the second account.
             let account2Signer = StarkCurveSigner(privateKey: account2PrivateKey)!
+
             let account2 = StarknetAccount(
                 address: account2Address,
                 signer: account2Signer,
@@ -81,12 +86,11 @@ class AccountsStore: ObservableObject {
                 chainId: chainId,
                 cairoVersion: .one
             )
-            // Now that you have the accounts setup, assign them.
+
             self.accounts = [account1, account2]
-        } catch {
-            print("Error setting up accounts: \(error)")
+            self.accountBalances = [0, 0]
         }
-    }
+
 
     func fetchBalance() async {
         let accountIndex = currentAccountIndex

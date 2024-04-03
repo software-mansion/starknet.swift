@@ -17,7 +17,6 @@ struct StarknetDemoApp: App {
             ContentView()
                 .environmentObject(accountsStore)
                 .task {
-                    await accountsStore.setUpAccounts()
                     await accountsStore.fetchBalance()
                 }
         }
