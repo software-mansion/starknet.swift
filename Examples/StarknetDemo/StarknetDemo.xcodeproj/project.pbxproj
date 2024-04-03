@@ -12,7 +12,7 @@
 		1D63E19E296DC6390080CA19 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D63E19D296DC6390080CA19 /* ContentView.swift */; };
 		1D63E1A0296DC63B0080CA19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D63E19F296DC63B0080CA19 /* Assets.xcassets */; };
 		1D63E1A3296DC63B0080CA19 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D63E1A2296DC63B0080CA19 /* Preview Assets.xcassets */; };
-		1D63E1AB296DC6780080CA19 /* Starknet in Frameworks */ = {isa = PBXBuildFile; productRef = 1D63E1AA296DC6780080CA19 /* Starknet */; };
+		AB4C536C2BBC816900B0B6FE /* Starknet in Frameworks */ = {isa = PBXBuildFile; productRef = AB4C536B2BBC816900B0B6FE /* Starknet */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,7 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D63E1AB296DC6780080CA19 /* Starknet in Frameworks */,
+				AB4C536C2BBC816900B0B6FE /* Starknet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,7 +91,7 @@
 			);
 			name = StarknetDemo;
 			packageProductDependencies = (
-				1D63E1AA296DC6780080CA19 /* Starknet */,
+				AB4C536B2BBC816900B0B6FE /* Starknet */,
 			);
 			productName = StarknetDemo;
 			productReference = 1D63E198296DC6390080CA19 /* StarknetDemo.app */;
@@ -122,7 +122,7 @@
 			);
 			mainGroup = 1D63E18F296DC6390080CA19;
 			packageReferences = (
-				1D63E1A9296DC6780080CA19 /* XCRemoteSwiftPackageReference "starknet.swift" */,
+				AB4C536A2BBC816900B0B6FE /* XCRemoteSwiftPackageReference "starknet" */,
 			);
 			productRefGroup = 1D63E199296DC6390080CA19 /* Products */;
 			projectDirPath = "";
@@ -357,9 +357,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1D63E1A9296DC6780080CA19 /* XCRemoteSwiftPackageReference "starknet.swift" */ = {
+		AB4C536A2BBC816900B0B6FE /* XCRemoteSwiftPackageReference "starknet" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/software-mansion/starknet.swift.git";
+			repositoryURL = "https://github.com/software-mansion/starknet.swift";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -368,9 +368,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1D63E1AA296DC6780080CA19 /* Starknet */ = {
+		AB4C536B2BBC816900B0B6FE /* Starknet */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1D63E1A9296DC6780080CA19 /* XCRemoteSwiftPackageReference "starknet.swift" */;
+			package = AB4C536A2BBC816900B0B6FE /* XCRemoteSwiftPackageReference "starknet" */;
 			productName = Starknet;
 		};
 /* End XCSwiftPackageProductDependency section */

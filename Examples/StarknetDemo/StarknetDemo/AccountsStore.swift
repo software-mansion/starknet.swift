@@ -25,15 +25,15 @@ let rpcEndpoint = "http://127.0.0.1:5050/rpc"
 // !!! Important !!!
 // These private keys are for demo only. Never publish a privateKey of your wallet, nor
 // store it in any repository as plain text.
-let account1PrivateKey: Felt = "0xe3e70682c2094cac629f6fbed82c07cd"
-let account2PrivateKey: Felt = "0xf728b4fa42485e3a0a5d2f346baa9455"
+let account1PrivateKey: Felt = "0xa2ed22bb0cb0b49c69f6d6a8d24bc5ea"
+let account2PrivateKey: Felt = "0xc1c7db92d22ef773de96f8bde8e56c85"
 
 // Addresses of accounts associated with above private keys.
-let account1Address: Felt = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
-let account2Address: Felt = "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79"
+let account1Address: Felt = "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b"
+let account2Address: Felt = "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35"
 
 class AccountsStore: ObservableObject {
-    let accounts: [StarknetAccountProtocol]
+    var accounts: [StarknetAccountProtocol]
     let provider: StarknetProviderProtocol
 
     @Published var currentAccountIndex = 0 {
@@ -57,51 +57,53 @@ class AccountsStore: ObservableObject {
     }
 
     init() {
-        // Create starknet provider that will be used to communicate with the given starknet node.
-        self.provider = StarknetProvider(url: rpcEndpoint)!
+            self.provider = StarknetProvider(url: rpcEndpoint)!
+            self.accounts = [] // Temporarily empty, will be populated in `setUpAccounts`.
+            self.accountBalances = [0, 0]
+        }
 
-        // Create a signer that will be used to sign starknet transactions with provided private key.
-        let account1Signer = StarkCurveSigner(privateKey: account1PrivateKey)!
-
-        // With address, signer and provider you can create starknet account.
-        // Please note that it will only work if it's already deployed.
-        let account1 = StarknetAccount(
-            address: account1Address,
-            signer: account1Signer,
-            provider: provider
-        )
-
-        // And do the same for the second account.
-        let account2Signer = StarkCurveSigner(privateKey: account2PrivateKey)!
-
-        let account2 = StarknetAccount(
-            address: account2Address,
-            signer: account2Signer,
-            provider: provider
-        )
-
-        self.accounts = [account1, account2]
-        self.accountBalances = [0, 0]
+    func setUpAccounts() async {
+        do {
+            let chainId = try await provider.getChainId()
+            let account1Signer = StarkCurveSigner(privateKey: account1PrivateKey)!
+            let account1 = StarknetAccount(
+                address: account1Address,
+                signer: account1Signer,
+                provider: provider,
+                chainId: chainId,
+                cairoVersion: .one
+            )
+            let account2Signer = StarkCurveSigner(privateKey: account2PrivateKey)!
+            let account2 = StarknetAccount(
+                address: account2Address,
+                signer: account2Signer,
+                provider: provider,
+                chainId: chainId,
+                cairoVersion: .one
+            )
+            // Now that you have the accounts setup, assign them.
+            self.accounts = [account1, account2]
+        } catch {
+            print("Error setting up accounts: \(error)")
+        }
     }
 
     func fetchBalance() async {
         let accountIndex = currentAccountIndex
-
         // Prepare a read call to be sent to starknet
         let call = StarknetCall(
             contractAddress: erc20ContractAddress,
             entrypoint: starknetSelector(from: "balanceOf"),
             calldata: [account.address]
         )
-
+        
         do {
             // Note that as it is a read only call, you can send it using provider.
             let result = try await provider.callContract(call)
-
+            
             // This erc20 contract uses uint256 instead of felt for balances, which is stored
             // as two felts - lower and upper 128 bits of the uint256.
             let balanceValue = result[0].value + result[1].value << 128
-
             DispatchQueue.main.async {
                 self.accountBalances[accountIndex] = balanceValue
             }
@@ -135,7 +137,7 @@ class AccountsStore: ObservableObject {
         let senderAccount = accounts[currentAccountIndex]
 
         Task {
-            let _ = try await senderAccount.execute(call: call)
+            let _ = try await senderAccount.executeV3(call: call)
 
             try await Task.sleep(nanoseconds: UInt64(Double(NSEC_PER_SEC)))
 
