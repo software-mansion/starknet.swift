@@ -14,6 +14,7 @@ public enum StarknetTypedDataError: Error, Equatable {
     case basicTypeRedefinition(String)
     case invalidTypeName(String)
     case danglingType(String)
+    case unsupportedType(String)
     case dependencyNotDefined(String)
     case contextNotDefined
     case parentNotDefined
@@ -137,7 +138,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
                 case let .standard(standard):
                     if standard.type.isEnum() {
                         guard revision == .v1 else {
-                            throw StarknetTypedDataError.invalidTypeName(standard.type)
+                            throw StarknetTypedDataError.unsupportedType(standard.type)
                         }
                         return try standard.type.extractEnumTypes()
                     } else {

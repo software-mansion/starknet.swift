@@ -89,7 +89,7 @@ final class TypedDataTests: XCTestCase {
             XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("()"))
         }
         try XCTAssertThrowsError(StarknetTypedData(types: [Self.domainTypeV0.0: Self.domainTypeV1.1, "myType": [StarknetTypedData.StandardType(name: "value", type: "(u128)")]], primaryType: "myType", domain: Self.exampleDomainV0, message: "{}")) { error in
-            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("(u128)"))
+            XCTAssertEqual(error as? StarknetTypedDataError, .unsupportedType("(u128)"))
         }
     }
 
