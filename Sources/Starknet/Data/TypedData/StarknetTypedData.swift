@@ -139,7 +139,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
         }
 
-        let basicTypes = getBasicTypes()
+        let basicTypes = Self.getBasicTypes(revision: revision)
         let presetTypes = Self.getPresetTypes(revision: revision)
 
         let referencedTypes = try Set(types.values.flatMap { type in
@@ -503,12 +503,12 @@ private extension StarknetTypedData {
         ],
     ]
 
-    func getBasicTypes() -> Set<String> {
+    static func getBasicTypes(revision: Revision) -> Set<String> {
         switch revision {
         case .v0:
-            Self.basicTypesV0
+            basicTypesV0
         case .v1:
-            Self.basicTypesV1
+            basicTypesV1
         }
     }
 
