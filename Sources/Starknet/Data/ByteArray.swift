@@ -2,6 +2,14 @@ import Foundation
 
 private let shortStringMaxLen = 31
 
+/// Represents a ByteArray struct from Cairo.
+///
+/// The ByteArray struct is used to represent a string in Cairo.
+///
+/// - Parameters:
+///  - data: list of 31-byte chunks of the byte array
+///  - pendingWord: the last chunk of the byte array, which consists of at most 30 bytes
+///  - pendingWordLen: the number of bytes in `pendingWord`
 public struct StarknetByteArray: Equatable, Hashable, ExpressibleByStringLiteral {
     let data: [Felt]
     let pendingWord: Felt
