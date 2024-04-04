@@ -388,7 +388,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         ])
     }
 }
-}
+
 public extension StarknetTypedData {
     struct Domain: Codable, Equatable, Hashable {
         public let name: Element
