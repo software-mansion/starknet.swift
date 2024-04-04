@@ -98,7 +98,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         self.revision = try domain.resolveRevision()
 
         self.allTypes = self.types.merging(
-            Self.PresetType.values(revision: self.revision).reduce(into: [:]) { $0[$1.rawValue] = $1.params },
+            Self.PresetType.cases(revision: self.revision).reduce(into: [:]) { $0[$1.rawValue] = $1.params },
             uniquingKeysWith: { current, _ in current }
         )
 
@@ -139,8 +139,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
         }
 
-        let basicTypes = Self.BasicType.values(revision: revision).map(\.rawValue)
-        let presetTypes = Self.PresetType.values(revision: revision).reduce(into: [:]) { $0[$1.rawValue] = $1.params }
+        let basicTypes = Self.BasicType.cases(revision: revision).map(\.rawValue)
+        let presetTypes = Self.PresetType.cases(revision: revision).reduce(into: [:]) { $0[$1.rawValue] = $1.params }
 
         let referencedTypes = try Set(types.values.flatMap { type in
             try type.flatMap { param in
@@ -484,31 +484,6 @@ public extension StarknetTypedData {
                 try bool.encode(to: encoder)
             }
         }
-    }
-}
-
-private extension StarknetTypedData {
-    static let presetTypesV1 = [
-        "u256": [
-            StandardType(name: "low", type: BasicType.u128.rawValue),
-            StandardType(name: "high", type: BasicType.u128.rawValue),
-        ],
-        "TokenAmount": [
-            StandardType(name: "token_address", type: BasicType.contractAddress.rawValue),
-            StandardType(name: "amount", type: "u256"),
-        ],
-        "NftId": [
-            StandardType(name: "collection_address", type: BasicType.contractAddress.rawValue),
-            StandardType(name: "token_id", type: "u256"),
-        ],
-    ]
-
-    static func getPresetTypes(revision: Revision) -> [String: [TypeDeclarationWrapper]] {
-        let types: [String: [any TypeDeclaration]] = switch revision {
-        case .v0: [:]
-        case .v1: Self.presetTypesV1
-        }
-        return types.mapValues { $0.map { TypeDeclarationWrapper($0) } }
     }
 }
 

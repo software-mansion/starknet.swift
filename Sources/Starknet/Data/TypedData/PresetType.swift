@@ -1,11 +1,7 @@
 import Foundation
 
 public extension StarknetTypedData {
-    protocol PresetTypeDeclaration: Codable, Hashable, Equatable {
-        var params: [TypeDeclarationWrapper] { get }
-    }
-
-    enum PresetType: String, PresetTypeDeclaration, Encodable, Hashable, Equatable, CaseIterable {
+    enum PresetType: String, Equatable, CaseIterable {
         case u256
         case tokenAmount = "TokenAmount"
         case nftId = "NftId"
@@ -27,10 +23,10 @@ public extension StarknetTypedData {
             case nftId
         }
 
-        static func values(revision: Revision) -> [PresetType] {
+        static func cases(revision: Revision) -> [PresetType] {
             switch revision {
             case .v0: []
-            case .v1: [.u256, .tokenAmount, .nftId]
+            case .v1: allCases
             }
         }
     }

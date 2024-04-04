@@ -1,7 +1,7 @@
 import Foundation
 
 extension StarknetTypedData {
-    enum BasicType: String, Codable, CaseIterable {
+    enum BasicType: String, CaseIterable {
         case felt
         case bool
         case selector
@@ -15,7 +15,7 @@ extension StarknetTypedData {
         case timestamp
         case shortstring
 
-        static func values(revision: Revision) -> [BasicType] {
+        static func cases(revision: Revision) -> [BasicType] {
             switch revision {
             case .v0: [.felt, .bool, .selector, .string, .merkletree]
             case .v1: allCases
