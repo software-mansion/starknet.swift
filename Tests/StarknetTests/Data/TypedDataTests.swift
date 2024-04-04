@@ -121,7 +121,7 @@ final class TypedDataTests: XCTestCase {
             try testBasicTypeRedifintion(type, .v1)
         }
         try presetTypesV1.forEach { type in
-            try testPresetsTypeRedifintion(type, .v1)
+            try testPresetTypeRedifintion(type, .v1)
         }
     }
 
