@@ -75,9 +75,6 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let revision: Revision
     private let allTypes: [String: [TypeDeclarationWrapper]]
     private let hashMethod: StarknetHashMethod
-    private var revision: Revision {
-        try! domain.resolveRevision()
-    }
 
     fileprivate enum CodingKeys: CodingKey {
         case types
