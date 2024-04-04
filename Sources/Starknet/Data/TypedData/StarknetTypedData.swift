@@ -66,18 +66,18 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let domain: Domain
     public let message: [String: Element]
 
-    var revision: Revision {
+    private var revision: Revision {
         domain.resolveRevision()!
     }
 
-    var hashMethod: StarknetHashMethod {
+    private var hashMethod: StarknetHashMethod {
         switch revision {
         case .v0: .pedersen
         case .v1: .poseidon
         }
     }
 
-    func hashArray(_ values: [Felt]) -> Felt {
+    private func hashArray(_ values: [Felt]) -> Felt {
         hashMethod.hash(values: values)
     }
 
