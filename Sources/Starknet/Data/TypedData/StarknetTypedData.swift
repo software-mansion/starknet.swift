@@ -81,11 +81,6 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         case primaryType
         case domain
         case message
-    private var hashMethod: StarknetHashMethod {
-        switch revision {
-        case .v0: .pedersen
-        case .v1: .poseidon
-        }
     }
 
     private func hashArray(_ values: [Felt]) -> Felt {
@@ -390,7 +385,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         ])
     }
 }
-}
+
 public extension StarknetTypedData {
     struct Domain: Codable, Equatable, Hashable {
         public let name: Element
