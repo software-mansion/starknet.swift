@@ -98,7 +98,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         self.revision = try domain.resolveRevision()
 
         self.allTypes = self.types.merging(
-            Self.getPresetTypes(revision: self.revision),
+            Self.PresetType.values(revision: self.revision).reduce(into: [:]) { $0[$1.rawValue] = $1.params },
             uniquingKeysWith: { current, _ in current }
         )
 
@@ -139,8 +139,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
         }
 
-        let presetTypes = Self.getPresetTypes(revision: revision)
         let basicTypes = Self.BasicType.values(revision: revision).map(\.rawValue)
+        let presetTypes = Self.PresetType.values(revision: revision).reduce(into: [:]) { $0[$1.rawValue] = $1.params }
 
         let referencedTypes = try Set(types.values.flatMap { type in
             try type.flatMap { param in
