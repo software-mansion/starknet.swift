@@ -35,7 +35,7 @@ public enum StarknetTypedDataError: Error, Equatable {
 ///             {"name": "name", "type": "shortstring"},
 ///             {"name": "version", "type": "shortstring"},
 ///             {"name": "chainId", "type": "shortstring"},
-///			 	{"name": "revision", "type": "shortstring"},
+///             {"name": "revision", "type": "shortstring"}
 ///         ],
 ///         "Person": [
 ///             {"name": "name", "type": "felt"},
