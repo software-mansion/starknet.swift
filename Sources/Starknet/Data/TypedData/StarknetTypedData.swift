@@ -71,7 +71,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let domain: Domain
     public let message: [String: Element]
 
-    private var revision: Revision {
+    public var revision: Revision {
         try! domain.resolveRevision()
     }
 
