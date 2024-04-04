@@ -101,7 +101,7 @@ final class TypedDataTests: XCTestCase {
                 XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition(type))
             }
         }
-        func testPresetsTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
+        func testPresetTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
             try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
                 XCTAssertEqual(error as? StarknetTypedDataError, .presetTypeRedefinition(type))
             }
@@ -121,7 +121,7 @@ final class TypedDataTests: XCTestCase {
             try testBasicTypeRedifintion(type, .v1)
         }
         try presetTypesV1.forEach { type in
-            try testPresetsTypeRedifintion(type, .v1)
+            try testPresetTypeRedifintion(type, .v1)
         }
     }
 
