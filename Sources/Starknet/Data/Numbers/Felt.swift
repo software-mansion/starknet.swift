@@ -28,6 +28,11 @@ public struct Felt: NumAsHexProtocol {
         self.value = value < Felt.prime ? value : Felt.prime - 1
     }
 
+    /// Initializes a new Felt instance from a signed integer.
+    ///
+    /// Calculated as `fromSigned mod Felt.prime`.
+    ///
+    /// - Parameter fromSigned: The signed integer to convert to Felt. The integer must be greater than `-Felt.prime` and less than `Felt.prime`.
     public init?(fromSigned exactly: some BinaryInteger) {
         let value = BigInt(exactly: exactly)
 
