@@ -75,20 +75,12 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let revision: Revision
     private let allTypes: [String: [TypeDeclarationWrapper]]
     private let hashMethod: StarknetHashMethod
-    private var revision: Revision {
-        try! domain.resolveRevision()
-    }
 
     fileprivate enum CodingKeys: CodingKey {
         case types
         case primaryType
         case domain
         case message
-    private var hashMethod: StarknetHashMethod {
-        switch revision {
-        case .v0: .pedersen
-        case .v1: .poseidon
-        }
     }
 
     private func hashArray(_ values: [Felt]) -> Felt {
