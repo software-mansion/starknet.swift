@@ -101,7 +101,7 @@ final class TypedDataTests: XCTestCase {
                 XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition(type))
             }
         }
-        func testPresetsTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
+        func testPresetTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
             try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
                 XCTAssertEqual(error as? StarknetTypedDataError, .presetTypeRedefinition(type))
             }
@@ -112,7 +112,7 @@ final class TypedDataTests: XCTestCase {
         ]
         let basicTypesV1 = basicTypesV0 + ["enum", "u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
         let presetTypesV1 = ["u256", "TokenAmount", "NftId"]
-        
+
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
         try basicTypesV0.forEach { type in
             try testBasicTypeRedifintion(type, .v0)
