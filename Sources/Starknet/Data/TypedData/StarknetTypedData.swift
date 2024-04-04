@@ -25,16 +25,17 @@ public enum StarknetTypedDataError: Error, Equatable {
     case encodingError
 }
 
-/// Sign message for off-chain usage. Follows standard proposed [here](https://github.com/argentlabs/argent-x/discussions/14)
+/// Sign message for off-chain usage. Follows standard proposed [here](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-12.md)
 ///
 /// ```swift
 /// let typedDataString = """
 /// {
 ///     "types": {
 ///         "StarkNetDomain": [
-///             {"name": "name", "type": "felt"},
-///             {"name": "version", "type": "felt"},
-///             {"name": "chainId", "type": "felt"},
+///             {"name": "name", "type": "shortstring"},
+///             {"name": "version", "type": "shortstring"},
+///             {"name": "chainId", "type": "shortstring"},
+///			 	{"name": "revision", "type": "shortstring"},
 ///         ],
 ///         "Person": [
 ///             {"name": "name", "type": "felt"},
@@ -47,7 +48,7 @@ public enum StarknetTypedDataError: Error, Equatable {
 ///         ],
 ///     },
 ///     "primaryType": "Mail",
-///     "domain": {"name": "StarkNet Mail", "version": "1", "chainId": 1},
+///     "domain": {"name": "StarkNet Mail", "version": "1", "chainId": "1", "revision": 1},
 ///     "message": {
 ///         "from": {
 ///             "name": "Cow",
