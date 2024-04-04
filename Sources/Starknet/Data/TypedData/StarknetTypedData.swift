@@ -139,8 +139,8 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
         }
 
-        let basicTypes = Self.getBasicTypes(revision: revision)
         let presetTypes = Self.getPresetTypes(revision: revision)
+        let basicTypes = Self.BasicType.values(revision: revision).map(\.rawValue)
 
         let referencedTypes = try Set(types.values.flatMap { type in
             try type.flatMap { param in
@@ -187,7 +187,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             switch param {
             case let .enum(enumType):
                 guard revision == .v1 else {
-                    throw StarknetTypedDataError.unsupportedType("enum")
+                    throw StarknetTypedDataError.unsupportedType(BasicType.enum.rawValue)
                 }
                 return [enumType.contains]
             default:
@@ -238,7 +238,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             switch param {
             case let .enum(enumType):
                 guard revision == .v1 else {
-                    throw StarknetTypedDataError.unsupportedType("enum")
+                    throw StarknetTypedDataError.unsupportedType(BasicType.enum.rawValue)
                 }
                 return enumType.contains
             default:
@@ -247,7 +247,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
         func encodeEnumTypes(from type: String) throws -> String {
             guard revision == .v1 else {
-                throw StarknetTypedDataError.unsupportedType("enum")
+                throw StarknetTypedDataError.unsupportedType(BasicType.enum.rawValue)
             }
 
             let enumTypes = try type.extractEnumTypes().map(escape).joined(separator: ",")
@@ -296,30 +296,33 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return hashArray(hashes)
         }
 
-        switch (typeName, revision) {
-        case ("felt", _), ("string", .v0), ("shortstring", .v1), ("ContractAddress", .v1), ("ClassHash", .v1):
+        let basicType = BasicType(rawValue: typeName)
+        switch (basicType, revision) {
+        case (.felt, _), (.string, .v0), (.shortstring, .v1), (.contractAddress, .v1), (.classHash, .v1):
             return try unwrapFelt(from: element)
-        case ("u128", .v1), ("timestamp", .v1):
+        case (.u128, .v1), (.timestamp, .v1):
             return try unwrapU128(from: element)
-        case ("i128", .v1):
+        case (.i128, .v1):
             return try unwrapI128(from: element)
-        case ("bool", _):
+        case (.bool, _):
             return try unwrapBool(from: element)
-        case ("string", .v1):
+        case (.string, .v1):
             return try hashArray(unwrapLongString(from: element))
-        case ("selector", _):
+        case (.selector, _):
             return try unwrapSelector(from: element)
-        case ("enum", .v1):
+        case (.enum, .v1):
             guard let context else {
                 throw StarknetTypedDataError.contextNotDefined
             }
             return try unwrapEnum(from: element, context: context)
-        case ("merkletree", _):
+        case (.merkletree, _):
             guard let context else {
                 throw StarknetTypedDataError.contextNotDefined
             }
             return try prepareMerkleTreeRoot(from: element, context: context)
-        default:
+        case (.some, .v0):
+            throw StarknetTypedDataError.unsupportedType(typeName)
+        case (nil, _):
             throw StarknetTypedDataError.dependencyNotDefined(typeName)
         }
     }
@@ -485,32 +488,20 @@ public extension StarknetTypedData {
 }
 
 private extension StarknetTypedData {
-    static let basicTypesV0: Set = ["felt", "bool", "string", "selector", "merkletree"]
-    static let basicTypesV1: Set = basicTypesV0.union(["enum", "u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"])
-
     static let presetTypesV1 = [
         "u256": [
-            StandardType(name: "low", type: "u128"),
-            StandardType(name: "high", type: "u128"),
+            StandardType(name: "low", type: BasicType.u128.rawValue),
+            StandardType(name: "high", type: BasicType.u128.rawValue),
         ],
         "TokenAmount": [
-            StandardType(name: "token_address", type: "ContractAddress"),
+            StandardType(name: "token_address", type: BasicType.contractAddress.rawValue),
             StandardType(name: "amount", type: "u256"),
         ],
         "NftId": [
-            StandardType(name: "collection_address", type: "ContractAddress"),
+            StandardType(name: "collection_address", type: BasicType.contractAddress.rawValue),
             StandardType(name: "token_id", type: "u256"),
         ],
     ]
-
-    static func getBasicTypes(revision: Revision) -> Set<String> {
-        switch revision {
-        case .v0:
-            basicTypesV0
-        case .v1:
-            basicTypesV1
-        }
-    }
 
     static func getPresetTypes(revision: Revision) -> [String: [TypeDeclarationWrapper]] {
         let types: [String: [any TypeDeclaration]] = switch revision {
