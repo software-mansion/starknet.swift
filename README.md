@@ -38,7 +38,7 @@ cargo install \
 --git https://github.com/0xSpaceShard/starknet-devnet-rs.git \
 --rev fa1238e
 ```
-and run the demo app on ios simulator, to be able to access the local devnet instance.
+Run the demo app on ios simulator, to be able to access the local devnet instance.
 
 ## Development
 
