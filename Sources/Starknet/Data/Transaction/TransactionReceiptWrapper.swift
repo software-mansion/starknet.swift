@@ -14,15 +14,15 @@ enum TransactionReceiptWrapper: Decodable {
     public var transactionReceipt: any StarknetTransactionReceipt {
         switch self {
         case let .invoke(tx):
-            return tx
+            tx
         case let .declare(tx):
-            return tx
+            tx
         case let .deployAccount(tx):
-            return tx
+            tx
         case let .l1Handler(tx):
-            return tx
+            tx
         case let .deploy(tx):
-            return tx
+            tx
         }
     }
 

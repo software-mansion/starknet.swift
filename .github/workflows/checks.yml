@@ -5,12 +5,15 @@ on:
 
 jobs:
   test_and_lint:
-    runs-on: macos-12
+    runs-on: macos-14
     env:
       DEVNET_SHA: fa1238e8039a53101b5d2d764d3622ff0403a527
     steps:
       - uses: actions/checkout@v3
-
+      - name: Setup Xcode 15.3
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        with:
+          xcode-version: 15.3
       - name: Cache/Restore Mint packages
         id: mint-cache
         uses: actions/cache@v2
