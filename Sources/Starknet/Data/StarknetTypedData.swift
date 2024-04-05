@@ -59,10 +59,25 @@ public enum StarknetTypedDataError: Error {
 public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let types: [String: [TypeDeclaration]]
     public let primaryType: String
-    public let domain: [String: Element]
+    public let domain: Domain
     public let message: [String: Element]
 
-    private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: [String: Element], message: [String: Element]) {
+    public var revision: Revision {
+        domain.resolveRevision()!
+    }
+
+    private var hashMethod: StarknetHashMethod {
+        switch revision {
+        case .v0: .pedersen
+        case .v1: .poseidon
+        }
+    }
+
+    private func hashArray(_ values: [Felt]) -> Felt {
+        hashMethod.hash(values: values)
+    }
+
+    private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
         let reservedTypeNames = ["felt", "felt*", "string", "selector"]
         for typeName in reservedTypeNames {
             if types.keys.contains(typeName) {
@@ -81,7 +96,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return nil
         }
 
-        guard let domain = try? JSONDecoder().decode([String: Element].self, from: domainData),
+        guard let domain = try? JSONDecoder().decode(Domain.self, from: domainData),
               let message = try? JSONDecoder().decode([String: Element].self, from: messageData)
         else {
             return nil
@@ -117,15 +132,21 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         guard let params = types[dependency] else {
             throw StarknetTypedDataError.dependencyNotDefined(dependency)
         }
+        func escape(_ string: String) -> String {
+            switch revision {
+            case .v0: string
+            case .v1: "\"\(string)\""
+            }
+        }
 
         let encodedParams = params.map {
-            "\($0.name):\($0.type)"
+            "\(escape($0.name)):\(escape($0.type))"
         }.joined(separator: ",")
 
-        return "\(dependency)(\(encodedParams))"
+        return "\(escape(dependency))(\(encodedParams))"
     }
 
-    private func encode(type: String) throws -> String {
+    func encode(type: String) throws -> String {
         let dependencies = getDependencies(of: type)
 
         return try dependencies.map {
@@ -149,25 +170,30 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
                 return try getStructHash(typeName: typeName.strippingPointer(), data: object)
             }
 
-            let hash = StarknetCurve.pedersenOn(hashes)
+            let hash = hashArray(hashes)
 
             return hash
         }
 
-        switch typeName {
-        case "felt*":
+        switch (typeName, revision) {
+        case ("felt*", _):
             let array = try unwrapArray(from: element)
             let hashes = try array.map {
                 try unwrapFelt(from: $0)
             }
-            let hash = StarknetCurve.pedersenOn(hashes)
-            return hash
-        case "felt", "string":
+            return hashArray(hashes)
+        case ("felt", _):
             return try unwrapFelt(from: element)
-        case "selector":
+        case ("string", .v0):
+            return try unwrapFelt(from: element)
+        case ("string", .v1):
+            fatalError("This function is not yet implemented")
+        case ("shortstring", .v1):
+            return try unwrapFelt(from: element)
+        case ("selector", _):
             return try unwrapSelector(from: element)
         default:
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.dependencyNotDefined(typeName)
         }
     }
 
@@ -197,7 +223,15 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public func getStructHash(typeName: String, data: [String: Element]) throws -> Felt {
         let encodedData = try encode(data: data, forType: typeName)
 
-        return try StarknetCurve.pedersenOn([getTypeHash(typeName: typeName)] + encodedData)
+        return try hashArray([getTypeHash(typeName: typeName)] + encodedData)
+    }
+
+    private func getStructHash(typeName: String, data: Data) throws -> Felt {
+        guard let decodedData = try? JSONDecoder().decode([String: Element].self, from: data) else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        return try getStructHash(typeName: typeName, data: decodedData)
     }
 
     public func getStructHash(typeName: String, data: String) throws -> Felt {
@@ -205,20 +239,27 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             throw StarknetTypedDataError.decodingError
         }
 
-        guard let dataDecoded = try? JSONDecoder().decode([String: Element].self, from: data) else {
-            throw StarknetTypedDataError.decodingError
-        }
+        return try getStructHash(typeName: typeName, data: data)
+    }
 
-        return try getStructHash(typeName: typeName, data: dataDecoded)
+    public func getStructHash(domain: Domain) throws -> Felt {
+        guard let domain = try? JSONEncoder().encode(domain) else {
+            throw StarknetTypedDataError.encodingError
+        }
+        let separatorName = switch revision {
+        case .v0: "StarkNetDomain"
+        case .v1: "StarknetDomain"
+        }
+        return try getStructHash(typeName: separatorName, data: domain)
     }
 
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
-        try StarknetCurve.pedersenOn(
+        try hashArray([
             Felt.fromShortString("StarkNet Message")!,
-            getStructHash(typeName: "StarkNetDomain", data: domain),
+            getStructHash(domain: domain),
             accountAddress,
-            getStructHash(typeName: primaryType, data: message)
-        )
+            getStructHash(typeName: primaryType, data: message),
+        ])
     }
 }
 
@@ -231,6 +272,30 @@ public extension StarknetTypedData {
             self.name = name
             self.type = type
         }
+    }
+
+    struct Domain: Codable, Equatable, Hashable {
+        public let name: Element
+        public let version: Element
+        public let chainId: Element
+        public let revision: Element?
+
+        public func resolveRevision() -> Revision? {
+            guard let revision else {
+                return .v0
+            }
+            switch revision {
+            case let .felt(felt):
+                return Revision(rawValue: felt)
+            default:
+                return nil
+            }
+        }
+    }
+
+    enum Revision: Felt, Codable, Equatable {
+        case v0 = 0
+        case v1 = 1
     }
 
     enum Element: Codable, Hashable, Equatable {
