@@ -26,7 +26,7 @@ You can find the documentation of the project [here](https://docs.swmansion.com/
 ## Demo app
 In the `Examples` folder you can find a demo ios application.
 
-Before running it, make sure to checkout to compatible devnet version with the one used by demo app. Navigate to you local devnet repo and use:
+Before running it, make sure to check out the compatible devnet version that is used by the demo app. Navigate to your local devnet repository and use the following command:
 ```
 git checkout fa1238e8039a53101b5d2d764d3622ff0403a527
 ```
