@@ -18,6 +18,7 @@ public enum StarknetTypedDataError: Error, Equatable {
     case contextNotDefined
     case parentNotDefined
     case keyNotDefined
+    case invalidNumberError(StarknetTypedData.Element)
     case invalidMerkleTree
     case invalidShortString
     case encodingError
@@ -453,11 +454,11 @@ extension StarknetTypedData {
 
     func unwrapU128(from element: Element) throws -> Felt {
         guard case let .felt(felt) = element else {
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumberError(element)
         }
 
         guard felt.value < BigUInt(2).power(128) else {
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumberError(element)
         }
 
         return felt
@@ -470,11 +471,11 @@ extension StarknetTypedData {
         case let .signedFelt(signedFelt):
             signedFelt
         default:
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumberError(element)
         }
 
         guard felt.value < BigUInt(2).power(127) || felt.value >= Felt.prime - BigUInt(2).power(127) else {
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumberError(element)
         }
 
         return felt
