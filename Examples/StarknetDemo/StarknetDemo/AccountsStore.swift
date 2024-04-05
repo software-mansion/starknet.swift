@@ -58,8 +58,8 @@ class AccountsStore: ObservableObject {
 
     init() {
         // Normally we should use provider.getChainId()
-        // for example purpose we can simply hardcode it as .goerli
-        let chainId = StarknetChainId.goerli
+        // for example purpose we can simply hardcode it as .sepolia
+        let chainId = StarknetChainId.sepolia
 
         self.provider = StarknetProvider(url: rpcEndpoint)!
 
