@@ -146,7 +146,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         let encodedParams = params.map {
-            "\(escape($0.type.name)):\(escape($0.type.type)))"
+            "\(escape($0.type.name)):\(escape($0.type.type))"
         }.joined(separator: ",")
 
         return "\(escape(dependency))(\(encodedParams))"
