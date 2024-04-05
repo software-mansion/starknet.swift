@@ -182,7 +182,7 @@ final class TypedDataTests: XCTestCase {
         for input in cases {
             let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
             XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "u128")) { error in
-                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumberError(element))
+                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumericValue(element))
             }
         }
     }
@@ -219,7 +219,7 @@ final class TypedDataTests: XCTestCase {
         for input in cases {
             let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
             XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "i128")) { error in
-                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumberError(element))
+                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumericValue(element))
             }
         }
     }
