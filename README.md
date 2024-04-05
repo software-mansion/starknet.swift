@@ -26,9 +26,20 @@ You can find the documentation of the project [here](https://docs.swmansion.com/
 ## Demo app
 In the `Examples` folder you can find a demo ios application.
 
-Before running it, make sure to check out the compatible devnet version that is used by the demo app. Navigate to your local devnet repository and use the following command:
+Before running it, make sure that you're using devnet version which is compatible with the demo app. 
+https://github.com/0xSpaceShard/starknet-devnet-rs/commit/fa1238e8039a53101b5d2d764d3622ff0403a527
+
+If you use devnet repository, run the following command:
 ```
 git checkout fa1238e8039a53101b5d2d764d3622ff0403a527
+```
+
+If you setup devnet with `cargo`, run following command:
+```
+cargo install \
+--locked \
+--git https://github.com/0xSpaceShard/starknet-devnet-rs.git \
+--rev fa1238e
 ```
 
 Also, make sure to run starknet devnet with given configuration:
