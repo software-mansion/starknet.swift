@@ -221,8 +221,21 @@ final class AccountTests: XCTestCase {
         XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
     }
 
-    func testSignTypedData() async throws {
-        let typedData = loadTypedDataFromFile(name: "typed_data_struct_array_example")!
+    func testSignTypedDataRev0() async throws {
+        let typedData = try loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")
+
+        let signature = try account.sign(typedData: typedData)
+        XCTAssertTrue(signature.count > 0)
+
+        let successResult = try await account.verify(signature: signature, for: typedData)
+        XCTAssertTrue(successResult)
+
+        let failResult = try await account.verify(signature: [.one, .one], for: typedData)
+        XCTAssertFalse(failResult)
+    }
+
+    func testSignTypedDataRev1() async throws {
+        let typedData = try loadTypedDataFromFile(name: "typed_data_rev_1_example")
 
         let signature = try account.sign(typedData: typedData)
         XCTAssertTrue(signature.count > 0)

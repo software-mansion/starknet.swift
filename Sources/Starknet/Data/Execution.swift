@@ -125,9 +125,9 @@ public struct StarknetDeployAccountParamsV1 {
 public func starknetCallsToExecuteCalldata(calls: [StarknetCall], cairoVersion: CairoVersion) -> [Felt] {
     switch cairoVersion {
     case .zero:
-        return starknetCallsToExecuteCalldataCairo0(calls: calls)
+        starknetCallsToExecuteCalldataCairo0(calls: calls)
     case .one:
-        return starknetCallsToExecuteCalldataCairo1(calls: calls)
+        starknetCallsToExecuteCalldataCairo1(calls: calls)
     }
 }
 
