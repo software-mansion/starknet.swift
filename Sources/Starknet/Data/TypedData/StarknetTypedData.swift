@@ -19,6 +19,8 @@ public enum StarknetTypedDataError: Error, Equatable {
     case contextNotDefined
     case parentNotDefined
     case keyNotDefined
+    case invalidNumericValue(StarknetTypedData.Element)
+    case invalidBool(StarknetTypedData.Element)
     case invalidMerkleTree
     case invalidShortString
     case encodingError
@@ -519,11 +521,11 @@ extension StarknetTypedData {
 
     func unwrapU128(from element: Element) throws -> Felt {
         guard case let .felt(felt) = element else {
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumericValue(element)
         }
 
         guard felt.value < BigUInt(2).power(128) else {
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumericValue(element)
         }
 
         return felt
@@ -536,11 +538,11 @@ extension StarknetTypedData {
         case let .signedFelt(signedFelt):
             signedFelt
         default:
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumericValue(element)
         }
 
         guard felt.value < BigUInt(2).power(127) || felt.value >= Felt.prime - BigUInt(2).power(127) else {
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidNumericValue(element)
         }
 
         return felt
@@ -573,18 +575,18 @@ extension StarknetTypedData {
         switch element {
         case let .felt(felt):
             guard felt == .zero || felt == .one else {
-                throw StarknetTypedDataError.decodingError
+                throw StarknetTypedDataError.invalidBool(element)
             }
             return felt
         case let .bool(bool):
             return bool ? .one : .zero
         case let .string(string):
             guard let bool = Bool(string) else {
-                throw StarknetTypedDataError.decodingError
+                throw StarknetTypedDataError.invalidBool(element)
             }
             return bool ? .one : .zero
         default:
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidBool(element)
         }
     }
 
