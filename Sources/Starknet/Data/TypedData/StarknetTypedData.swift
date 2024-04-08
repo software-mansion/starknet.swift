@@ -18,6 +18,7 @@ public enum StarknetTypedDataError: Error, Equatable {
     case contextNotDefined
     case parentNotDefined
     case keyNotDefined
+    case invalidNumericValue(StarknetTypedData.Element)
     case invalidBool(StarknetTypedData.Element)
     case invalidMerkleTree
     case invalidShortString
@@ -222,6 +223,10 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         switch (typeName, revision) {
         case ("felt", _), ("string", .v0), ("shortstring", .v1), ("ContractAddress", .v1), ("ClassHash", .v1):
             return try unwrapFelt(from: element)
+        case ("u128", .v1), ("timestamp", .v1):
+            return try unwrapU128(from: element)
+        case ("i128", .v1):
+            return try unwrapI128(from: element)
         case ("bool", _):
             return try unwrapBool(from: element)
         case ("string", .v1):
@@ -340,6 +345,7 @@ public extension StarknetTypedData {
         case array([Element])
         case string(String)
         case felt(Felt)
+        case signedFelt(Felt)
         case bool(Bool)
 
         public init(from decoder: Decoder) throws {
@@ -355,6 +361,10 @@ public extension StarknetTypedData {
                       let felt = Felt(uint)
             {
                 self = .felt(felt)
+            } else if let int = try? container.decode(Int64.self),
+                      let felt = Felt(fromSigned: int)
+            {
+                self = .signedFelt(felt)
             } else if let bool = try? container.decode(Bool.self) {
                 self = .bool(bool)
             } else if let string = try? container.decode(String.self) {
@@ -362,6 +372,10 @@ public extension StarknetTypedData {
                    let felt = Felt(uint)
                 {
                     self = .felt(felt)
+                } else if let int = BigInt(string),
+                          let felt = Felt(fromSigned: int)
+                {
+                    self = .signedFelt(felt)
                 } else {
                     self = .string(string)
                 }
@@ -376,6 +390,8 @@ public extension StarknetTypedData {
                 try string.encode(to: encoder)
             case let .felt(felt):
                 try felt.encode(to: encoder)
+            case let .signedFelt(felt):
+                try felt.encode(to: encoder)
             case let .object(object):
                 try object.encode(to: encoder)
             case let .array(array):
@@ -389,7 +405,7 @@ public extension StarknetTypedData {
 
 private extension StarknetTypedData {
     static let basicTypesV0: Set = ["felt", "bool", "string", "selector", "merkletree"]
-    static let basicTypesV1: Set = basicTypesV0.union(["ContractAddress", "ClassHash", "shortstring"])
+    static let basicTypesV1: Set = basicTypesV0.union(["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"])
 
     func getBasicTypes() -> Set<String> {
         switch revision {
@@ -435,6 +451,35 @@ extension StarknetTypedData {
         default:
             throw StarknetTypedDataError.decodingError
         }
+    }
+
+    func unwrapU128(from element: Element) throws -> Felt {
+        guard case let .felt(felt) = element else {
+            throw StarknetTypedDataError.invalidNumericValue(element)
+        }
+
+        guard felt.value < BigUInt(2).power(128) else {
+            throw StarknetTypedDataError.invalidNumericValue(element)
+        }
+
+        return felt
+    }
+
+    func unwrapI128(from element: Element) throws -> Felt {
+        let felt = switch element {
+        case let .felt(felt):
+            felt
+        case let .signedFelt(signedFelt):
+            signedFelt
+        default:
+            throw StarknetTypedDataError.invalidNumericValue(element)
+        }
+
+        guard felt.value < BigUInt(2).power(127) || felt.value >= Felt.prime - BigUInt(2).power(127) else {
+            throw StarknetTypedDataError.invalidNumericValue(element)
+        }
+
+        return felt
     }
 
     func unwrapSelector(from element: Element) throws -> Felt {

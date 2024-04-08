@@ -4,6 +4,7 @@
 //
 //  Created by Bartosz Rybarski on 14/02/2023.
 //
+import BigInt
 @testable import Starknet
 import XCTest
 
@@ -92,7 +93,7 @@ final class TypedDataTests: XCTestCase {
         let basicTypesV0 = [
             "felt", "bool", "string", "selector", "merkletree",
         ]
-        let basicTypesV1 = basicTypesV0 + ["ContractAddress", "ClassHash", "shortstring"]
+        let basicTypesV1 = basicTypesV0 + ["u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
 
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
         try basicTypesV0.forEach { type in
@@ -157,6 +158,78 @@ final class TypedDataTests: XCTestCase {
             let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
             XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "bool")) { error in
                 XCTAssertEqual(error as? StarknetTypedDataError, .invalidBool(element))
+            }
+        }
+    }
+
+    func testEncodeU128() throws {
+        let cases: [(any Encodable, Felt)] = [
+            (0, .zero),
+            (1, .one),
+            (1_000_000, 1_000_000),
+            ("0x0", .zero),
+            ("0x1", .one),
+            ("0x3e8", 1000),
+            ((BigUInt(2).power(128) - 1).description, Felt(BigUInt(2).power(128) - 1)!),
+        ]
+
+        for (input, expected) in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            let encodedValue = try CasesRev1.td.encode(element: element, forType: "u128")
+
+            XCTAssertEqual(encodedValue, expected)
+        }
+    }
+
+    func testEncodeInvalidU128() throws {
+        let cases: [any Encodable] = [
+            -1,
+            "-1",
+            "0x" + String(BigUInt(2).power(128), radix: 16),
+            (BigUInt(2).power(128) + 1).description,
+        ]
+
+        for input in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "u128")) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumericValue(element))
+            }
+        }
+    }
+
+    func testEncodeI128() throws {
+        let cases: [(any Encodable, Felt)] = [
+            (0, .zero),
+            (1, .one),
+            (1_000_000, 1_000_000),
+            ("0x0", .zero),
+            ("0x1", .one),
+            ("0x3e8", 1000),
+            ((BigUInt(2).power(127) - 1).description, Felt(BigUInt(2).power(127) - 1)!),
+            (-1, Felt(fromSigned: -1)!),
+            (-1_000_000, Felt(fromSigned: -1_000_000)!),
+            ("-1", Felt(fromSigned: -1)!),
+            ((-BigInt(2).power(127)).description, Felt(fromSigned: -BigInt(2).power(127))!),
+        ]
+
+        for (input, expected) in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            let encodedValue = try CasesRev1.td.encode(element: element, forType: "i128")
+
+            XCTAssertEqual(encodedValue, expected)
+        }
+    }
+
+    func testEncodeInvalidI128() throws {
+        let cases: [any Encodable] = [
+            (-BigInt(2).power(127) - 1).description,
+            "0x" + String(BigUInt(2).power(127), radix: 16),
+        ]
+
+        for input in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "i128")) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumericValue(element))
             }
         }
     }
