@@ -22,6 +22,7 @@ final class TypedDataTests: XCTestCase {
         static let td = try! loadTypedDataFromFile(name: "typed_data_rev_1_example")
         static let tdFeltMerkleTree = try! loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")
         static let tdBasicTypes = try! loadTypedDataFromFile(name: "typed_data_rev_1_basic_types_example")
+        static let tdPresetTypes = try! loadTypedDataFromFile(name: "typed_data_rev_1_preset_types_example")
         static let tdEnum = try! loadTypedDataFromFile(name: "typed_data_rev_1_enum_example")
     }
 
@@ -95,9 +96,14 @@ final class TypedDataTests: XCTestCase {
     }
 
     func testTypesRedifintion() throws {
-        func testTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
+        func testBasicTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
             try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
                 XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition(type))
+            }
+        }
+        func testPresetTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
+            try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .presetTypeRedefinition(type))
             }
         }
 
@@ -105,13 +111,17 @@ final class TypedDataTests: XCTestCase {
             "felt", "bool", "string", "selector", "merkletree",
         ]
         let basicTypesV1 = basicTypesV0 + ["enum", "u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
+        let presetTypesV1 = ["u256", "TokenAmount", "NftId"]
 
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
         try basicTypesV0.forEach { type in
-            try testTypeRedifintion(type, .v0)
+            try testBasicTypeRedifintion(type, .v0)
         }
         try basicTypesV1.forEach { type in
-            try testTypeRedifintion(type, .v1)
+            try testBasicTypeRedifintion(type, .v1)
+        }
+        try presetTypesV1.forEach { type in
+            try testPresetTypeRedifintion(type, .v1)
         }
     }
 
@@ -287,6 +297,7 @@ final class TypedDataTests: XCTestCase {
             (Self.CasesRev1.td, "Person", "0x30f7aa21b8d67cb04c30f962dd29b95ab320cb929c07d1605f5ace304dadf34"),
             (Self.CasesRev1.td, "Mail", "0x560430bf7a02939edd1a5c104e7b7a55bbab9f35928b1cf5c7c97de3a907bd"),
             (Self.CasesRev1.tdBasicTypes, "Example", "0x1f94cd0be8b4097a41486170fdf09a4cd23aefbc74bb2344718562994c2c111"),
+            (Self.CasesRev1.tdPresetTypes, "Example", "0x1a25a8bb84b761090b1fadaebe762c4b679b0d8883d2bedda695ea340839a55"),
             (Self.CasesRev1.tdEnum, "Example", "0x380a54d417fb58913b904675d94a8a62e2abc3467f4b5439de0fd65fafdd1a8"),
             (Self.CasesRev1.tdFeltMerkleTree, "Example", "0x160b9c0e8a7c561f9c5d9e3cc2990a1b4d26e94aa319e9eb53e163cd06c71be"),
         ]
@@ -348,6 +359,12 @@ final class TypedDataTests: XCTestCase {
                 "Example",
                 "message",
                 "0x391d09a51a31dd17f7270aaa9904688fbeeb9c56a7e2d15c5a6af32e981c730"
+            ),
+            (
+                Self.CasesRev1.tdPresetTypes,
+                "Example",
+                "message",
+                "0x74fba3f77f8a6111a9315bac313bf75ecfa46d1234e0fda60312fb6a6517667"
             ),
             (
                 Self.CasesRev1.tdEnum,
@@ -415,6 +432,11 @@ final class TypedDataTests: XCTestCase {
                 Self.CasesRev1.tdBasicTypes,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
                 "0x2d80b87b8bc32068247c779b2ef0f15f65c9c449325e44a9df480fb01eb43ec"
+            ),
+            (
+                Self.CasesRev1.tdPresetTypes,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"
             ),
             (
                 Self.CasesRev1.tdEnum,
