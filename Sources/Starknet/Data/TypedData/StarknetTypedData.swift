@@ -19,6 +19,7 @@ public enum StarknetTypedDataError: Error, Equatable {
     case parentNotDefined
     case keyNotDefined
     case invalidNumericValue(StarknetTypedData.Element)
+    case invalidBool(StarknetTypedData.Element)
     case invalidMerkleTree
     case invalidShortString
     case encodingError
@@ -496,18 +497,18 @@ extension StarknetTypedData {
         switch element {
         case let .felt(felt):
             guard felt == .zero || felt == .one else {
-                throw StarknetTypedDataError.decodingError
+                throw StarknetTypedDataError.invalidBool(element)
             }
             return felt
         case let .bool(bool):
             return bool ? .one : .zero
         case let .string(string):
             guard let bool = Bool(string) else {
-                throw StarknetTypedDataError.decodingError
+                throw StarknetTypedDataError.invalidBool(element)
             }
             return bool ? .one : .zero
         default:
-            throw StarknetTypedDataError.decodingError
+            throw StarknetTypedDataError.invalidBool(element)
         }
     }
 
