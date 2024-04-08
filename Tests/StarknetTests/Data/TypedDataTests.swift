@@ -89,11 +89,18 @@ final class TypedDataTests: XCTestCase {
             }
         }
 
+        let basicTypesV0 = [
+            "felt", "bool", "string", "selector", "merkletree",
+        ]
+        let basicTypesV1 = basicTypesV0 + ["ContractAddress", "ClassHash", "shortstring"]
+
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
-        try testTypeRedifintion("felt", .v0)
-        try testTypeRedifintion("string", .v0)
-        try testTypeRedifintion("selector", .v0)
-        try testTypeRedifintion("merkletree", .v0)
+        try basicTypesV0.forEach { type in
+            try testTypeRedifintion(type, .v0)
+        }
+        try basicTypesV1.forEach { type in
+            try testTypeRedifintion(type, .v1)
+        }
     }
 
     func testMissingDomainType() throws {
@@ -131,6 +138,27 @@ final class TypedDataTests: XCTestCase {
         XCTAssertThrowsError(
             try typedData.getStructHash(typeName: "house", data: "{\"fridge\": 1}")
         )
+    }
+
+    func testEncodeBool() throws {
+        let cases: [(Any: Encodable, Felt)] = [(true, .one), (false, .zero), ("true", .one), ("false", .zero), ("0x1", .one), ("0x0", .zero), ("1", .one), ("0", .zero), (1, .one), (0, .zero)]
+
+        for (input, expected) in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            let encodedValue = try CasesRev1.td.encode(element: element, forType: "bool")
+
+            XCTAssertEqual(encodedValue, expected)
+        }
+    }
+
+    func testEncodeInvalidBool() throws {
+        let cases: [any Encodable] = [2, "2", "0x123"]
+        for input in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "bool")) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .invalidBool(element))
+            }
+        }
     }
 
     func testEncodeType() throws {

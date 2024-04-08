@@ -18,6 +18,7 @@ public enum StarknetTypedDataError: Error, Equatable {
     case contextNotDefined
     case parentNotDefined
     case keyNotDefined
+    case invalidBool(StarknetTypedData.Element)
     case invalidMerkleTree
     case invalidShortString
     case encodingError
@@ -125,12 +126,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
         }
 
-        let reservedTypeNames = ["felt", "string", "selector", "merkletree"]
-        for typeName in reservedTypeNames {
-            guard !types.keys.contains(typeName) else {
-                throw StarknetTypedDataError.basicTypeRedefinition(typeName)
-            }
-        }
+        let basicTypes = getBasicTypes()
 
         let referencedTypes = Set(types.values.flatMap { type in
             type.map { param in
@@ -144,6 +140,10 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         } + [domain.separatorName, primaryType])
 
         try self.types.keys.forEach { typeName in
+            guard !basicTypes.contains(typeName) else {
+                throw StarknetTypedDataError.basicTypeRedefinition(typeName)
+            }
+
             guard !typeName.isEmpty, !typeName.isArray() else {
                 throw StarknetTypedDataError.invalidTypeName(typeName)
             }
@@ -202,42 +202,30 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }.joined()
     }
 
-    private func encode(element: Element, forType typeName: String, context: Context? = nil) throws -> Felt {
+    func encode(element: Element, forType typeName: String, context: Context? = nil) throws -> Felt {
         if types.keys.contains(typeName) {
             let object = try unwrapObject(from: element)
 
             return try getStructHash(typeName: typeName, data: object)
         }
 
-        if types.keys.contains(typeName.strippingPointer()) {
+        if typeName.isArray() {
             let array = try unwrapArray(from: element)
 
             let hashes = try array.map {
-                let object = try unwrapObject(from: $0)
-
-                return try getStructHash(typeName: typeName.strippingPointer(), data: object)
+                try encode(element: $0, forType: typeName.strippingPointer())
             }
 
-            let hash = hashArray(hashes)
-
-            return hash
+            return hashArray(hashes)
         }
 
         switch (typeName, revision) {
-        case ("felt*", _):
-            let array = try unwrapArray(from: element)
-            let hashes = try array.map {
-                try unwrapFelt(from: $0)
-            }
-            return hashArray(hashes)
-        case ("felt", _):
+        case ("felt", _), ("string", .v0), ("shortstring", .v1), ("ContractAddress", .v1), ("ClassHash", .v1):
             return try unwrapFelt(from: element)
-        case ("string", .v0):
-            return try unwrapFelt(from: element)
+        case ("bool", _):
+            return try unwrapBool(from: element)
         case ("string", .v1):
             fatalError("This function is not yet implemented")
-        case ("shortstring", .v1):
-            return try unwrapFelt(from: element)
         case ("selector", _):
             return try unwrapSelector(from: element)
         case ("merkletree", _):
@@ -352,6 +340,7 @@ public extension StarknetTypedData {
         case array([Element])
         case string(String)
         case felt(Felt)
+        case bool(Bool)
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
@@ -366,6 +355,8 @@ public extension StarknetTypedData {
                       let felt = Felt(uint)
             {
                 self = .felt(felt)
+            } else if let bool = try? container.decode(Bool.self) {
+                self = .bool(bool)
             } else if let string = try? container.decode(String.self) {
                 if let uint = BigUInt(string),
                    let felt = Felt(uint)
@@ -389,12 +380,28 @@ public extension StarknetTypedData {
                 try object.encode(to: encoder)
             case let .array(array):
                 try array.encode(to: encoder)
+            case let .bool(bool):
+                try bool.encode(to: encoder)
             }
         }
     }
 }
 
 private extension StarknetTypedData {
+    static let basicTypesV0: Set = ["felt", "bool", "string", "selector", "merkletree"]
+    static let basicTypesV1: Set = basicTypesV0.union(["ContractAddress", "ClassHash", "shortstring"])
+
+    func getBasicTypes() -> Set<String> {
+        switch revision {
+        case .v0:
+            Self.basicTypesV0
+        case .v1:
+            Self.basicTypesV1
+        }
+    }
+}
+
+extension StarknetTypedData {
     struct Context: Equatable {
         let parent: String
         let key: String
@@ -438,6 +445,25 @@ private extension StarknetTypedData {
             return starknetSelector(from: string)
         default:
             throw StarknetTypedDataError.decodingError
+        }
+    }
+
+    func unwrapBool(from element: Element) throws -> Felt {
+        switch element {
+        case let .felt(felt):
+            guard felt == .zero || felt == .one else {
+                throw StarknetTypedDataError.invalidBool(element)
+            }
+            return felt
+        case let .bool(bool):
+            return bool ? .one : .zero
+        case let .string(string):
+            guard let bool = Bool(string) else {
+                throw StarknetTypedDataError.invalidBool(element)
+            }
+            return bool ? .one : .zero
+        default:
+            throw StarknetTypedDataError.invalidBool(element)
         }
     }
 
