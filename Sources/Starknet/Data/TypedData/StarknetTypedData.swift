@@ -230,7 +230,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         case ("bool", _):
             return try unwrapBool(from: element)
         case ("string", .v1):
-            fatalError("This function is not yet implemented")
+            return try hashArray(unwrapLongString(from: element))
         case ("selector", _):
             return try unwrapSelector(from: element)
         case ("merkletree", _):
@@ -491,6 +491,18 @@ extension StarknetTypedData {
         default:
             throw StarknetTypedDataError.decodingError
         }
+    }
+
+    func unwrapLongString(from element: Element) throws -> [Felt] {
+        guard case let .string(string) = element else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        let byteArray = StarknetByteArray(fromString: string)
+
+        return [Felt(byteArray.data.count)!]
+            + byteArray.data
+            + [byteArray.pendingWord, Felt(byteArray.pendingWordLen)!]
     }
 
     func unwrapBool(from element: Element) throws -> Felt {

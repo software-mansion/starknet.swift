@@ -21,6 +21,7 @@ final class TypedDataTests: XCTestCase {
     enum CasesRev1 {
         static let td = try! loadTypedDataFromFile(name: "typed_data_rev_1_example")
         static let tdFeltMerkleTree = try! loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")
+        static let tdBasicTypes = try! loadTypedDataFromFile(name: "typed_data_rev_1_basic_types_example")
     }
 
     static let domainTypeV0 = (
@@ -242,6 +243,9 @@ final class TypedDataTests: XCTestCase {
                 (CasesRev1.td, "Mail", """
                 "Mail"("from":"Person","to":"Person","contents":"felt")"Person"("name":"felt","wallet":"felt")
                 """),
+                (CasesRev1.tdBasicTypes, "Example", """
+                "Example"("n0":"felt","n1":"bool","n2":"string","n3":"selector","n4":"u128","n5":"i128","n6":"ContractAddress","n7":"ClassHash","n8":"timestamp","n9":"shortstring")
+                """),
                 (CasesRev1.tdFeltMerkleTree, "Example", """
                 "Example"("value":"felt","root":"merkletree")
                 """),
@@ -269,6 +273,7 @@ final class TypedDataTests: XCTestCase {
             (Self.CasesRev1.td, "StarknetDomain", "0x1ff2f602e42168014d405a94f75e8a93d640751d71d16311266e140d8b0a210"),
             (Self.CasesRev1.td, "Person", "0x30f7aa21b8d67cb04c30f962dd29b95ab320cb929c07d1605f5ace304dadf34"),
             (Self.CasesRev1.td, "Mail", "0x560430bf7a02939edd1a5c104e7b7a55bbab9f35928b1cf5c7c97de3a907bd"),
+            (Self.CasesRev1.tdBasicTypes, "Example", "0x1f94cd0be8b4097a41486170fdf09a4cd23aefbc74bb2344718562994c2c111"),
             (Self.CasesRev1.tdFeltMerkleTree, "Example", "0x160b9c0e8a7c561f9c5d9e3cc2990a1b4d26e94aa319e9eb53e163cd06c71be"),
         ]
 
@@ -325,6 +330,12 @@ final class TypedDataTests: XCTestCase {
                 "0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"
             ),
             (
+                Self.CasesRev1.tdBasicTypes,
+                "Example",
+                "message",
+                "0x391d09a51a31dd17f7270aaa9904688fbeeb9c56a7e2d15c5a6af32e981c730"
+            ),
+            (
                 Self.CasesRev1.tdFeltMerkleTree,
                 "Example",
                 "message",
@@ -379,6 +390,11 @@ final class TypedDataTests: XCTestCase {
                 Self.CasesRev1.td,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
                 "0x7f6e8c3d8965b5535f5cc68f837c04e3bbe568535b71aa6c621ddfb188932b8"
+            ),
+            (
+                Self.CasesRev1.tdBasicTypes,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x2d80b87b8bc32068247c779b2ef0f15f65c9c449325e44a9df480fb01eb43ec"
             ),
             (
                 Self.CasesRev1.tdFeltMerkleTree,
