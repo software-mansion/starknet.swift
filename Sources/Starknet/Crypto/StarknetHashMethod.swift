@@ -4,7 +4,7 @@ public enum StarknetHashMethod {
     case pedersen
     case poseidon
 
-    func hash(values: [Felt]) -> Felt {
+    public func hash(values: [Felt]) -> Felt {
         switch self {
         case .pedersen:
             StarknetCurve.pedersenOn(values)
@@ -13,7 +13,7 @@ public enum StarknetHashMethod {
         }
     }
 
-    func hash(first: Felt, second: Felt) -> Felt {
+    public func hash(first: Felt, second: Felt) -> Felt {
         switch self {
         case .pedersen:
             StarknetCurve.pedersen(first: first, second: second)
