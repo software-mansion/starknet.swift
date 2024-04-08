@@ -11,6 +11,10 @@ import Foundation
 public enum StarknetTypedDataError: Error {
     case decodingError
     case dependencyNotDefined(String)
+    case contextNotDefined
+    case parentNotDefined
+    case keyNotDefined
+    case invalidMerkleTree
     case invalidShortString
     case encodingError
 }
@@ -57,7 +61,7 @@ public enum StarknetTypedDataError: Error {
 /// let messageHash = try typedData.getMessageHash(accountAddress: "0x1234")
 /// ```
 public struct StarknetTypedData: Codable, Equatable, Hashable {
-    public let types: [String: [TypeDeclaration]]
+    public let types: [String: [TypeDeclarationWrapper]]
     public let primaryType: String
     public let domain: Domain
     public let message: [String: Element]
@@ -77,21 +81,23 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         hashMethod.hash(values: values)
     }
 
-    private init?(types: [String: [TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
-        let reservedTypeNames = ["felt", "felt*", "string", "selector"]
+    private init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
+        let reservedTypeNames = ["felt", "felt*", "string", "selector", "merkletree"]
         for typeName in reservedTypeNames {
             if types.keys.contains(typeName) {
                 return nil
             }
         }
 
-        self.types = types
+        self.types = types.mapValues { value in
+            value.map { TypeDeclarationWrapper($0) }
+        }
         self.primaryType = primaryType
         self.domain = domain
         self.message = message
     }
 
-    public init?(types: [String: [TypeDeclaration]], primaryType: String, domain: String, message _: String) {
+    public init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: String, message _: String) {
         guard let domainData = domain.data(using: .utf8), let messageData = domain.data(using: .utf8) else {
             return nil
         }
@@ -114,7 +120,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             let params = types[currentType] ?? []
 
             params.forEach { param in
-                let typeStripped = param.type.strippingPointer()
+                let typeStripped = param.type.type.strippingPointer()
 
                 if types.keys.contains(typeStripped), !dependencies.contains(typeStripped) {
                     dependencies.append(typeStripped)
@@ -140,7 +146,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         let encodedParams = params.map {
-            "\(escape($0.name)):\(escape($0.type))"
+            "\(escape($0.type.name)):\(escape($0.type.type))"
         }.joined(separator: ",")
 
         return "\(escape(dependency))(\(encodedParams))"
@@ -154,7 +160,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }.joined()
     }
 
-    private func encode(element: Element, forType typeName: String) throws -> Felt {
+    private func encode(element: Element, forType typeName: String, context: Context? = nil) throws -> Felt {
         if types.keys.contains(typeName) {
             let object = try unwrapObject(from: element)
 
@@ -192,6 +198,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             return try unwrapFelt(from: element)
         case ("selector", _):
             return try unwrapSelector(from: element)
+        case ("merkletree", _):
+            guard let context else {
+                throw StarknetTypedDataError.contextNotDefined
+            }
+            return try prepareMerkleTreeRoot(from: element, context: context)
         default:
             throw StarknetTypedDataError.dependencyNotDefined(typeName)
         }
@@ -205,11 +216,11 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         }
 
         try types.forEach { param in
-            guard let element = data[param.name] else {
+            guard let element = data[param.type.name] else {
                 throw StarknetTypedDataError.encodingError
             }
 
-            let encodedElement = try encode(element: element, forType: param.type)
+            let encodedElement = try encode(element: element, forType: param.type.type, context: Context(parent: typeName, key: param.type.name))
             values.append(encodedElement)
         }
 
@@ -264,16 +275,6 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 }
 
 public extension StarknetTypedData {
-    struct TypeDeclaration: Codable, Equatable, Hashable {
-        public let name: String
-        public let type: String
-
-        public init(name: String, type: String) {
-            self.name = name
-            self.type = type
-        }
-    }
-
     struct Domain: Codable, Equatable, Hashable {
         public let name: Element
         public let version: Element
@@ -346,6 +347,11 @@ public extension StarknetTypedData {
 }
 
 private extension StarknetTypedData {
+    struct Context: Equatable {
+        let parent: String
+        let key: String
+    }
+
     func unwrapArray(from element: Element) throws -> [Element] {
         guard case let .array(array) = element else {
             throw StarknetTypedDataError.decodingError
@@ -385,6 +391,37 @@ private extension StarknetTypedData {
         default:
             throw StarknetTypedDataError.decodingError
         }
+    }
+
+    func prepareMerkleTreeRoot(from element: Element, context: Context) throws -> Felt {
+        let leavesType = try getMerkleTreeLeavesType(context: context)
+
+        let elements = try unwrapArray(from: element)
+        let structHashes = try elements.map { element in
+            try encode(element: element, forType: leavesType)
+        }
+
+        guard let merkleTree = MerkleTree(leafHashes: structHashes, hashMethod: hashMethod) else {
+            throw StarknetTypedDataError.invalidMerkleTree
+        }
+
+        return merkleTree.rootHash
+    }
+
+    func getMerkleTreeLeavesType(context: Context) throws -> String {
+        let (parent, key) = (context.parent, context.key)
+
+        guard let parentType = types[parent] else {
+            throw StarknetTypedDataError.parentNotDefined
+        }
+        guard let targetType = parentType.first(where: { $0.type.name == key }) else {
+            throw StarknetTypedDataError.keyNotDefined
+        }
+        guard let merkleType = targetType.type as? MerkleTreeType else {
+            throw StarknetTypedDataError.decodingError
+        }
+
+        return merkleType.contains
     }
 }
 
