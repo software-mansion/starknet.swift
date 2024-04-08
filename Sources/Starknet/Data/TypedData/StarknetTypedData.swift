@@ -161,7 +161,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             let currentType = toVisit.removeFirst()
             let params = types[currentType] ?? []
 
-            params.forEach { param in
+            for param in params {
                 let typeStripped = param.type.type.strippingPointer()
 
                 if types.keys.contains(typeStripped), !dependencies.contains(typeStripped) {
