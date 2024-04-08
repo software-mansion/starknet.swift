@@ -9,18 +9,36 @@ import XCTest
 
 final class TypedDataTests: XCTestCase {
     enum CasesRev0 {
-        static let td = loadTypedDataFromFile(name: "typed_data_rev_0_example")!
-        static let tdFeltArr = loadTypedDataFromFile(name: "typed_data_rev_0_felt_array_example")!
-        static let tdString = loadTypedDataFromFile(name: "typed_data_rev_0_long_string_example")!
-        static let tdStructArr = loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")!
-        static let tdStructMerkleTree = loadTypedDataFromFile(name: "typed_data_rev_0_struct_merkletree_example")!
-        static let tdValidate = loadTypedDataFromFile(name: "typed_data_rev_0_validate_example")!
+        static let td = try! loadTypedDataFromFile(name: "typed_data_rev_0_example")
+        static let tdFeltArr = try! loadTypedDataFromFile(name: "typed_data_rev_0_felt_array_example")
+        static let tdString = try! loadTypedDataFromFile(name: "typed_data_rev_0_long_string_example")
+        static let tdStructArr = try! loadTypedDataFromFile(name: "typed_data_rev_0_struct_array_example")
+        static let tdStructMerkleTree = try! loadTypedDataFromFile(name: "typed_data_rev_0_struct_merkletree_example")
+        static let tdValidate = try! loadTypedDataFromFile(name: "typed_data_rev_0_validate_example")
     }
 
     enum CasesRev1 {
-        static let td = loadTypedDataFromFile(name: "typed_data_rev_1_example")!
-        static let tdFeltMerkleTree = loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")!
+        static let td = try! loadTypedDataFromFile(name: "typed_data_rev_1_example")
+        static let tdFeltMerkleTree = try! loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")
     }
+
+    static let domainTypeV0 = (
+        "StarkNetDomain",
+        [
+            StarknetTypedData.StandardType(name: "name", type: "felt"),
+            StarknetTypedData.StandardType(name: "version", type: "felt"),
+            StarknetTypedData.StandardType(name: "chainId", type: "felt"),
+        ]
+    )
+    static let domainTypeV1 = (
+        "StarknetDomain",
+        [
+            StarknetTypedData.StandardType(name: "name", type: "shortstring"),
+            StarknetTypedData.StandardType(name: "version", type: "shortstring"),
+            StarknetTypedData.StandardType(name: "chainId", type: "shortstring"),
+            StarknetTypedData.StandardType(name: "revision", type: "shortstring"),
+        ]
+    )
 
     static let exampleDomainV0 = """
     {
@@ -38,30 +56,80 @@ final class TypedDataTests: XCTestCase {
     }
     """
 
-    func testInvalidTypes() {
-        func makeTypedData(_ type: String) -> StarknetTypedData? {
-            StarknetTypedData(types: [type: []], primaryType: type, domain: Self.exampleDomainV0, message: "{\"\(type)\": 1}")
+    private func makeTypedData(_ type: String, _ revision: StarknetTypedData.Revision) throws -> StarknetTypedData {
+        let (domainType, domain) = switch revision {
+        case .v0: (Self.domainTypeV0, Self.exampleDomainV0)
+        case .v1: (Self.domainTypeV1, Self.exampleDomainV1)
         }
 
-        XCTAssertNotNil(makeTypedData("myType"))
-        XCTAssertNil(makeTypedData("felt"))
-        XCTAssertNil(makeTypedData("felt*"))
-        XCTAssertNil(makeTypedData("string"))
-        XCTAssertNil(makeTypedData("selector"))
-        XCTAssertNil(makeTypedData("merkletree"))
+        return try StarknetTypedData(
+            types: [
+                type: [],
+                domainType.0: domainType.1,
+            ],
+            primaryType: type,
+            domain: domain,
+            message: "{\"\(type)\": 1}"
+        )
     }
 
-    func testMissingDependency() {
-        let typedData = StarknetTypedData(
-            types: ["house": [StarknetTypedData.StandardType(name: "fridge", type: "ice cream")]],
-            primaryType: "felt",
+    func testInvalidTypeNames() {
+        try XCTAssertThrowsError(makeTypedData("", .v1)) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName(""))
+        }
+        try XCTAssertThrowsError(makeTypedData("myType*", .v1)) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("myType*"))
+        }
+    }
+
+    func testTypesRedifintion() throws {
+        func testTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
+            try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition(type))
+            }
+        }
+
+        try XCTAssertNoThrow(makeTypedData("myType", .v0))
+        try testTypeRedifintion("felt", .v0)
+        try testTypeRedifintion("string", .v0)
+        try testTypeRedifintion("selector", .v0)
+        try testTypeRedifintion("merkletree", .v0)
+    }
+
+    func testMissingDomainType() throws {
+        try [StarknetTypedData.Revision.v0, .v1].forEach { revision in
+            let (separatorName, domain) = switch revision {
+            case .v0: (Self.domainTypeV0.0, Self.exampleDomainV0)
+            case .v1: (Self.domainTypeV1.0, Self.exampleDomainV1)
+            }
+
+            try XCTAssertThrowsError(StarknetTypedData(types: [:], primaryType: "felt", domain: domain, message: "{}")) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .dependencyNotDefined(separatorName))
+            }
+        }
+    }
+
+    func testDanglingTypes() throws {
+        try XCTAssertThrowsError(
+            StarknetTypedData(types: [Self.domainTypeV1.0: Self.domainTypeV1.1, "danglingType": []], primaryType: "felt", domain: Self.exampleDomainV1, message: "{}")
+        ) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .danglingType("danglingType"))
+        }
+    }
+
+    func testMissingDependency() throws {
+        let typedData = try StarknetTypedData(
+            types: [
+                Self.domainTypeV1.0: Self.domainTypeV1.1,
+                "house": [StarknetTypedData.StandardType(name: "fridge", type: "ice cream")],
+            ],
+            primaryType: "house",
             domain: Self.exampleDomainV1,
             message: "{}"
         )
-        XCTAssertNotNil(typedData)
 
         XCTAssertThrowsError(
-            try typedData!.getStructHash(typeName: "house", data: "{\"fridge\": 1}")
+            try typedData.getStructHash(typeName: "house", data: "{\"fridge\": 1}")
         )
     }
 

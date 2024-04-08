@@ -8,8 +8,12 @@
 import BigInt
 import Foundation
 
-public enum StarknetTypedDataError: Error {
+public enum StarknetTypedDataError: Error, Equatable {
     case decodingError
+    case invalidRevision(Felt)
+    case basicTypeRedefinition(String)
+    case invalidTypeName(String)
+    case danglingType(String)
     case dependencyNotDefined(String)
     case contextNotDefined
     case parentNotDefined
@@ -67,7 +71,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     public let message: [String: Element]
 
     public var revision: Revision {
-        domain.resolveRevision()!
+        try! domain.resolveRevision()
     }
 
     private var hashMethod: StarknetHashMethod {
@@ -81,34 +85,72 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         hashMethod.hash(values: values)
     }
 
-    private init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) {
-        let reservedTypeNames = ["felt", "felt*", "string", "selector", "merkletree"]
-        for typeName in reservedTypeNames {
-            if types.keys.contains(typeName) {
-                return nil
-            }
-        }
-
+    private init(types: [String: [any TypeDeclaration]], primaryType: String, domain: Domain, message: [String: Element]) throws {
         self.types = types.mapValues { value in
             value.map { TypeDeclarationWrapper($0) }
         }
         self.primaryType = primaryType
         self.domain = domain
         self.message = message
+
+        try self.verifyTypes()
     }
 
-    public init?(types: [String: [any TypeDeclaration]], primaryType: String, domain: String, message _: String) {
+    public init(types: [String: [any TypeDeclaration]], primaryType: String, domain: String, message _: String) throws {
         guard let domainData = domain.data(using: .utf8), let messageData = domain.data(using: .utf8) else {
-            return nil
+            throw StarknetTypedDataError.decodingError
         }
 
         guard let domain = try? JSONDecoder().decode(Domain.self, from: domainData),
               let message = try? JSONDecoder().decode([String: Element].self, from: messageData)
         else {
-            return nil
+            throw StarknetTypedDataError.decodingError
         }
 
-        self.init(types: types, primaryType: primaryType, domain: domain, message: message)
+        try self.init(types: types, primaryType: primaryType, domain: domain, message: message)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let types = try container.decode([String: [TypeDeclarationWrapper]].self, forKey: .types)
+        let primaryType = try container.decode(String.self, forKey: .primaryType)
+        let domain = try container.decode(Domain.self, forKey: .domain)
+        let message = try container.decode([String: Element].self, forKey: .message)
+
+        try self.init(types: types.mapValues { $0.map(\.type) }, primaryType: primaryType, domain: domain, message: message)
+    }
+
+    private func verifyTypes() throws {
+        guard types.keys.contains(domain.separatorName) else {
+            throw StarknetTypedDataError.dependencyNotDefined(domain.separatorName)
+        }
+
+        let reservedTypeNames = ["felt", "string", "selector", "merkletree"]
+        for typeName in reservedTypeNames {
+            guard !types.keys.contains(typeName) else {
+                throw StarknetTypedDataError.basicTypeRedefinition(typeName)
+            }
+        }
+
+        let referencedTypes = Set(types.values.flatMap { type in
+            type.map { param in
+                switch param {
+                case let .merkletree(merkle):
+                    merkle.contains
+                case let .standard(standard):
+                    standard.type.strippingPointer()
+                }
+            }
+        } + [domain.separatorName, primaryType])
+
+        try self.types.keys.forEach { typeName in
+            guard !typeName.isEmpty, !typeName.isArray() else {
+                throw StarknetTypedDataError.invalidTypeName(typeName)
+            }
+            guard referencedTypes.contains(typeName) else {
+                throw StarknetTypedDataError.danglingType(typeName)
+            }
+        }
     }
 
     private func getDependencies(of type: String) -> [String] {
@@ -254,14 +296,10 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
     }
 
     public func getStructHash(domain: Domain) throws -> Felt {
-        guard let domain = try? JSONEncoder().encode(domain) else {
+        guard let domainData = try? JSONEncoder().encode(domain) else {
             throw StarknetTypedDataError.encodingError
         }
-        let separatorName = switch revision {
-        case .v0: "StarkNetDomain"
-        case .v1: "StarknetDomain"
-        }
-        return try getStructHash(typeName: separatorName, data: domain)
+        return try getStructHash(typeName: domain.separatorName, data: domainData)
     }
 
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
@@ -281,15 +319,25 @@ public extension StarknetTypedData {
         public let chainId: Element
         public let revision: Element?
 
-        public func resolveRevision() -> Revision? {
+        public func resolveRevision() throws -> Revision {
             guard let revision else {
                 return .v0
             }
             switch revision {
             case let .felt(felt):
-                return Revision(rawValue: felt)
+                guard let revision = Revision(rawValue: felt) else {
+                    throw StarknetTypedDataError.invalidRevision(felt)
+                }
+                return revision
             default:
-                return nil
+                throw StarknetTypedDataError.decodingError
+            }
+        }
+
+        public var separatorName: String {
+            switch try! resolveRevision() {
+            case .v0: "StarkNetDomain"
+            case .v1: "StarknetDomain"
             }
         }
     }
@@ -427,14 +475,14 @@ private extension StarknetTypedData {
 
 private extension String {
     func strippingPointer() -> String {
-        if self.count == 0 {
-            return self
-        }
-
-        if self.last == "*" {
+        if self.isArray() {
             return String(self.dropLast(1))
         }
 
         return self
+    }
+
+    func isArray() -> Bool {
+        self.hasSuffix("*")
     }
 }

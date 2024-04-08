@@ -8,13 +8,13 @@
 import Foundation
 import Starknet
 
-func loadTypedDataFromFile(name: String) -> StarknetTypedData? {
+func loadTypedDataFromFile(name: String) throws -> StarknetTypedData {
     guard let url = Bundle.module.url(forResource: name, withExtension: "json"),
           let contents = try? String(contentsOf: url),
           let contentsData = contents.data(using: .utf8)
     else {
-        return nil
+        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Failed to load typed data from file \(name)"))
     }
 
-    return try? JSONDecoder().decode(StarknetTypedData.self, from: contentsData)
+    return try JSONDecoder().decode(StarknetTypedData.self, from: contentsData)
 }
