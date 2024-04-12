@@ -4,6 +4,7 @@
 //
 //  Created by Bartosz Rybarski on 14/02/2023.
 //
+import BigInt
 @testable import Starknet
 import XCTest
 
@@ -20,6 +21,9 @@ final class TypedDataTests: XCTestCase {
     enum CasesRev1 {
         static let td = try! loadTypedDataFromFile(name: "typed_data_rev_1_example")
         static let tdFeltMerkleTree = try! loadTypedDataFromFile(name: "typed_data_rev_1_felt_merkletree_example")
+        static let tdBasicTypes = try! loadTypedDataFromFile(name: "typed_data_rev_1_basic_types_example")
+        static let tdPresetTypes = try! loadTypedDataFromFile(name: "typed_data_rev_1_preset_types_example")
+        static let tdEnum = try! loadTypedDataFromFile(name: "typed_data_rev_1_enum_example")
     }
 
     static let domainTypeV0 = (
@@ -80,26 +84,44 @@ final class TypedDataTests: XCTestCase {
         try XCTAssertThrowsError(makeTypedData("myType*", .v1)) { error in
             XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("myType*"))
         }
+        try XCTAssertThrowsError(makeTypedData("(myType)", .v1)) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("(myType)"))
+        }
+        try XCTAssertThrowsError(makeTypedData("()", .v1)) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .invalidTypeName("()"))
+        }
+        try XCTAssertThrowsError(StarknetTypedData(types: [Self.domainTypeV0.0: Self.domainTypeV1.1, "myType": [StarknetTypedData.StandardType(name: "value", type: "(u128)")]], primaryType: "myType", domain: Self.exampleDomainV0, message: "{}")) { error in
+            XCTAssertEqual(error as? StarknetTypedDataError, .unsupportedType("(u128)"))
+        }
     }
 
     func testTypesRedifintion() throws {
-        func testTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
+        func testBasicTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
             try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
                 XCTAssertEqual(error as? StarknetTypedDataError, .basicTypeRedefinition(type))
+            }
+        }
+        func testPresetTypeRedifintion(_ type: String, _ revision: StarknetTypedData.Revision) throws {
+            try XCTAssertThrowsError(makeTypedData(type, revision)) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .presetTypeRedefinition(type))
             }
         }
 
         let basicTypesV0 = [
             "felt", "bool", "string", "selector", "merkletree",
         ]
-        let basicTypesV1 = basicTypesV0 + ["ContractAddress", "ClassHash", "shortstring"]
+        let basicTypesV1 = basicTypesV0 + ["enum", "u128", "i128", "ContractAddress", "ClassHash", "timestamp", "shortstring"]
+        let presetTypesV1 = ["u256", "TokenAmount", "NftId"]
 
         try XCTAssertNoThrow(makeTypedData("myType", .v0))
         try basicTypesV0.forEach { type in
-            try testTypeRedifintion(type, .v0)
+            try testBasicTypeRedifintion(type, .v0)
         }
         try basicTypesV1.forEach { type in
-            try testTypeRedifintion(type, .v1)
+            try testBasicTypeRedifintion(type, .v1)
+        }
+        try presetTypesV1.forEach { type in
+            try testPresetTypeRedifintion(type, .v1)
         }
     }
 
@@ -161,6 +183,78 @@ final class TypedDataTests: XCTestCase {
         }
     }
 
+    func testEncodeU128() throws {
+        let cases: [(any Encodable, Felt)] = [
+            (0, .zero),
+            (1, .one),
+            (1_000_000, 1_000_000),
+            ("0x0", .zero),
+            ("0x1", .one),
+            ("0x3e8", 1000),
+            ((BigUInt(2).power(128) - 1).description, Felt(BigUInt(2).power(128) - 1)!),
+        ]
+
+        for (input, expected) in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            let encodedValue = try CasesRev1.td.encode(element: element, forType: "u128")
+
+            XCTAssertEqual(encodedValue, expected)
+        }
+    }
+
+    func testEncodeInvalidU128() throws {
+        let cases: [any Encodable] = [
+            -1,
+            "-1",
+            "0x" + String(BigUInt(2).power(128), radix: 16),
+            (BigUInt(2).power(128) + 1).description,
+        ]
+
+        for input in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "u128")) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumericValue(element))
+            }
+        }
+    }
+
+    func testEncodeI128() throws {
+        let cases: [(any Encodable, Felt)] = [
+            (0, .zero),
+            (1, .one),
+            (1_000_000, 1_000_000),
+            ("0x0", .zero),
+            ("0x1", .one),
+            ("0x3e8", 1000),
+            ((BigUInt(2).power(127) - 1).description, Felt(BigUInt(2).power(127) - 1)!),
+            (-1, Felt(fromSigned: -1)!),
+            (-1_000_000, Felt(fromSigned: -1_000_000)!),
+            ("-1", Felt(fromSigned: -1)!),
+            ((-BigInt(2).power(127)).description, Felt(fromSigned: -BigInt(2).power(127))!),
+        ]
+
+        for (input, expected) in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            let encodedValue = try CasesRev1.td.encode(element: element, forType: "i128")
+
+            XCTAssertEqual(encodedValue, expected)
+        }
+    }
+
+    func testEncodeInvalidI128() throws {
+        let cases: [any Encodable] = [
+            (-BigInt(2).power(127) - 1).description,
+            "0x" + String(BigUInt(2).power(127), radix: 16),
+        ]
+
+        for input in cases {
+            let element = try JSONDecoder().decode(StarknetTypedData.Element.self, from: JSONEncoder().encode(input))
+            XCTAssertThrowsError(try CasesRev1.td.encode(element: element, forType: "i128")) { error in
+                XCTAssertEqual(error as? StarknetTypedDataError, .invalidNumericValue(element))
+            }
+        }
+    }
+
     func testEncodeType() throws {
         let cases: [(StarknetTypedData, String, String)] =
             [
@@ -168,6 +262,12 @@ final class TypedDataTests: XCTestCase {
                 (CasesRev0.tdStructMerkleTree, "Session", "Session(key:felt,expires:felt,root:merkletree)"),
                 (CasesRev1.td, "Mail", """
                 "Mail"("from":"Person","to":"Person","contents":"felt")"Person"("name":"felt","wallet":"felt")
+                """),
+                (CasesRev1.tdBasicTypes, "Example", """
+                "Example"("n0":"felt","n1":"bool","n2":"string","n3":"selector","n4":"u128","n5":"i128","n6":"ContractAddress","n7":"ClassHash","n8":"timestamp","n9":"shortstring")
+                """),
+                (CasesRev1.tdEnum, "Example", """
+                "Example"("someEnum":"MyEnum")"MyEnum"("Variant 1":(),"Variant 2":("u128","u128*"),"Variant 3":("u128"))
                 """),
                 (CasesRev1.tdFeltMerkleTree, "Example", """
                 "Example"("value":"felt","root":"merkletree")
@@ -196,6 +296,9 @@ final class TypedDataTests: XCTestCase {
             (Self.CasesRev1.td, "StarknetDomain", "0x1ff2f602e42168014d405a94f75e8a93d640751d71d16311266e140d8b0a210"),
             (Self.CasesRev1.td, "Person", "0x30f7aa21b8d67cb04c30f962dd29b95ab320cb929c07d1605f5ace304dadf34"),
             (Self.CasesRev1.td, "Mail", "0x560430bf7a02939edd1a5c104e7b7a55bbab9f35928b1cf5c7c97de3a907bd"),
+            (Self.CasesRev1.tdBasicTypes, "Example", "0x1f94cd0be8b4097a41486170fdf09a4cd23aefbc74bb2344718562994c2c111"),
+            (Self.CasesRev1.tdPresetTypes, "Example", "0x1a25a8bb84b761090b1fadaebe762c4b679b0d8883d2bedda695ea340839a55"),
+            (Self.CasesRev1.tdEnum, "Example", "0x380a54d417fb58913b904675d94a8a62e2abc3467f4b5439de0fd65fafdd1a8"),
             (Self.CasesRev1.tdFeltMerkleTree, "Example", "0x160b9c0e8a7c561f9c5d9e3cc2990a1b4d26e94aa319e9eb53e163cd06c71be"),
         ]
 
@@ -252,6 +355,24 @@ final class TypedDataTests: XCTestCase {
                 "0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"
             ),
             (
+                Self.CasesRev1.tdBasicTypes,
+                "Example",
+                "message",
+                "0x391d09a51a31dd17f7270aaa9904688fbeeb9c56a7e2d15c5a6af32e981c730"
+            ),
+            (
+                Self.CasesRev1.tdPresetTypes,
+                "Example",
+                "message",
+                "0x74fba3f77f8a6111a9315bac313bf75ecfa46d1234e0fda60312fb6a6517667"
+            ),
+            (
+                Self.CasesRev1.tdEnum,
+                "Example",
+                "message",
+                "0x3d4384ff5cec32b86462e89f5a803b55ff0048c4f5a10ba9d6cd381317d9c3"
+            ),
+            (
                 Self.CasesRev1.tdFeltMerkleTree,
                 "Example",
                 "message",
@@ -306,6 +427,21 @@ final class TypedDataTests: XCTestCase {
                 Self.CasesRev1.td,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
                 "0x7f6e8c3d8965b5535f5cc68f837c04e3bbe568535b71aa6c621ddfb188932b8"
+            ),
+            (
+                Self.CasesRev1.tdBasicTypes,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x2d80b87b8bc32068247c779b2ef0f15f65c9c449325e44a9df480fb01eb43ec"
+            ),
+            (
+                Self.CasesRev1.tdPresetTypes,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"
+            ),
+            (
+                Self.CasesRev1.tdEnum,
+                "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                "0x3df10475ad5a8f49db4345a04a5b09164d2e24b09f6e1e236bc1ccd87627cc"
             ),
             (
                 Self.CasesRev1.tdFeltMerkleTree,
