@@ -101,7 +101,7 @@ final class MerkleTreeTest: XCTestCase {
             XCTAssertEqual(tree!.branches.count, expectedBranchCount)
         }
 
-        [StarknetHashMethod.pedersen, .poseidon].forEach { hashMethod in
+        for hashMethod in [StarknetHashMethod.pedersen, .poseidon] {
             testBuildFrom1(hashMethod)
             testBuildFrom2(hashMethod)
             testBuildFrom4(hashMethod)

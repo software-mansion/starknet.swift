@@ -12,7 +12,7 @@ final class SelectorTests: XCTestCase {
             ("__l1_default__", "0x0"),
         ]
 
-        cases.forEach { name, hex in
+        for (name, hex) in cases {
             XCTAssertEqual(starknetSelector(from: name), Felt(fromHex: hex))
         }
     }

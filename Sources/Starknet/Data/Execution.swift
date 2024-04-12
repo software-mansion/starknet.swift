@@ -135,7 +135,7 @@ private func starknetCallsToExecuteCalldataCairo0(calls: [StarknetCall]) -> [Fel
     var wholeCalldata: [Felt] = []
     var callArray: [Felt] = []
 
-    calls.forEach { call in
+    for call in calls {
         callArray.append(call.contractAddress)
         callArray.append(call.entrypoint)
         callArray.append(Felt(wholeCalldata.count)!)
@@ -152,7 +152,7 @@ private func starknetCallsToExecuteCalldataCairo1(calls: [StarknetCall]) -> [Fel
 
     callArray.append(Felt(calls.count)!)
 
-    calls.forEach { call in
+    for call in calls {
         callArray.append(call.contractAddress)
         callArray.append(call.entrypoint)
         callArray.append(Felt(call.calldata.count)!)

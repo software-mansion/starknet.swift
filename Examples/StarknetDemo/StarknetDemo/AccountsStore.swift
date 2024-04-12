@@ -25,12 +25,12 @@ let rpcEndpoint = "http://127.0.0.1:5050/rpc"
 // !!! Important !!!
 // These private keys are for demo only. Never publish a privateKey of your wallet, nor
 // store it in any repository as plain text.
-let account1PrivateKey: Felt = "0xe3e70682c2094cac629f6fbed82c07cd"
-let account2PrivateKey: Felt = "0xf728b4fa42485e3a0a5d2f346baa9455"
+let account1PrivateKey: Felt = "0x71d7bb07b9a64f6f78ac4c816aff4da9"
+let account2PrivateKey: Felt = "0xe1406455b7d66b1690803be066cbe5e"
 
 // Addresses of accounts associated with above private keys.
-let account1Address: Felt = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
-let account2Address: Felt = "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79"
+let account1Address: Felt = "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691"
+let account2Address: Felt = "0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"
 
 class AccountsStore: ObservableObject {
     let accounts: [StarknetAccountProtocol]
@@ -57,7 +57,10 @@ class AccountsStore: ObservableObject {
     }
 
     init() {
-        // Create starknet provider that will be used to communicate with the given starknet node.
+        // Normally we should use provider.getChainId()
+        // for example purpose we can simply hardcode it as .sepolia
+        let chainId = StarknetChainId.sepolia
+
         self.provider = StarknetProvider(url: rpcEndpoint)!
 
         // Create a signer that will be used to sign starknet transactions with provided private key.
@@ -68,7 +71,9 @@ class AccountsStore: ObservableObject {
         let account1 = StarknetAccount(
             address: account1Address,
             signer: account1Signer,
-            provider: provider
+            provider: provider,
+            chainId: chainId,
+            cairoVersion: .one
         )
 
         // And do the same for the second account.
@@ -77,7 +82,9 @@ class AccountsStore: ObservableObject {
         let account2 = StarknetAccount(
             address: account2Address,
             signer: account2Signer,
-            provider: provider
+            provider: provider,
+            chainId: chainId,
+            cairoVersion: .one
         )
 
         self.accounts = [account1, account2]
@@ -86,7 +93,6 @@ class AccountsStore: ObservableObject {
 
     func fetchBalance() async {
         let accountIndex = currentAccountIndex
-
         // Prepare a read call to be sent to starknet
         let call = StarknetCall(
             contractAddress: erc20ContractAddress,
@@ -101,7 +107,6 @@ class AccountsStore: ObservableObject {
             // This erc20 contract uses uint256 instead of felt for balances, which is stored
             // as two felts - lower and upper 128 bits of the uint256.
             let balanceValue = result[0].value + result[1].value << 128
-
             DispatchQueue.main.async {
                 self.accountBalances[accountIndex] = balanceValue
             }
@@ -135,7 +140,7 @@ class AccountsStore: ObservableObject {
         let senderAccount = accounts[currentAccountIndex]
 
         Task {
-            let _ = try await senderAccount.execute(call: call)
+            let _ = try await senderAccount.executeV3(call: call)
 
             try await Task.sleep(nanoseconds: UInt64(Double(NSEC_PER_SEC)))
 

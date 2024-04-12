@@ -26,11 +26,19 @@ You can find the documentation of the project [here](https://docs.swmansion.com/
 ## Demo app
 In the `Examples` folder you can find a demo ios application.
 
-Before running it, make sure to run starknet devnet with given configuration:
+Before running it, make sure to run compatible version of [`starknet-devnet`](https://github.com/0xSpaceShard/starknet-devnet-rs) with a given configuration:
 ```
-starknet-devnet --port 5050 --seed 0
+starknet-devnet --port 5050 --seed 0`
 ```
-and run the demo app on ios simulator, to be able to access the local devnet instance.
+
+To install starknet devnet, please run:
+```
+cargo install \
+--locked \
+--git https://github.com/0xSpaceShard/starknet-devnet-rs.git \
+--rev fa1238e
+```
+Run the demo app on ios simulator, to be able to access the local devnet instance.
 
 ## Development
 

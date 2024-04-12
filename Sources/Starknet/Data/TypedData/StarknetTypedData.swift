@@ -216,7 +216,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
             try params.forEach { param in
                 let extractedTypes = try extractTypes(from: param).map { $0.strippingPointer() }
 
-                extractedTypes.forEach { extractedType in
+                for extractedType in extractedTypes {
                     if allTypes.keys.contains(extractedType), !dependencies.contains(extractedType) {
                         dependencies.append(extractedType)
                         toVisit.append(extractedType)

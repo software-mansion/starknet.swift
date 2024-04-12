@@ -65,8 +65,8 @@ final class TransactionTests: XCTestCase {
             "\"version\":\"0x1\"",
         ]
 
-        pairs.forEach {
-            XCTAssertTrue(encodedString.localizedStandardContains($0))
+        for pair in pairs {
+            XCTAssertTrue(encodedString.localizedStandardContains(pair))
         }
     }
 
