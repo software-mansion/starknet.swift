@@ -75,7 +75,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 
     public func specVersion() -> HttpRequest<String> {
-        return buildRequest(method: .specVersion)
+        buildRequest(method: .specVersion)
     }
 
     public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt] {
