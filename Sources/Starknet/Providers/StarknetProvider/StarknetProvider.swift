@@ -34,6 +34,19 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.init(url: url, urlSession: urlSession)
     }
 
+    private func buildRequest<U: Decodable>(method: JsonRpcMethod, params: EmptyParams = EmptyParams()) -> HttpRequest<U> {
+        let rpcPayload = JsonRpcPayload<EmptyParams>(method: method, params: params)
+        let config = HttpNetworkProvider.Configuration(
+            url: url,
+            method: "POST",
+            params: [
+                (header: "Content-Type", value: "application/json"),
+                (header: "Accept", value: "application/json"),
+            ]
+        )
+        return HttpRequest<U>(rpcPayload: rpcPayload, config: config, networkProvider: networkProvider)
+    }
+
     private func makeRequest<U>(method: JsonRpcMethod, params: some Encodable = EmptyParams(), receive _: U.Type) async throws -> U where U: Decodable {
         let rpcPayload = JsonRpcPayload(method: method, params: params)
 
@@ -61,12 +74,8 @@ public class StarknetProvider: StarknetProviderProtocol {
         }
     }
 
-    public func specVersion() async throws -> String {
-        let params = EmptySequence()
-
-        let result = try await makeRequest(method: .specVersion, params: params, receive: String.self)
-
-        return result
+    public func specVersion() -> HttpRequest<String> {
+        return buildRequest(method: .specVersion)
     }
 
     public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt] {

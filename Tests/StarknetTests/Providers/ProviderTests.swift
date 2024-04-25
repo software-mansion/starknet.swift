@@ -58,7 +58,9 @@ final class ProviderTests: XCTestCase {
     }
 
     func testSpecVersion() async throws {
-        let result = try await provider.specVersion()
+        let request = provider.specVersion()
+        let result = try await request.send()
+
         XCTAssertFalse(result.isEmpty)
     }
 

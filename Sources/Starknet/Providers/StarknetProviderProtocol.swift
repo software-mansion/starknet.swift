@@ -5,7 +5,7 @@ public protocol StarknetProviderProtocol {
     /// Get the version of the Starknet JSON-RPC specification being used by the node.
     ///
     ///  - Returns: the version of the Starknet JSON-RPC specification being used.
-    func specVersion() async throws -> String
+    func specVersion() -> HttpRequest<String>
 
     /// Call starknet contract.
     ///

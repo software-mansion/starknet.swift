@@ -11,6 +11,40 @@ enum HttpNetworkProviderError: Error {
     case requestRejected
 }
 
+public class HttpRequest<U: Decodable> {
+    let rpcPayload: JsonRpcPayload<EmptyParams>
+    let config: HttpNetworkProvider.Configuration
+    let networkProvider: HttpNetworkProvider
+
+    init(
+        rpcPayload: JsonRpcPayload<EmptyParams>,
+        config: HttpNetworkProvider.Configuration,
+        networkProvider: HttpNetworkProvider
+    ) {
+        self.rpcPayload = rpcPayload
+        self.config = config
+        self.networkProvider = networkProvider
+    }
+
+    func send() async throws -> U {
+        let response: JsonRpcResponse<U> = try await networkProvider.send(
+            payload: rpcPayload,
+            config: config,
+            receive: JsonRpcResponse<U>.self
+        )
+
+        if let error = response.error {
+            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data)
+        }
+
+        guard let result = response.result else {
+            throw StarknetProviderError.unknownError
+        }
+
+        return result
+    }
+}
+
 class HttpNetworkProvider {
     let session: URLSession
 
