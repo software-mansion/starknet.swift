@@ -35,7 +35,7 @@ final class ProviderTests: XCTestCase {
         let accountDetails = Self.devnetClient.constants.predeployedAccount2
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
 
-        chainId = try await provider.getChainId()
+        chainId = try await provider.getChainId().send()
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .one)
     }
 
@@ -52,7 +52,7 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetChainId() async throws {
-        let chainId = try await provider.getChainId()
+        let chainId = try await provider.getChainId().send()
 
         XCTAssertEqual(chainId, .goerli)
     }
@@ -72,8 +72,9 @@ final class ProviderTests: XCTestCase {
         )
 
         do {
-            let result = try await provider.callContract(call)
-
+            let request = provider.callContract(call)
+            let result = try await request.send()
+ 
             XCTAssertEqual(result.count, 1)
             XCTAssertEqual(result[0], ProviderTests.devnetClient.constants.predeployedAccount1.publicKey)
         } catch let e {
@@ -89,26 +90,27 @@ final class ProviderTests: XCTestCase {
             calldata: [Felt(2138)]
         )
 
-        let result = try await provider.callContract(call)
+        let result = try await provider.callContract(call).send()
 
         XCTAssertEqual(result[0], Felt.zero)
     }
 
     func testGetNonce() async throws {
-        let nonce = try await provider.getNonce(of: ProviderTests.devnetClient.constants.predeployedAccount1.address)
+        let nonce = try await provider.getNonce(of: ProviderTests.devnetClient.constants.predeployedAccount1.address).send()
 
         print(nonce)
     }
 
     func testGetClassHash() async throws {
-        let classHash = try await provider.getClassHashAt(ethContractAddress)
+        let classHash = try await provider.getClassHashAt(ethContractAddress).send()
 
         print(classHash)
     }
 
     func testGetBlockNumber() async throws {
-        let blockNumber = try await provider.getBlockNumber()
-
+        print("AAA")
+        let blockNumber = try await provider.getBlockNumber().send()
+        
         print(blockNumber)
     }
 
@@ -116,7 +118,7 @@ final class ProviderTests: XCTestCase {
         // Note to future developers experiencing failures in this test:
         // If there were no transactions, minting or other changes to the state of the network,
         // "Block not found" error is likely to occur
-        let result = try await provider.getBlockHashAndNumber()
+        let result = try await provider.getBlockHashAndNumber().send()
 
         print(result)
     }
@@ -128,25 +130,25 @@ final class ProviderTests: XCTestCase {
         try await ProviderTests.devnetClient.assertTransactionSucceeded(transactionHash: invokeResult.transactionHash)
 
         let filter = StarknetGetEventsFilter(address: contract.deploy.contractAddress, keys: [["0x477e157efde59c5531277ede78acb3e03ef69508c6c35fde3495aa0671d227"]])
-        let result = try await provider.getEvents(filter: filter)
+        let result = try await provider.getEvents(filter: filter).send()
 
         XCTAssertFalse(result.events.isEmpty)
         print(result)
     }
 
     func testGetTransactionByBlockIdAndHash() async throws {
-        let result = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0)
+        let result = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
 
         print(result)
     }
 
     func testGetTransactionByHash() async throws {
-        let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0)
+        let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
 
-        let _ = try await provider.getTransactionBy(hash: previousResult.hash!)
+        let _ = try await provider.getTransactionBy(hash: previousResult.transaction.hash!).send()
 
         do {
-            let _ = try await provider.getTransactionBy(hash: "0x123")
+            let _ = try await provider.getTransactionBy(hash: "0x123").send()
             XCTFail("Fetching transaction with nonexistent hash should fail")
         } catch {}
     }
@@ -155,28 +157,28 @@ final class ProviderTests: XCTestCase {
         let contract = try await Self.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
         let transactionHash = try await Self.devnetClient.invokeContract(contractAddress: contract.deploy.contractAddress, function: "increase_balance", calldata: [2137]).transactionHash
 
-        let result = try await provider.getTransactionBy(hash: transactionHash)
-        XCTAssertTrue(result.type == .invoke)
+        let result = try await provider.getTransactionBy(hash: transactionHash).send()
+        XCTAssertTrue(result.transaction.type == .invoke)
     }
 
     func testGetDeployAccountTransactionByHash() async throws {
         let account = try await ProviderTests.devnetClient.deployAccount(name: "provider_test")
 
-        let result = try await provider.getTransactionBy(hash: account.transactionHash)
-        XCTAssertTrue(result.type == .deployAccount)
+        let result = try await provider.getTransactionBy(hash: account.transactionHash).send()
+        XCTAssertTrue(result.transaction.type == .deployAccount)
     }
 
     func testGetDeclareTransactionByHash() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
-        let result = try await provider.getTransactionBy(hash: contract.declare.transactionHash)
-        XCTAssertTrue(result.type == .declare)
+        let result = try await provider.getTransactionBy(hash: contract.declare.transactionHash).send()
+        XCTAssertTrue(result.transaction.type == .declare)
     }
 
     func testGetTransactionStatus() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
-        let status = try await provider.getTransactionStatusBy(hash: contract.declare.transactionHash)
-        let status2 = try await provider.getTransactionStatusBy(hash: contract.deploy.transactionHash)
+        let status = try await provider.getTransactionStatusBy(hash: contract.declare.transactionHash).send()
+        let status2 = try await provider.getTransactionStatusBy(hash: contract.deploy.transactionHash).send()
 
         XCTAssertEqual(status.finalityStatus, .acceptedL2)
         XCTAssertEqual(status2.finalityStatus, .acceptedL2)
@@ -186,22 +188,22 @@ final class ProviderTests: XCTestCase {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
         let transactionHash = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract.deploy.contractAddress, function: "increase_balance", calldata: [2137]).transactionHash
 
-        let receipt = try await provider.getTransactionReceiptBy(hash: transactionHash)
-        XCTAssertTrue(receipt.isSuccessful)
+        let result = try await provider.getTransactionReceiptBy(hash: transactionHash).send()
+        XCTAssertTrue(result.transactionReceipt.isSuccessful)
     }
 
     func testGetDeployAccountTransactionReceipt() async throws {
         let account = try await ProviderTests.devnetClient.deployAccount(name: "provider_test")
 
-        let receipt = try await provider.getTransactionReceiptBy(hash: account.transactionHash)
-        XCTAssertTrue(receipt.isSuccessful)
+        let result = try await provider.getTransactionReceiptBy(hash: account.transactionHash).send()
+        XCTAssertTrue(result.transactionReceipt.isSuccessful)
     }
 
     func testGetDeclareTransactionReceipt() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
-        let receipt = try await provider.getTransactionReceiptBy(hash: contract.declare.transactionHash)
-        XCTAssertTrue(receipt.isSuccessful)
+        let result = try await provider.getTransactionReceiptBy(hash: contract.declare.transactionHash).send()
+        XCTAssertTrue(result.transactionReceipt.isSuccessful)
     }
 
     func testEstimateInvokeV1Fee() async throws {
@@ -218,12 +220,12 @@ final class ProviderTests: XCTestCase {
         let params2 = StarknetInvokeParamsV1(nonce: Felt(nonce.value + 1)!, maxFee: 0)
         let tx2 = try account.signV1(calls: [call, call2], params: params2, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: [])
+        let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: []).send()
 
         let tx1WithoutSignature = StarknetInvokeTransactionV1(senderAddress: tx1.senderAddress, calldata: tx1.calldata, signature: [], maxFee: tx1.maxFee, nonce: nonce, forFeeEstimation: true)
         let tx2WithoutSignature = StarknetInvokeTransactionV1(senderAddress: tx2.senderAddress, calldata: tx2.calldata, signature: [], maxFee: tx2.maxFee, nonce: Felt(nonce.value + 1)!, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: [tx1WithoutSignature, tx2WithoutSignature], simulationFlags: [.skipValidate])
+        let _ = try await provider.estimateFee(for: [tx1WithoutSignature, tx2WithoutSignature], simulationFlags: [.skipValidate]).send()
     }
 
     func testEstimateInvokeV3Fee() async throws {
@@ -239,12 +241,12 @@ final class ProviderTests: XCTestCase {
         let params2 = StarknetInvokeParamsV3(nonce: Felt(nonce.value + 1)!, l1ResourceBounds: .zero)
         let tx2 = try account.signV3(calls: [call, call2], params: params2, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: [])
+        let _ = try await provider.estimateFee(for: [tx1, tx2], simulationFlags: []).send()
 
         let tx1WithoutSignature = StarknetInvokeTransactionV3(senderAddress: tx1.senderAddress, calldata: tx1.calldata, signature: [], l1ResourceBounds: tx1.resourceBounds.l1Gas, nonce: nonce, forFeeEstimation: true)
         let tx2WithoutSignature = StarknetInvokeTransactionV3(senderAddress: tx2.senderAddress, calldata: tx2.calldata, signature: [], l1ResourceBounds: tx2.resourceBounds.l1Gas, nonce: Felt(nonce.value + 1)!, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: [tx1WithoutSignature, tx2WithoutSignature], simulationFlags: [.skipValidate])
+        let _ = try await provider.estimateFee(for: [tx1WithoutSignature, tx2WithoutSignature], simulationFlags: [.skipValidate]).send()
     }
 
     func testEstimateDeployAccountV1Fee() async throws {
@@ -261,11 +263,11 @@ final class ProviderTests: XCTestCase {
 
         let tx = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: tx, simulationFlags: [])
+        let _ = try await provider.estimateFee(for: tx, simulationFlags: []).send()
 
         let txWithoutSignature = StarknetDeployAccountTransactionV1(signature: [], maxFee: tx.maxFee, nonce: tx.maxFee, contractAddressSalt: tx.contractAddressSalt, constructorCalldata: tx.constructorCalldata, classHash: tx.classHash, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: txWithoutSignature, simulationFlags: [.skipValidate])
+        let _ = try await provider.estimateFee(for: txWithoutSignature, simulationFlags: [.skipValidate]).send()
     }
 
     func testEstimateDeployAccountV3Fee() async throws {
@@ -282,11 +284,11 @@ final class ProviderTests: XCTestCase {
 
         let tx = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: tx)
+        let _ = try await provider.estimateFee(for: tx).send()
 
         let txWithoutSignature = StarknetDeployAccountTransactionV3(signature: [], l1ResourceBounds: tx.resourceBounds.l1Gas, nonce: tx.nonce, contractAddressSalt: tx.contractAddressSalt, constructorCalldata: tx.constructorCalldata, classHash: tx.classHash, forFeeEstimation: true)
 
-        let _ = try await provider.estimateFee(for: txWithoutSignature, simulationFlags: [.skipValidate])
+        let _ = try await provider.estimateFee(for: txWithoutSignature, simulationFlags: [.skipValidate]).send()
     }
 
     func testEstimateMessageFee() async throws {
@@ -305,7 +307,7 @@ final class ProviderTests: XCTestCase {
         let feeEstimate = try await provider.estimateMessageFee(
             message,
             at: StarknetBlockId.tag(.pending)
-        )
+        ).send()
 
         XCTAssertNotEqual(Felt.zero, feeEstimate.gasPrice)
         XCTAssertNotEqual(Felt.zero, feeEstimate.gasConsumed)
@@ -323,7 +325,7 @@ final class ProviderTests: XCTestCase {
 
         let invokeTx = try account.signV1(calls: [call], params: params, forFeeEstimation: false)
 
-        let accountClassHash = try await provider.getClassHashAt(account.address)
+        let accountClassHash = try await provider.getClassHashAt(account.address).send()
         let newSigner = StarkCurveSigner(privateKey: 1001)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
@@ -334,7 +336,7 @@ final class ProviderTests: XCTestCase {
         let newAccountParams = StarknetDeployAccountParamsV1(nonce: .zero, maxFee: 500_000_000_000_000)
         let deployAccountTx = try newAccount.signDeployAccountV1(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
-        let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: [])
+        let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: []).send()
 
         XCTAssertEqual(simulations.count, 2)
         XCTAssertTrue(simulations[0].transactionTrace is StarknetInvokeTransactionTrace)
@@ -344,7 +346,7 @@ final class ProviderTests: XCTestCase {
 
         let deployAccountWithoutSignature = StarknetDeployAccountTransactionV1(signature: [], maxFee: deployAccountTx.maxFee, nonce: deployAccountTx.nonce, contractAddressSalt: deployAccountTx.contractAddressSalt, constructorCalldata: deployAccountTx.constructorCalldata, classHash: deployAccountTx.classHash)
 
-        let simulations2 = try await provider.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.pending), simulationFlags: [.skipValidate])
+        let simulations2 = try await provider.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.pending), simulationFlags: [.skipValidate]).send()
 
         XCTAssertEqual(simulations2.count, 2)
         XCTAssertTrue(simulations2[0].transactionTrace is StarknetInvokeTransactionTrace)
@@ -364,7 +366,7 @@ final class ProviderTests: XCTestCase {
 
         let invokeTx = try account.signV3(calls: [call], params: params, forFeeEstimation: false)
 
-        let accountClassHash = try await provider.getClassHashAt(account.address)
+        let accountClassHash = try await provider.getClassHashAt(account.address).send()
         let newSigner = StarkCurveSigner(privateKey: 3003)!
         let newPublicKey = newSigner.publicKey
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
@@ -376,7 +378,7 @@ final class ProviderTests: XCTestCase {
         let newAccountParams = StarknetDeployAccountParamsV3(nonce: 0, l1ResourceBounds: deployAccountL1Gas)
         let deployAccountTx = try newAccount.signDeployAccountV3(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
-        let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: [])
+        let simulations = try await provider.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: []).send()
 
         XCTAssertEqual(simulations.count, 2)
         XCTAssertTrue(simulations[0].transactionTrace is StarknetInvokeTransactionTrace)
@@ -398,7 +400,7 @@ final class ProviderTests: XCTestCase {
             classHash: deployAccountTx.classHash
         )
 
-        let simulations2 = try await provider.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.pending), simulationFlags: [.skipValidate])
+        let simulations2 = try await provider.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.pending), simulationFlags: [.skipValidate]).send()
 
         XCTAssertEqual(simulations2.count, 2)
         XCTAssertTrue(simulations2[0].transactionTrace is StarknetInvokeTransactionTrace)
