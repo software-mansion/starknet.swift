@@ -11,13 +11,13 @@ enum HttpNetworkProviderError: Error {
     case requestRejected
 }
 
-public class HttpRequest<U: Decodable> {
-    let rpcPayload: JsonRpcPayload<EmptyParams>
+public class HttpRequest<U: Decodable, P: Encodable> {
+    let rpcPayload: JsonRpcPayload<P>
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
 
     init(
-        rpcPayload: JsonRpcPayload<EmptyParams>,
+        rpcPayload: JsonRpcPayload<P>,
         config: HttpNetworkProvider.Configuration,
         networkProvider: HttpNetworkProvider
     ) {
