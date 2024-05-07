@@ -1,7 +1,7 @@
 import Foundation
 
 /// Transaction wrapper used for decoding polymorphic StarknetTransaction
-enum TransactionWrapper: Decodable {
+public enum TransactionWrapper: Decodable {
     fileprivate enum Keys: String, CodingKey {
         case type
         case version
