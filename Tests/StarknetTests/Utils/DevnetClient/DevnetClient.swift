@@ -262,7 +262,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 throw DevnetClientError.missingResourceFile
             }
 
-            guard let toolVersionsPath = Bundle.module.path(forResource: "Scarb", ofType: "tool-versions") else {
+            guard let toolVersionsPath = Bundle.module.path(forResource: "", ofType: "tool-versions") else {
                 throw DevnetClientError.missingResourceFile
             }
 
