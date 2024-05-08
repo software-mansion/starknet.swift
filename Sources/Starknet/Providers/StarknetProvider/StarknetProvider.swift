@@ -35,7 +35,6 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 
     private func buildRequest<U: Decodable, P: Encodable>(method: JsonRpcMethod, params: P) -> HttpRequest<U, P> {
-        let rpcPayload = JsonRpcPayload<P>(method: method, params: params)
         let config = HttpNetworkProvider.Configuration(
             url: url,
             method: "POST",
@@ -44,7 +43,22 @@ public class StarknetProvider: StarknetProviderProtocol {
                 (header: "Accept", value: "application/json"),
             ]
         )
-        return HttpRequest<U, P>(rpcPayload: rpcPayload, config: config, networkProvider: networkProvider)
+        return HttpRequest<U, P>(method: method, params: params, config: config, networkProvider: networkProvider)
+    }
+
+    public func batchRequests<U: Decodable, P: Encodable>(requests: [HttpRequest<U, P>]) -> HttpBatchRequest<U, P> {
+        let rpcPayloads = requests.map { request in
+            JsonRpcPayload(method: request.method, params: request.params)
+        }
+        let config = HttpNetworkProvider.Configuration(
+            url: url,
+            method: "POST",
+            params: [
+                (header: "Content-Type", value: "application/json"),
+                (header: "Accept", value: "application/json"),
+            ]
+        )
+        return HttpBatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
     public func specVersion() -> HttpRequest<String, EmptyParams> {

@@ -1,5 +1,7 @@
 import Foundation
 
+// TODO: Update deocumentation comments
+
 /// Provider used to interact with the StakNet blockchain.
 public protocol StarknetProviderProtocol {
     /// Get the version of the Starknet JSON-RPC specification being used by the node.
@@ -138,6 +140,9 @@ public protocol StarknetProviderProtocol {
     ///
     ///  - Returns: array of simulated transactions
     func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> HttpRequest<[StarknetSimulatedTransaction], SimulateTransactionsParams>
+
+    // TODO: Add documentation comments
+    func batchRequests<U: Decodable, P: Encodable>(requests: [HttpRequest<U, P>]) -> HttpBatchRequest<U, P>
 }
 
 let defaultBlockId = StarknetBlockId.tag(.pending)
