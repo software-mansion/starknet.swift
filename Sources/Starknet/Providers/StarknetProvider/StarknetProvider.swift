@@ -49,7 +49,7 @@ public class StarknetProvider: StarknetProviderProtocol {
 
     public func specVersion() -> HttpRequest<String, EmptyParams> {
         let params = EmptyParams()
-        
+
         return buildRequest(method: .specVersion, params: params)
     }
 
@@ -97,7 +97,7 @@ public class StarknetProvider: StarknetProviderProtocol {
 
     public func getBlockNumber() -> HttpRequest<UInt64, EmptySequence> {
         let params = EmptySequence()
-        
+
         return buildRequest(method: .getBlockNumber, params: params)
     }
 
@@ -125,7 +125,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return buildRequest(method: .getTransactionByBlockIdAndIndex, params: params)
     }
 
-    public func getTransactionReceiptBy(hash: Felt) -> HttpRequest<TransactionReceiptWrapper, GetTransactionReceiptPayload>{
+    public func getTransactionReceiptBy(hash: Felt) -> HttpRequest<TransactionReceiptWrapper, GetTransactionReceiptPayload> {
         let params = GetTransactionReceiptPayload(transactionHash: hash)
 
         return buildRequest(method: .getTransactionReceipt, params: params)

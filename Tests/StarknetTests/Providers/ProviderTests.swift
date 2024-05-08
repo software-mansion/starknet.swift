@@ -74,7 +74,7 @@ final class ProviderTests: XCTestCase {
         do {
             let request = provider.callContract(call)
             let result = try await request.send()
- 
+
             XCTAssertEqual(result.count, 1)
             XCTAssertEqual(result[0], ProviderTests.devnetClient.constants.predeployedAccount1.publicKey)
         } catch let e {
@@ -110,7 +110,7 @@ final class ProviderTests: XCTestCase {
     func testGetBlockNumber() async throws {
         print("AAA")
         let blockNumber = try await provider.getBlockNumber().send()
-        
+
         print(blockNumber)
     }
 
