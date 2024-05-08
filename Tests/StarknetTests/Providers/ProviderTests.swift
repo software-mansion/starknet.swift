@@ -407,13 +407,16 @@ final class ProviderTests: XCTestCase {
     }
 
     func testBatchGetTransactionByHash() async throws {
-        let transactions = try await provider.batchRequests(requests: [
-            provider.getTransactionBy(blockId: .tag(.latest), index: 0),
-            provider.getTransactionBy(blockId: .tag(.latest), index: 0),
+        let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
+
+        let transactionsResponse = try await provider.batchRequests(requests: [
+            provider.getTransactionBy(hash: previousResult.transaction.hash!),
+            provider.getTransactionBy(hash: previousResult.transaction.hash!),
         ]).send()
 
-        XCTAssertEqual(transactions.count, 2)
+        XCTAssertEqual(transactionsResponse.count, 2)
+        XCTAssertEqual(transactionsResponse[0].transaction.hash, previousResult.transaction.hash)
 
-        print(transactions)
+        print(transactionsResponse)
     }
 }
