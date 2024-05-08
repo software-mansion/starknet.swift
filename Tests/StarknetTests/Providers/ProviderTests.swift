@@ -108,7 +108,6 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetBlockNumber() async throws {
-        print("AAA")
         let blockNumber = try await provider.getBlockNumber().send()
 
         print(blockNumber)
@@ -405,5 +404,16 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(simulations2.count, 2)
         XCTAssertTrue(simulations2[0].transactionTrace is StarknetInvokeTransactionTrace)
         XCTAssertTrue(simulations2[1].transactionTrace is StarknetDeployAccountTransactionTrace)
+    }
+
+    func testBatchGetTransactionByHash() async throws {
+        let transactions = try await provider.batchRequests(requests: [
+            provider.getTransactionBy(blockId: .tag(.latest), index: 0),
+            provider.getTransactionBy(blockId: .tag(.latest), index: 0),
+        ]).send()
+
+        XCTAssertEqual(transactions.count, 2)
+
+        print(transactions)
     }
 }
