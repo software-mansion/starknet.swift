@@ -1,4 +1,4 @@
-public class HttpBatchRequest<U: Decodable, P: Encodable>: Request {
+public class BatchRequest<U: Decodable, P: Encodable> {
     let rpcPayloads: [JsonRpcPayload<P>]
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
