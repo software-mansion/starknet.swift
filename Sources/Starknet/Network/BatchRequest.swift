@@ -19,7 +19,12 @@ public class BatchRequest<U: Decodable, P: Encodable> {
             config: config,
             receive: [JsonRpcResponse<U>.self]
         )
-
-        return responses.compactMap(\.result)
+        
+        var orderedRequests: [U?] = Array(repeating: nil, count: rpcPayloads.count)
+           for response in responses {
+                orderedRequests[response.id] = response.result
+           }
+           
+        return orderedRequests.compactMap { $0 }
     }
 }
