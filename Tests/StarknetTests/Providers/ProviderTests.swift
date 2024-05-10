@@ -416,8 +416,8 @@ final class ProviderTests: XCTestCase {
         ).send()
 
         XCTAssertEqual(transactionsResponse.count, 2)
-        XCTAssertEqual(transactionsResponse[0].transaction.hash, previousResult.transaction.hash)
-        XCTAssertEqual(transactionsResponse[1].transaction.hash, previousResult.transaction.hash)
+        XCTAssertEqual(try transactionsResponse[0].get().transaction.hash, previousResult.transaction.hash)
+        XCTAssertEqual(try transactionsResponse[1].get().transaction.hash, previousResult.transaction.hash)
 
         print(transactionsResponse)
     }

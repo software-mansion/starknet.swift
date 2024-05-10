@@ -13,16 +13,22 @@ public class BatchRequest<U: Decodable, P: Encodable> {
         self.networkProvider = networkProvider
     }
 
-    func send() async throws -> [U] {
+    func send() async throws -> [Result<U, StarknetProviderError>] {
         let responses: [JsonRpcResponse<U>] = try await networkProvider.sendBatch(
             payload: rpcPayloads,
             config: config,
             receive: [JsonRpcResponse<U>.self]
         )
 
-        var orderedResults: [U?] = Array(repeating: nil, count: rpcPayloads.count)
+        var orderedResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: rpcPayloads.count)
         for response in responses {
-            orderedResults[response.id] = response.result
+            if let error = response.error {
+                orderedResults[response.id] = .failure(StarknetProviderError.jsonRpcError(error.code, error.message, error.data))
+            } else if let result = response.result {
+                orderedResults[response.id] = .success(result)
+            } else {
+                orderedResults[response.id] = .failure(StarknetProviderError.unknownError)
+            }
         }
 
         return orderedResults.compactMap { $0 }
