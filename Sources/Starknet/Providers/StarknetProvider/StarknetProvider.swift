@@ -88,7 +88,6 @@ public class StarknetProvider: StarknetProviderProtocol {
         return BatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
-
     public func specVersion() -> Request<String, EmptyParams> {
         let params = EmptyParams()
 
