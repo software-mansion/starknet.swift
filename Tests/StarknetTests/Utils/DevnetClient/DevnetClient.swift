@@ -163,6 +163,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private let scarbPath: String
         private let snCastPath: String
         private var scarbTomlPath: String!
+        private var toolVersionsPath: String!
         private var contractsPath: String!
         private let tmpPath: String
 
@@ -260,25 +261,34 @@ func makeDevnetClient() -> DevnetClientProtocol {
             guard let scarbTomlPath = Bundle.module.path(forResource: "Scarb", ofType: "toml") else {
                 throw DevnetClientError.missingResourceFile
             }
+
+            guard let toolVersionsPath = Bundle.module.path(forResource: "tool-versions", ofType: nil) else {
+                throw DevnetClientError.missingResourceFile
+            }
+
             let scarbTomlResourcePath = URL(fileURLWithPath: scarbTomlPath)
+            let toolVersionsResourcePath = URL(fileURLWithPath: toolVersionsPath)
             guard let contractResourcePaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
                 throw DevnetClientError.missingResourceFile
             }
 
             let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
             let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
+            let newToolVersionsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/.tool-versions")
             let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
 
             try fileManager.createDirectory(at: newContractsPath, withIntermediateDirectories: true, attributes: nil)
             try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
 
             try fileManager.copyItem(at: scarbTomlResourcePath, to: newScarbTomlPath)
+            try fileManager.copyItem(at: toolVersionsResourcePath, to: newToolVersionsPath)
             for contractPath in contractResourcePaths {
                 let newContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(contractPath.lastPathComponent)")
                 try fileManager.copyItem(at: contractPath, to: newContractPath)
             }
 
             self.scarbTomlPath = newScarbTomlPath.path
+            self.toolVersionsPath = newToolVersionsPath.path
             self.contractsPath = newContractsPath.path
 
             // TODO: (#130) Use the old approach once we're able to update sncast
