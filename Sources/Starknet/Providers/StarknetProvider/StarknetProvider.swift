@@ -46,6 +46,12 @@ public class StarknetProvider: StarknetProviderProtocol {
         return Request<U, P>(method: method, params: params, config: config, networkProvider: networkProvider)
     }
 
+    /// Batch multiple HTTP requests together into a single HTTP request.
+    ///
+    /// - Parameters
+    ///     - requests: list of HTTP requests to be batched together.
+    ///
+    /// - Returns: batch HTTP request.
     public func batchRequests<U: Decodable, P: Encodable>(requests: [Request<U, P>]) -> BatchRequest<U, P> {
         let rpcPayloads = requests.map { request in
             JsonRpcPayload(method: request.method, params: request.params)
@@ -60,6 +66,28 @@ public class StarknetProvider: StarknetProviderProtocol {
         )
         return BatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
+
+    /// Batch multiple HTTP requests together into a single HTTP request using variadic parameters.
+    ///
+    /// - Parameters
+    ///     - requests: one or more HTTP requests to be batched together.
+    ///
+    /// - Returns: batch HTTP request.
+    public func batchRequests<U: Decodable, P: Encodable>(requests: Request<U, P>...) -> BatchRequest<U, P> {
+        let rpcPayloads = requests.map { request in
+            JsonRpcPayload(method: request.method, params: request.params)
+        }
+        let config = HttpNetworkProvider.Configuration(
+            url: url,
+            method: "POST",
+            params: [
+                (header: "Content-Type", value: "application/json"),
+                (header: "Accept", value: "application/json"),
+            ]
+        )
+        return BatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
+    }
+
 
     public func specVersion() -> Request<String, EmptyParams> {
         let params = EmptyParams()
