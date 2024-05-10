@@ -5,7 +5,7 @@ import XCTest
 final class ProviderTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
-    var provider: StarknetProviderProtocol!
+    var provider: StarknetProvider!
     var chainId: StarknetChainId!
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
@@ -39,7 +39,7 @@ final class ProviderTests: XCTestCase {
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .one)
     }
 
-    func makeStarknetProvider(url: String) -> StarknetProviderProtocol {
+    func makeStarknetProvider(url: String) -> StarknetProvider {
         StarknetProvider(url: url)!
     }
 
