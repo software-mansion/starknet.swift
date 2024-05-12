@@ -409,11 +409,9 @@ final class ProviderTests: XCTestCase {
     func testBatchGetTransactionByHash() async throws {
         let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
 
-        let transactionsResponse = try await provider.batchRequests(requests: [
+        let transactionsResponse = try await provider.batchRequests(requests:
             provider.getTransactionBy(hash: previousResult.transaction.hash!),
-            provider.getTransactionBy(hash: "0x123"),
-        ]
-        ).send()
+            provider.getTransactionBy(hash: "0x123")).send()
 
         XCTAssertEqual(transactionsResponse.count, 2)
         XCTAssertEqual(try transactionsResponse[0].get().transaction.hash, previousResult.transaction.hash)
