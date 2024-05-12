@@ -35,7 +35,12 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 
     private func buildRequest<U: Decodable, P: Encodable>(method: JsonRpcMethod, params: P) -> Request<U, P> {
-        let config = HttpNetworkProvider.Configuration(
+        let config = getHttpConfiguration()
+        return Request<U, P>(method: method, params: params, config: config, networkProvider: networkProvider)
+    }
+
+    private func getHttpConfiguration() -> HttpNetworkProvider.Configuration {
+        HttpNetworkProvider.Configuration(
             url: url,
             method: "POST",
             params: [
@@ -43,7 +48,49 @@ public class StarknetProvider: StarknetProviderProtocol {
                 (header: "Accept", value: "application/json"),
             ]
         )
-        return Request<U, P>(method: method, params: params, config: config, networkProvider: networkProvider)
+    }
+
+    public class BatchRequest<U: Decodable, P: Encodable> {
+        let rpcPayloads: [JsonRpcPayload<P>]
+        let config: HttpNetworkProvider.Configuration
+        let networkProvider: HttpNetworkProvider
+
+        init(
+            rpcPayloads: [JsonRpcPayload<P>],
+            config: HttpNetworkProvider.Configuration,
+            networkProvider: HttpNetworkProvider
+        ) {
+            self.rpcPayloads = rpcPayloads
+            self.config = config
+            self.networkProvider = networkProvider
+        }
+
+        func send() async throws -> [Result<U, StarknetProviderError>] {
+            let responses: [JsonRpcResponse<U>] = try await networkProvider.sendBatch(
+                payload: rpcPayloads,
+                config: config,
+                receive: [JsonRpcResponse<U>.self]
+            )
+
+            var orderedResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: rpcPayloads.count)
+            for response in responses {
+                if let error = response.error {
+                    orderedResults[response.id] = .failure(StarknetProviderError.jsonRpcError(error.code, error.message, error.data))
+                } else if let result = response.result {
+                    orderedResults[response.id] = .success(result)
+                } else {
+                    orderedResults[response.id] = .failure(StarknetProviderError.unknownError)
+                }
+            }
+
+            return orderedResults.compactMap { $0 }
+        }
+    }
+
+    private func getBatchRequestPayloads<P: Encodable>(requests: [Request<some Decodable, P>]) -> [JsonRpcPayload<P>] {
+        requests.enumerated().map { index, request in
+            JsonRpcPayload(method: request.method, params: request.params, id: index)
+        }
     }
 
     /// Batch multiple HTTP requests together into a single HTTP request.
@@ -53,17 +100,9 @@ public class StarknetProvider: StarknetProviderProtocol {
     ///
     /// - Returns: batch HTTP request.
     public func batchRequests<U: Decodable, P: Encodable>(requests: [Request<U, P>]) -> BatchRequest<U, P> {
-        let rpcPayloads = requests.enumerated().map { index, request in
-            JsonRpcPayload(method: request.method, params: request.params, id: index)
-        }
-        let config = HttpNetworkProvider.Configuration(
-            url: url,
-            method: "POST",
-            params: [
-                (header: "Content-Type", value: "application/json"),
-                (header: "Accept", value: "application/json"),
-            ]
-        )
+        let rpcPayloads = getBatchRequestPayloads(requests: requests)
+        let config = getHttpConfiguration()
+
         return BatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
@@ -74,17 +113,9 @@ public class StarknetProvider: StarknetProviderProtocol {
     ///
     /// - Returns: batch HTTP request.
     public func batchRequests<U: Decodable, P: Encodable>(requests: Request<U, P>...) -> BatchRequest<U, P> {
-        let rpcPayloads = requests.map { request in
-            JsonRpcPayload(method: request.method, params: request.params)
-        }
-        let config = HttpNetworkProvider.Configuration(
-            url: url,
-            method: "POST",
-            params: [
-                (header: "Content-Type", value: "application/json"),
-                (header: "Accept", value: "application/json"),
-            ]
-        )
+        let rpcPayloads = getBatchRequestPayloads(requests: requests)
+        let config = getHttpConfiguration()
+
         return BatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
