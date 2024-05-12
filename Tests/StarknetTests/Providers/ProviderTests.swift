@@ -417,8 +417,8 @@ final class ProviderTests: XCTestCase {
 
         XCTAssertEqual(transactionsResponse.count, 2)
         XCTAssertEqual(try transactionsResponse[0].get().transaction.hash, previousResult.transaction.hash)
-        
-         do {
+
+        do {
             let _ = try transactionsResponse[1].get().transaction.hash
             XCTFail("Fetching transaction with nonexistent hash should fail")
         } catch {}
