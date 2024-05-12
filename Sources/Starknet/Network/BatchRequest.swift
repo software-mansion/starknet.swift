@@ -13,24 +13,28 @@ public class BatchRequest<U: Decodable, P: Encodable> {
         self.networkProvider = networkProvider
     }
 
+    private func getOrderedRpcResults(rpcResponses: [JsonRpcResponse<U>]) -> [Result<U, StarknetProviderError>] {
+        var orderedRpcResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: rpcPayloads.count)
+        for rpcResponse in rpcResponses {
+            if let error = rpcResponse.error {
+                orderedRpcResults[rpcResponse.id] = .failure(StarknetProviderError.jsonRpcError(error.code, error.message, error.data))
+            } else if let result = rpcResponse.result {
+                orderedRpcResults[rpcResponse.id] = .success(result)
+            } else {
+                orderedRpcResults[rpcResponse.id] = .failure(StarknetProviderError.unknownError)
+            }
+        }
+
+        return orderedRpcResults.compactMap { $0 }
+    }
+
     func send() async throws -> [Result<U, StarknetProviderError>] {
-        let responses: [JsonRpcResponse<U>] = try await networkProvider.sendBatch(
+        let rpcResponses: [JsonRpcResponse<U>] = try await networkProvider.sendBatch(
             payload: rpcPayloads,
             config: config,
             receive: [JsonRpcResponse<U>.self]
         )
 
-        var orderedResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: rpcPayloads.count)
-        for response in responses {
-            if let error = response.error {
-                orderedResults[response.id] = .failure(StarknetProviderError.jsonRpcError(error.code, error.message, error.data))
-            } else if let result = response.result {
-                orderedResults[response.id] = .success(result)
-            } else {
-                orderedResults[response.id] = .failure(StarknetProviderError.unknownError)
-            }
-        }
-
-        return orderedResults.compactMap { $0 }
+        return getOrderedRpcResults(rpcResponses: rpcResponses)
     }
 }
