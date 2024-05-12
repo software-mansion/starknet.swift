@@ -411,14 +411,16 @@ final class ProviderTests: XCTestCase {
 
         let transactionsResponse = try await provider.batchRequests(requests: [
             provider.getTransactionBy(hash: previousResult.transaction.hash!),
-            provider.getTransactionBy(hash: previousResult.transaction.hash!),
+            provider.getTransactionBy(hash: "0x123"),
         ]
         ).send()
 
         XCTAssertEqual(transactionsResponse.count, 2)
         XCTAssertEqual(try transactionsResponse[0].get().transaction.hash, previousResult.transaction.hash)
-        XCTAssertEqual(try transactionsResponse[1].get().transaction.hash, previousResult.transaction.hash)
-
-        print(transactionsResponse)
+        
+         do {
+            let _ = try transactionsResponse[1].get().transaction.hash
+            XCTFail("Fetching transaction with nonexistent hash should fail")
+        } catch {}
     }
 }
