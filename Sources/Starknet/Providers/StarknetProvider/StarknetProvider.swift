@@ -53,8 +53,8 @@ public class StarknetProvider: StarknetProviderProtocol {
     ///
     /// - Returns: batch HTTP request.
     public func batchRequests<U: Decodable, P: Encodable>(requests: [Request<U, P>]) -> BatchRequest<U, P> {
-        let rpcPayloads = requests.map { request in
-            JsonRpcPayload(method: request.method, params: request.params)
+        let rpcPayloads = requests.enumerated().map { index, request in
+            JsonRpcPayload(method: request.method, params: request.params, id: index)
         }
         let config = HttpNetworkProvider.Configuration(
             url: url,
