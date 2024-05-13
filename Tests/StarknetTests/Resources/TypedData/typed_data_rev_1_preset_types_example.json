@@ -1,19 +1,37 @@
 {
     "types": {
         "StarknetDomain": [
-            { "name": "name", "type": "shortstring" },
-            { "name": "version", "type": "shortstring" },
-            { "name": "chainId", "type": "shortstring" },
-            { "name": "revision", "type": "shortstring" }
+            {
+                "name": "name",
+                "type": "shortstring"
+            },
+            {
+                "name": "version",
+                "type": "shortstring"
+            },
+            {
+                "name": "chainId",
+                "type": "shortstring"
+            },
+            {
+                "name": "revision",
+                "type": "shortstring"
+            }
         ],
         "Example": [
-            { "name": "n0", "type": "TokenAmount" },
-            { "name": "n1", "type": "NftId" }
+            {
+                "name": "n0",
+                "type": "TokenAmount"
+            },
+            {
+                "name": "n1",
+                "type": "NftId"
+            }
         ]
     },
     "primaryType": "Example",
     "domain": {
-        "name": "StarkNet Mail",
+        "name": "Starknet Mail",
         "version": "1",
         "chainId": "1",
         "revision": "1"

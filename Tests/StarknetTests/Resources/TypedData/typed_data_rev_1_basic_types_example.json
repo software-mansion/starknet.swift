@@ -1,27 +1,69 @@
 {
     "types": {
         "StarknetDomain": [
-            { "name": "name", "type": "shortstring" },
-            { "name": "version", "type": "shortstring" },
-            { "name": "chainId", "type": "shortstring" },
-            { "name": "revision", "type": "shortstring" }
+            {
+                "name": "name",
+                "type": "shortstring"
+            },
+            {
+                "name": "version",
+                "type": "shortstring"
+            },
+            {
+                "name": "chainId",
+                "type": "shortstring"
+            },
+            {
+                "name": "revision",
+                "type": "shortstring"
+            }
         ],
         "Example": [
-            { "name": "n0", "type": "felt" },
-            { "name": "n1", "type": "bool" },
-            { "name": "n2", "type": "string" },
-            { "name": "n3", "type": "selector" },
-            { "name": "n4", "type": "u128" },
-            { "name": "n5", "type": "i128" },
-            { "name": "n6", "type": "ContractAddress" },
-            { "name": "n7", "type": "ClassHash" },
-            { "name": "n8", "type": "timestamp" },
-            { "name": "n9", "type": "shortstring" }
+            {
+                "name": "n0",
+                "type": "felt"
+            },
+            {
+                "name": "n1",
+                "type": "bool"
+            },
+            {
+                "name": "n2",
+                "type": "string"
+            },
+            {
+                "name": "n3",
+                "type": "selector"
+            },
+            {
+                "name": "n4",
+                "type": "u128"
+            },
+            {
+                "name": "n5",
+                "type": "i128"
+            },
+            {
+                "name": "n6",
+                "type": "ContractAddress"
+            },
+            {
+                "name": "n7",
+                "type": "ClassHash"
+            },
+            {
+                "name": "n8",
+                "type": "timestamp"
+            },
+            {
+                "name": "n9",
+                "type": "shortstring"
+            }
         ]
     },
     "primaryType": "Example",
     "domain": {
-        "name": "StarkNet Mail",
+        "name": "Starknet Mail",
         "version": "1",
         "chainId": "1",
         "revision": "1"

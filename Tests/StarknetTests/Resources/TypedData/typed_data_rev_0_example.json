@@ -1,23 +1,47 @@
 {
   "types": {
-    "StarkNetDomain": [
-      { "name": "name", "type": "felt" },
-      { "name": "version", "type": "felt" },
-      { "name": "chainId", "type": "felt" }
+    "StarknetDomain": [
+      {
+        "name": "name",
+        "type": "felt"
+      },
+      {
+        "name": "version",
+        "type": "felt"
+      },
+      {
+        "name": "chainId",
+        "type": "felt"
+      }
     ],
     "Person": [
-      { "name": "name", "type": "felt" },
-      { "name": "wallet", "type": "felt" }
+      {
+        "name": "name",
+        "type": "felt"
+      },
+      {
+        "name": "wallet",
+        "type": "felt"
+      }
     ],
     "Mail": [
-      { "name": "from", "type": "Person" },
-      { "name": "to", "type": "Person" },
-      { "name": "contents", "type": "felt" }
+      {
+        "name": "from",
+        "type": "Person"
+      },
+      {
+        "name": "to",
+        "type": "Person"
+      },
+      {
+        "name": "contents",
+        "type": "felt"
+      }
     ]
   },
   "primaryType": "Mail",
   "domain": {
-    "name": "StarkNet Mail",
+    "name": "Starknet Mail",
     "version": "1",
     "chainId": 1
   },
