@@ -48,14 +48,38 @@ class HttpNetworkProvider {
     }
 
     func send<U>(payload: some Encodable, config: Configuration, receive _: U.Type) async throws -> U where U: Decodable {
-        let result = try await sendBatch(payload: [payload], config: config, receive: [U.self])
-        guard let firstResult = result.first else {
+        let encoded: Data
+        do {
+            encoded = try JSONEncoder().encode(payload)
+        } catch {
+            if let encodingError = error as? EncodingError {
+                throw HttpNetworkProviderError.encodingError(encodingError)
+            } else {
+                throw HttpNetworkProviderError.unknownError
+            }
+        }
+
+        let request = makeRequestWith(body: encoded, config: config)
+
+        guard let (data, response) = try? await session.data(for: request) else {
             throw HttpNetworkProviderError.unknownError
         }
-        return firstResult
+
+        do {
+            let result = try JSONDecoder().decode(U.self, from: data)
+            return result
+        } catch {
+            if let response = response as? HTTPURLResponse, response.statusCode < 200 || response.statusCode > 299 {
+                throw HttpNetworkProviderError.requestRejected
+            } else if let decodingError = error as? DecodingError {
+                throw HttpNetworkProviderError.decodingError(decodingError)
+            } else {
+                throw HttpNetworkProviderError.unknownError
+            }
+        }
     }
 
-    func sendBatch<U>(payload: [some Encodable], config: Configuration, receive _: [U.Type]) async throws -> [U] where U: Decodable {
+    func send<U>(payload: [some Encodable], config: Configuration, receive _: [U.Type]) async throws -> [U] where U: Decodable {
         let encoded: Data
         do {
             encoded = try JSONEncoder().encode(payload)

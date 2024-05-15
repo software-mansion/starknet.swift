@@ -29,7 +29,7 @@ public class BatchRequest<U: Decodable, P: Encodable> {
     }
 
     func send() async throws -> [Result<U, StarknetProviderError>] {
-        let rpcResponses: [JsonRpcResponse<U>] = try await networkProvider.sendBatch(
+        let rpcResponses: [JsonRpcResponse<U>] = try await networkProvider.send(
             payload: rpcPayloads,
             config: config,
             receive: [JsonRpcResponse<U>.self]
