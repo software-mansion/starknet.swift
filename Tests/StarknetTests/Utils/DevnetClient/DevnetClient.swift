@@ -642,7 +642,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             if let data = contents.data(using: .utf8),
                let response = try? JSONDecoder().decode(AccountDetailsResponse.self, from: data),
-               let account = response["alpha-goerli"]?[accountName]
+               let account = response["SN_SEPOLIA"]?[accountName]
             {
                 return account
             }

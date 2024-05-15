@@ -5,7 +5,6 @@ public struct StarknetChainId: Codable, Equatable {
     public let value: Felt
 
     public static let main = StarknetChainId(fromHex: "0x534e5f4d41494e")
-    public static let goerli = StarknetChainId(fromHex: "0x534e5f474f45524c49")
     public static let sepolia = StarknetChainId(fromHex: "0x534e5f5345504f4c4941")
     public static let integration_sepolia = StarknetChainId(fromHex: "0x534e5f494e544547524154494f4e5f5345504f4c4941")
 
@@ -26,7 +25,6 @@ public struct StarknetChainId: Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case mainnet = "0x534e5f4d41494e"
-        case goerli = "0x534e5f474f45524c49"
         case sepolia = "0x534e5f5345504f4c4941"
         case integration_sepolia = "0x534e5f494e544547524154494f4e5f5345504f4c4941"
     }

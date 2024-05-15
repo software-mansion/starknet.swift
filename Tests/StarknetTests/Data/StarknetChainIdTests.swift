@@ -8,7 +8,6 @@ final class StarknetChainIdTests: XCTestCase {
     override class func setUp() {
         self.chainIdCases = [
             (StarknetChainId.main, "SN_MAIN", "0x534e5f4d41494e"),
-            (StarknetChainId.goerli, "SN_GOERLI", "0x534e5f474f45524c49"),
             (StarknetChainId.sepolia, "SN_SEPOLIA", "0x534e5f5345504f4c4941"),
             (StarknetChainId.integration_sepolia, "SN_INTEGRATION_SEPOLIA", "0x534e5f494e544547524154494f4e5f5345504f4c4941"),
         ]
