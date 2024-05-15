@@ -47,7 +47,7 @@ class HttpNetworkProvider {
         return request
     }
 
-    private func handleEncodeError(_ error: Error) throws -> Never {
+    private func handleEncodingError(_ error: Error) throws -> Never {
         if let encodingError = error as? EncodingError {
             throw HttpNetworkProviderError.encodingError(encodingError)
         } else {
@@ -70,7 +70,7 @@ class HttpNetworkProvider {
         do {
             encoded = try JSONEncoder().encode(payload)
         } catch {
-            try handleEncodeError(error)
+            try handleEncodingError(error)
         }
 
         let request = makeRequestWith(body: encoded, config: config)
@@ -92,7 +92,7 @@ class HttpNetworkProvider {
         do {
             encoded = try JSONEncoder().encode(payload)
         } catch {
-            try handleEncodeError(error)
+            try handleEncodingError(error)
         }
 
         let request = makeRequestWith(body: encoded, config: config)
