@@ -421,7 +421,7 @@ final class TypedDataTests: XCTestCase {
             (
                 Self.CasesRev0.tdValidate,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x6038f35de58f40a6afa9d359859b2f930e5eb987580ba6875324cc4dbfcee"
+                "0x3b3fbdb1961ae09cb5b2716b07142e63930fb2eddc4842641ca1df7352766a1"
             ),
             (
                 Self.CasesRev1.td,
