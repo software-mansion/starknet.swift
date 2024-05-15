@@ -1,63 +1,23 @@
 {
   "types": {
-    "StarknetDomain": [
-      {
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "name": "version",
-        "type": "felt"
-      },
-      {
-        "name": "chainId",
-        "type": "felt"
-      }
+    "StarkNetDomain": [
+      {"name": "name", "type": "string"},
+      {"name": "version", "type": "felt"},
+      {"name": "chainId", "type": "felt"}
     ],
     "Airdrop": [
-      {
-        "name": "address",
-        "type": "felt"
-      },
-      {
-        "name": "amount",
-        "type": "felt"
-      }
+      {"name": "address", "type": "felt"},
+      {"name": "amount", "type": "felt"}
     ],
     "Validate": [
-      {
-        "name": "id",
-        "type": "felt"
-      },
-      {
-        "name": "from",
-        "type": "felt"
-      },
-      {
-        "name": "amount",
-        "type": "felt"
-      },
-      {
-        "name": "nameGamer",
-        "type": "string"
-      },
-      {
-        "name": "endDate",
-        "type": "felt"
-      },
-      {
-        "name": "itemsAuthorized",
-        "type": "felt*"
-      },
-      {
-        "name": "chkFunction",
-        "type": "selector"
-      },
-      {
-        "name": "rootList",
-        "type": "merkletree",
-        "contains": "Airdrop"
-      }
+      {"name": "id", "type": "felt"},
+      {"name": "from", "type": "felt"},
+      {"name": "amount", "type": "felt"},
+      {"name": "nameGamer", "type": "string"},
+      {"name": "endDate", "type": "felt"},
+      {"name": "itemsAuthorized", "type": "felt*"},
+      {"name": "chkFunction", "type": "selector"},
+      {"name": "rootList", "type": "merkletree", "contains": "Airdrop"}
     ]
   },
   "primaryType": "Validate",
@@ -72,12 +32,7 @@
     "amount": "400",
     "nameGamer": "Hector26",
     "endDate": "0x27d32a3033df4277caa9e9396100b7ca8c66a4ef8ea5f6765b91a7c17f0109c",
-    "itemsAuthorized": [
-      "0x01",
-      "0x03",
-      "0x0a",
-      "0x0e"
-    ],
+    "itemsAuthorized": ["0x01", "0x03", "0x0a", "0x0e"],
     "chkFunction": "check_authorization",
     "rootList": [
       {

@@ -2,47 +2,22 @@
   "primaryType": "Session",
   "types": {
     "Policy": [
-      {
-        "name": "contractAddress",
-        "type": "felt"
-      },
-      {
-        "name": "selector",
-        "type": "selector"
-      }
+      { "name": "contractAddress", "type": "felt" },
+      { "name": "selector", "type": "selector" }
     ],
     "Session": [
-      {
-        "name": "key",
-        "type": "felt"
-      },
-      {
-        "name": "expires",
-        "type": "felt"
-      },
-      {
-        "name": "root",
-        "type": "merkletree",
-        "contains": "Policy"
-      }
+      { "name": "key", "type": "felt" },
+      { "name": "expires", "type": "felt" },
+      { "name": "root", "type": "merkletree", "contains": "Policy" }
     ],
-    "StarknetDomain": [
-      {
-        "name": "name",
-        "type": "felt"
-      },
-      {
-        "name": "version",
-        "type": "felt"
-      },
-      {
-        "name": "chainId",
-        "type": "felt"
-      }
+    "StarkNetDomain": [
+      { "name": "name", "type": "felt" },
+      { "name": "version", "type": "felt" },
+      { "name": "chainId", "type": "felt" }
     ]
   },
   "domain": {
-    "name": "Starknet Mail",
+    "name": "StarkNet Mail",
     "version": "1",
     "chainId": 1
   },

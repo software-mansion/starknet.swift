@@ -1,61 +1,28 @@
 {
   "types": {
-    "StarknetDomain": [
-      {
-        "name": "name",
-        "type": "felt"
-      },
-      {
-        "name": "version",
-        "type": "felt"
-      },
-      {
-        "name": "chainId",
-        "type": "felt"
-      }
+    "StarkNetDomain": [
+      { "name": "name", "type": "felt" },
+      { "name": "version", "type": "felt" },
+      { "name": "chainId", "type": "felt" }
     ],
     "Person": [
-      {
-        "name": "name",
-        "type": "felt"
-      },
-      {
-        "name": "wallet",
-        "type": "felt"
-      }
+      { "name": "name", "type": "felt" },
+      { "name": "wallet", "type": "felt" }
     ],
     "Post": [
-      {
-        "name": "title",
-        "type": "felt"
-      },
-      {
-        "name": "content",
-        "type": "felt"
-      }
+      { "name": "title", "type": "felt" },
+      { "name": "content", "type": "felt" }
     ],
     "Mail": [
-      {
-        "name": "from",
-        "type": "Person"
-      },
-      {
-        "name": "to",
-        "type": "Person"
-      },
-      {
-        "name": "posts_len",
-        "type": "felt"
-      },
-      {
-        "name": "posts",
-        "type": "Post*"
-      }
+      { "name": "from", "type": "Person" },
+      { "name": "to", "type": "Person" },
+      { "name": "posts_len", "type": "felt" },
+      { "name": "posts", "type": "Post*" }
     ]
   },
   "primaryType": "Mail",
   "domain": {
-    "name": "Starknet Mail",
+    "name": "StarkNet Mail",
     "version": "1",
     "chainId": 1
   },
@@ -70,14 +37,8 @@
     },
     "posts_len": 2,
     "posts": [
-      {
-        "title": "Greeting",
-        "content": "Hello, Bob!"
-      },
-      {
-        "title": "Farewell",
-        "content": "Goodbye, Bob!"
-      }
+      { "title": "Greeting", "content": "Hello, Bob!" },
+      { "title": "Farewell", "content": "Goodbye, Bob!" }
     ]
   }
 }

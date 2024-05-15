@@ -27,7 +27,7 @@ final class TypedDataTests: XCTestCase {
     }
 
     static let domainTypeV0 = (
-        "StarknetDomain",
+        "StarkNetDomain",
         [
             StarknetTypedData.StandardType(name: "name", type: "felt"),
             StarknetTypedData.StandardType(name: "version", type: "felt"),
@@ -281,7 +281,7 @@ final class TypedDataTests: XCTestCase {
 
     func testTypeHashCalculation() throws {
         let cases: [(StarknetTypedData, String, Felt)] = [
-            (Self.CasesRev0.td, "StarknetDomain", "0x2aec96fcd62ca4b913e0bc887137537688a0546882c369877a3cbf776f119ef"),
+            (Self.CasesRev0.td, "StarkNetDomain", "0x1bfc207425a47a5dfa1a50a4f5241203f50624ca5fdf5e18755765416b8e288"),
             (Self.CasesRev0.td, "Person", "0x2896dbe4b96a67110f454c01e5336edc5bbc3635537efd690f122f4809cc855"),
             (Self.CasesRev0.td, "Mail", "0x13d89452df9512bf750f539ba3001b945576243288137ddb6c788457d4b2f79"),
             (Self.CasesRev0.tdString, "String", "0x1933fe9de7e181d64298eecb44fc43b4cec344faa26968646761b7278df4ae2"),
@@ -313,9 +313,9 @@ final class TypedDataTests: XCTestCase {
         let cases: [(StarknetTypedData, String, String, Felt)] = [
             (
                 Self.CasesRev0.td,
-                "StarknetDomain",
+                "StarkNetDomain",
                 "domain",
-                "0x2854094d57f19a3abe97844546e3cb66525ae4bb9fae1694469e416908ccdd3"
+                "0x54833b121883a3e3aebff48ec08a962f5742e5f7b973469c1f8f4f55d470b07"
             ),
             (Self.CasesRev0.td, "Mail", "message", "0x4758f1ed5e7503120c228cbcaba626f61514559e9ef5ed653b0b885e0f38aec"),
             (
@@ -352,7 +352,7 @@ final class TypedDataTests: XCTestCase {
                 Self.CasesRev1.td,
                 "StarknetDomain",
                 "domain",
-                "0x50741d1ff343898231372d282e39cab1ce0b0ae8725984b5bcada914b25700e"
+                "0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"
             ),
             (
                 Self.CasesRev1.tdBasicTypes,
@@ -396,57 +396,57 @@ final class TypedDataTests: XCTestCase {
             (
                 Self.CasesRev0.td,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x7fde15a6731a6f04e5112ad678b51952cbae410c6544b5a4314368d8e44050f"
+                "0x6fcff244f63e38b9d88b9e3378d44757710d1b244282b435cb472053c8d78d0"
             ),
             (
                 Self.CasesRev0.tdString,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x514090dc66971fa269e3efe7c13e4b21f16a5ff9f78cf70c2381155156082eb"
+                "0x691b977ee0ee645647336f01d724274731f544ad0d626b078033d2541ee641d"
             ),
             (
                 Self.CasesRev0.tdFeltArr,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x5f95a34821d399140e737905ae5fcb6dcc1357ddcd4e7536c48a834a1188b5a"
+                "0x30ab43ef724b08c3b0a9bbe425e47c6173470be75d1d4c55fd5bf9309896bce"
             ),
             (
                 Self.CasesRev0.tdStructArr,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x6eba9184b1c8d49f888c158081ff912c337ffd6088b5e59ce4c3a5c01090919"
+                "0x5914ed2764eca2e6a41eb037feefd3d2e33d9af6225a9e7fe31ac943ff712c"
             ),
             (
                 Self.CasesRev0.tdStructMerkleTree,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x2a9ecb57847c52fb2fdd5e39e6eab314c3c48808bda9548188010fb6cc8c3b9"
+                "0x5d28fa1b31f92e63022f7d85271606e52bed89c046c925f16b09e644dc99794"
             ),
             (
                 Self.CasesRev0.tdValidate,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x9410650b3964284ea17d69e509c8d9c17db0e7493b0d966cbd0cdeafca0160"
+                "0x6038f35de58f40a6afa9d359859b2f930e5eb987580ba6875324cc4dbfcee"
             ),
             (
                 Self.CasesRev1.td,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x68bc218000ceaa6c38ab8adeeac21c339e807bab00a26dd13604fa98d867ec"
+                "0x7f6e8c3d8965b5535f5cc68f837c04e3bbe568535b71aa6c621ddfb188932b8"
             ),
             (
                 Self.CasesRev1.tdBasicTypes,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x6e8b1c59c9b4d7b0129953ee8e7e27b2c7a23ea169fe2c62ebd1b434f817a99"
+                "0x2d80b87b8bc32068247c779b2ef0f15f65c9c449325e44a9df480fb01eb43ec"
             ),
             (
                 Self.CasesRev1.tdPresetTypes,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x41f3cf88c97adf30688d8b111fc8c8115b888df0306471df5b695dfd6716ae4"
+                "0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"
             ),
             (
                 Self.CasesRev1.tdEnum,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x24cac4ca9b9abb679743f5d3d2a5d60e4e2769a63dcb355f203a3626afdceca"
+                "0x3df10475ad5a8f49db4345a04a5b09164d2e24b09f6e1e236bc1ccd87627cc"
             ),
             (
                 Self.CasesRev1.tdFeltMerkleTree,
                 "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
-                "0x35a4fb53efb073fe59a6af35a478b9b547119ebba0155a90f31ff2f362ad47d"
+                "0x4f706783e0d7d0e61433d41343a248a213e9ab341d50ba978dfc055f26484c9"
             ),
         ]
 

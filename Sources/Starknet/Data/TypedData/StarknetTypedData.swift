@@ -33,7 +33,7 @@ public enum StarknetTypedDataError: Error, Equatable {
 /// let typedDataString = """
 /// {
 ///     "types": {
-///         "StarknetDomain": [
+///         "StarkNetDomain": [
 ///             {"name": "name", "type": "shortstring"},
 ///             {"name": "version", "type": "shortstring"},
 ///             {"name": "chainId", "type": "shortstring"},
@@ -50,7 +50,7 @@ public enum StarknetTypedDataError: Error, Equatable {
 ///         ],
 ///     },
 ///     "primaryType": "Mail",
-///     "domain": {"name": "Starknet Mail", "version": "1", "chainId": "1", "revision": 1},
+///     "domain": {"name": "StarkNet Mail", "version": "1", "chainId": "1", "revision": 1},
 ///     "message": {
 ///         "from": {
 ///             "name": "Cow",
@@ -384,7 +384,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 
     public func getMessageHash(accountAddress: Felt) throws -> Felt {
         try hashArray([
-            Felt.fromShortString("Starknet Message")!,
+            Felt.fromShortString("StarkNet Message")!,
             getStructHash(domain: domain),
             accountAddress,
             getStructHash(typeName: primaryType, data: message),
@@ -416,7 +416,7 @@ public extension StarknetTypedData {
 
         public var separatorName: String {
             switch try! resolveRevision() {
-            case .v0: "StarknetDomain"
+            case .v0: "StarkNetDomain"
             case .v1: "StarknetDomain"
             }
         }
