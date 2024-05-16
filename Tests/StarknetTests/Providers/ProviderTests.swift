@@ -208,7 +208,7 @@ final class ProviderTests: XCTestCase {
     func testEstimateInvokeV1Fee() async throws {
         let contractAddress = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000]).deploy.contractAddress
 
-        let nonce = try await account.getNonce()
+        let nonce = try await account.getNonce().send()
 
         let call = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
@@ -229,7 +229,7 @@ final class ProviderTests: XCTestCase {
 
     func testEstimateInvokeV3Fee() async throws {
         let contractAddress = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000]).deploy.contractAddress
-        let nonce = try await account.getNonce()
+        let nonce = try await account.getNonce().send()
 
         let call = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
@@ -256,7 +256,7 @@ final class ProviderTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
-        let nonce = await (try? newAccount.getNonce()) ?? .zero
+        let nonce = await (try? newAccount.getNonce().send()) ?? .zero
 
         let params = StarknetDeployAccountParamsV1(nonce: nonce, maxFee: .zero)
 
@@ -277,7 +277,7 @@ final class ProviderTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
-        let nonce = await (try? newAccount.getNonce()) ?? .zero
+        let nonce = await (try? newAccount.getNonce().send()) ?? .zero
 
         let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: .zero)
 
@@ -317,7 +317,7 @@ final class ProviderTests: XCTestCase {
     func testSimulateTransactionsV1() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
-        let nonce = try await account.getNonce()
+        let nonce = try await account.getNonce().send()
 
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let params = StarknetInvokeParamsV1(nonce: nonce, maxFee: 500_000_000_000_000)
@@ -355,7 +355,7 @@ final class ProviderTests: XCTestCase {
     func testSimulateTransactionsV3() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
-        let nonce = try await account.getNonce()
+        let nonce = try await account.getNonce().send()
 
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
 

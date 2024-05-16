@@ -56,7 +56,7 @@ final class AccountTests: XCTestCase {
 
         let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let result = try await account.executeV1(call: call)
+        let result = try await account.executeV1(call: call).send()
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -72,7 +72,7 @@ final class AccountTests: XCTestCase {
 
         let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let result = try await account.executeV3(calls: [call])
+        let result = try await account.executeV3(calls: [call]).send()
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -83,10 +83,10 @@ final class AccountTests: XCTestCase {
         let calldata: [Felt] = [recipientAddress, 1000, 0]
         let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let result = try await account.executeV1(call: call, estimateFeeMultiplier: 1.8)
+        let result = try await account.executeV1(call: call, estimateFeeMultiplier: 1.8).send()
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
 
-        let result2 = try await account.executeV1(call: call, estimateFeeMultiplier: 0.9)
+        let result2 = try await account.executeV1(call: call, estimateFeeMultiplier: 0.9).send()
         try await Self.devnetClient.assertTransactionFailed(transactionHash: result2.transactionHash)
     }
 
@@ -96,10 +96,10 @@ final class AccountTests: XCTestCase {
         let calldata: [Felt] = [recipientAddress, 1000, 0]
         let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let result = try await account.executeV3(call: call, estimateAmountMultiplier: 1.8, estimateUnitPriceMultiplier: 1.8)
+        let result = try await account.executeV3(call: call, estimateAmountMultiplier: 1.8, estimateUnitPriceMultiplier: 1.8).send()
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
 
-        let result2 = try await account.executeV3(call: call, estimateAmountMultiplier: 0.9, estimateUnitPriceMultiplier: 1.0)
+        let result2 = try await account.executeV3(call: call, estimateAmountMultiplier: 0.9, estimateUnitPriceMultiplier: 1.0).send()
         try await Self.devnetClient.assertTransactionFailed(transactionHash: result2.transactionHash)
     }
 
@@ -114,13 +114,13 @@ final class AccountTests: XCTestCase {
 
         let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let nonce = try await account.getNonce()
-        let feeEstimate = try await account.estimateFeeV1(call: call, nonce: nonce)
+        let nonce = try await account.getNonce().send()
+        let feeEstimate = try await account.estimateFeeV1(call: call, nonce: nonce).send()[0]
         let maxFee = feeEstimate.toMaxFee()
 
         let params = StarknetOptionalInvokeParamsV1(nonce: nonce, maxFee: maxFee)
 
-        let result = try await account.executeV1(call: call, params: params)
+        let result = try await account.executeV1(call: call, params: params).send()
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -136,13 +136,13 @@ final class AccountTests: XCTestCase {
 
         let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
 
-        let nonce = try await account.getNonce()
-        let feeEstimate = try await account.estimateFeeV3(call: call, nonce: nonce, skipValidate: false)
+        let nonce = try await account.getNonce().send()
+        let feeEstimate = try await account.estimateFeeV3(call: call, nonce: nonce, skipValidate: false).send()[0]
         let resourceBounds = feeEstimate.toResourceBounds()
 
         let params = StarknetOptionalInvokeParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
 
-        let result = try await account.executeV3(calls: [call], params: params)
+        let result = try await account.executeV3(calls: [call], params: params).send()
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -165,7 +165,7 @@ final class AccountTests: XCTestCase {
         let call1 = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
         let call2 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.ethErc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
-        let result = try await account.executeV1(calls: [call1, call2])
+        let result = try await account.executeV1(calls: [call1, call2]).send()
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
@@ -178,9 +178,9 @@ final class AccountTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress)
 
-        let nonce = await (try? newAccount.getNonce()) ?? .zero
+        let nonce = await (try? newAccount.getNonce().send()) ?? .zero
 
-        let feeEstimate = try await newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce, skipValidate: false)
+        let feeEstimate = try await newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce, skipValidate: false).send()[0]
         let maxFee = feeEstimate.toMaxFee()
 
         let params = StarknetDeployAccountParamsV1(nonce: nonce, maxFee: maxFee)
@@ -191,7 +191,7 @@ final class AccountTests: XCTestCase {
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
 
-        let newNonce = try await newAccount.getNonce()
+        let newNonce = try await newAccount.getNonce().send()
 
         XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
     }
@@ -204,9 +204,9 @@ final class AccountTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress, unit: .fri)
 
-        let nonce = await (try? newAccount.getNonce()) ?? .zero
+        let nonce = await (try? newAccount.getNonce().send()) ?? .zero
 
-        let feeEstimate = try await newAccount.estimateDeployAccountFeeV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce)
+        let feeEstimate = try await newAccount.estimateDeployAccountFeeV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce).send()[0]
 
         let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: feeEstimate.toResourceBounds().l1Gas)
 
@@ -216,7 +216,7 @@ final class AccountTests: XCTestCase {
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
 
-        let newNonce = try await newAccount.getNonce()
+        let newNonce = try await newAccount.getNonce().send()
 
         XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
     }
