@@ -3,16 +3,6 @@ public struct StarknetBatchRequest<U: Decodable, P: Encodable> {
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
 
-    init(
-        rpcPayloads: [JsonRpcPayload<P>],
-        config: HttpNetworkProvider.Configuration,
-        networkProvider: HttpNetworkProvider
-    ) {
-        self.rpcPayloads = rpcPayloads
-        self.config = config
-        self.networkProvider = networkProvider
-    }
-
     public func send() async throws -> [Result<U, StarknetProviderError>] {
         let rpcResponses: [JsonRpcResponse<U>] = try await networkProvider.send(
             payload: rpcPayloads,
