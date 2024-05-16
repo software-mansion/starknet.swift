@@ -1,4 +1,4 @@
-public class StarknetRequest<U: Decodable, P: Encodable> {
+public struct StarknetRequest<U: Decodable, P: Encodable> {
     let method: JsonRpcMethod
     let params: P
     let config: HttpNetworkProvider.Configuration
