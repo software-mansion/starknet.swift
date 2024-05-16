@@ -2,7 +2,7 @@ import Foundation
 
 struct JsonRpcPayload<T: Encodable>: Encodable {
     let version = "2.0"
-    var id: Int
+    let id: Int
 
     let method: JsonRpcMethod
     let params: T
