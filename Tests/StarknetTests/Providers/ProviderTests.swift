@@ -417,8 +417,17 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(try transactionsResponse[0].get().transaction.hash, previousResult.transaction.hash)
 
         do {
-            let _ = try transactionsResponse[1].get().transaction.hash
-            XCTFail("Fetching transaction with nonexistent hash should fail")
-        } catch {}
+                let _ = try transactionsResponse[1].get().transaction.hash
+                XCTFail("Fetching transaction with nonexistent hash should fail")
+            } catch let error as StarknetProviderError {
+                switch error {
+                case .jsonRpcError(let code, let message, _):
+                    XCTAssertEqual(message, "Transaction hash not found", "Unexpected error message received")
+                default:
+                    XCTFail("Expected JsonRpcError but received \(error)")
+                }
+            } catch {
+                XCTFail("Error was not a StarknetProviderError. Received error type: \(type(of: error))")
+            }
     }
 }

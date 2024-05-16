@@ -28,7 +28,7 @@ public class StarknetBatchRequest<U: Decodable, P: Encodable> {
         return orderedRpcResults.compactMap { $0 }
     }
 
-    func send() async throws -> [Result<U, StarknetProviderError>] {
+    public func send() async throws -> [Result<U, StarknetProviderError>] {
         let rpcResponses: [JsonRpcResponse<U>] = try await networkProvider.send(
             payload: rpcPayloads,
             config: config,

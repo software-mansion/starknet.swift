@@ -16,7 +16,7 @@ public class StarknetRequest<U: Decodable, P: Encodable> {
         self.networkProvider = networkProvider
     }
 
-    func send() async throws -> U {
+    public func send() async throws -> U {
         let rpcPayload = JsonRpcPayload<P>(method: method, params: params)
         let response: JsonRpcResponse<U> = try await networkProvider.send(
             payload: rpcPayload,
