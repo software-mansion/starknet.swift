@@ -5,7 +5,8 @@ import XCTest
 final class ProviderTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
-    var provider: StarknetProvider!
+    var provider: StarknetProviderProtocol!
+    var batchProvider: StarknetProvider!
     var chainId: StarknetChainId!
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!
@@ -30,6 +31,7 @@ final class ProviderTests: XCTestCase {
         }
 
         provider = makeStarknetProvider(url: Self.devnetClient.rpcUrl)
+        batchProvider = makeStarknetProvider(url: Self.devnetClient.rpcUrl)
         ethContractAddress = Self.devnetClient.constants.ethErc20ContractAddress
         accountContractClassHash = Self.devnetClient.constants.accountContractClassHash
         let accountDetails = Self.devnetClient.constants.predeployedAccount2
@@ -407,9 +409,9 @@ final class ProviderTests: XCTestCase {
     }
 
     func testBatchGetTransactionByHash() async throws {
-        let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
+        let previousResult = try await batchProvider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
 
-        let transactionsResponse = try await provider.batchRequests(requests:
+        let transactionsResponse = try await batchProvider.batchRequests(requests:
             provider.getTransactionBy(hash: previousResult.transaction.hash!),
             provider.getTransactionBy(hash: "0x123")).send()
 
@@ -421,7 +423,7 @@ final class ProviderTests: XCTestCase {
             XCTFail("Fetching transaction with nonexistent hash should fail")
         } catch let error as StarknetProviderError {
             switch error {
-            case let .jsonRpcError(code, message, _):
+            case let .jsonRpcError(_, message, _):
                 XCTAssertEqual(message, "Transaction hash not found", "Unexpected error message received")
             default:
                 XCTFail("Expected JsonRpcError but received \(error)")
