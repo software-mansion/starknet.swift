@@ -39,7 +39,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return StarknetRequest<U, P>(method: method, params: params, config: config, networkProvider: networkProvider)
     }
 
-    /// Batch multiple HTTP requests together into a single HTTP request.
+    /// Batch multiple HTTP requests with JSON-RPC calls together into a single HTTP request
     ///
     /// - Parameters
     ///     - requests: list of HTTP requests to be batched together.
@@ -54,7 +54,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         return StarknetBatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
-    /// Batch multiple HTTP requests together into a single HTTP request using variadic parameters.
+    /// Batch multiple HTTP requests with JSON-RPC calls together into a single HTTP request
     ///
     /// - Parameters
     ///     - requests: one or more HTTP requests to be batched together.
