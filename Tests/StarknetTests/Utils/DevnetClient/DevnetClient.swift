@@ -291,18 +291,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.toolVersionsPath = newToolVersionsPath.path
             self.contractsPath = newContractsPath.path
 
-            // TODO: (#130) Use the old approach once we're able to update sncast
-            guard let accountsPath = Bundle.module.path(forResource: "starknet_open_zeppelin_accounts", ofType: "json") else {
-                throw DevnetClientError.missingResourceFile
-            }
-            let accountsResourcePath = URL(fileURLWithPath: accountsPath)
-            let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
-            try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
-
-            let _ = try await deployAccount(name: "__default__")
-
-            // // Initialize new accounts file
-            // let _ = try await createDeployAccount(name: "__default__")
+            // Initialize new accounts file
+            let _ = try await createDeployAccount(name: "__default__")
         }
 
         public func close() {

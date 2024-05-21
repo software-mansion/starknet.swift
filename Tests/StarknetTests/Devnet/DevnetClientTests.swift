@@ -13,8 +13,7 @@ final class DevnetClientTests: XCTestCase {
         client.close()
     }
 
-    // TODO: (#130) re-enable once creating accounts is supported again
-    func disabledTestCreateDeployAccount() async throws {
+    func testCreateDeployAccount() async throws {
         let account = try await client.createDeployAccount(name: "Account1")
         try await client.assertTransactionSucceeded(transactionHash: account.transactionHash)
 
@@ -22,8 +21,7 @@ final class DevnetClientTests: XCTestCase {
         try await client.assertTransactionSucceeded(transactionHash: account2.transactionHash)
     }
 
-    // TODO: (#130) re-enable once creating accounts is supported again
-    func disabledTestCreateAndDeployAccount() async throws {
+    func testCreateAndDeployAccount() async throws {
         let account = try await client.createAccount()
         try await client.prefundAccount(address: account.details.address)
         let deployedAccount = try await client.deployAccount(name: account.name)
