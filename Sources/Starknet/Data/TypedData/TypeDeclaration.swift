@@ -98,5 +98,17 @@ public extension StarknetTypedData {
                 self = try .standard(StandardType(from: decoder))
             }
         }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            switch self {
+            case let .standard(standardType):
+                try container.encode(standardType)
+            case let .enum(enumType):
+                try container.encode(enumType)
+            case let .merkletree(merkleTreeType):
+                try container.encode(merkleTreeType)
+            }
+        }
     }
 }
