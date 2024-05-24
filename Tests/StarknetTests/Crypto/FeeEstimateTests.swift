@@ -51,8 +51,8 @@ final class FeeEstimateTests: XCTestCase {
             ]
 
         cases.forEach {
-            let calculatedOverallFee = $0.overallFee.value
-            XCTAssertEqual(calculatedOverallFee, $1.value)
+            let calculatedOverallFee = $0.overallFee
+            XCTAssertEqual(calculatedOverallFee, $1)
         }
     }
 }
