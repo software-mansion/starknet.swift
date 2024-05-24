@@ -39,7 +39,7 @@ public struct StarknetFeeEstimate: Decodable, Equatable {
         self.gasPrice = gasPrice
         self.dataGasConsumed = dataGasConsumed
         self.dataGasPrice = dataGasPrice
-        self.overallFee = Felt(gasPrice.value * gasConsumed.value + dataGasPrice.value * dataGasConsumed.value)
+        self.overallFee = Felt(gasPrice.value * gasConsumed.value + dataGasPrice.value * dataGasConsumed.value)!
         self.feeUnit = feeUnit
     }
 }
