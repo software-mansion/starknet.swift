@@ -44,10 +44,10 @@ final class FeeEstimateTests: XCTestCase {
     func testEstimateFeeOverallFeeCalculation() {
         let cases: [(StarknetFeeEstimate, Felt)] =
             [
-                (StarknetFeeEstimate(gasConsumed: 1, gasPrice: 2138, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei), 2148),
-                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 1000, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei), 10010),
-                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 0, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei), 10),
-                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 2000, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei), 20010),
+                (StarknetFeeEstimate(gasConsumed: 1, gasPrice: 2138, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei)!, 2148),
+                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 1000, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei)!, 10010),
+                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 0, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei)!, 10),
+                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 2000, dataGasConsumed: 10, dataGasPrice: 1, feeUnit: .wei)!, 20010),
             ]
 
         cases.forEach {
