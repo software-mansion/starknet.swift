@@ -31,7 +31,7 @@ final class FeeEstimateTests: XCTestCase {
                 (StarknetFeeEstimate(gasConsumed: 1, gasPrice: 2138, dataGasConsumed: 10, dataGasPrice: 1, overallFee: 2148, feeUnit: .wei), 1.1, 2362),
                 (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 1000, dataGasConsumed: 10, dataGasPrice: 1, overallFee: 10010, feeUnit: .wei), 1.0, 10010),
                 (StarknetFeeEstimate(gasConsumed: Felt(UInt64AsHex.max.value - 100)!, gasPrice: Felt(UInt128AsHex.max.value - 100)!, dataGasConsumed: 10, dataGasPrice: 1, overallFee: Felt.max, feeUnit: .wei), 1.1, Felt.max),
-                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 0, dataGasConsumed: 10, dataGasPrice: 1, overallFee: 0, feeUnit: .wei), 1.5, 0),
+                (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 0, dataGasConsumed: 10, dataGasPrice: 1, overallFee: 10, feeUnit: .wei), 1.5, 15),
                 (StarknetFeeEstimate(gasConsumed: 10, gasPrice: 2000, dataGasConsumed: 10, dataGasPrice: 1, overallFee: 20010, feeUnit: .wei), 2, 40020),
             ]
 
