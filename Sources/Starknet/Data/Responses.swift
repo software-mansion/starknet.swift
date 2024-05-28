@@ -24,6 +24,24 @@ public struct StarknetFeeEstimate: Decodable, Equatable {
         case overallFee = "overall_fee"
         case feeUnit = "unit"
     }
+
+    public init(gasConsumed: Felt, gasPrice: Felt, dataGasConsumed: Felt, dataGasPrice: Felt, overallFee: Felt, feeUnit: StarknetPriceUnit) {
+        self.gasConsumed = gasConsumed
+        self.gasPrice = gasPrice
+        self.dataGasConsumed = dataGasConsumed
+        self.dataGasPrice = dataGasPrice
+        self.overallFee = overallFee
+        self.feeUnit = feeUnit
+    }
+
+    public init?(gasConsumed: Felt, gasPrice: Felt, dataGasConsumed: Felt, dataGasPrice: Felt, feeUnit: StarknetPriceUnit) {
+        self.gasConsumed = gasConsumed
+        self.gasPrice = gasPrice
+        self.dataGasConsumed = dataGasConsumed
+        self.dataGasPrice = dataGasPrice
+        self.overallFee = Felt(gasPrice.value * gasConsumed.value + dataGasPrice.value * dataGasConsumed.value)!
+        self.feeUnit = feeUnit
+    }
 }
 
 public struct StarknetDeployAccountResponse: Decodable, Equatable {
