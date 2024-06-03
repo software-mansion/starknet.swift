@@ -47,11 +47,15 @@ class HttpNetworkProvider {
         return request
     }
 
-    private func handleEncodingError(_ error: Error) throws -> Never {
-        if let encodingError = error as? EncodingError {
-            throw HttpNetworkProviderError.encodingError(encodingError)
-        } else {
-            throw HttpNetworkProviderError.unknownError
+    private func encodePayload(payload: any Encodable) throws -> Data {
+        do {
+            return try JSONEncoder().encode(payload)
+        } catch {
+            if let encodingError = error as? EncodingError {
+                throw HttpNetworkProviderError.encodingError(encodingError)
+            } else {
+                throw HttpNetworkProviderError.unknownError
+            }
         }
     }
 
@@ -66,12 +70,7 @@ class HttpNetworkProvider {
     }
 
     func send<U>(payload: some Encodable, config: Configuration, receive _: U.Type) async throws -> U where U: Decodable {
-        let encoded: Data
-        do {
-            encoded = try JSONEncoder().encode(payload)
-        } catch {
-            try handleEncodingError(error)
-        }
+        let encoded: Data = try encodePayload(payload: payload)
 
         let request = makeRequestWith(body: encoded, config: config)
 
@@ -88,12 +87,7 @@ class HttpNetworkProvider {
     }
 
     func send<U>(payload: [some Encodable], config: Configuration, receive _: [U.Type]) async throws -> [U] where U: Decodable {
-        let encoded: Data
-        do {
-            encoded = try JSONEncoder().encode(payload)
-        } catch {
-            try handleEncodingError(error)
-        }
+        let encoded: Data = try encodePayload(payload: payload)
 
         let request = makeRequestWith(body: encoded, config: config)
 
