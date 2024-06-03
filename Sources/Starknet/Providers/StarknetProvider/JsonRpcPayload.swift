@@ -1,13 +1,13 @@
 import Foundation
 
-struct JsonRpcPayload<T: Encodable>: Encodable {
+struct JsonRpcPayload: Encodable {
     let version = "2.0"
     let id: Int
 
     let method: JsonRpcMethod
-    let params: T
+    let params: EncodableParams
 
-    init(method: JsonRpcMethod, params: T, id: Int = 0) {
+    init(method: JsonRpcMethod, params: EncodableParams, id: Int = 0) {
         self.method = method
         self.params = params
         self.id = id

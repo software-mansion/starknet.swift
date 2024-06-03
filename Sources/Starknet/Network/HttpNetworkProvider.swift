@@ -69,7 +69,7 @@ class HttpNetworkProvider {
         }
     }
 
-    func send<U>(payload: some Encodable, config: Configuration, receive _: U.Type) async throws -> U where U: Decodable {
+    func send<U>(payload: JsonRpcPayload, config: Configuration, receive _: U.Type) async throws -> U where U: Decodable {
         let encoded: Data = try encodePayload(payload: payload)
 
         let request = makeRequestWith(body: encoded, config: config)
@@ -86,7 +86,7 @@ class HttpNetworkProvider {
         }
     }
 
-    func send<U>(payload: [some Encodable], config: Configuration, receive _: [U.Type]) async throws -> [U] where U: Decodable {
+    func send<U>(payload: [JsonRpcPayload], config: Configuration, receive _: [U.Type]) async throws -> [U] where U: Decodable {
         let encoded: Data = try encodePayload(payload: payload)
 
         let request = makeRequestWith(body: encoded, config: config)

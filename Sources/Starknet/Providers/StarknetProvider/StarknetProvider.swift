@@ -34,9 +34,9 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.init(url: url, urlSession: urlSession)
     }
 
-    private func buildRequest<U: Decodable, P: Encodable>(method: JsonRpcMethod, params: P) -> StarknetRequest<U, P> {
+    private func buildRequest<U: Decodable>(method: JsonRpcMethod, params: EncodableParams) -> StarknetRequest<U> {
         let config = prepareHttpRequestConfiguration()
-        return StarknetRequest<U, P>(method: method, params: params, config: config, networkProvider: networkProvider)
+        return StarknetRequest<U>(method: method, params: params, config: config, networkProvider: networkProvider)
     }
 
     /// Batch multiple HTTP requests with JSON-RPC calls together into a single HTTP request
@@ -45,13 +45,13 @@ public class StarknetProvider: StarknetProviderProtocol {
     ///     - requests: list of HTTP requests to be batched together.
     ///
     /// - Returns: batch HTTP request.
-    public func batchRequests<U: Decodable, P: Encodable>(requests: [StarknetRequest<U, P>]) -> StarknetBatchRequest<U, P> {
+    public func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) -> StarknetBatchRequest<U> {
         let rpcPayloads = requests.enumerated().map { index, request in
             JsonRpcPayload(method: request.method, params: request.params, id: index)
         }
         let config = prepareHttpRequestConfiguration()
 
-        return StarknetBatchRequest<U, P>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
+        return StarknetBatchRequest<U>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
     /// Batch multiple HTTP requests with JSON-RPC calls together into a single HTTP request
@@ -60,110 +60,110 @@ public class StarknetProvider: StarknetProviderProtocol {
     ///     - requests: one or more HTTP requests to be batched together.
     ///
     /// - Returns: batch HTTP request.
-    public func batchRequests<U: Decodable, P: Encodable>(requests: StarknetRequest<U, P>...) -> StarknetBatchRequest<U, P> {
+    public func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) -> StarknetBatchRequest<U> {
         batchRequests(requests: requests)
     }
 
-    public func specVersion() -> StarknetRequest<String, EmptyParams> {
+    public func specVersion() -> StarknetRequest<String> {
         let params = EmptyParams()
 
-        return buildRequest(method: .specVersion, params: params)
+        return buildRequest(method: .specVersion, params: .emptyParams(params))
     }
 
-    public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) -> StarknetRequest<[Felt], CallParams> {
+    public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) -> StarknetRequest<[Felt]> {
         let params = CallParams(request: call, blockId: blockId)
 
-        return buildRequest(method: .call, params: params)
+        return buildRequest(method: .call, params: .callParams(params))
     }
 
-    public func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate, EstimateMessageFeeParams> {
+    public func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate> {
         let params = EstimateMessageFeeParams(message: message, blockId: blockId)
 
-        return buildRequest(method: .estimateMessageFee, params: params)
+        return buildRequest(method: .estimateMessageFee, params: .estimateMessageFeeParams(params))
     }
 
-    public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate], EstimateFeeParams> {
+    public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
         let params = EstimateFeeParams(request: transactions, simulationFlags: simulationFlags, blockId: blockId)
 
-        return buildRequest(method: .estimateFee, params: params)
+        return buildRequest(method: .estimateFee, params: .estimateFeeParams(params))
     }
 
-    public func getNonce(of contract: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt, GetNonceParams> {
+    public func getNonce(of contract: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetNonceParams(contractAddress: contract, blockId: blockId)
 
-        return buildRequest(method: .getNonce, params: params)
+        return buildRequest(method: .getNonce, params: .getNonceParams(params))
     }
 
-    public func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) -> StarknetRequest<StarknetInvokeTransactionResponse, AddInvokeTransactionParams> {
+    public func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) -> StarknetRequest<StarknetInvokeTransactionResponse> {
         let params = AddInvokeTransactionParams(invokeTransaction: transaction)
 
-        return buildRequest(method: .invokeFunction, params: params)
+        return buildRequest(method: .invokeFunction, params: .addInvokeTransactionParams(params))
     }
 
-    public func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) -> StarknetRequest<StarknetDeployAccountResponse, AddDeployAccountTransactionParams> {
+    public func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) -> StarknetRequest<StarknetDeployAccountResponse> {
         let params = AddDeployAccountTransactionParams(deployAccountTransaction: transaction)
 
-        return buildRequest(method: .deployAccount, params: params)
+        return buildRequest(method: .deployAccount, params: .addDeployAccountTransactionParams(params))
     }
 
-    public func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt, GetClassHashAtParams> {
+    public func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetClassHashAtParams(contractAddress: address, blockId: blockId)
 
-        return buildRequest(method: .getClassHashAt, params: params)
+        return buildRequest(method: .getClassHashAt, params: .getClassHashAtParams(params))
     }
 
-    public func getBlockNumber() -> StarknetRequest<UInt64, EmptySequence> {
+    public func getBlockNumber() -> StarknetRequest<UInt64> {
         let params = EmptySequence()
 
-        return buildRequest(method: .getBlockNumber, params: params)
+        return buildRequest(method: .getBlockNumber, params: .emptySequenceParams(params))
     }
 
-    public func getBlockHashAndNumber() -> StarknetRequest<StarknetBlockHashAndNumber, EmptySequence> {
+    public func getBlockHashAndNumber() -> StarknetRequest<StarknetBlockHashAndNumber> {
         let params = EmptySequence()
 
-        return buildRequest(method: .getBlockHashAndNumber, params: params)
+        return buildRequest(method: .getBlockHashAndNumber, params: .emptySequenceParams(params))
     }
 
-    public func getEvents(filter: StarknetGetEventsFilter) -> StarknetRequest<StarknetGetEventsResponse, GetEventsPayload> {
+    public func getEvents(filter: StarknetGetEventsFilter) -> StarknetRequest<StarknetGetEventsResponse> {
         let params = GetEventsPayload(filter: filter)
 
-        return buildRequest(method: .getEvents, params: params)
+        return buildRequest(method: .getEvents, params: .getEventsPayload(params))
     }
 
-    public func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper, GetTransactionByHashParams> {
+    public func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByHashParams(hash: hash)
 
-        return buildRequest(method: .getTransactionByHash, params: params)
+        return buildRequest(method: .getTransactionByHash, params: .getTransactionByHashParams(params))
     }
 
-    public func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper, GetTransactionByBlockIdAndIndex> {
+    public func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByBlockIdAndIndex(blockId: blockId, index: index)
 
-        return buildRequest(method: .getTransactionByBlockIdAndIndex, params: params)
+        return buildRequest(method: .getTransactionByBlockIdAndIndex, params: .getTransactionByBlockIdAndIndex(params))
     }
 
-    public func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper, GetTransactionReceiptPayload> {
+    public func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper> {
         let params = GetTransactionReceiptPayload(transactionHash: hash)
 
-        return buildRequest(method: .getTransactionReceipt, params: params)
+        return buildRequest(method: .getTransactionReceipt, params: .getTransactionReceiptPayload(params))
     }
 
-    public func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse, GetTransactionStatusPayload> {
+    public func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse> {
         let params = GetTransactionStatusPayload(transactionHash: hash)
 
-        return buildRequest(method: .getTransactionStatus, params: params)
+        return buildRequest(method: .getTransactionStatus, params: .getTransactionStatusPayload(params))
     }
 
-    public func getChainId() -> StarknetRequest<StarknetChainId, EmptySequence> {
+    public func getChainId() -> StarknetRequest<StarknetChainId> {
         let params = EmptySequence()
 
-        return buildRequest(method: .getChainId, params: params)
+        return buildRequest(method: .getChainId, params: .emptySequenceParams(params))
     }
 
-    public func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction], SimulateTransactionsParams> {
+    public func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
-        return buildRequest(method: .simulateTransactions, params: params)
+        return buildRequest(method: .simulateTransactions, params: .simulateTransactionsParams(params))
     }
 }
 

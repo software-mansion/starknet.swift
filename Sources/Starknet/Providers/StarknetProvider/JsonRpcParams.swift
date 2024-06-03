@@ -1,9 +1,9 @@
 import Foundation
 
-public typealias EmptySequence = [String]
-public struct EmptyParams: Encodable {}
+typealias EmptySequence = [String]
+struct EmptyParams: Encodable {}
 
-public struct CallParams: Encodable {
+struct CallParams: Encodable {
     let request: StarknetCall
     let blockId: StarknetBlockId
 
@@ -13,7 +13,7 @@ public struct CallParams: Encodable {
     }
 }
 
-public struct GetNonceParams: Encodable {
+struct GetNonceParams: Encodable {
     let contractAddress: Felt
     let blockId: StarknetBlockId
 
@@ -23,7 +23,7 @@ public struct GetNonceParams: Encodable {
     }
 }
 
-public struct AddInvokeTransactionParams: Encodable {
+struct AddInvokeTransactionParams: Encodable {
     let invokeTransaction: any StarknetExecutableInvokeTransaction
 
     public func encode(to encoder: Encoder) throws {
@@ -46,7 +46,7 @@ struct WrappedExecutableTransaction: Encodable {
     }
 }
 
-public struct EstimateFeeParams: Encodable {
+struct EstimateFeeParams: Encodable {
     let request: [any StarknetExecutableTransaction]
     let simulationFlags: Set<StarknetSimulationFlagForEstimateFee>
     let blockId: StarknetBlockId
@@ -68,7 +68,7 @@ public struct EstimateFeeParams: Encodable {
     }
 }
 
-public struct EstimateMessageFeeParams: Encodable {
+struct EstimateMessageFeeParams: Encodable {
     let message: StarknetMessageFromL1
     let blockId: StarknetBlockId
 
@@ -78,7 +78,7 @@ public struct EstimateMessageFeeParams: Encodable {
     }
 }
 
-public struct AddDeployAccountTransactionParams: Encodable {
+struct AddDeployAccountTransactionParams: Encodable {
     let deployAccountTransaction: any StarknetExecutableDeployAccountTransaction
 
     public func encode(to encoder: Encoder) throws {
@@ -92,7 +92,7 @@ public struct AddDeployAccountTransactionParams: Encodable {
     }
 }
 
-public struct GetClassHashAtParams: Encodable {
+struct GetClassHashAtParams: Encodable {
     let contractAddress: Felt
     let blockId: StarknetBlockId
 
@@ -102,7 +102,7 @@ public struct GetClassHashAtParams: Encodable {
     }
 }
 
-public struct GetEventsPayload: Encodable {
+struct GetEventsPayload: Encodable {
     let filter: StarknetGetEventsFilter
 }
 
@@ -114,7 +114,7 @@ public struct GetTransactionByHashParams: Encodable {
     }
 }
 
-public struct GetTransactionByBlockIdAndIndex: Encodable {
+struct GetTransactionByBlockIdAndIndex: Encodable {
     let blockId: StarknetBlockId
     let index: UInt64
 
@@ -124,7 +124,7 @@ public struct GetTransactionByBlockIdAndIndex: Encodable {
     }
 }
 
-public struct GetTransactionReceiptPayload: Encodable {
+struct GetTransactionReceiptPayload: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -132,7 +132,7 @@ public struct GetTransactionReceiptPayload: Encodable {
     }
 }
 
-public struct GetTransactionStatusPayload: Encodable {
+struct GetTransactionStatusPayload: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -140,7 +140,7 @@ public struct GetTransactionStatusPayload: Encodable {
     }
 }
 
-public struct SimulateTransactionsParams: Encodable {
+struct SimulateTransactionsParams: Encodable {
     let transactions: [any StarknetExecutableTransaction]
     let blockId: StarknetBlockId
     let simulationFlags: Set<StarknetSimulationFlag>
@@ -159,5 +159,63 @@ public struct SimulateTransactionsParams: Encodable {
         case transactions
         case blockId = "block_id"
         case simulationFlags = "simulation_flags"
+    }
+}
+
+enum EncodableParams {
+    case getNonceParams(GetNonceParams)
+    case addInvokeTransactionParams(AddInvokeTransactionParams)
+    case wrappedExecutableParams(WrappedExecutableTransaction)
+    case emptySequenceParams(EmptySequence)
+    case emptyParams(EmptyParams)
+    case callParams(CallParams)
+    case estimateFeeParams(EstimateFeeParams)
+    case estimateMessageFeeParams(EstimateMessageFeeParams)
+    case addDeployAccountTransactionParams(AddDeployAccountTransactionParams)
+    case getClassHashAtParams(GetClassHashAtParams)
+    case getEventsPayload(GetEventsPayload)
+    case getTransactionByHashParams(GetTransactionByHashParams)
+    case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
+    case getTransactionReceiptPayload(GetTransactionReceiptPayload)
+    case getTransactionStatusPayload(GetTransactionStatusPayload)
+    case simulateTransactionsParams(SimulateTransactionsParams)
+}
+
+extension EncodableParams: Encodable {
+    func encode(to encoder: Encoder) throws {
+        switch self {
+        case let .getNonceParams(params):
+            try params.encode(to: encoder)
+        case let .addInvokeTransactionParams(params):
+            try params.encode(to: encoder)
+        case let .wrappedExecutableParams(params):
+            try params.encode(to: encoder)
+        case let .emptySequenceParams(params):
+            try params.encode(to: encoder)
+        case let .emptyParams(params):
+            try params.encode(to: encoder)
+        case let .callParams(params):
+            try params.encode(to: encoder)
+        case let .estimateFeeParams(params):
+            try params.encode(to: encoder)
+        case let .estimateMessageFeeParams(params):
+            try params.encode(to: encoder)
+        case let .addDeployAccountTransactionParams(params):
+            try params.encode(to: encoder)
+        case let .getClassHashAtParams(params):
+            try params.encode(to: encoder)
+        case let .getEventsPayload(params):
+            try params.encode(to: encoder)
+        case let .getTransactionByHashParams(params):
+            try params.encode(to: encoder)
+        case let .getTransactionByBlockIdAndIndex(params):
+            try params.encode(to: encoder)
+        case let .getTransactionReceiptPayload(params):
+            try params.encode(to: encoder)
+        case let .getTransactionStatusPayload(params):
+            try params.encode(to: encoder)
+        case let .simulateTransactionsParams(params):
+            try params.encode(to: encoder)
+        }
     }
 }

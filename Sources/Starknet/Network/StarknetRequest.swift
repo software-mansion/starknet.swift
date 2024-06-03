@@ -1,11 +1,11 @@
-public struct StarknetRequest<U: Decodable, P: Encodable> {
+public struct StarknetRequest<U: Decodable> {
     let method: JsonRpcMethod
-    let params: P
+    let params: EncodableParams
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
 
     public func send() async throws -> U {
-        let rpcPayload = JsonRpcPayload<P>(method: method, params: params)
+        let rpcPayload = JsonRpcPayload(method: method, params: params)
         let response: JsonRpcResponse<U> = try await networkProvider.send(
             payload: rpcPayload,
             config: config,

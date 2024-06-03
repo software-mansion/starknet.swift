@@ -1,5 +1,5 @@
-public struct StarknetBatchRequest<U: Decodable, P: Encodable> {
-    let rpcPayloads: [JsonRpcPayload<P>]
+public struct StarknetBatchRequest<U: Decodable> {
+    let rpcPayloads: [JsonRpcPayload]
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
 
