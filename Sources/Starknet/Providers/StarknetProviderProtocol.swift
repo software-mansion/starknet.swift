@@ -1,6 +1,6 @@
 import Foundation
 
-/// Provider used to interact with the StakNet blockchain.
+/// Provider used to interact with the Starknet blockchain.
 public protocol StarknetProviderProtocol {
     /// Get the version of the Starknet JSON-RPC specification being used by the node.
     ///
