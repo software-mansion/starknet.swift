@@ -69,7 +69,7 @@ struct EstimateFeeParams: Encodable {
     }
 }
 
-struct EstimateMessageFeeParams: Encodable {
+public struct EstimateMessageFeeParams: Encodable {
     let message: StarknetMessageFromL1
     let blockId: StarknetBlockId
 
