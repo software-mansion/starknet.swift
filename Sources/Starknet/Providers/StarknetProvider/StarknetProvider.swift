@@ -69,7 +69,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         try batchRequests(requests: requests)
     }
 
-    public func specVersion() -> StarknetRequest<String> {
+    public func getSpecVersion() -> StarknetRequest<String> {
         let params = EmptyParams()
 
         return buildRequest(method: .specVersion, params: .emptyParams(params))

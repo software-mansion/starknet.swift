@@ -59,8 +59,8 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(chainId, .sepolia)
     }
 
-    func testSpecVersion() async throws {
-        let request = provider.specVersion()
+    func testGetSpecVersion() async throws {
+        let request = provider.getSpecVersion()
         let result = try await request.send()
 
         XCTAssertFalse(result.isEmpty)
