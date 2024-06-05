@@ -1,6 +1,7 @@
 import Foundation
 
 typealias EmptySequence = [String]
+
 struct EmptyParams: Encodable {}
 
 struct CallParams: Encodable {
@@ -26,7 +27,7 @@ struct GetNonceParams: Encodable {
 struct AddInvokeTransactionParams: Encodable {
     let invokeTransaction: any StarknetExecutableInvokeTransaction
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(invokeTransaction, forKey: .invokeTransaction)
@@ -51,7 +52,7 @@ struct EstimateFeeParams: Encodable {
     let simulationFlags: Set<StarknetSimulationFlagForEstimateFee>
     let blockId: StarknetBlockId
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         let wrappedRequest = request.map { WrappedExecutableTransaction(transaction: $0) }
@@ -81,7 +82,7 @@ struct EstimateMessageFeeParams: Encodable {
 struct AddDeployAccountTransactionParams: Encodable {
     let deployAccountTransaction: any StarknetExecutableDeployAccountTransaction
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(deployAccountTransaction, forKey: .deployAccountTransaction)
@@ -106,7 +107,7 @@ struct GetEventsPayload: Encodable {
     let filter: StarknetGetEventsFilter
 }
 
-public struct GetTransactionByHashParams: Encodable {
+struct GetTransactionByHashParams: Encodable {
     let hash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -145,7 +146,7 @@ struct SimulateTransactionsParams: Encodable {
     let blockId: StarknetBlockId
     let simulationFlags: Set<StarknetSimulationFlag>
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         let wrappedTransactions = transactions.map { WrappedExecutableTransaction(transaction: $0) }
