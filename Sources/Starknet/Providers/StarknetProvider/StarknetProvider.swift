@@ -4,6 +4,7 @@ public enum StarknetProviderError: Error {
     case networkProviderError
     case unknownError
     case jsonRpcError(Int, String, String?)
+    case emptyRequestList
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
@@ -39,13 +40,17 @@ public class StarknetProvider: StarknetProviderProtocol {
         return StarknetRequest<U>(method: method, params: params, config: config, networkProvider: networkProvider)
     }
 
-    /// Batch multiple HTTP requests with JSON-RPC calls together into a single HTTP request
+    /// Batch multiple calls into a single RPC request
     ///
     /// - Parameters
-    ///     - requests: list of HTTP requests to be batched together.
+    ///     - requests: list of requests to be batched together.
     ///
-    /// - Returns: batch HTTP request.
-    public func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) -> StarknetBatchRequest<U> {
+    /// - Returns: batch request.
+    public func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) throws -> StarknetBatchRequest<U> {
+        guard !requests.isEmpty else {
+            throw StarknetProviderError.emptyRequestList
+        }
+
         let rpcPayloads = requests.enumerated().map { index, request in
             JsonRpcPayload(method: request.method, params: request.params, id: index)
         }
@@ -54,14 +59,14 @@ public class StarknetProvider: StarknetProviderProtocol {
         return StarknetBatchRequest<U>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
-    /// Batch multiple HTTP requests with JSON-RPC calls together into a single HTTP request
+    /// Batch multiple calls into a single RPC request
     ///
     /// - Parameters
-    ///     - requests: one or more HTTP requests to be batched together.
+    ///     - requests: list of requests to be batched together.
     ///
-    /// - Returns: batch HTTP request.
-    public func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) -> StarknetBatchRequest<U> {
-        batchRequests(requests: requests)
+    /// - Returns: batch request.
+    public func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) throws -> StarknetBatchRequest<U> {
+        try batchRequests(requests: requests)
     }
 
     public func specVersion() -> StarknetRequest<String> {
