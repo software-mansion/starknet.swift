@@ -6,7 +6,7 @@ public struct StarknetRequest<U: Decodable> {
 
     public func send() async throws -> U {
         let rpcPayload = JsonRpcPayload(method: method, params: params)
-        let response: JsonRpcResponse<U> = try await networkProvider.send(
+        let response = try await networkProvider.send(
             payload: rpcPayload,
             config: config,
             receive: JsonRpcResponse<U>.self
