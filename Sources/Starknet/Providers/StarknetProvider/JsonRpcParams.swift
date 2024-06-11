@@ -164,22 +164,22 @@ struct SimulateTransactionsParams: Encodable {
 }
 
 enum JsonRpcParams {
-    case getNonceParams(GetNonceParams)
-    case addInvokeTransactionParams(AddInvokeTransactionParams)
-    case wrappedExecutableParams(WrappedExecutableTransaction)
-    case emptySequenceParams(EmptySequence)
-    case emptyParams(EmptyParams)
-    case callParams(CallParams)
-    case estimateFeeParams(EstimateFeeParams)
-    case estimateMessageFeeParams(EstimateMessageFeeParams)
-    case addDeployAccountTransactionParams(AddDeployAccountTransactionParams)
-    case getClassHashAtParams(GetClassHashAtParams)
-    case getEventsPayload(GetEventsPayload)
-    case getTransactionByHashParams(GetTransactionByHashParams)
+    case getNonce(GetNonceParams)
+    case addInvokeTransaction(AddInvokeTransactionParams)
+    case wrappedExecutableTransaction(WrappedExecutableTransaction)
+    case emptySequence(EmptySequence)
+    case empty(EmptyParams)
+    case call(CallParams)
+    case estimateFee(EstimateFeeParams)
+    case estimateMessageFee(EstimateMessageFeeParams)
+    case addDeployAccountTransaction(AddDeployAccountTransactionParams)
+    case getClassHashAt(GetClassHashAtParams)
+    case getEvents(GetEventsPayload)
+    case getTransactionByHash(GetTransactionByHashParams)
     case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
-    case getTransactionReceiptPayload(GetTransactionReceiptPayload)
-    case getTransactionStatusPayload(GetTransactionStatusPayload)
-    case simulateTransactionsParams(SimulateTransactionsParams)
+    case getTransactionReceipt(GetTransactionReceiptPayload)
+    case getTransactionStatus(GetTransactionStatusPayload)
+    case simulateTransactions(SimulateTransactionsParams)
 }
 
 extension JsonRpcParams: Encodable {
