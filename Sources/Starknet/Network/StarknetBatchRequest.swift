@@ -4,7 +4,7 @@ public struct StarknetBatchRequest<U: Decodable> {
     let networkProvider: HttpNetworkProvider
 
     public func send() async throws -> [Result<U, StarknetProviderError>] {
-        let rpcResponses: [JsonRpcResponse<U>] = try await networkProvider.send(
+        let rpcResponses = try await networkProvider.send(
             payload: rpcPayloads,
             config: config,
             receive: [JsonRpcResponse<U>.self]
