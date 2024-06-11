@@ -1,6 +1,6 @@
 public struct StarknetRequest<U: Decodable> {
     let method: JsonRpcMethod
-    let params: EncodableParams
+    let params: JsonRpcParams
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
 

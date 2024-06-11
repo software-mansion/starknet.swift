@@ -4,7 +4,7 @@ public enum StarknetProviderError: Error {
     case networkProviderError
     case unknownError
     case jsonRpcError(Int, String, String?)
-    case emptyRequestList
+    case emptyBatchRequestError
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
@@ -35,7 +35,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.init(url: url, urlSession: urlSession)
     }
 
-    private func buildRequest<U: Decodable>(method: JsonRpcMethod, params: EncodableParams) -> StarknetRequest<U> {
+    private func buildRequest<U: Decodable>(method: JsonRpcMethod, params: JsonRpcParams) -> StarknetRequest<U> {
         let config = prepareHttpRequestConfiguration()
         return StarknetRequest<U>(method: method, params: params, config: config, networkProvider: networkProvider)
     }
@@ -48,7 +48,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     /// - Returns: batch request.
     public func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) throws -> StarknetBatchRequest<U> {
         guard !requests.isEmpty else {
-            throw StarknetProviderError.emptyRequestList
+            throw StarknetProviderError.emptyBatchRequestError
         }
 
         let rpcPayloads = requests.enumerated().map { index, request in
@@ -62,7 +62,7 @@ public class StarknetProvider: StarknetProviderProtocol {
     /// Batch multiple calls into a single RPC request
     ///
     /// - Parameters
-    ///     - requests: list of requests to be batched together.
+    ///     - requests: requests to be batched together.
     ///
     /// - Returns: batch request.
     public func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) throws -> StarknetBatchRequest<U> {

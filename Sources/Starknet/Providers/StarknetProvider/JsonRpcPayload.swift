@@ -5,9 +5,9 @@ struct JsonRpcPayload: Encodable {
     let id: Int
 
     let method: JsonRpcMethod
-    let params: EncodableParams
+    let params: JsonRpcParams
 
-    init(method: JsonRpcMethod, params: EncodableParams, id: Int = 0) {
+    init(method: JsonRpcMethod, params: JsonRpcParams, id: Int = 0) {
         self.method = method
         self.params = params
         self.id = id

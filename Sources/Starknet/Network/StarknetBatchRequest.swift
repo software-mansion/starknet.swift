@@ -10,11 +10,11 @@ public struct StarknetBatchRequest<U: Decodable> {
             receive: [JsonRpcResponse<U>.self]
         )
 
-        return getOrderedRpcResults(rpcResponses: rpcResponses, count: rpcPayloads.count)
+        return orderRpcResults(rpcResponses: rpcResponses, count: rpcPayloads.count)
     }
 }
 
-func getOrderedRpcResults<U: Decodable>(rpcResponses: [JsonRpcResponse<U>], count: Int) -> [Result<U, StarknetProviderError>] {
+func orderRpcResults<U: Decodable>(rpcResponses: [JsonRpcResponse<U>], count: Int) -> [Result<U, StarknetProviderError>] {
     var orderedRpcResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: count)
     for rpcResponse in rpcResponses {
         if let error = rpcResponse.error {

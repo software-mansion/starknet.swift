@@ -163,7 +163,7 @@ struct SimulateTransactionsParams: Encodable {
     }
 }
 
-enum EncodableParams {
+enum JsonRpcParams {
     case getNonceParams(GetNonceParams)
     case addInvokeTransactionParams(AddInvokeTransactionParams)
     case wrappedExecutableParams(WrappedExecutableTransaction)
@@ -182,7 +182,7 @@ enum EncodableParams {
     case simulateTransactionsParams(SimulateTransactionsParams)
 }
 
-extension EncodableParams: Encodable {
+extension JsonRpcParams: Encodable {
     func encode(to encoder: Encoder) throws {
         switch self {
         case let .getNonceParams(params):
