@@ -674,7 +674,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func isTransactionSuccessful(transactionHash: Felt) async throws -> Bool {
             let params = GetTransactionByHashParams(hash: transactionHash)
-            let rpcPayload = JsonRpcPayload(method: .getTransactionReceipt, params: .getTransactionByHashParams(params))
+            let rpcPayload = JsonRpcPayload(method: .getTransactionReceipt, params: .getTransactionByHash(params))
 
             let url = URL(string: rpcUrl)!
             let networkProvider = HttpNetworkProvider()
