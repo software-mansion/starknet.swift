@@ -143,7 +143,7 @@ final class JsonRpcResponseTests: XCTestCase {
         XCTAssertNotNil(responses[1].result)
         XCTAssertNotNil(responses[2].result)
 
-        let orderedResponses = orderRpcResults(rpcResponses: responses, count: responses.count)
+        let orderedResponses = orderRpcResults(rpcResponses: responses)
 
         XCTAssertEqual(try orderedResponses[0].get(), 111)
         XCTAssertEqual(try orderedResponses[1].get(), 222)

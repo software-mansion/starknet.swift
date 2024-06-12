@@ -10,17 +10,17 @@ public struct StarknetBatchRequest<U: Decodable> {
             receive: [JsonRpcResponse<U>.self]
         )
 
-        return orderRpcResults(rpcResponses: rpcResponses, count: rpcPayloads.count)
+        return orderRpcResults(rpcResponses: rpcResponses)
     }
 }
 
-func orderRpcResults<U: Decodable>(rpcResponses: [JsonRpcResponse<U>], count: Int) -> [Result<U, StarknetProviderError>] {
-    var orderedRpcResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: count)
+func orderRpcResults<U: Decodable>(rpcResponses: [JsonRpcResponse<U>]) -> [Result<U, StarknetProviderError>] {
+    var orderedRpcResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: rpcResponses.count)
     for rpcResponse in rpcResponses {
-        if let error = rpcResponse.error {
-            orderedRpcResults[rpcResponse.id] = .failure(StarknetProviderError.jsonRpcError(error.code, error.message, error.data))
-        } else if let result = rpcResponse.result {
+        if let result = rpcResponse.result {
             orderedRpcResults[rpcResponse.id] = .success(result)
+        } else if let error = rpcResponse.error {
+            orderedRpcResults[rpcResponse.id] = .failure(StarknetProviderError.jsonRpcError(error.code, error.message, error.data))
         } else {
             orderedRpcResults[rpcResponse.id] = .failure(StarknetProviderError.unknownError)
         }
