@@ -138,6 +138,22 @@ public protocol StarknetProviderProtocol {
     ///
     ///  - Returns: array of simulated transactions
     func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]>
+
+    /// Batch multiple calls into a single RPC request
+    ///
+    /// - Parameters
+    ///     - requests: list of requests to be batched together.
+    ///
+    /// - Returns: batch request.
+    func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) throws -> StarknetBatchRequest<U>
+
+    /// Batch multiple calls into a single RPC request
+    ///
+    /// - Parameters
+    ///     - requests: requests to be batched together.
+    ///
+    /// - Returns: batch request.
+    func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) throws -> StarknetBatchRequest<U>
 }
 
 let defaultBlockId = StarknetBlockId.tag(.pending)

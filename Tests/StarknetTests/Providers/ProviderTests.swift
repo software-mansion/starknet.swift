@@ -6,7 +6,7 @@ final class ProviderTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
     var provider: StarknetProviderProtocol!
-    var batchProvider: StarknetProvider!
+    var batchProvider: StarknetProviderProtocol!
     var chainId: StarknetChainId!
     var signer: StarknetSignerProtocol!
     var account: StarknetAccountProtocol!

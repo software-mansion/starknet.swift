@@ -40,12 +40,6 @@ public class StarknetProvider: StarknetProviderProtocol {
         return StarknetRequest<U>(method: method, params: params, config: config, networkProvider: networkProvider)
     }
 
-    /// Batch multiple calls into a single RPC request
-    ///
-    /// - Parameters
-    ///     - requests: list of requests to be batched together.
-    ///
-    /// - Returns: batch request.
     public func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) throws -> StarknetBatchRequest<U> {
         guard !requests.isEmpty else {
             throw StarknetProviderError.emptyBatchRequestError
@@ -59,12 +53,6 @@ public class StarknetProvider: StarknetProviderProtocol {
         return StarknetBatchRequest<U>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
-    /// Batch multiple calls into a single RPC request
-    ///
-    /// - Parameters
-    ///     - requests: requests to be batched together.
-    ///
-    /// - Returns: batch request.
     public func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) throws -> StarknetBatchRequest<U> {
         try batchRequests(requests: requests)
     }
