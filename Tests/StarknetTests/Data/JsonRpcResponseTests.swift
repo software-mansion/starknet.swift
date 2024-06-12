@@ -114,4 +114,39 @@ final class JsonRpcResponseTests: XCTestCase {
         let data = response.error!.data!
         XCTAssertEqual(data, "[\"More data about the execution failure.\",\"And even more data.\"]")
     }
+
+    func testBatchResponseWithIncorrectOrder() throws {
+        let json = """
+        [
+            {
+                "id": 1,
+                "jsonrpc": "2.0",
+                "result": 222
+            },
+            {
+                "id": 2,
+                "jsonrpc": "2.0",
+                "result": 333
+            },
+            {
+                "id": 0,
+                "jsonrpc": "2.0",
+                "result": 111
+            }
+        ]
+        """.data(using: .utf8)!
+
+        let decoder = JSONDecoder()
+        let responses = try decoder.decode([JsonRpcResponse<Int>].self, from: json)
+
+        XCTAssertNotNil(responses[0].result)
+        XCTAssertNotNil(responses[1].result)
+        XCTAssertNotNil(responses[2].result)
+
+        let orderedResponses = orderRpcResults(rpcResponses: responses)
+
+        XCTAssertEqual(try orderedResponses[0].get(), 111)
+        XCTAssertEqual(try orderedResponses[1].get(), 222)
+        XCTAssertEqual(try orderedResponses[2].get(), 333)
+    }
 }

@@ -47,10 +47,9 @@ class HttpNetworkProvider {
         return request
     }
 
-    func send<U>(payload: some Encodable, config: Configuration, receive _: U.Type) async throws -> U where U: Decodable {
-        let encoded: Data
+    private func encodePayload(payload: any Encodable) throws -> Data {
         do {
-            encoded = try JSONEncoder().encode(payload)
+            return try JSONEncoder().encode(payload)
         } catch {
             if let encodingError = error as? EncodingError {
                 throw HttpNetworkProviderError.encodingError(encodingError)
@@ -58,6 +57,20 @@ class HttpNetworkProvider {
                 throw HttpNetworkProviderError.unknownError
             }
         }
+    }
+
+    private func handleResponseError(_ error: Error, _ response: URLResponse) throws -> Never {
+        if let response = response as? HTTPURLResponse, response.statusCode < 200 || response.statusCode > 299 {
+            throw HttpNetworkProviderError.requestRejected
+        } else if let decodingError = error as? DecodingError {
+            throw HttpNetworkProviderError.decodingError(decodingError)
+        } else {
+            throw HttpNetworkProviderError.unknownError
+        }
+    }
+
+    func send<U>(payload: JsonRpcPayload, config: Configuration, receive _: U.Type) async throws -> U where U: Decodable {
+        let encoded: Data = try encodePayload(payload: payload)
 
         let request = makeRequestWith(body: encoded, config: config)
 
@@ -69,13 +82,24 @@ class HttpNetworkProvider {
             let result = try JSONDecoder().decode(U.self, from: data)
             return result
         } catch {
-            if let response = response as? HTTPURLResponse, response.statusCode < 200 || response.statusCode > 299 {
-                throw HttpNetworkProviderError.requestRejected
-            } else if let decodingError = error as? DecodingError {
-                throw HttpNetworkProviderError.decodingError(decodingError)
-            } else {
-                throw HttpNetworkProviderError.unknownError
-            }
+            try handleResponseError(error, response)
+        }
+    }
+
+    func send<U>(payload: [JsonRpcPayload], config: Configuration, receive _: [U.Type]) async throws -> [U] where U: Decodable {
+        let encoded: Data = try encodePayload(payload: payload)
+
+        let request = makeRequestWith(body: encoded, config: config)
+
+        guard let (data, response) = try? await session.data(for: request) else {
+            throw HttpNetworkProviderError.unknownError
+        }
+
+        do {
+            let result = try JSONDecoder().decode([U].self, from: data)
+            return result
+        } catch {
+            try handleResponseError(error, response)
         }
     }
 }

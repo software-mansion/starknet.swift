@@ -162,3 +162,58 @@ struct SimulateTransactionsParams: Encodable {
         case simulationFlags = "simulation_flags"
     }
 }
+
+enum JsonRpcParams {
+    case getNonce(GetNonceParams)
+    case addInvokeTransaction(AddInvokeTransactionParams)
+    case emptySequence(EmptySequence)
+    case empty(EmptyParams)
+    case call(CallParams)
+    case estimateFee(EstimateFeeParams)
+    case estimateMessageFee(EstimateMessageFeeParams)
+    case addDeployAccountTransaction(AddDeployAccountTransactionParams)
+    case getClassHashAt(GetClassHashAtParams)
+    case getEvents(GetEventsPayload)
+    case getTransactionByHash(GetTransactionByHashParams)
+    case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
+    case getTransactionReceipt(GetTransactionReceiptPayload)
+    case getTransactionStatus(GetTransactionStatusPayload)
+    case simulateTransactions(SimulateTransactionsParams)
+}
+
+extension JsonRpcParams: Encodable {
+    func encode(to encoder: Encoder) throws {
+        switch self {
+        case let .getNonce(params):
+            try params.encode(to: encoder)
+        case let .addInvokeTransaction(params):
+            try params.encode(to: encoder)
+        case let .emptySequence(params):
+            try params.encode(to: encoder)
+        case let .empty(params):
+            try params.encode(to: encoder)
+        case let .call(params):
+            try params.encode(to: encoder)
+        case let .estimateFee(params):
+            try params.encode(to: encoder)
+        case let .estimateMessageFee(params):
+            try params.encode(to: encoder)
+        case let .addDeployAccountTransaction(params):
+            try params.encode(to: encoder)
+        case let .getClassHashAt(params):
+            try params.encode(to: encoder)
+        case let .getEvents(params):
+            try params.encode(to: encoder)
+        case let .getTransactionByHash(params):
+            try params.encode(to: encoder)
+        case let .getTransactionByBlockIdAndIndex(params):
+            try params.encode(to: encoder)
+        case let .getTransactionReceipt(params):
+            try params.encode(to: encoder)
+        case let .getTransactionStatus(params):
+            try params.encode(to: encoder)
+        case let .simulateTransactions(params):
+            try params.encode(to: encoder)
+        }
+    }
+}

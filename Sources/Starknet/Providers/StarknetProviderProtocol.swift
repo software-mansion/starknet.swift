@@ -5,7 +5,7 @@ public protocol StarknetProviderProtocol {
     /// Get the version of the Starknet JSON-RPC specification being used by the node.
     ///
     ///  - Returns: the version of the Starknet JSON-RPC specification being used.
-    func specVersion() async throws -> String
+    func getSpecVersion() -> StarknetRequest<String>
 
     /// Call starknet contract.
     ///
@@ -14,7 +14,7 @@ public protocol StarknetProviderProtocol {
     ///     - blockId: hash, number, or tag of a block at which the call should be made.
     ///
     /// - Returns: Array of field elements, returned by called contract.
-    func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt]
+    func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) -> StarknetRequest<[Felt]>
 
     /// Get nonce of given starknet contract
     ///
@@ -23,7 +23,7 @@ public protocol StarknetProviderProtocol {
     ///     - blockId: hash, number, or tag of a block at which the call should be made.
     ///
     /// - Returns: Felt value of contract's current nonce.
-    func getNonce(of contract: Felt, at blockId: StarknetBlockId) async throws -> Felt
+    func getNonce(of contract: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt>
 
     /// Estimate fee for a transaction.
     ///
@@ -33,7 +33,7 @@ public protocol StarknetProviderProtocol {
     ///  - simulationFlags: a set of simulation flags.
     ///
     /// - Returns: Array of fee estimates
-    func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> [StarknetFeeEstimate]
+    func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]>
 
     /// Estimate the L2 fee of a message sent on L1
     ///
@@ -42,7 +42,7 @@ public protocol StarknetProviderProtocol {
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: the fee estimation
-    func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate
+    func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate>
 
     /// Invoke a function.
     ///
@@ -52,7 +52,7 @@ public protocol StarknetProviderProtocol {
     ///     - payload: invoke function payload.
     ///
     /// - Returns: transaction hash of invoked transaction.
-    func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) async throws -> StarknetInvokeTransactionResponse
+    func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) -> StarknetRequest<StarknetInvokeTransactionResponse>
 
     /// Deploy account
     ///
@@ -62,7 +62,7 @@ public protocol StarknetProviderProtocol {
     ///  - transaction: deploy account transaction to be executed
     ///
     /// - Returns: transaction hash and contract address of deployed account
-    func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) async throws -> StarknetDeployAccountResponse
+    func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) -> StarknetRequest<StarknetDeployAccountResponse>
 
     /// Get the contract class hash for the contract deployed at the given address.
     ///
@@ -71,17 +71,17 @@ public protocol StarknetProviderProtocol {
     ///  - blockId: id of the requested block
     ///
     /// - Returns: Class hash of the given contract
-    func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) async throws -> Felt
+    func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt>
 
     /// Get the most recent accepted block number.
     ///
     /// - Returns: Number of the most recent accepted block
-    func getBlockNumber() async throws -> UInt64
+    func getBlockNumber() -> StarknetRequest<UInt64>
 
     /// Get the most recent accepted block hash and number.
     ///
     /// - Returns: Block hash and block number  of the most recent accepted block
-    func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber
+    func getBlockHashAndNumber() -> StarknetRequest<StarknetBlockHashAndNumber>
 
     /// Get all event objects matching the conditions in the provided filter
     ///
@@ -89,7 +89,7 @@ public protocol StarknetProviderProtocol {
     ///  - filter : the conditions used to filter the returned events
     ///
     /// - Returns: events matching the conditions in the provided filter and continuation token
-    func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse
+    func getEvents(filter: StarknetGetEventsFilter) -> StarknetRequest<StarknetGetEventsResponse>
 
     /// Get the details and status of a submitted transaction
     ///
@@ -97,7 +97,7 @@ public protocol StarknetProviderProtocol {
     ///  - hash: The hash of the requested transaction
     ///
     /// - Returns: Transaction found with provided hash
-    func getTransactionBy(hash: Felt) async throws -> any StarknetTransaction
+    func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper>
 
     /// Get the details and status of a submitted transaction
     ///
@@ -106,7 +106,7 @@ public protocol StarknetProviderProtocol {
     ///  - index: index of transaction in the block
     ///
     /// - Returns: Transaction found with provided blockId and index.
-    func getTransactionBy(blockId: StarknetBlockId, index: UInt64) async throws -> any StarknetTransaction
+    func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper>
 
     /// Get transaction receipt of a submitted transaction
     ///
@@ -114,7 +114,7 @@ public protocol StarknetProviderProtocol {
     ///  - hash : the hash of the requested transaction
     ///
     /// - Returns: receipt of a transaction identified by given hash
-    func getTransactionReceiptBy(hash: Felt) async throws -> any StarknetTransactionReceipt
+    func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper>
 
     /// Get the status of a submitted transaction.
     ///
@@ -122,12 +122,12 @@ public protocol StarknetProviderProtocol {
     ///  - hash: The hash of the requested transaction
     ///
     /// - Returns: The status(es) of a transaction
-    func getTransactionStatusBy(hash: Felt) async throws -> StarknetGetTransactionStatusResponse
+    func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse>
 
     /// Get the currently configured Starknet chain id
     ///
     /// - Returns: The Starknet chain id
-    func getChainId() async throws -> StarknetChainId
+    func getChainId() -> StarknetRequest<StarknetChainId>
 
     /// Simulate running a given list of transactions, and generate the execution trace
     ///
@@ -137,7 +137,23 @@ public protocol StarknetProviderProtocol {
     ///  - simulationFlags: a set of simulation flags
     ///
     ///  - Returns: array of simulated transactions
-    func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction]
+    func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]>
+
+    /// Batch multiple calls into a single RPC request
+    ///
+    /// - Parameters
+    ///     - requests: list of requests to be batched together.
+    ///
+    /// - Returns: batch request.
+    func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) throws -> StarknetBatchRequest<U>
+
+    /// Batch multiple calls into a single RPC request
+    ///
+    /// - Parameters
+    ///     - requests: requests to be batched together.
+    ///
+    /// - Returns: batch request.
+    func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) throws -> StarknetBatchRequest<U>
 }
 
 let defaultBlockId = StarknetBlockId.tag(.pending)
@@ -149,8 +165,8 @@ public extension StarknetProviderProtocol {
     ///     - call: starknet call to be made.
     ///
     /// - Returns: Array of field elements, returned by called contract.
-    func callContract(_ call: StarknetCall) async throws -> [Felt] {
-        try await callContract(call, at: defaultBlockId)
+    func callContract(_ call: StarknetCall) -> StarknetRequest<[Felt]> {
+        callContract(call, at: defaultBlockId)
     }
 
     /// Estimate fee for a list of transactions with default flags in the pending block.
@@ -159,8 +175,8 @@ public extension StarknetProviderProtocol {
     ///  -  transactions: transactions for which the fees should be estimated.
     ///
     /// - Returns: Array of fee estimates
-    func estimateFee(for transactions: [any StarknetExecutableTransaction]) async throws -> [StarknetFeeEstimate] {
-        try await estimateFee(for: transactions, at: defaultBlockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
+    func estimateFee(for transactions: [any StarknetExecutableTransaction]) -> StarknetRequest<[StarknetFeeEstimate]> {
+        estimateFee(for: transactions, at: defaultBlockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
     }
 
     /// Estimate fee for a list of transactions with default flags.
@@ -170,8 +186,8 @@ public extension StarknetProviderProtocol {
     ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: Array of fee estimates
-    func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
-        try await estimateFee(for: transactions, at: blockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
+    func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) -> StarknetRequest<[StarknetFeeEstimate]> {
+        estimateFee(for: transactions, at: blockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
     }
 
     /// Estimate fee for a list of transactions in the pending block..
@@ -181,8 +197,8 @@ public extension StarknetProviderProtocol {
     ///  -  simulationFlags: a set of simulation flags
     ///
     /// - Returns: Array of fee estimates
-    func estimateFee(for transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> [StarknetFeeEstimate] {
-        try await estimateFee(for: transactions, at: defaultBlockId, simulationFlags: simulationFlags)
+    func estimateFee(for transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
+        estimateFee(for: transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
 
     /// Estimate fee for a single transaction with default flags in the pending block.
@@ -191,8 +207,8 @@ public extension StarknetProviderProtocol {
     ///  -  transaction: transaction for which the fee should be estimated.
     ///
     /// - Returns: Fee estimate
-    func estimateFee(for transaction: any StarknetExecutableTransaction) async throws -> StarknetFeeEstimate {
-        try await estimateFee(for: [transaction])[0]
+    func estimateFee(for transaction: any StarknetExecutableTransaction) -> StarknetRequest<[StarknetFeeEstimate]> {
+        estimateFee(for: [transaction])
     }
 
     /// Estimate fee for a single transaction with default flags.
@@ -202,8 +218,8 @@ public extension StarknetProviderProtocol {
     ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: Fee estimate
-    func estimateFee(for transaction: any StarknetExecutableTransaction, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
-        try await estimateFee(for: [transaction], at: blockId)[0]
+    func estimateFee(for transaction: any StarknetExecutableTransaction, at blockId: StarknetBlockId) -> StarknetRequest<[StarknetFeeEstimate]> {
+        estimateFee(for: [transaction], at: blockId)
     }
 
     /// Estimate fee for a single transaction in the pending block..
@@ -213,8 +229,8 @@ public extension StarknetProviderProtocol {
     ///  -  simulationFlags: a set of simulation flags
     ///
     /// - Returns: Fee estimate
-    func estimateFee(for transaction: any StarknetExecutableTransaction, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> StarknetFeeEstimate {
-        try await estimateFee(for: [transaction], simulationFlags: simulationFlags)[0]
+    func estimateFee(for transaction: any StarknetExecutableTransaction, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
+        estimateFee(for: [transaction], simulationFlags: simulationFlags)
     }
 
     /// Estimate the L2 fee of a message sent on L1
@@ -223,8 +239,8 @@ public extension StarknetProviderProtocol {
     ///  - message: the message's parameters
     ///
     /// - Returns: Fee estimate
-    func estimateMessageFee(_ message: StarknetMessageFromL1) async throws -> StarknetFeeEstimate {
-        try await estimateMessageFee(message, at: defaultBlockId)
+    func estimateMessageFee(_ message: StarknetMessageFromL1) -> StarknetRequest<StarknetFeeEstimate> {
+        estimateMessageFee(message, at: defaultBlockId)
     }
 
     /// Get nonce of given starknet contract in the pending block.
@@ -233,8 +249,8 @@ public extension StarknetProviderProtocol {
     ///     - contract: address of a contract, for which the nonce should be returned.
     ///
     /// - Returns: Felt value of contract's current nonce.
-    func getNonce(of contract: Felt) async throws -> Felt {
-        try await getNonce(of: contract, at: defaultBlockId)
+    func getNonce(of contract: Felt) -> StarknetRequest<Felt> {
+        getNonce(of: contract, at: defaultBlockId)
     }
 
     /// Get the contract class hash for the contract deployed at the given address.
@@ -243,8 +259,8 @@ public extension StarknetProviderProtocol {
     ///  - address: address of the contract whose address will be returned
     ///
     /// - Returns: Class hash of the given contract
-    func getClassHashAt(_ address: Felt) async throws -> Felt {
-        try await getClassHashAt(address, at: defaultBlockId)
+    func getClassHashAt(_ address: Felt) -> StarknetRequest<Felt> {
+        getClassHashAt(address, at: defaultBlockId)
     }
 
     /// Simulate running a given list of transactions in the latest block, and generate the execution trace
@@ -254,7 +270,7 @@ public extension StarknetProviderProtocol {
     ///  - simulationFlags: a set of simulation flags
     ///
     ///  - Returns : array of simulated transactions
-    func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
-        try await simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
+    func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
+        simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
 }
