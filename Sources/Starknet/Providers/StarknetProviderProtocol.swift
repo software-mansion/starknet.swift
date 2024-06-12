@@ -29,7 +29,7 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Parameters:
     ///  - transactions: list of transactions for which the fees should be estimated.
-    ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
+    ///  - blockId: hash, number, or tag of a block for which the estimation should be made.
     ///  - simulationFlags: a set of simulation flags.
     ///
     /// - Returns: Array of fee estimates
@@ -39,7 +39,7 @@ public protocol StarknetProviderProtocol {
     ///
     /// - Parameters:
     ///  - message: the message's parameters
-    ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
+    ///  - blockId: hash, number, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: the fee estimation
     func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate
@@ -167,7 +167,7 @@ public extension StarknetProviderProtocol {
     ///
     /// - Parameters:
     ///  -  transactions: transactions for which the fees should be estimated.
-    ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
+    ///  -  blockId: hash, number, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: Array of fee estimates
     func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) async throws -> [StarknetFeeEstimate] {
@@ -199,7 +199,7 @@ public extension StarknetProviderProtocol {
     ///
     /// - Parameters:
     ///  -  transaction: transaction for which the fee should be estimated.
-    ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
+    ///  -  blockId: hash, number, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: Fee estimate
     func estimateFee(for transaction: any StarknetExecutableTransaction, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
