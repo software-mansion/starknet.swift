@@ -98,7 +98,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
         self.domain = domain
         self.message = message
 
-        self.revision = try domain.resolveRevision()
+        self.revision = domain.revision
 
         self.allTypes = self.types.merging(
             Self.PresetType.cases(revision: self.revision).reduce(into: [:]) { $0[$1.rawValue] = $1.params },
@@ -397,34 +397,45 @@ public extension StarknetTypedData {
         public let name: Element
         public let version: Element
         public let chainId: Element
-        public let revision: Element?
-
-        public func resolveRevision() throws -> Revision {
-            guard let revision else {
-                return .v0
-            }
-            switch revision {
-            case let .felt(felt):
-                guard let revision = Revision(rawValue: felt) else {
-                    throw StarknetTypedDataError.invalidRevision(felt)
-                }
-                return revision
-            default:
-                throw StarknetTypedDataError.decodingError
-            }
-        }
+        public let revision: Revision
 
         public var separatorName: String {
-            switch try! resolveRevision() {
+            switch revision {
             case .v0: "StarkNetDomain"
             case .v1: "StarknetDomain"
             }
         }
+
+        enum CodingKeys: String, CodingKey {
+            case name
+            case version
+            case chainId
+            case revision
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.name = try container.decode(Element.self, forKey: .name)
+            self.version = try container.decode(Element.self, forKey: .version)
+            self.chainId = try container.decode(Element.self, forKey: .chainId)
+            self.revision = try container.decodeIfPresent(Revision.self, forKey: .revision) ?? .v0
+        }
     }
 
-    enum Revision: Felt, Codable, Equatable {
-        case v0 = 0
-        case v1 = 1
+    enum Revision: String, Codable, Equatable {
+        case v0 = "0"
+        case v1 = "1"
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            if let stringValue = try? container.decode(String.self), let value = Revision(rawValue: stringValue) {
+                self = value
+            } else if let intValue = try? container.decode(Int.self), let value = Revision(rawValue: String(intValue)) {
+                self = value
+            } else {
+                throw StarknetTypedDataError.decodingError
+            }
+        }
     }
 
     enum Element: Codable, Hashable, Equatable {
