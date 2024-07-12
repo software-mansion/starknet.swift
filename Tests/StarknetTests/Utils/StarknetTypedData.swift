@@ -18,3 +18,13 @@ func loadTypedDataFromFile(name: String) throws -> StarknetTypedData {
 
     return try JSONDecoder().decode(StarknetTypedData.self, from: contentsData)
 }
+
+
+func loadTypedDataJsonStringFromFile(name: String) throws -> String {
+    guard let url = Bundle.module.url(forResource: name, withExtension: "json"),
+          let contents = try? String(contentsOf: url)
+    else {
+        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Failed to load typed data from file \(name)"))
+    }
+    return contents
+}
