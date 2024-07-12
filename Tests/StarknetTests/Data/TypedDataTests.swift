@@ -456,7 +456,7 @@ final class TypedDataTests: XCTestCase {
             XCTAssertEqual(hash, expectedResult)
         }
     }
-    
+
     func testEncodingTimestamp() throws {
         let tdJsonStr = try loadTypedDataJsonStringFromFile(name: "typed_data_rev_1_timestamp_example")
         guard let tdEncodedContents = tdJsonStr.data(using: .utf8) else {
@@ -468,7 +468,7 @@ final class TypedDataTests: XCTestCase {
             let tdEncoded = try JSONEncoder().encode(td)
             let originalJson = try JSONSerialization.jsonObject(with: tdEncodedContents, options: []) as? [String: Any]
             let encodedJson = try JSONSerialization.jsonObject(with: tdEncoded, options: []) as? [String: Any]
-            
+
             XCTAssertEqual(originalJson as NSDictionary?, encodedJson as NSDictionary?)
         } catch let e {
             throw e
