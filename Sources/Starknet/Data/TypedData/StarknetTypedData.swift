@@ -607,13 +607,10 @@ extension StarknetTypedData {
     func unwrapBool(from element: Element) throws -> Felt {
         switch element {
         case let .decimal(decimal):
-            if decimal == 0 {
-                return .zero
-            } else if decimal == 1 {
-                return .one
-            } else {
+            guard decimal == 0 || decimal == 1 else {
                 throw StarknetTypedDataError.invalidBool(element)
             }
+            return decimal == 0 ? .zero : .one
         case let .felt(felt):
             guard felt == .zero || felt == .one else {
                 throw StarknetTypedDataError.invalidBool(element)
