@@ -406,13 +406,6 @@ public extension StarknetTypedData {
             }
         }
 
-        enum CodingKeys: String, CodingKey {
-            case name
-            case version
-            case chainId
-            case revision
-        }
-
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             self.name = try container.decode(Element.self, forKey: .name)
