@@ -27,6 +27,7 @@ public extension StarknetTypedData {
         fileprivate enum CodingKeys: String, CodingKey {
             case name
             case contains
+            case type
         }
     }
 
@@ -43,6 +44,7 @@ public extension StarknetTypedData {
         fileprivate enum CodingKeys: String, CodingKey {
             case name
             case contains
+            case type
         }
     }
 
