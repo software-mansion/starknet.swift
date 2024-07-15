@@ -1,6 +1,6 @@
 import Foundation
 
-enum TransactionReceiptWrapper: Decodable {
+public enum TransactionReceiptWrapper: Decodable {
     fileprivate enum Keys: String, CodingKey {
         case type
     }

@@ -33,7 +33,7 @@ public enum StarknetTypedDataError: Error, Equatable {
 /// let typedDataString = """
 /// {
 ///     "types": {
-///         "StarkNetDomain": [
+///         "StarknetDomain": [
 ///             {"name": "name", "type": "shortstring"},
 ///             {"name": "version", "type": "shortstring"},
 ///             {"name": "chainId", "type": "shortstring"},
@@ -50,7 +50,7 @@ public enum StarknetTypedDataError: Error, Equatable {
 ///         ],
 ///     },
 ///     "primaryType": "Mail",
-///     "domain": {"name": "StarkNet Mail", "version": "1", "chainId": "1", "revision": 1},
+///     "domain": {"name": "Starknet Mail", "version": "1", "chainId": "1", "revision": 1},
 ///     "message": {
 ///         "from": {
 ///             "name": "Cow",

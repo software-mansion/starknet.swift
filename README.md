@@ -1,7 +1,7 @@
 ![alt text](logo.png)
 
 # starknet.swift
-StarkNet SDK for Swift to interact with the starknet rpc nodes.
+Starknet SDK for Swift to interact with the starknet rpc nodes.
 
 ## Installation
 

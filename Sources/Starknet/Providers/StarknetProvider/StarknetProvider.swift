@@ -4,6 +4,7 @@ public enum StarknetProviderError: Error {
     case networkProviderError
     case unknownError
     case jsonRpcError(Int, String, String?)
+    case emptyBatchRequestError
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
@@ -34,163 +35,140 @@ public class StarknetProvider: StarknetProviderProtocol {
         self.init(url: url, urlSession: urlSession)
     }
 
-    private func makeRequest<U>(method: JsonRpcMethod, params: some Encodable = EmptyParams(), receive _: U.Type) async throws -> U where U: Decodable {
-        let rpcPayload = JsonRpcPayload(method: method, params: params)
-
-        var response: JsonRpcResponse<U>
-
-        let config = HttpNetworkProvider.Configuration(url: url, method: "POST", params: [
-            (header: "Content-Type", value: "application/json"),
-            (header: "Accept", value: "application/json"),
-        ])
-
-        do {
-            response = try await networkProvider.send(payload: rpcPayload, config: config, receive: JsonRpcResponse<U>.self)
-        } catch let error as HttpNetworkProviderError {
-            throw error
-        } catch {
-            throw StarknetProviderError.unknownError
-        }
-
-        if let result = response.result {
-            return result
-        } else if let error = response.error {
-            throw StarknetProviderError.jsonRpcError(error.code, error.message, error.data)
-        } else {
-            throw StarknetProviderError.unknownError
-        }
+    private func buildRequest<U: Decodable>(method: JsonRpcMethod, params: JsonRpcParams) -> StarknetRequest<U> {
+        let config = prepareHttpRequestConfiguration()
+        return StarknetRequest<U>(method: method, params: params, config: config, networkProvider: networkProvider)
     }
 
-    public func specVersion() async throws -> String {
-        let params = EmptySequence()
+    public func batchRequests<U: Decodable>(requests: [StarknetRequest<U>]) throws -> StarknetBatchRequest<U> {
+        guard !requests.isEmpty else {
+            throw StarknetProviderError.emptyBatchRequestError
+        }
 
-        let result = try await makeRequest(method: .specVersion, params: params, receive: String.self)
+        let rpcPayloads = requests.enumerated().map { index, request in
+            JsonRpcPayload(method: request.method, params: request.params, id: index)
+        }
+        let config = prepareHttpRequestConfiguration()
 
-        return result
+        return StarknetBatchRequest<U>(rpcPayloads: rpcPayloads, config: config, networkProvider: networkProvider)
     }
 
-    public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) async throws -> [Felt] {
+    public func batchRequests<U: Decodable>(requests: StarknetRequest<U>...) throws -> StarknetBatchRequest<U> {
+        try batchRequests(requests: requests)
+    }
+
+    public func getSpecVersion() -> StarknetRequest<String> {
+        let params = EmptyParams()
+
+        return buildRequest(method: .specVersion, params: .empty(params))
+    }
+
+    public func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) -> StarknetRequest<[Felt]> {
         let params = CallParams(request: call, blockId: blockId)
 
-        let result = try await makeRequest(method: .call, params: params, receive: [Felt].self)
-
-        return result
+        return buildRequest(method: .call, params: .call(params))
     }
 
-    public func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) async throws -> StarknetFeeEstimate {
+    public func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate> {
         let params = EstimateMessageFeeParams(message: message, blockId: blockId)
 
-        let result = try await makeRequest(method: .estimateMessageFee, params: params, receive: StarknetFeeEstimate.self)
-
-        return result
+        return buildRequest(method: .estimateMessageFee, params: .estimateMessageFee(params))
     }
 
-    public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) async throws -> [StarknetFeeEstimate] {
+    public func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
         let params = EstimateFeeParams(request: transactions, simulationFlags: simulationFlags, blockId: blockId)
 
-        let result = try await makeRequest(method: .estimateFee, params: params, receive: [StarknetFeeEstimate].self)
-        return result
+        return buildRequest(method: .estimateFee, params: .estimateFee(params))
     }
 
-    public func getNonce(of contract: Felt, at blockId: StarknetBlockId) async throws -> Felt {
+    public func getNonce(of contract: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetNonceParams(contractAddress: contract, blockId: blockId)
 
-        let result = try await makeRequest(method: .getNonce, params: params, receive: Felt.self)
-
-        return result
+        return buildRequest(method: .getNonce, params: .getNonce(params))
     }
 
-    public func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) async throws -> StarknetInvokeTransactionResponse {
+    public func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) -> StarknetRequest<StarknetInvokeTransactionResponse> {
         let params = AddInvokeTransactionParams(invokeTransaction: transaction)
 
-        let result = try await makeRequest(method: .invokeFunction, params: params, receive: StarknetInvokeTransactionResponse.self)
-
-        return result
+        return buildRequest(method: .invokeFunction, params: .addInvokeTransaction(params))
     }
 
-    public func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) async throws -> StarknetDeployAccountResponse {
+    public func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) -> StarknetRequest<StarknetDeployAccountResponse> {
         let params = AddDeployAccountTransactionParams(deployAccountTransaction: transaction)
 
-        let result = try await makeRequest(method: .deployAccount, params: params, receive: StarknetDeployAccountResponse.self)
-
-        return result
+        return buildRequest(method: .deployAccount, params: .addDeployAccountTransaction(params))
     }
 
-    public func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) async throws -> Felt {
+    public func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetClassHashAtParams(contractAddress: address, blockId: blockId)
 
-        let result = try await makeRequest(method: .getClassHashAt, params: params, receive: Felt.self)
-
-        return result
+        return buildRequest(method: .getClassHashAt, params: .getClassHashAt(params))
     }
 
-    public func getBlockNumber() async throws -> UInt64 {
+    public func getBlockNumber() -> StarknetRequest<UInt64> {
         let params = EmptySequence()
-        let result = try await makeRequest(method: .getBlockNumber, params: params, receive: UInt64.self)
 
-        return result
+        return buildRequest(method: .getBlockNumber, params: .emptySequence(params))
     }
 
-    public func getBlockHashAndNumber() async throws -> StarknetBlockHashAndNumber {
+    public func getBlockHashAndNumber() -> StarknetRequest<StarknetBlockHashAndNumber> {
         let params = EmptySequence()
-        let result = try await makeRequest(method: .getBlockHashAndNumber, params: params, receive: StarknetBlockHashAndNumber.self)
 
-        return result
+        return buildRequest(method: .getBlockHashAndNumber, params: .emptySequence(params))
     }
 
-    public func getEvents(filter: StarknetGetEventsFilter) async throws -> StarknetGetEventsResponse {
+    public func getEvents(filter: StarknetGetEventsFilter) -> StarknetRequest<StarknetGetEventsResponse> {
         let params = GetEventsPayload(filter: filter)
 
-        let result = try await makeRequest(method: .getEvents, params: params, receive: StarknetGetEventsResponse.self)
-
-        return result
+        return buildRequest(method: .getEvents, params: .getEvents(params))
     }
 
-    public func getTransactionBy(hash: Felt) async throws -> any StarknetTransaction {
+    public func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByHashParams(hash: hash)
 
-        let result = try await makeRequest(method: .getTransactionByHash, params: params, receive: TransactionWrapper.self)
-
-        return result.transaction
+        return buildRequest(method: .getTransactionByHash, params: .getTransactionByHash(params))
     }
 
-    public func getTransactionBy(blockId: StarknetBlockId, index: UInt64) async throws -> any StarknetTransaction {
+    public func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByBlockIdAndIndex(blockId: blockId, index: index)
 
-        let result = try await makeRequest(method: .getTransactionByBlockIdAndIndex, params: params, receive: TransactionWrapper.self)
-
-        return result.transaction
+        return buildRequest(method: .getTransactionByBlockIdAndIndex, params: .getTransactionByBlockIdAndIndex(params))
     }
 
-    public func getTransactionReceiptBy(hash: Felt) async throws -> any StarknetTransactionReceipt {
+    public func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper> {
         let params = GetTransactionReceiptPayload(transactionHash: hash)
 
-        let result = try await makeRequest(method: .getTransactionReceipt, params: params, receive: TransactionReceiptWrapper.self)
-
-        return result.transactionReceipt
+        return buildRequest(method: .getTransactionReceipt, params: .getTransactionReceipt(params))
     }
 
-    public func getTransactionStatusBy(hash: Felt) async throws -> StarknetGetTransactionStatusResponse {
+    public func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse> {
         let params = GetTransactionStatusPayload(transactionHash: hash)
 
-        let result = try await makeRequest(method: .getTransactionStatus, params: params, receive: StarknetGetTransactionStatusResponse.self)
-
-        return result
+        return buildRequest(method: .getTransactionStatus, params: .getTransactionStatus(params))
     }
 
-    public func getChainId() async throws -> StarknetChainId {
+    public func getChainId() -> StarknetRequest<StarknetChainId> {
         let params = EmptySequence()
 
-        let result = try await makeRequest(method: .getChainId, params: params, receive: StarknetChainId.self)
-
-        return result
+        return buildRequest(method: .getChainId, params: .emptySequence(params))
     }
 
-    public func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) async throws -> [StarknetSimulatedTransaction] {
+    public func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
-        let result = try await makeRequest(method: .simulateTransactions, params: params, receive: [StarknetSimulatedTransaction].self)
+        return buildRequest(method: .simulateTransactions, params: .simulateTransactions(params))
+    }
+}
 
-        return result
+private extension StarknetProvider {
+    private func prepareHttpRequestConfiguration() -> HttpNetworkProvider.Configuration {
+        HttpNetworkProvider.Configuration(
+            url: url,
+            method: "POST",
+            params: [
+                (header: "Content-Type", value: "application/json"),
+                (header: "Accept", value: "application/json"),
+            ]
+        )
     }
 }
