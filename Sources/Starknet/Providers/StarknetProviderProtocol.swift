@@ -145,8 +145,8 @@ public protocol StarknetProviderProtocol {
     ///     - requests: list of requests to be batched together.
     ///
     /// - Returns: batch request.
-    @available(macOS 13.0.0, *) 
-@available(iOS 16.0.0, *)
+    @available(macOS 13.0.0, *)
+    @available(iOS 16.0.0, *)
     func batchRequests<U: Decodable>(requests: [any StarknetRequestProtocol<U>]) throws -> any StarknetBatchRequestProtocol<U>
 
     /// Batch multiple calls into a single RPC request
@@ -154,8 +154,8 @@ public protocol StarknetProviderProtocol {
     /// - Parameters
     ///     - requests: requests to be batched together.
     ///
-    @available(macOS 13.0.0, *) 
-@available(iOS 16.0.0, *)
+    @available(macOS 13.0.0, *)
+    @available(iOS 16.0.0, *)
     /// - Returns: batch request.
     func batchRequests<U: Decodable>(requests: any StarknetRequestProtocol<U>...) throws -> any StarknetBatchRequestProtocol<U>
 }
