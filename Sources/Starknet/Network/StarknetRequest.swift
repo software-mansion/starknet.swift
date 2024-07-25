@@ -1,5 +1,3 @@
-import Foundation
-
 public protocol StarknetRequestProtocol<U> {
     associatedtype U: Decodable
     var method: JsonRpcMethod { get }
