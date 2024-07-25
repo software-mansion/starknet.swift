@@ -1,4 +1,9 @@
-public struct StarknetBatchRequest<U: Decodable> {
+public protocol StarknetBatchRequestProtocol<U> {
+    associatedtype U: Decodable
+    func send() async throws -> [Result<U, StarknetProviderError>]
+}
+
+public struct StarknetBatchRequest<U: Decodable>: StarknetBatchRequestProtocol {
     let rpcPayloads: [JsonRpcPayload]
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
