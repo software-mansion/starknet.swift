@@ -1,6 +1,6 @@
 import Foundation
 
-struct JsonRpcPayload: Encodable {
+public struct JsonRpcPayload: Encodable {
     let version = "2.0"
     let id: Int
 
