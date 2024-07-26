@@ -1,8 +1,22 @@
-public struct StarknetRequest<U: Decodable> {
-    let method: JsonRpcMethod
-    let params: JsonRpcParams
+public protocol StarknetRequestProtocol<U> {
+    associatedtype U: Decodable
+    var method: JsonRpcMethod { get }
+    var params: JsonRpcParams { get }
+    func send() async throws -> U
+}
+
+public struct StarknetRequest<U: Decodable>: StarknetRequestProtocol {
+    public let method: JsonRpcMethod
+    public let params: JsonRpcParams
     let config: HttpNetworkProvider.Configuration
     let networkProvider: HttpNetworkProvider
+
+    public init(method: JsonRpcMethod, params: JsonRpcParams, config: HttpNetworkProvider.Configuration, networkProvider: HttpNetworkProvider) {
+        self.method = method
+        self.params = params
+        self.config = config
+        self.networkProvider = networkProvider
+    }
 
     public func send() async throws -> U {
         let rpcPayload = JsonRpcPayload(method: method, params: params)

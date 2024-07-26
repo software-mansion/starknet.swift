@@ -11,10 +11,10 @@ enum HttpNetworkProviderError: Error {
     case requestRejected
 }
 
-class HttpNetworkProvider {
+public class HttpNetworkProvider {
     let session: URLSession
 
-    struct Configuration {
+    public struct Configuration {
         let url: URL
         let method: String
         let params: [(header: String, value: String)]

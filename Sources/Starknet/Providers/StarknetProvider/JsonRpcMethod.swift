@@ -1,6 +1,6 @@
 import Foundation
 
-enum JsonRpcMethod: String, Encodable {
+public enum JsonRpcMethod: String, Encodable {
     case specVersion = "starknet_specVersion"
     case call = "starknet_call"
     case getNonce = "starknet_getNonce"
