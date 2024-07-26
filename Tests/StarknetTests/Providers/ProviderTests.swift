@@ -410,7 +410,7 @@ final class ProviderTests: XCTestCase {
         let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
 
         // Note to future developers:
-        // Combining batch request and sending it into single statement causes a compiler crash,
+        // Combining a batch request with sending it in a single statement causes a compiler crash,
         // so we need to split it into two separate statements.
         let batchRequest = try provider.batchRequests(requests:
             provider.getTransactionBy(hash: previousResult.transaction.hash!),
