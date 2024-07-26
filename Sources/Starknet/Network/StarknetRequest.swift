@@ -1,5 +1,7 @@
 public protocol StarknetRequestProtocol<U> {
     associatedtype U: Decodable
+    var method: JsonRpcMethod { get }
+    var params: JsonRpcParams { get }
     func send() async throws -> U
 }
 

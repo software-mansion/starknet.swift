@@ -5,7 +5,6 @@ public enum StarknetProviderError: Error {
     case unknownError
     case jsonRpcError(Int, String, String?)
     case emptyBatchRequestError
-    case invalidBatchRequestTypeError
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
@@ -46,11 +45,8 @@ public class StarknetProvider: StarknetProviderProtocol {
             throw StarknetProviderError.emptyBatchRequestError
         }
 
-        let rpcPayloads = try requests.enumerated().map { index, request -> JsonRpcPayload in
-            guard let starknetRequest = request as? StarknetRequest<U> else {
-                throw StarknetProviderError.invalidBatchRequestTypeError
-            }
-            return JsonRpcPayload(method: starknetRequest.method, params: starknetRequest.params, id: index)
+        let rpcPayloads = requests.enumerated().map { index, request in
+            JsonRpcPayload(method: request.method, params: request.params, id: index)
         }
         let config = prepareHttpRequestConfiguration()
 
