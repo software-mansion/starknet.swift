@@ -8,8 +8,6 @@ public enum StarknetProviderError: Error {
     case invalidBatchRequestTypeError
 }
 
-@available(macOS 13.0.0, *)
-@available(iOS 16.0.0, *)
 public class StarknetProvider: StarknetProviderProtocol {
     private let url: URL
     private let networkProvider: HttpNetworkProvider
@@ -166,8 +164,6 @@ public class StarknetProvider: StarknetProviderProtocol {
     }
 }
 
-@available(macOS 13.0.0, *)
-@available(iOS 16.0.0, *)
 private extension StarknetProvider {
     private func prepareHttpRequestConfiguration() -> HttpNetworkProvider.Configuration {
         HttpNetworkProvider.Configuration(
