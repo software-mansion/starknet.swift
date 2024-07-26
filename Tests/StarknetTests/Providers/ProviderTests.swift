@@ -409,6 +409,9 @@ final class ProviderTests: XCTestCase {
     func testBatchGetTransactionByHash() async throws {
         let previousResult = try await provider.getTransactionBy(blockId: .tag(.latest), index: 0).send()
 
+        // Note to future developers:
+        // Combining batch request and sending it into single statement causes a compiler crash,
+        // so we need to split it into two separate statements.
         let batchRequest = try provider.batchRequests(requests:
             provider.getTransactionBy(hash: previousResult.transaction.hash!),
             provider.getTransactionBy(hash: "0x123"))
