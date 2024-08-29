@@ -1,6 +1,11 @@
 public struct StarknetRequest<U: Decodable> {
     let method: JsonRpcMethod
     let params: JsonRpcParams
+    
+    public init(method: JsonRpcMethod, params: JsonRpcParams) {
+        self.method = method
+        self.params = params
+    }
 }
 
 let defaultBlockId = StarknetBlockId.tag(.pending)
