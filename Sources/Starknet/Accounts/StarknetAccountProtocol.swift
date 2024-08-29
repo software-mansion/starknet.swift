@@ -5,6 +5,8 @@ public protocol StarknetAccountProtocol {
     var address: Felt { get }
     /// Chain id of the Starknet provider.
     var chainId: StarknetChainId { get }
+    // Starknet provider.
+    var provider: StarknetProviderProtocol { get }
 
     /// Sign list of calls as invoke transaction v1
     ///
@@ -361,7 +363,7 @@ public extension StarknetAccountProtocol {
 
     /// - Returns: struct containing fee estimate
     func estimateFeeV1(calls: [StarknetCall], skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        let nonce = try await getNonce().send()
+        let nonce = try await provider.send(request: getNonce())
         return try await estimateFeeV1(calls: calls, nonce: nonce, skipValidate: skipValidate)
     }
 
@@ -373,7 +375,7 @@ public extension StarknetAccountProtocol {
     ///
     /// - Returns: struct containing fee estimate
     func estimateFeeV3(calls: [StarknetCall], skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        let nonce = try await getNonce().send()
+        let nonce = try await provider.send(request: getNonce())
         return try await estimateFeeV3(calls: calls, nonce: nonce, skipValidate: skipValidate)
     }
 
