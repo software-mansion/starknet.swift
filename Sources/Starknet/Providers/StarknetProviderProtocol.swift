@@ -10,7 +10,7 @@ public protocol StarknetProviderProtocol {
     /// - Returns: request result.
     func send<U>(request: StarknetRequest<U>) async throws -> U
 
-    /// Send multiple RPC requests
+    /// Send multiple calls in a single RPC request
     ///
     /// - Parameters
     ///     - requests: list of requests to be sent.
@@ -20,7 +20,7 @@ public protocol StarknetProviderProtocol {
         requests: [StarknetRequest<U>]
     ) async throws -> [Result<U, StarknetProviderError>] where U: Decodable
 
-    /// Send multiple RPC requests
+    /// Send multiple calls in a single RPC request
     ///
     /// - Parameters
     ///     - requests: requests to be sent.
