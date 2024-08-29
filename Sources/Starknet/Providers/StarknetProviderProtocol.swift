@@ -15,7 +15,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters
     ///     - requests: list of requests to be sent.
     ///
-    /// - Returns: requests' result.
+    /// - Returns: requests' results.
     func send<U>(
         requests: [StarknetRequest<U>]
     ) async throws -> [Result<U, StarknetProviderError>] where U: Decodable
@@ -25,7 +25,7 @@ public protocol StarknetProviderProtocol {
     /// - Parameters
     ///     - requests: requests to be sent.
     ///
-    /// - Returns: requests' result.
+    /// - Returns: requests' results.
     func send<U>(
         requests: StarknetRequest<U>...
     ) async throws -> [Result<U, StarknetProviderError>] where U: Decodable
