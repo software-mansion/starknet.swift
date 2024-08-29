@@ -94,3 +94,18 @@ private extension StarknetProvider {
         )
     }
 }
+
+func orderRpcResults<U: Decodable>(rpcResponses: [JsonRpcResponse<U>]) -> [Result<U, StarknetProviderError>] {
+    var orderedRpcResults: [Result<U, StarknetProviderError>?] = Array(repeating: nil, count: rpcResponses.count)
+    for rpcResponse in rpcResponses {
+        if let result = rpcResponse.result {
+            orderedRpcResults[rpcResponse.id] = .success(result)
+        } else if let error = rpcResponse.error {
+            orderedRpcResults[rpcResponse.id] = .failure(StarknetProviderError.jsonRpcError(error.code, error.message, error.data))
+        } else {
+            orderedRpcResults[rpcResponse.id] = .failure(StarknetProviderError.unknownError)
+        }
+    }
+
+    return orderedRpcResults.compactMap { $0 }
+}
