@@ -13,7 +13,7 @@ public enum RequestBuilder {
     static func getSpecVersion() -> StarknetRequest<String> {
         let params = EmptyParams()
 
-        return StarknetRequest<String>(method: .specVersion, params: .empty(params))
+        return StarknetRequest(method: .specVersion, params: .empty(params))
     }
 
     /// Call starknet contract.
@@ -26,7 +26,7 @@ public enum RequestBuilder {
     static func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) -> StarknetRequest<[Felt]> {
         let params = CallParams(request: call, blockId: blockId)
 
-        return StarknetRequest<[Felt]>(method: .call, params: .call(params))
+        return StarknetRequest(method: .call, params: .call(params))
     }
 
     /// Estimate the L2 fee of a message sent on L1
@@ -39,7 +39,7 @@ public enum RequestBuilder {
     static func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate> {
         let params = EstimateMessageFeeParams(message: message, blockId: blockId)
 
-        return StarknetRequest<StarknetFeeEstimate>(method: .estimateMessageFee, params: .estimateMessageFee(params))
+        return StarknetRequest(method: .estimateMessageFee, params: .estimateMessageFee(params))
     }
 
     /// Estimate fee for a transaction.
@@ -53,7 +53,7 @@ public enum RequestBuilder {
     static func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
         let params = EstimateFeeParams(request: transactions, simulationFlags: simulationFlags, blockId: blockId)
 
-        return StarknetRequest<[StarknetFeeEstimate]>(method: .estimateFee, params: .estimateFee(params))
+        return StarknetRequest(method: .estimateFee, params: .estimateFee(params))
     }
 
     /// Get nonce of given starknet contract
@@ -66,7 +66,7 @@ public enum RequestBuilder {
     static func getNonce(of contract: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetNonceParams(contractAddress: contract, blockId: blockId)
 
-        return StarknetRequest<Felt>(method: .getNonce, params: .getNonce(params))
+        return StarknetRequest(method: .getNonce, params: .getNonce(params))
     }
 
     /// Invoke a function.
@@ -80,7 +80,7 @@ public enum RequestBuilder {
     static func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) -> StarknetRequest<StarknetInvokeTransactionResponse> {
         let params = AddInvokeTransactionParams(invokeTransaction: transaction)
 
-        return StarknetRequest<StarknetInvokeTransactionResponse>(method: .invokeFunction, params: .addInvokeTransaction(params))
+        return StarknetRequest(method: .invokeFunction, params: .addInvokeTransaction(params))
     }
 
     /// Deploy account
@@ -94,7 +94,7 @@ public enum RequestBuilder {
     static func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) -> StarknetRequest<StarknetDeployAccountResponse> {
         let params = AddDeployAccountTransactionParams(deployAccountTransaction: transaction)
 
-        return StarknetRequest<StarknetDeployAccountResponse>(method: .deployAccount, params: .addDeployAccountTransaction(params))
+        return StarknetRequest(method: .deployAccount, params: .addDeployAccountTransaction(params))
     }
 
     /// Get the contract class hash for the contract deployed at the given address.
@@ -107,7 +107,7 @@ public enum RequestBuilder {
     static func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetClassHashAtParams(contractAddress: address, blockId: blockId)
 
-        return StarknetRequest<Felt>(method: .getClassHashAt, params: .getClassHashAt(params))
+        return StarknetRequest(method: .getClassHashAt, params: .getClassHashAt(params))
     }
 
     /// Get the most recent accepted block number.
@@ -116,7 +116,7 @@ public enum RequestBuilder {
     static func getBlockNumber() -> StarknetRequest<UInt64> {
         let params = EmptySequence()
 
-        return StarknetRequest<UInt64>(method: .getBlockNumber, params: .emptySequence(params))
+        return StarknetRequest(method: .getBlockNumber, params: .emptySequence(params))
     }
 
     /// Get the most recent accepted block hash and number.
@@ -125,7 +125,7 @@ public enum RequestBuilder {
     static func getBlockHashAndNumber() -> StarknetRequest<StarknetBlockHashAndNumber> {
         let params = EmptySequence()
 
-        return StarknetRequest<StarknetBlockHashAndNumber>(method: .getBlockHashAndNumber, params: .emptySequence(params))
+        return StarknetRequest(method: .getBlockHashAndNumber, params: .emptySequence(params))
     }
 
     /// Get all event objects matching the conditions in the provided filter
@@ -137,7 +137,7 @@ public enum RequestBuilder {
     static func getEvents(filter: StarknetGetEventsFilter) -> StarknetRequest<StarknetGetEventsResponse> {
         let params = GetEventsPayload(filter: filter)
 
-        return StarknetRequest<StarknetGetEventsResponse>(method: .getEvents, params: .getEvents(params))
+        return StarknetRequest(method: .getEvents, params: .getEvents(params))
     }
 
     /// Get the details and status of a submitted transaction
@@ -149,7 +149,7 @@ public enum RequestBuilder {
     static func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByHashParams(hash: hash)
 
-        return StarknetRequest<TransactionWrapper>(method: .getTransactionByHash, params: .getTransactionByHash(params))
+        return StarknetRequest(method: .getTransactionByHash, params: .getTransactionByHash(params))
     }
 
     /// Get the details and status of a submitted transaction
@@ -162,7 +162,7 @@ public enum RequestBuilder {
     static func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByBlockIdAndIndex(blockId: blockId, index: index)
 
-        return StarknetRequest<TransactionWrapper>(method: .getTransactionByBlockIdAndIndex, params: .getTransactionByBlockIdAndIndex(params))
+        return StarknetRequest(method: .getTransactionByBlockIdAndIndex, params: .getTransactionByBlockIdAndIndex(params))
     }
 
     /// Get transaction receipt of a submitted transaction
@@ -174,7 +174,7 @@ public enum RequestBuilder {
     static func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper> {
         let params = GetTransactionReceiptPayload(transactionHash: hash)
 
-        return StarknetRequest<TransactionReceiptWrapper>(method: .getTransactionReceipt, params: .getTransactionReceipt(params))
+        return StarknetRequest(method: .getTransactionReceipt, params: .getTransactionReceipt(params))
     }
 
     /// Get the status of a submitted transaction.
@@ -186,7 +186,7 @@ public enum RequestBuilder {
     static func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse> {
         let params = GetTransactionStatusPayload(transactionHash: hash)
 
-        return StarknetRequest<StarknetGetTransactionStatusResponse>(method: .getTransactionStatus, params: .getTransactionStatus(params))
+        return StarknetRequest(method: .getTransactionStatus, params: .getTransactionStatus(params))
     }
 
     /// Get the currently configured Starknet chain id
@@ -195,7 +195,7 @@ public enum RequestBuilder {
     static func getChainId() -> StarknetRequest<StarknetChainId> {
         let params = EmptySequence()
 
-        return StarknetRequest<StarknetChainId>(method: .getChainId, params: .emptySequence(params))
+        return StarknetRequest(method: .getChainId, params: .emptySequence(params))
     }
 
     /// Simulate running a given list of transactions, and generate the execution trace
@@ -209,7 +209,7 @@ public enum RequestBuilder {
     static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
-        return StarknetRequest<[StarknetSimulatedTransaction]>(method: .simulateTransactions, params: .simulateTransactions(params))
+        return StarknetRequest(method: .simulateTransactions, params: .simulateTransactions(params))
     }
 
     /// Call starknet contract in the pending block.
