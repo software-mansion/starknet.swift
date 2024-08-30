@@ -2,9 +2,9 @@ import Foundation
 
 public typealias EmptySequence = [String]
 
-public struct EmptyParams: Encodable {}
+struct EmptyParams: Encodable {}
 
-public struct CallParams: Encodable {
+struct CallParams: Encodable {
     let request: StarknetCall
     let blockId: StarknetBlockId
 
@@ -14,7 +14,7 @@ public struct CallParams: Encodable {
     }
 }
 
-public struct GetNonceParams: Encodable {
+struct GetNonceParams: Encodable {
     let contractAddress: Felt
     let blockId: StarknetBlockId
 
@@ -24,10 +24,10 @@ public struct GetNonceParams: Encodable {
     }
 }
 
-public struct AddInvokeTransactionParams: Encodable {
+struct AddInvokeTransactionParams: Encodable {
     let invokeTransaction: any StarknetExecutableInvokeTransaction
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(invokeTransaction, forKey: .invokeTransaction)
@@ -47,7 +47,7 @@ struct WrappedExecutableTransaction: Encodable {
     }
 }
 
-public struct EstimateFeeParams: Encodable {
+struct EstimateFeeParams: Encodable {
     let request: [any StarknetExecutableTransaction]
     let simulationFlags: Set<StarknetSimulationFlagForEstimateFee>
     let blockId: StarknetBlockId
@@ -69,7 +69,7 @@ public struct EstimateFeeParams: Encodable {
     }
 }
 
-public struct EstimateMessageFeeParams: Encodable {
+struct EstimateMessageFeeParams: Encodable {
     let message: StarknetMessageFromL1
     let blockId: StarknetBlockId
 
@@ -79,7 +79,7 @@ public struct EstimateMessageFeeParams: Encodable {
     }
 }
 
-public struct AddDeployAccountTransactionParams: Encodable {
+struct AddDeployAccountTransactionParams: Encodable {
     let deployAccountTransaction: any StarknetExecutableDeployAccountTransaction
 
     public func encode(to encoder: Encoder) throws {
@@ -93,7 +93,7 @@ public struct AddDeployAccountTransactionParams: Encodable {
     }
 }
 
-public struct GetClassHashAtParams: Encodable {
+struct GetClassHashAtParams: Encodable {
     let contractAddress: Felt
     let blockId: StarknetBlockId
 
@@ -103,11 +103,11 @@ public struct GetClassHashAtParams: Encodable {
     }
 }
 
-public struct GetEventsPayload: Encodable {
+struct GetEventsPayload: Encodable {
     let filter: StarknetGetEventsFilter
 }
 
-public struct GetTransactionByHashParams: Encodable {
+struct GetTransactionByHashParams: Encodable {
     let hash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -115,7 +115,7 @@ public struct GetTransactionByHashParams: Encodable {
     }
 }
 
-public struct GetTransactionByBlockIdAndIndex: Encodable {
+struct GetTransactionByBlockIdAndIndex: Encodable {
     let blockId: StarknetBlockId
     let index: UInt64
 
@@ -125,7 +125,7 @@ public struct GetTransactionByBlockIdAndIndex: Encodable {
     }
 }
 
-public struct GetTransactionReceiptPayload: Encodable {
+struct GetTransactionReceiptPayload: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -133,7 +133,7 @@ public struct GetTransactionReceiptPayload: Encodable {
     }
 }
 
-public struct GetTransactionStatusPayload: Encodable {
+struct GetTransactionStatusPayload: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -141,7 +141,7 @@ public struct GetTransactionStatusPayload: Encodable {
     }
 }
 
-public struct SimulateTransactionsParams: Encodable {
+struct SimulateTransactionsParams: Encodable {
     let transactions: [any StarknetExecutableTransaction]
     let blockId: StarknetBlockId
     let simulationFlags: Set<StarknetSimulationFlag>
@@ -163,7 +163,7 @@ public struct SimulateTransactionsParams: Encodable {
     }
 }
 
-public enum JsonRpcParams {
+enum JsonRpcParams {
     case getNonce(GetNonceParams)
     case addInvokeTransaction(AddInvokeTransactionParams)
     case emptySequence(EmptySequence)
@@ -182,7 +182,7 @@ public enum JsonRpcParams {
 }
 
 extension JsonRpcParams: Encodable {
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         switch self {
         case let .getNonce(params):
             try params.encode(to: encoder)

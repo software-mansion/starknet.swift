@@ -58,7 +58,7 @@ public class StarknetProvider: StarknetProviderProtocol {
         requests: [StarknetRequest<U>]
     ) async throws -> [Result<U, StarknetProviderError>] where U: Decodable {
         guard !requests.isEmpty else {
-            throw StarknetProviderError.emptyRequestsError
+            throw StarknetProviderError.emptyBatchRequestError
         }
 
         let rpcPayloads = requests.enumerated().map { index, request -> JsonRpcPayload in
