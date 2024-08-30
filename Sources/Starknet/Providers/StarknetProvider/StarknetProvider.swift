@@ -4,7 +4,7 @@ public enum StarknetProviderError: Error {
     case networkProviderError
     case unknownError
     case jsonRpcError(Int, String, String?)
-    case emptyRequestsError
+    case emptyBatchRequestError
 }
 
 public class StarknetProvider: StarknetProviderProtocol {
