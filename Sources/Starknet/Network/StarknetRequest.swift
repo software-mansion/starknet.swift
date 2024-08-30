@@ -6,7 +6,7 @@ public struct StarknetRequest<U: Decodable> {
 let defaultBlockId = StarknetBlockId.tag(.pending)
 let defaultSimulationFlagsForEstimateFee: Set<StarknetSimulationFlagForEstimateFee> = []
 
-public extension StarknetRequest {
+public enum RequestBuilder {
     /// Get the version of the Starknet JSON-RPC specification being used by the node.
     ///
     ///  - Returns: the version of the Starknet JSON-RPC specification being used.
@@ -219,7 +219,7 @@ public extension StarknetRequest {
     ///
     /// - Returns: Array of field elements, returned by called contract.
     static func callContract(_ call: StarknetCall) -> StarknetRequest<[Felt]> {
-        StarknetRequest<[Felt]>.callContract(call, at: defaultBlockId)
+        RequestBuilder.callContract(call, at: defaultBlockId)
     }
 
     /// Estimate fee for a list of transactions with default flags in the pending block.

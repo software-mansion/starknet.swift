@@ -24,7 +24,7 @@ final class AccountTests: XCTestCase {
         ethContractAddress = Self.devnetClient.constants.ethErc20ContractAddress
         let accountDetails = Self.devnetClient.constants.predeployedAccount1
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
-        chainId = try await provider.send(request: StarknetRequest<StarknetChainId>.getChainId())
+        chainId = try await provider.send(request: RequestBuilder.getChainId())
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .one)
     }
 
@@ -187,7 +187,7 @@ final class AccountTests: XCTestCase {
 
         let deployAccountTransaction = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
-        let response = try await provider.send(request: StarknetRequest<StarknetDeployAccountResponse>.addDeployAccountTransaction(deployAccountTransaction))
+        let response = try await provider.send(request: RequestBuilder.addDeployAccountTransaction(deployAccountTransaction))
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
 
@@ -212,7 +212,7 @@ final class AccountTests: XCTestCase {
 
         let deployAccountTransaction = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 
-        let response = try await provider.send(request: StarknetRequest<StarknetDeployAccountResponse>.addDeployAccountTransaction(deployAccountTransaction))
+        let response = try await provider.send(request: RequestBuilder.addDeployAccountTransaction(deployAccountTransaction))
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
 
