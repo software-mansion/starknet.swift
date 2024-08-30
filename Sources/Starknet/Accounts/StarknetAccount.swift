@@ -16,7 +16,7 @@ public class StarknetAccount: StarknetAccountProtocol {
     public let chainId: StarknetChainId
 
     private let signer: StarknetSignerProtocol
-    public let provider: StarknetProviderProtocol
+    private let provider: StarknetProviderProtocol
 
     public init(address: Felt, signer: StarknetSignerProtocol, provider: StarknetProviderProtocol, chainId: StarknetChainId, cairoVersion: CairoVersion) {
         self.address = address
