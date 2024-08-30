@@ -10,7 +10,7 @@ public enum RequestBuilder {
     /// Get the version of the Starknet JSON-RPC specification being used by the node.
     ///
     ///  - Returns: the version of the Starknet JSON-RPC specification being used.
-    static func getSpecVersion() -> StarknetRequest<String> {
+    public static func getSpecVersion() -> StarknetRequest<String> {
         let params = EmptyParams()
 
         return StarknetRequest(method: .specVersion, params: .empty(params))
@@ -23,7 +23,7 @@ public enum RequestBuilder {
     ///     - blockId: hash, number, or tag of a block at which the call should be made.
     ///
     /// - Returns: Array of field elements, returned by called contract.
-    static func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) -> StarknetRequest<[Felt]> {
+    public static func callContract(_ call: StarknetCall, at blockId: StarknetBlockId) -> StarknetRequest<[Felt]> {
         let params = CallParams(request: call, blockId: blockId)
 
         return StarknetRequest(method: .call, params: .call(params))
@@ -36,7 +36,7 @@ public enum RequestBuilder {
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: the fee estimation
-    static func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate> {
+    public static func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate> {
         let params = EstimateMessageFeeParams(message: message, blockId: blockId)
 
         return StarknetRequest(method: .estimateMessageFee, params: .estimateMessageFee(params))
@@ -50,7 +50,7 @@ public enum RequestBuilder {
     ///  - simulationFlags: a set of simulation flags.
     ///
     /// - Returns: Array of fee estimates
-    static func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
+    public static func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
         let params = EstimateFeeParams(request: transactions, simulationFlags: simulationFlags, blockId: blockId)
 
         return StarknetRequest(method: .estimateFee, params: .estimateFee(params))
@@ -63,7 +63,7 @@ public enum RequestBuilder {
     ///     - blockId: hash, number, or tag of a block at which the call should be made.
     ///
     /// - Returns: Felt value of contract's current nonce.
-    static func getNonce(of contract: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
+    public static func getNonce(of contract: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetNonceParams(contractAddress: contract, blockId: blockId)
 
         return StarknetRequest(method: .getNonce, params: .getNonce(params))
@@ -77,7 +77,7 @@ public enum RequestBuilder {
     ///     - payload: invoke function payload.
     ///
     /// - Returns: transaction hash of invoked transaction.
-    static func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) -> StarknetRequest<StarknetInvokeTransactionResponse> {
+    public static func addInvokeTransaction(_ transaction: any StarknetExecutableInvokeTransaction) -> StarknetRequest<StarknetInvokeTransactionResponse> {
         let params = AddInvokeTransactionParams(invokeTransaction: transaction)
 
         return StarknetRequest(method: .invokeFunction, params: .addInvokeTransaction(params))
@@ -91,7 +91,7 @@ public enum RequestBuilder {
     ///  - transaction: deploy account transaction to be executed
     ///
     /// - Returns: transaction hash and contract address of deployed account
-    static func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) -> StarknetRequest<StarknetDeployAccountResponse> {
+    public static func addDeployAccountTransaction(_ transaction: any StarknetExecutableDeployAccountTransaction) -> StarknetRequest<StarknetDeployAccountResponse> {
         let params = AddDeployAccountTransactionParams(deployAccountTransaction: transaction)
 
         return StarknetRequest(method: .deployAccount, params: .addDeployAccountTransaction(params))
@@ -104,7 +104,7 @@ public enum RequestBuilder {
     ///  - blockId: id of the requested block
     ///
     /// - Returns: Class hash of the given contract
-    static func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
+    public static func getClassHashAt(_ address: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
         let params = GetClassHashAtParams(contractAddress: address, blockId: blockId)
 
         return StarknetRequest(method: .getClassHashAt, params: .getClassHashAt(params))
@@ -113,7 +113,7 @@ public enum RequestBuilder {
     /// Get the most recent accepted block number.
     ///
     /// - Returns: Number of the most recent accepted block
-    static func getBlockNumber() -> StarknetRequest<UInt64> {
+    public static func getBlockNumber() -> StarknetRequest<UInt64> {
         let params = EmptySequence()
 
         return StarknetRequest(method: .getBlockNumber, params: .emptySequence(params))
@@ -122,7 +122,7 @@ public enum RequestBuilder {
     /// Get the most recent accepted block hash and number.
     ///
     /// - Returns: Block hash and block number  of the most recent accepted block
-    static func getBlockHashAndNumber() -> StarknetRequest<StarknetBlockHashAndNumber> {
+    public static func getBlockHashAndNumber() -> StarknetRequest<StarknetBlockHashAndNumber> {
         let params = EmptySequence()
 
         return StarknetRequest(method: .getBlockHashAndNumber, params: .emptySequence(params))
@@ -134,7 +134,7 @@ public enum RequestBuilder {
     ///  - filter : the conditions used to filter the returned events
     ///
     /// - Returns: events matching the conditions in the provided filter and continuation token
-    static func getEvents(filter: StarknetGetEventsFilter) -> StarknetRequest<StarknetGetEventsResponse> {
+    public static func getEvents(filter: StarknetGetEventsFilter) -> StarknetRequest<StarknetGetEventsResponse> {
         let params = GetEventsPayload(filter: filter)
 
         return StarknetRequest(method: .getEvents, params: .getEvents(params))
@@ -146,7 +146,7 @@ public enum RequestBuilder {
     ///  - hash: The hash of the requested transaction
     ///
     /// - Returns: Transaction found with provided hash
-    static func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper> {
+    public static func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByHashParams(hash: hash)
 
         return StarknetRequest(method: .getTransactionByHash, params: .getTransactionByHash(params))
@@ -159,7 +159,7 @@ public enum RequestBuilder {
     ///  - index: index of transaction in the block
     ///
     /// - Returns: Transaction found with provided blockId and index.
-    static func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper> {
+    public static func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper> {
         let params = GetTransactionByBlockIdAndIndex(blockId: blockId, index: index)
 
         return StarknetRequest(method: .getTransactionByBlockIdAndIndex, params: .getTransactionByBlockIdAndIndex(params))
@@ -171,7 +171,7 @@ public enum RequestBuilder {
     ///  - hash : the hash of the requested transaction
     ///
     /// - Returns: receipt of a transaction identified by given hash
-    static func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper> {
+    public static func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper> {
         let params = GetTransactionReceiptPayload(transactionHash: hash)
 
         return StarknetRequest(method: .getTransactionReceipt, params: .getTransactionReceipt(params))
@@ -183,7 +183,7 @@ public enum RequestBuilder {
     ///  - hash: The hash of the requested transaction
     ///
     /// - Returns: The status(es) of a transaction
-    static func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse> {
+    public static func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse> {
         let params = GetTransactionStatusPayload(transactionHash: hash)
 
         return StarknetRequest(method: .getTransactionStatus, params: .getTransactionStatus(params))
@@ -192,7 +192,7 @@ public enum RequestBuilder {
     /// Get the currently configured Starknet chain id
     ///
     /// - Returns: The Starknet chain id
-    static func getChainId() -> StarknetRequest<StarknetChainId> {
+    public static func getChainId() -> StarknetRequest<StarknetChainId> {
         let params = EmptySequence()
 
         return StarknetRequest(method: .getChainId, params: .emptySequence(params))
@@ -206,7 +206,7 @@ public enum RequestBuilder {
     ///  - simulationFlags: a set of simulation flags
     ///
     ///  - Returns: array of simulated transactions
-    static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
+    public static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
         return StarknetRequest(method: .simulateTransactions, params: .simulateTransactions(params))
@@ -218,7 +218,7 @@ public enum RequestBuilder {
     ///     - call: starknet call to be made.
     ///
     /// - Returns: Array of field elements, returned by called contract.
-    static func callContract(_ call: StarknetCall) -> StarknetRequest<[Felt]> {
+    public static func callContract(_ call: StarknetCall) -> StarknetRequest<[Felt]> {
         RequestBuilder.callContract(call, at: defaultBlockId)
     }
 
@@ -228,7 +228,7 @@ public enum RequestBuilder {
     ///  -  transactions: transactions for which the fees should be estimated.
     ///
     /// - Returns: Array of fee estimates
-    static func estimateFee(for transactions: [any StarknetExecutableTransaction]) -> StarknetRequest<[StarknetFeeEstimate]> {
+    public static func estimateFee(for transactions: [any StarknetExecutableTransaction]) -> StarknetRequest<[StarknetFeeEstimate]> {
         estimateFee(for: transactions, at: defaultBlockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
     }
 
@@ -239,7 +239,7 @@ public enum RequestBuilder {
     ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: Array of fee estimates
-    static func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) -> StarknetRequest<[StarknetFeeEstimate]> {
+    public static func estimateFee(for transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId) -> StarknetRequest<[StarknetFeeEstimate]> {
         estimateFee(for: transactions, at: blockId, simulationFlags: defaultSimulationFlagsForEstimateFee)
     }
 
@@ -250,7 +250,7 @@ public enum RequestBuilder {
     ///  -  simulationFlags: a set of simulation flags
     ///
     /// - Returns: Array of fee estimates
-    static func estimateFee(for transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
+    public static func estimateFee(for transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
         estimateFee(for: transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
 
@@ -260,7 +260,7 @@ public enum RequestBuilder {
     ///  -  transaction: transaction for which the fee should be estimated.
     ///
     /// - Returns: Fee estimate
-    static func estimateFee(for transaction: any StarknetExecutableTransaction) -> StarknetRequest<[StarknetFeeEstimate]> {
+    public static func estimateFee(for transaction: any StarknetExecutableTransaction) -> StarknetRequest<[StarknetFeeEstimate]> {
         estimateFee(for: [transaction])
     }
 
@@ -271,7 +271,7 @@ public enum RequestBuilder {
     ///  -  blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: Fee estimate
-    static func estimateFee(for transaction: any StarknetExecutableTransaction, at blockId: StarknetBlockId) -> StarknetRequest<[StarknetFeeEstimate]> {
+    public static func estimateFee(for transaction: any StarknetExecutableTransaction, at blockId: StarknetBlockId) -> StarknetRequest<[StarknetFeeEstimate]> {
         estimateFee(for: [transaction], at: blockId)
     }
 
@@ -282,7 +282,7 @@ public enum RequestBuilder {
     ///  -  simulationFlags: a set of simulation flags
     ///
     /// - Returns: Fee estimate
-    static func estimateFee(for transaction: any StarknetExecutableTransaction, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
+    public static func estimateFee(for transaction: any StarknetExecutableTransaction, simulationFlags: Set<StarknetSimulationFlagForEstimateFee>) -> StarknetRequest<[StarknetFeeEstimate]> {
         estimateFee(for: [transaction], simulationFlags: simulationFlags)
     }
 
@@ -292,7 +292,7 @@ public enum RequestBuilder {
     ///  - message: the message's parameters
     ///
     /// - Returns: Fee estimate
-    static func estimateMessageFee(_ message: StarknetMessageFromL1) -> StarknetRequest<StarknetFeeEstimate> {
+    public static func estimateMessageFee(_ message: StarknetMessageFromL1) -> StarknetRequest<StarknetFeeEstimate> {
         estimateMessageFee(message, at: defaultBlockId)
     }
 
@@ -302,7 +302,7 @@ public enum RequestBuilder {
     ///     - contract: address of a contract, for which the nonce should be returned.
     ///
     /// - Returns: Felt value of contract's current nonce.
-    static func getNonce(of contract: Felt) -> StarknetRequest<Felt> {
+    public static func getNonce(of contract: Felt) -> StarknetRequest<Felt> {
         getNonce(of: contract, at: defaultBlockId)
     }
 
@@ -312,7 +312,7 @@ public enum RequestBuilder {
     ///  - address: address of the contract whose address will be returned
     ///
     /// - Returns: Class hash of the given contract
-    static func getClassHashAt(_ address: Felt) -> StarknetRequest<Felt> {
+    public static func getClassHashAt(_ address: Felt) -> StarknetRequest<Felt> {
         getClassHashAt(address, at: defaultBlockId)
     }
 
@@ -323,7 +323,7 @@ public enum RequestBuilder {
     ///  - simulationFlags: a set of simulation flags
     ///
     /// - Returns : array of simulated transactions
-    static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
+    public static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
         simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
 }
