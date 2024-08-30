@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias EmptySequence = [String]
+typealias EmptySequence = [String]
 
 struct EmptyParams: Encodable {}
 
@@ -52,7 +52,7 @@ struct EstimateFeeParams: Encodable {
     let simulationFlags: Set<StarknetSimulationFlagForEstimateFee>
     let blockId: StarknetBlockId
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         let wrappedRequest = request.map { WrappedExecutableTransaction(transaction: $0) }
@@ -69,7 +69,7 @@ struct EstimateFeeParams: Encodable {
     }
 }
 
-struct EstimateMessageFeeParams: Encodable {
+public struct EstimateMessageFeeParams: Encodable {
     let message: StarknetMessageFromL1
     let blockId: StarknetBlockId
 
@@ -82,7 +82,7 @@ struct EstimateMessageFeeParams: Encodable {
 struct AddDeployAccountTransactionParams: Encodable {
     let deployAccountTransaction: any StarknetExecutableDeployAccountTransaction
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(deployAccountTransaction, forKey: .deployAccountTransaction)
@@ -146,7 +146,7 @@ struct SimulateTransactionsParams: Encodable {
     let blockId: StarknetBlockId
     let simulationFlags: Set<StarknetSimulationFlag>
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         let wrappedTransactions = transactions.map { WrappedExecutableTransaction(transaction: $0) }
