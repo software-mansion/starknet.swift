@@ -322,7 +322,7 @@ public enum RequestBuilder {
     ///  - transactions: list of transactions to simulate
     ///  - simulationFlags: a set of simulation flags
     ///
-    ///  - Returns : array of simulated transactions
+    /// - Returns : array of simulated transactions
     static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
         simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
