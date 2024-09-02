@@ -360,8 +360,8 @@ public extension StarknetAccountProtocol {
     ///  - skipValidate: flag indicating whether validation of the transaction should be skipped.
 
     /// - Returns: struct containing fee estimate
-    func estimateFeeV1(calls: [StarknetCall], skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        let nonce = try await getNonce().send()
+    func estimateFeeV1(calls: [StarknetCall], provider: StarknetProviderProtocol, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
+        let nonce = try await provider.send(request: getNonce())
         return try await estimateFeeV1(calls: calls, nonce: nonce, skipValidate: skipValidate)
     }
 
@@ -372,8 +372,8 @@ public extension StarknetAccountProtocol {
     ///  - skipValidate: flag indicating whether validation of the transaction should be skipped.
     ///
     /// - Returns: struct containing fee estimate
-    func estimateFeeV3(calls: [StarknetCall], skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        let nonce = try await getNonce().send()
+    func estimateFeeV3(calls: [StarknetCall], provider: StarknetProviderProtocol, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
+        let nonce = try await provider.send(request: getNonce())
         return try await estimateFeeV3(calls: calls, nonce: nonce, skipValidate: skipValidate)
     }
 
@@ -408,8 +408,8 @@ public extension StarknetAccountProtocol {
     ///  - skipValidate: flag indicating whether validation of the transaction should be skipped.
     ///
     /// - Returns: struct containing fee estimate
-    func estimateFeeV1(call: StarknetCall, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        try await estimateFeeV1(calls: [call], skipValidate: skipValidate)
+    func estimateFeeV1(call: StarknetCall, provider: StarknetProviderProtocol, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
+        try await estimateFeeV1(calls: [call], provider: provider, skipValidate: skipValidate)
     }
 
     /// Estimate fee for a call as invoke transaction v3
@@ -419,8 +419,8 @@ public extension StarknetAccountProtocol {
     ///  - skipValidate: flag indicating whether validation of the transaction should be skipped.
     ///
     /// - Returns: struct containing fee estimate
-    func estimateFeeV3(call: StarknetCall, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        try await estimateFeeV3(calls: [call], skipValidate: skipValidate)
+    func estimateFeeV3(call: StarknetCall, provider: StarknetProviderProtocol, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
+        try await estimateFeeV3(calls: [call], provider: provider, skipValidate: skipValidate)
     }
 
     /// Estimate fee for a deploy account transaction v1
