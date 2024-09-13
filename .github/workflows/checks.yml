@@ -84,9 +84,8 @@ jobs:
           asdf global starknet-foundry 0.6.0
 
       - name: Check Cairo contracts formatting
-        run: |
-          cd ${{ github.workspace }}/Tests/StarknetTests/Resources/Contracts/src
-          scarb fmt --check
+        working-directory: ./Tests/StarknetTests/Resources/Contracts/src
+        run: scarb fmt --check
 
       - name: Run tests
         run: |
