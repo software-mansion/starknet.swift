@@ -89,3 +89,8 @@ jobs:
           export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
           swift test --disable-sandbox
+
+      - name: Check Cairo contracts formatting
+        run: |
+          cd ${{ github.workspace }}/Tests/StarknetTests/Resources/Contracts/src
+          scarb fmt --check
