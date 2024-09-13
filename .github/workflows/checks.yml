@@ -83,14 +83,14 @@ jobs:
           asdf install starknet-foundry 0.6.0
           asdf global starknet-foundry 0.6.0
 
+      - name: Check Cairo contracts formatting
+        run: |
+          cd ${{ github.workspace }}/Tests/StarknetTests/Resources/Contracts/src
+          scarb fmt --check
+
       - name: Run tests
         run: |
           export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
           export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
           swift test --disable-sandbox
-
-      - name: Check Cairo contracts formatting
-        run: |
-          cd ${{ github.workspace }}/Tests/StarknetTests/Resources/Contracts/src
-          scarb fmt --check
