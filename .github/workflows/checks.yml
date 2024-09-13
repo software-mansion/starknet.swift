@@ -83,6 +83,10 @@ jobs:
           asdf install starknet-foundry 0.6.0
           asdf global starknet-foundry 0.6.0
 
+      - name: Check Cairo contracts formatting
+        working-directory: ./Tests/StarknetTests/Resources/Contracts/src
+        run: scarb fmt --check
+
       - name: Run tests
         run: |
           export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
