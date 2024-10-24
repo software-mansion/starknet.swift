@@ -107,6 +107,20 @@ struct GetEventsPayload: Encodable {
     let filter: StarknetGetEventsFilter
 }
 
+struct GetStorageProofParams: Encodable {
+    let blockId: StarknetBlockId
+    let classHashes: [Felt]?
+    let contractAddresses: [Felt]?
+    let contractStorageKeys: [ContractStorageKey]?
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+        case classHashes = "class_hashes"
+        case contractAddresses = "contract_addresses"
+        case contractStorageKeys = "contract_storage_keys"
+    }
+}
+
 struct GetTransactionByHashParams: Encodable {
     let hash: Felt
 
@@ -138,6 +152,14 @@ struct GetTransactionStatusPayload: Encodable {
 
     enum CodingKeys: String, CodingKey {
         case transactionHash = "transaction_hash"
+    }
+}
+
+struct GetMessagesStatusPayload: Encodable {
+    let l1TransactionHash: NumAsHex
+
+    enum CodingKeys: String, CodingKey {
+        case l1TransactionHash = "l1_transaction_hash"
     }
 }
 
@@ -174,10 +196,12 @@ enum JsonRpcParams {
     case addDeployAccountTransaction(AddDeployAccountTransactionParams)
     case getClassHashAt(GetClassHashAtParams)
     case getEvents(GetEventsPayload)
+    case getStorageProof(GetStorageProofParams)
     case getTransactionByHash(GetTransactionByHashParams)
     case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
     case getTransactionReceipt(GetTransactionReceiptPayload)
     case getTransactionStatus(GetTransactionStatusPayload)
+    case getMessagesStatus(GetMessagesStatusPayload)
     case simulateTransactions(SimulateTransactionsParams)
 }
 
@@ -204,6 +228,8 @@ extension JsonRpcParams: Encodable {
             try params.encode(to: encoder)
         case let .getEvents(params):
             try params.encode(to: encoder)
+        case let .getStorageProof(params):
+            try params.encode(to: encoder)
         case let .getTransactionByHash(params):
             try params.encode(to: encoder)
         case let .getTransactionByBlockIdAndIndex(params):
@@ -211,6 +237,8 @@ extension JsonRpcParams: Encodable {
         case let .getTransactionReceipt(params):
             try params.encode(to: encoder)
         case let .getTransactionStatus(params):
+            try params.encode(to: encoder)
+        case let .getMessagesStatus(params):
             try params.encode(to: encoder)
         case let .simulateTransactions(params):
             try params.encode(to: encoder)
