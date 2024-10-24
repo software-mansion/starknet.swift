@@ -195,6 +195,18 @@ public enum RequestBuilder {
         return StarknetRequest(method: .getTransactionStatus, params: .getTransactionStatus(params))
     }
 
+    /// Get L1 handler transaction data for all L1 → L2 messages sent by the given L1 transaction.
+    ///
+    /// - Parameters:
+    ///  - l1TransactionHash: The hash of the L1 transaction
+    ///
+    /// - Returns: The status of the messages
+    public static func getMessagesStatus(l1TransactionHash: NumAsHex) -> StarknetRequest<[MessageStatus]> {
+        let params = GetMessagesStatusPayload(l1TransactionHash: l1TransactionHash)
+
+        return StarknetRequest(method: .getMessagesStatus, params: .getMessagesStatus(params))
+    }
+
     /// Get the currently configured Starknet chain id
     ///
     /// - Returns: The Starknet chain id

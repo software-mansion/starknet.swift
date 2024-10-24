@@ -155,6 +155,14 @@ struct GetTransactionStatusPayload: Encodable {
     }
 }
 
+struct GetMessagesStatusPayload: Encodable {
+    let l1TransactionHash: NumAsHex
+
+    enum CodingKeys: String, CodingKey {
+        case l1TransactionHash = "l1_transaction_hash"
+    }
+}
+
 struct SimulateTransactionsParams: Encodable {
     let transactions: [any StarknetExecutableTransaction]
     let blockId: StarknetBlockId
@@ -193,6 +201,7 @@ enum JsonRpcParams {
     case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
     case getTransactionReceipt(GetTransactionReceiptPayload)
     case getTransactionStatus(GetTransactionStatusPayload)
+    case getMessagesStatus(GetMessagesStatusPayload)
     case simulateTransactions(SimulateTransactionsParams)
 }
 
@@ -228,6 +237,8 @@ extension JsonRpcParams: Encodable {
         case let .getTransactionReceipt(params):
             try params.encode(to: encoder)
         case let .getTransactionStatus(params):
+            try params.encode(to: encoder)
+        case let .getMessagesStatus(params):
             try params.encode(to: encoder)
         case let .simulateTransactions(params):
             try params.encode(to: encoder)
