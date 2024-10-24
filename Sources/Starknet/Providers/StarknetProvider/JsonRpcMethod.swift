@@ -11,6 +11,7 @@ enum JsonRpcMethod: String, Encodable {
     case getBlockNumber = "starknet_blockNumber"
     case getBlockHashAndNumber = "starknet_blockHashAndNumber"
     case getEvents = "starknet_getEvents"
+    case getStorageProof = "starknet_getStorageProof"
     case getTransactionByHash = "starknet_getTransactionByHash"
     case getTransactionByBlockIdAndIndex = "starknet_getTransactionByBlockIdAndIndex"
     case getTransactionReceipt = "starknet_getTransactionReceipt"

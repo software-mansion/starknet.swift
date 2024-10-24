@@ -107,6 +107,30 @@ struct GetEventsPayload: Encodable {
     let filter: StarknetGetEventsFilter
 }
 
+struct GetStorageProofParams: Encodable {
+    let blockId: StarknetBlockId
+    let classHashes: [Felt]?
+    let contractAddresses: [Felt]?
+    let contractStorageKeys: [ContractStorageKey]?
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+        case classHashes = "class_hashes"
+        case contractAddresses = "contract_addresses"
+        case contractStorageKeys = "contract_storage_keys"
+    }
+}
+
+public struct ContractStorageKey: Encodable {
+    let contractAddress: Felt
+    let key: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case contractAddress = "contract_address"
+        case key
+    }
+}
+
 struct GetTransactionByHashParams: Encodable {
     let hash: Felt
 
@@ -174,6 +198,7 @@ enum JsonRpcParams {
     case addDeployAccountTransaction(AddDeployAccountTransactionParams)
     case getClassHashAt(GetClassHashAtParams)
     case getEvents(GetEventsPayload)
+    case getStorageProof(GetStorageProofParams)
     case getTransactionByHash(GetTransactionByHashParams)
     case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
     case getTransactionReceipt(GetTransactionReceiptPayload)
@@ -203,6 +228,8 @@ extension JsonRpcParams: Encodable {
         case let .getClassHashAt(params):
             try params.encode(to: encoder)
         case let .getEvents(params):
+            try params.encode(to: encoder)
+        case let .getStorageProof(params):
             try params.encode(to: encoder)
         case let .getTransactionByHash(params):
             try params.encode(to: encoder)
