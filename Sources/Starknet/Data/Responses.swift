@@ -26,7 +26,7 @@ public struct StarknetFeeEstimate: Decodable, Equatable {
         case l1DataGasConsumed = "l1_data_gas_consumed"
         case l1DataGasPrice = "l1_data_gas_price"
         case overallFee = "overall_fee"
-        case feeUnit = "fee_unit"
+        case feeUnit = "unit"
     }
 
     public init(l1GasConsumed: Felt, l1GasPrice: Felt, l2GasConsumed: Felt, l2GasPrice: Felt, l1DataGasConsumed: Felt, l1DataGasPrice: Felt, overallFee: Felt, feeUnit: StarknetPriceUnit) {
