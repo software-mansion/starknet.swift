@@ -8,10 +8,4 @@ public struct MessageStatus: Decodable, Equatable {
         case finalityStatus = "finality_status"
         case failureReason = "failure_reason"
     }
-
-    // public static func == (lhs: MessageStatus, rhs: MessageStatus) -> Bool {
-    //     lhs.transactionHash == rhs.transactionHash &&
-    //         lhs.finalityStatus == rhs.finalityStatus &&
-    //         lhs.failureReason == rhs.failureReason
-    // }
 }
