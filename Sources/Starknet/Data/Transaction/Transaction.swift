@@ -28,15 +28,14 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
 
     public let hash: Felt?
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, l1ResourceBounds: StarknetResourceBounds, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
         self.nonce = nonce
         self.version = forFeeEstimation ? .v3Query : .v3
         self.hash = hash
-        // As of Starknet 0.13, most of v3 fields have hardcoded values.
-        self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
+        self.resourceBounds = resourceBounds
         self.tip = .zero
         self.paymasterData = []
         self.accountDeploymentData = []
@@ -209,7 +208,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
 
     public let hash: Felt?
 
-    public init(signature: StarknetSignature, l1ResourceBounds: StarknetResourceBounds, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil) {
+    public init(signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil) {
         self.signature = signature
         self.nonce = nonce
         self.contractAddressSalt = contractAddressSalt
@@ -217,8 +216,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
         self.classHash = classHash
         self.version = forFeeEstimation ? .v3Query : .v3
         self.hash = hash
-        // As of Starknet 0.13, most of v3 fields have hardcoded values.
-        self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
+        self.resourceBounds = resourceBounds
         self.tip = .zero
         self.paymasterData = []
         self.nonceDataAvailabilityMode = .l1
@@ -392,15 +390,14 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
 
     public let hash: Felt?
 
-    public init(signature: StarknetSignature, l1ResourceBounds: StarknetResourceBounds, nonce: Felt, classHash: Felt, compiledClassHash: Felt, senderAddress: Felt, hash: Felt? = nil) {
+    public init(signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, classHash: Felt, compiledClassHash: Felt, senderAddress: Felt, hash: Felt? = nil) {
         self.signature = signature
         self.nonce = nonce
         self.classHash = classHash
         self.compiledClassHash = compiledClassHash
         self.senderAddress = senderAddress
         self.hash = hash
-        // As of Starknet 0.13, most of v3 fields have hardcoded values.
-        self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
+        self.resourceBounds = resourceBounds
         self.tip = .zero
         self.paymasterData = []
         self.accountDeploymentData = []

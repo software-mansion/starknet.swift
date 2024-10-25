@@ -140,7 +140,7 @@ final class AccountTests: XCTestCase {
         let feeEstimate = try await provider.send(request: account.estimateFeeV3(call: call, nonce: nonce, skipValidate: false))[0]
         let resourceBounds = feeEstimate.toResourceBounds()
 
-        let params = StarknetOptionalInvokeParamsV3(nonce: nonce, l1ResourceBounds: resourceBounds.l1Gas)
+        let params = StarknetOptionalInvokeParamsV3(nonce: nonce, resourceBounds: resourceBounds)
 
         let result = try await provider.send(request: account.executeV3(calls: [call], params: params))
 
@@ -208,7 +208,7 @@ final class AccountTests: XCTestCase {
 
         let feeEstimate = try await provider.send(request: newAccount.estimateDeployAccountFeeV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce))[0]
 
-        let params = StarknetDeployAccountParamsV3(nonce: nonce, l1ResourceBounds: feeEstimate.toResourceBounds().l1Gas)
+        let params = StarknetDeployAccountParamsV3(nonce: nonce, resourceBounds: feeEstimate.toResourceBounds())
 
         let deployAccountTransaction = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
 

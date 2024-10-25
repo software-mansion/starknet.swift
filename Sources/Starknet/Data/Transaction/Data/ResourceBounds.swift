@@ -24,11 +24,6 @@ public struct StarknetResourceBoundsMapping: Codable, Equatable, Hashable {
     public let l1Gas: StarknetResourceBounds
     public let l2Gas: StarknetResourceBounds
 
-    public init(l1Gas: StarknetResourceBounds) {
-        self.l1Gas = l1Gas
-        self.l2Gas = StarknetResourceBounds.zero
-    }
-
     enum CodingKeys: String, CodingKey {
         case l1Gas = "l1_gas"
         case l2Gas = "l2_gas"
