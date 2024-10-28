@@ -21,6 +21,7 @@ public enum MerkleNode: Codable, Equatable {
         } else {
             let context = DecodingError.Context(
                 codingPath: decoder.codingPath,
+                // TODO: Improve error message.
                 debugDescription: "Failed to decode MerkleNode from the given data."
             )
             throw DecodingError.dataCorrupted(context)
