@@ -1,4 +1,4 @@
-public struct BinaryNode: MerkleNode {
+public struct BinaryNode: MerkleNode, Equatable {
     let left: Felt
     let right: Felt
 
@@ -9,5 +9,9 @@ public struct BinaryNode: MerkleNode {
 
         let otherBinaryNode = other as! BinaryNode
         return self == otherBinaryNode
+    }
+
+    public static func == (lhs: BinaryNode, rhs: BinaryNode) -> Bool {
+        lhs.left == rhs.left && lhs.right == rhs.right
     }
 }
