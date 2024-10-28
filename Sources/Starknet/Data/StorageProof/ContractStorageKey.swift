@@ -1,9 +1,9 @@
-public struct ContractStorageKey: Encodable {
+public struct ContractStorageKeys: Encodable {
     let contractAddress: Felt
-    let key: Felt
+    let storageKeys: [Felt]
 
     enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
-        case key
+        case storageKeys = "storage_keys"
     }
 }
