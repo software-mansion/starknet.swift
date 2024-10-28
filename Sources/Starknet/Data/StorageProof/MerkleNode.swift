@@ -37,6 +37,17 @@ public enum MerkleNode: Codable, Equatable {
             try container.encode(edgeNode)
         }
     }
+
+    public static func == (lhs: MerkleNode, rhs: MerkleNode) -> Bool {
+        switch (lhs, rhs) {
+        case let (.binaryNode(lhsBinaryNode), .binaryNode(rhsBinaryNode)):
+            lhsBinaryNode == rhsBinaryNode
+        case let (.edgeNode(lhsEdgeNode), .edgeNode(rhsEdgeNode)):
+            lhsEdgeNode == rhsEdgeNode
+        default:
+            false
+        }
+    }
 }
 
 public struct BinaryNode: Codable, Equatable {
