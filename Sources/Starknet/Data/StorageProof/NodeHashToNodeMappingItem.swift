@@ -11,21 +11,12 @@ public struct NodeHashToNodeMappingItem: Decodable, Equatable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        
         nodeHash = try container.decode(Felt.self, forKey: .nodeHash)
-
         node = try container.decode(MerkleNode.self, forKey: .node)
     }
 
     public static func == (lhs: NodeHashToNodeMappingItem, rhs: NodeHashToNodeMappingItem) -> Bool {
         lhs.nodeHash == rhs.nodeHash && lhs.node == rhs.node
-    }
-
-    private struct NodeTypeContainer: Decodable {
-        let type: NodeType
-
-        enum NodeType: String, Decodable {
-            case binaryNode = "BinaryNode"
-            case edgeNode = "EdgeNode"
-        }
     }
 }
