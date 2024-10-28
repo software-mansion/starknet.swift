@@ -108,7 +108,7 @@ struct GetEventsPayload: Encodable {
 }
 
 struct GetStorageProofParams: Encodable {
-    let blockId: StarknetBlockId?
+    let blockId: StarknetBlockId
     let classHashes: [Felt]?
     let contractAddresses: [Felt]?
     let contractsStorageKeys: [ContractStorageKeys]?
