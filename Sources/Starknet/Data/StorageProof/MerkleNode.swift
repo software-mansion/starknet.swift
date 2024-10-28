@@ -4,28 +4,24 @@ public enum MerkleNode: Codable, Equatable {
     case binaryNode(BinaryNode)
     case edgeNode(EdgeNode)
 
-    private enum CodingKeys: String, CodingKey {
-        case left, right, path, length, child
-    }
-
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let binaryNodeKeys = Set(BinaryNode.CodingKeys.allCases.map(\.stringValue))
+        let edgeNodeKeys = Set(EdgeNode.CodingKeys.allCases.map(\.stringValue))
 
-        let binaryNodeKeys: Set<CodingKeys> = [.left, .right]
-        let edgeNodeKeys: Set<CodingKeys> = [.path, .length, .child]
+        let binaryNodeContainer = try decoder.container(keyedBy: BinaryNode.CodingKeys.self)
 
-        let jsonKeys = Set(container.allKeys)
-
-        if jsonKeys == binaryNodeKeys {
+        if Set(binaryNodeContainer.allKeys.map(\.stringValue)) == binaryNodeKeys {
             let binaryNode = try BinaryNode(from: decoder)
             self = .binaryNode(binaryNode)
-        } else if jsonKeys == edgeNodeKeys {
+        } else if let edgeNodeContainer = try? decoder.container(keyedBy: EdgeNode.CodingKeys.self),
+                  Set(edgeNodeContainer.allKeys.map(\.stringValue)) == edgeNodeKeys
+        {
             let edgeNode = try EdgeNode(from: decoder)
             self = .edgeNode(edgeNode)
         } else {
             let context = DecodingError.Context(
-                codingPath: container.codingPath,
-                debugDescription: "Invalid MerkleNode JSON object."
+                codingPath: decoder.codingPath,
+                debugDescription: "Failed to decode MerkleNode from the given data."
             )
             throw DecodingError.dataCorrupted(context)
         }
@@ -47,7 +43,7 @@ public struct BinaryNode: Codable, Equatable {
     let left: Felt
     let right: Felt
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case left
         case right
     }
@@ -58,7 +54,7 @@ public struct EdgeNode: Codable, Equatable {
     let length: Int
     let child: Felt
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case path
         case length
         case child
