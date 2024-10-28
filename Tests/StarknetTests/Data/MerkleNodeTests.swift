@@ -38,7 +38,7 @@ final class MerkleNodeTests: XCTestCase {
     func testEdgeNode() throws {
         let json = """
         {
-            "path": 123,
+            "path": "0x123",
             "length": 456,
             "child": "0x789"
         }
@@ -59,7 +59,7 @@ final class MerkleNodeTests: XCTestCase {
     func testInvalidEdgeNode() throws {
         let json = """
         {
-            "path": 123,
+            "path": "0x123",
             "length": 456
         }
         """.data(using: .utf8)!
@@ -72,7 +72,7 @@ final class MerkleNodeTests: XCTestCase {
     func testInvalidNodeWithMixedKeys() throws {
         let json = """
         {
-            "path": "123",
+            "path": "0x123",
             "length": "456",
             "left": 10
         }

@@ -62,7 +62,7 @@ public struct BinaryNode: Codable, Equatable {
 }
 
 public struct EdgeNode: Codable, Equatable {
-    let path: Int
+    let path: NumAsHex
     let length: Int
     let child: Felt
 
