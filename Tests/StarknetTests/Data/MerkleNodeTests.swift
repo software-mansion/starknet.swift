@@ -59,8 +59,8 @@ final class MerkleNodeTests: XCTestCase {
     func testInvalidEdgeNode() throws {
         let json = """
         {
-            "path": "123",
-            "length": "456"
+            "path": 123,
+            "length": 456
         }
         """.data(using: .utf8)!
 
