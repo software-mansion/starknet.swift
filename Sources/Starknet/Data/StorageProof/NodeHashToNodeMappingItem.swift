@@ -2,7 +2,7 @@ public typealias NodeHashToNodeMapping = [NodeHashToNodeMappingItem]
 
 public struct NodeHashToNodeMappingItem: Decodable, Equatable {
     public let nodeHash: Felt
-    public let node: any MerkleNode
+    public let node: MerkleNode
 
     enum CodingKeys: String, CodingKey {
         case nodeHash = "node_hash"
@@ -13,17 +13,11 @@ public struct NodeHashToNodeMappingItem: Decodable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         nodeHash = try container.decode(Felt.self, forKey: .nodeHash)
 
-        let nodeContainer = try container.decode(NodeTypeContainer.self, forKey: .node)
-        switch nodeContainer.type {
-        case .binaryNode:
-            node = try container.decode(BinaryNode.self, forKey: .node)
-        case .edgeNode:
-            node = try container.decode(EdgeNode.self, forKey: .node)
-        }
+        node = try container.decode(MerkleNode.self, forKey: .node)
     }
 
     public static func == (lhs: NodeHashToNodeMappingItem, rhs: NodeHashToNodeMappingItem) -> Bool {
-        lhs.nodeHash == rhs.nodeHash && (try? lhs.node.isEqual(to: rhs.node)) ?? false
+        lhs.nodeHash == rhs.nodeHash && lhs.node == rhs.node
     }
 
     private struct NodeTypeContainer: Decodable {
