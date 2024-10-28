@@ -140,7 +140,7 @@ public enum RequestBuilder {
         return StarknetRequest(method: .getEvents, params: .getEvents(params))
     }
 
-    public static func getStorageProof(blockId: StarknetBlockId, classHashes: [Felt]?, contractAddresses: [Felt], contractStorageKeys: [ContractStorageKey]) -> StarknetRequest<StarknetGetStorageProofResponse> {
+    public static func getStorageProof(blockId: StarknetBlockId, classHashes: [Felt]?, contractAddresses: [Felt]?, contractStorageKeys: [ContractStorageKey]?) -> StarknetRequest<StarknetGetStorageProofResponse> {
         let params = GetStorageProofParams(blockId: blockId, classHashes: classHashes, contractAddresses: contractAddresses, contractStorageKeys: contractStorageKeys)
 
         return StarknetRequest(method: .getStorageProof, params: .getStorageProof(params))
