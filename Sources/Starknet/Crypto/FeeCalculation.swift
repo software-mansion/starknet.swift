@@ -4,8 +4,8 @@ import Foundation
 public extension StarknetFeeEstimate {
     /// Convert estimated fee to resource bounds with applied multipliers
     ///
-    /// Calculates `maxAmountL1 = overallFee / l1GasPrice`, unless `l1GasPrice` is 0, then `maxAmount` is 0.
-    /// Calculates `maxAmountL2 = overallFee / l2GasPrice`, unless `l2GasPrice` is 0, then `maxAmount` is 0.
+    /// Calculates `maxAmountL1 = overallFee / l1GasPrice`, unless `l1GasPrice` is 0, then `maxAmountL1` is 0.
+    /// Calculates `maxAmountL2 = overallFee / l2GasPrice`, unless `l2GasPrice` is 0, then `maxAmountL2` is 0.
     /// Calculates `maxPricePerUnitL1 = gasPriceL1`.
     /// Calculates `maxPricePerUnitL2 = gasPriceL2`.
     /// Then multiplies `maxAmountL1` and `maxAmountL2` by **round((amountMultiplier) \* 100)** and `maxPricePerUnitL1` and `maxPricePerUnitL2` by **round((unitPriceMultiplier) \* 100)** and performs integer division by 100 on each.
