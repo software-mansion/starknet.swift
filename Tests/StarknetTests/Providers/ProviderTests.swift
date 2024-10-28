@@ -235,7 +235,7 @@ final class ProviderTests: XCTestCase {
         let params1 = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: StarknetResourceBoundsMapping.zero)
         let tx1 = try account.signV3(calls: [call], params: params1, forFeeEstimation: true)
 
-        let params2 = StarknetInvokeParamsV3(nonce: Felt(nonce.value + 1)!, resourceBounds: resourceBounds)
+        let params2 = StarknetInvokeParamsV3(nonce: Felt(nonce.value + 1)!, resourceBounds: StarknetResourceBoundsMapping.zero)
         let tx2 = try account.signV3(calls: [call, call2], params: params2, forFeeEstimation: true)
 
         let _ = try await provider.send(request: RequestBuilder.estimateFee(for: [tx1, tx2], simulationFlags: []))
