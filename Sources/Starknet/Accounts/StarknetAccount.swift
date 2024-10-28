@@ -162,8 +162,7 @@ public class StarknetAccount: StarknetAccountProtocol {
     }
 
     public func estimateFeeV3(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        let resourceBounds = StarknetResourceBoundsMapping(l1Gas: StarknetResourceBounds.zero, l2Gas: StarknetResourceBounds.zero)
-        let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: resourceBounds)
+        let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: StarknetResourceBoundsMapping.zero)
         let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: true)
 
         return RequestBuilder.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])
@@ -177,8 +176,7 @@ public class StarknetAccount: StarknetAccountProtocol {
     }
 
     public func estimateDeployAccountFeeV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt, skipValidate: Bool) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        let resourceBounds = StarknetResourceBoundsMapping(l1Gas: StarknetResourceBounds.zero, l2Gas: StarknetResourceBounds.zero)
-        let params = StarknetDeployAccountParamsV3(nonce: nonce, resourceBounds: resourceBounds)
+        let params = StarknetDeployAccountParamsV3(nonce: nonce, resourceBounds: StarknetResourceBoundsMapping.zero)
         let signedTransaction = try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: params, forFeeEstimation: true)
 
         return RequestBuilder.estimateFee(for: signedTransaction, simulationFlags: skipValidate ? [.skipValidate] : [])

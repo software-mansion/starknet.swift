@@ -232,8 +232,7 @@ final class ProviderTests: XCTestCase {
         let call = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
         let call2 = StarknetCall(contractAddress: contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [100_000_000_000])
 
-        let resourceBounds = StarknetResourceBoundsMapping(l1Gas: StarknetResourceBounds.zero, l2Gas: StarknetResourceBounds.zero)
-        let params1 = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: resourceBounds)
+        let params1 = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: StarknetResourceBoundsMapping.zero)
         let tx1 = try account.signV3(calls: [call], params: params1, forFeeEstimation: true)
 
         let params2 = StarknetInvokeParamsV3(nonce: Felt(nonce.value + 1)!, resourceBounds: resourceBounds)
