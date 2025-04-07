@@ -2,6 +2,21 @@ import BigInt
 import Foundation
 @testable import Starknet
 
+let defaultResourceBounds = StarknetResourceBoundsMapping(
+    l1Gas: StarknetResourceBounds(
+        maxAmount: 100_000,
+        maxPricePerUnit: 10_000_000_000_000
+    ),
+    l2Gas: StarknetResourceBounds(
+        maxAmount: 1_000_000_000,
+        maxPricePerUnit: 100_000_000_000_000_000
+    ),
+    l1DataGas: StarknetResourceBounds(
+        maxAmount: 100_000,
+        maxPricePerUnit: 10_000_000_000_000
+    )
+)
+
 protocol DevnetClientProtocol {
     var rpcUrl: String { get }
     var mintUrl: String { get }
@@ -19,13 +34,13 @@ protocol DevnetClientProtocol {
     func isRunning() -> Bool
 
     func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws
-    func createDeployAccount(name: String, classHash: Felt, salt: Felt?, maxFee: Felt) async throws -> DeployAccountResult
+    func createDeployAccount(name: String, classHash: Felt, salt: Felt?, resourceBounds: StarknetResourceBoundsMapping) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?) async throws -> CreateAccountResult
-    func deployAccount(name: String, classHash: Felt, maxFee: Felt, prefund: Bool) async throws -> DeployAccountResult
-    func declareDeployContract(contractName: String, constructorCalldata: [Felt], salt: Felt?, unique: Bool, maxFeeDeclare: Felt, maxFeeDeploy: Felt) async throws -> DeclareDeployContractResult
-    func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult
-    func deployContract(classHash: Felt, constructorCalldata: [Felt], salt: Felt?, unique: Bool, maxFee: Felt) async throws -> DeployContractResult
-    func invokeContract(contractAddress: Felt, function: String, calldata: [Felt], maxFee: Felt) async throws -> InvokeContractResult
+    func deployAccount(name: String, classHash: Felt, resourceBounds: StarknetResourceBoundsMapping, prefund: Bool) async throws -> DeployAccountResult
+    func declareDeployContract(contractName: String, constructorCalldata: [Felt], salt: Felt?, unique: Bool, resourceBounds: StarknetResourceBoundsMapping) async throws -> DeclareDeployContractResult
+    func declareContract(contractName: String, resourceBounds: StarknetResourceBoundsMapping) async throws -> DeclareContractResult
+    func deployContract(classHash: Felt, constructorCalldata: [Felt], salt: Felt?, unique: Bool, resourceBounds: StarknetResourceBoundsMapping) async throws -> DeployContractResult
+    func invokeContract(contractAddress: Felt, function: String, calldata: [Felt], resourceBounds: StarknetResourceBoundsMapping) async throws -> InvokeContractResult
     func readAccountDetails(accountName: String) throws -> AccountDetails
 
     func assertTransactionSucceeded(transactionHash: Felt) async throws
@@ -42,13 +57,13 @@ extension DevnetClientProtocol {
         name: String,
         classHash: Felt = DevnetClientConstants.accountContractClassHash,
         salt: Felt? = .zero,
-        maxFee: Felt = 1_000_000_000_000_000
+        resourceBounds: StarknetResourceBoundsMapping
     ) async throws -> DeployAccountResult {
         try await createDeployAccount(
             name: name,
             classHash: classHash,
             salt: salt,
-            maxFee: maxFee
+            resourceBounds: resourceBounds
         )
     }
 
@@ -57,7 +72,7 @@ extension DevnetClientProtocol {
             name: UUID().uuidString,
             classHash: DevnetClientConstants.accountContractClassHash,
             salt: .zero,
-            maxFee: 1_000_000_000_000_000
+            resourceBounds: defaultResourceBounds
         )
     }
 
@@ -84,14 +99,14 @@ extension DevnetClientProtocol {
     func deployAccount(
         name: String,
         classHash: Felt = DevnetClientConstants.accountContractClassHash,
-        maxFee: Felt = 1_000_000_000_000_000,
+        resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds,
         prefund: Bool = true
     ) async throws -> DeployAccountResult {
-        try await deployAccount(name: name, classHash: classHash, maxFee: maxFee, prefund: prefund)
+        try await deployAccount(name: name, classHash: classHash, resourceBounds: resourceBounds, prefund: prefund)
     }
 
-    func declareContract(contractName: String, maxFee: Felt = 10_000_000_000_000_000) async throws -> DeclareContractResult {
-        try await declareContract(contractName: contractName, maxFee: maxFee)
+    func declareContract(contractName: String, resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds) async throws -> DeclareContractResult {
+        try await declareContract(contractName: contractName, resourceBounds: resourceBounds)
     }
 
     func declareDeployContract(
@@ -99,16 +114,14 @@ extension DevnetClientProtocol {
         constructorCalldata: [Felt] = [],
         salt: Felt? = .zero,
         unique: Bool = false,
-        maxFeeDeclare: Felt = 10_000_000_000_000_000,
-        maxFeeDeploy: Felt = 1_000_000_000_000_000
+        resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
     ) async throws -> DeclareDeployContractResult {
         try await declareDeployContract(
             contractName: contractName,
             constructorCalldata: constructorCalldata,
             salt: salt,
             unique: unique,
-            maxFeeDeclare: maxFeeDeclare,
-            maxFeeDeploy: maxFeeDeploy
+            resourceBounds: resourceBounds
         )
     }
 
@@ -117,14 +130,14 @@ extension DevnetClientProtocol {
         constructorCalldata: [Felt] = [],
         salt: Felt? = .zero,
         unique: Bool = false,
-        maxFee: Felt = 1_000_000_000_000_000
+        resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
     ) async throws -> DeployContractResult {
         try await deployContract(
             classHash: classHash,
             constructorCalldata: constructorCalldata,
             salt: salt,
             unique: unique,
-            maxFee: maxFee
+            resourceBounds: resourceBounds
         )
     }
 
@@ -132,13 +145,13 @@ extension DevnetClientProtocol {
         contractAddress: Felt,
         function: String,
         calldata: [Felt] = [],
-        maxFee: Felt = 1_000_000_000_000_000
+        resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
     ) async throws -> InvokeContractResult {
         try await invokeContract(
             contractAddress: contractAddress,
             function: function,
             calldata: calldata,
-            maxFee: maxFee
+            resourceBounds: resourceBounds
         )
     }
 }
@@ -299,7 +312,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
             try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
 
-            let _ = try await deployAccount(name: "__default__")
+// FIXME
+//            let _ = try await deployAccount(name: "__default__")
 
             // // Initialize new accounts file
             // let _ = try await createDeployAccount(name: "__default__")
@@ -351,14 +365,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
             salt: Felt? = nil,
-            maxFee: Felt = 1_000_000_000_000_000
+            resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
         ) async throws -> DeployAccountResult {
             try guardDevnetIsRunning()
 
             let createResult = try await createAccount(name: name, salt: salt)
             let details = createResult.details
             try await prefundAccount(address: details.address)
-            let deployResult = try await deployAccount(name: name, classHash: classHash, maxFee: maxFee)
+            let deployResult = try await deployAccount(name: name, classHash: classHash, resourceBounds: resourceBounds)
 
             return DeployAccountResult(
                 details: details,
@@ -369,7 +383,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
         public func createAccount(
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
-            salt: Felt? = nil
+            salt: Felt? = nil,
+            type: String
         ) async throws -> CreateAccountResult {
             var params = [
                 "create",
@@ -377,6 +392,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 name,
                 "--class-hash",
                 classHash.toHex(),
+                "--type",
+                type,
+                "--silent",
+                "--url",
+                rpcUrl,
             ]
             if salt != nil {
                 params.append("--salt")
@@ -393,14 +413,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return CreateAccountResult(
                 name: name,
                 details: details,
-                maxFee: response.maxFee
+                resourceBounds: defaultResourceBounds
             )
         }
 
         public func deployAccount(
             name: String,
-            classHash: Felt = DevnetClientConstants.accountContractClassHash,
-            maxFee: Felt = 1_000_000_000_000_000,
+            classHash _: Felt = DevnetClientConstants.accountContractClassHash,
+            resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds,
             prefund: Bool = true
         ) async throws -> DeployAccountResult {
             let details = try readAccountDetails(accountName: name)
@@ -417,11 +437,9 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "deploy",
                 "--name",
                 name,
-                "--max-fee",
-                maxFee.toHex(),
-                "--class-hash",
-                classHash.toHex(),
-            ]
+                "--url",
+                rpcUrl,
+            ] + createFeeArgs(resourceBounds: resourceBounds)
             let response = try runSnCast(
                 command: "account",
                 args: params
@@ -442,12 +460,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
             constructorCalldata: [Felt] = [],
             salt: Felt? = nil,
             unique: Bool = false,
-            maxFeeDeclare: Felt = 10_000_000_000_000_000,
-            maxFeeDeploy: Felt = 1_000_000_000_000_000
+            resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
         ) async throws -> DeclareDeployContractResult {
             try guardDevnetIsRunning()
 
-            let declareResult = try await declareContract(contractName: contractName, maxFee: maxFeeDeclare)
+            let declareResult = try await declareContract(contractName: contractName, resourceBounds: resourceBounds)
 
             let classHash = declareResult.classHash
             let deployResult = try await deployContract(
@@ -455,7 +472,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 constructorCalldata: constructorCalldata,
                 salt: salt,
                 unique: unique,
-                maxFee: maxFeeDeploy
+                resourceBounds: resourceBounds
             )
             return DeclareDeployContractResult(
                 declare: declareResult,
@@ -463,7 +480,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        public func declareContract(contractName: String, maxFee: Felt) async throws -> DeclareContractResult {
+        public func declareContract(contractName: String, resourceBounds: StarknetResourceBoundsMapping) async throws -> DeclareContractResult {
             try guardDevnetIsRunning()
 
             if let result = declaredContractsAtName[contractName] {
@@ -473,9 +490,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let params = [
                 "--contract-name",
                 contractName,
-                "--max-fee",
-                maxFee.toHex(),
-            ]
+            ] + createFeeArgs(resourceBounds: resourceBounds)
             let response = try runSnCast(
                 command: "declare",
                 args: params
@@ -495,7 +510,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             constructorCalldata: [Felt] = [],
             salt: Felt? = nil,
             unique: Bool = false,
-            maxFee: Felt = 1_000_000_000_000_000
+            resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
         ) async throws -> DeployContractResult {
             try guardDevnetIsRunning()
 
@@ -506,9 +521,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             var params = [
                 "--class-hash",
                 classHash.toHex(),
-                "--max-fee",
-                maxFee.toHex(),
-            ]
+            ] + createFeeArgs(resourceBounds: resourceBounds)
             if !constructorCalldata.isEmpty {
                 params.append("--constructor-calldata")
                 let hexCalldata = constructorCalldata.map { $0.toHex() }
@@ -540,16 +553,18 @@ func makeDevnetClient() -> DevnetClientProtocol {
             contractAddress: Felt,
             function: String,
             calldata: [Felt] = [],
-            maxFee: Felt = 1_000_000_000_000_000
+            resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds,
+            accountName: String = "__default__"
         ) async throws -> InvokeContractResult {
             var params = [
                 "--contract-address",
                 contractAddress.toHex(),
                 "--function",
                 function,
-                "--max-fee",
-                maxFee.toHex(),
-            ]
+                "--url",
+                rpcUrl,
+            ] + createFeeArgs(resourceBounds: resourceBounds)
+
             if !calldata.isEmpty {
                 params.append("--calldata")
                 let hexCalldata = calldata.map { $0.toHex() }
@@ -558,7 +573,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             let response = try runSnCast(
                 command: "invoke",
-                args: params
+                args: params,
+                accountName: accountName
             ) as! InvokeSnCastResponse
 
             return InvokeContractResult(transactionHash: response.transactionHash)
@@ -584,13 +600,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.launchPath = snCastPath
             process.currentDirectoryPath = contractsPath!
             process.arguments = [
+                "--hex-format",
                 "--json",
-                "--path-to-scarb-toml",
-                scarbTomlPath!,
                 "--accounts-file",
                 "\(accountDirectory)/starknet_open_zeppelin_accounts.json",
-                "--url",
-                rpcUrl,
                 "--account",
                 accountName,
                 command,
@@ -619,7 +632,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             var output = String(decoding: outputData, as: UTF8.self)
 
             // TODO: remove this - pending sncast update
-            // As of sncast 0.6.0, "account create" currently outputs non-json data
+            // As of sncast 0.40.0, "account create" currently outputs non-json data
             if let range = output.range(of: "{") {
                 // Remove all characters before the first `{`
                 output.removeSubrange(output.startIndex ..< range.lowerBound)
@@ -642,7 +655,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             if let data = contents.data(using: .utf8),
                let response = try? JSONDecoder().decode(AccountDetailsResponse.self, from: data),
-               let account = response["SN_SEPOLIA"]?[accountName]
+               let account = response["alpha-sepolia"]?[accountName]
             {
                 return account
             }
@@ -658,6 +671,23 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         private func sleep(seconds: UInt64) async throws {
             try await Task.sleep(nanoseconds: seconds * UInt64(Double(NSEC_PER_SEC)))
+        }
+
+        private func createFeeArgs(resourceBounds: StarknetResourceBoundsMapping) -> [String] {
+            [
+                "--l1-gas",
+                resourceBounds.l1Gas.maxAmount.value.description,
+                "--l1-gas-price",
+                resourceBounds.l1Gas.maxPricePerUnit.value.description,
+                "--l2-gas",
+                resourceBounds.l2Gas.maxAmount.value.description,
+                "--l2-gas-price",
+                resourceBounds.l2Gas.maxPricePerUnit.value.description,
+                "--l1-data-gas",
+                resourceBounds.l1DataGas.maxAmount.value.description,
+                "--l1-data-gas-price",
+                resourceBounds.l1DataGas.maxPricePerUnit.value.description,
+            ]
         }
 
         public func assertTransactionSucceeded(transactionHash: Felt) async throws {

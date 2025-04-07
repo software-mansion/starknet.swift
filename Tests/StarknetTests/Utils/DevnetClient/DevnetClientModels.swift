@@ -54,7 +54,7 @@ struct DeployAccountResult {
 struct CreateAccountResult {
     let name: String
     let details: AccountDetails
-    let maxFee: Felt
+    let resourceBounds: StarknetResourceBoundsMapping
 }
 
 struct DeclareContractResult {
