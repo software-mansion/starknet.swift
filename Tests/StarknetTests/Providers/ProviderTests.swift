@@ -11,6 +11,20 @@ final class ProviderTests: XCTestCase {
     var account: StarknetAccountProtocol!
     var accountContractClassHash: Felt!
     var ethContractAddress: Felt!
+    var resourceBounds: StarknetResourceBoundsMapping = .init(
+        l1Gas: StarknetResourceBounds(
+            maxAmount: UInt64AsHex(100_000_000_000),
+            maxPricePerUnit: UInt128AsHex(10_000_000_000_000_000)
+        ),
+        l2Gas: StarknetResourceBounds(
+            maxAmount: UInt64AsHex(100_000_000_000_000),
+            maxPricePerUnit: UInt128AsHex(1_000_000_000_000_000_000)
+        ),
+        l1DataGas: StarknetResourceBounds(
+            maxAmount: UInt64AsHex(100_000_000_000),
+            maxPricePerUnit: UInt128AsHex(10_000_000_000_000_000)
+        )
+    )
 
     override class func setUp() {
         super.setUp()
@@ -277,7 +291,7 @@ final class ProviderTests: XCTestCase {
 
         let nonce = await (try? provider.send(request: newAccount.getNonce())) ?? .zero
 
-        let resourceBounds = StarknetResourceBoundsMapping(l1Gas: StarknetResourceBounds.zero, l2Gas: StarknetResourceBounds.zero)
+        let resourceBounds = StarknetResourceBoundsMapping.zero
         let params = StarknetDeployAccountParamsV3(nonce: nonce, resourceBounds: resourceBounds)
 
         let tx = try newAccount.signDeployAccountV3(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: true)
@@ -361,9 +375,9 @@ final class ProviderTests: XCTestCase {
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
 
         try await Self.devnetClient.prefundAccount(address: account.address, amount: 5_000_000_000_000_000_000, unit: .fri)
-        let invokeL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
-        let invokResourceBounds = StarknetResourceBoundsMapping(l1Gas: invokeL1Gas, l2Gas: StarknetResourceBounds.zero)
-        let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: invokResourceBounds)
+//        let invokeL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
+//        let invokResourceBounds = StarknetResourceBoundsMapping(l1Gas: invokeL1Gas, l2Gas: StarknetResourceBounds.zero)
+        let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: resourceBounds)
 
         let invokeTx = try account.signV3(calls: [call], params: params, forFeeEstimation: false)
 
@@ -376,7 +390,7 @@ final class ProviderTests: XCTestCase {
         try await Self.devnetClient.prefundAccount(address: newAccountAddress, amount: 5_000_000_000_000_000_000, unit: .fri)
 
         let deployAccountL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
-        let deployAccountResourceBounds = StarknetResourceBoundsMapping(l1Gas: deployAccountL1Gas, l2Gas: StarknetResourceBounds.zero)
+        let deployAccountResourceBounds = StarknetResourceBoundsMapping.zero
         let newAccountParams = StarknetDeployAccountParamsV3(nonce: 0, resourceBounds: deployAccountResourceBounds)
         let deployAccountTx = try newAccount.signDeployAccountV3(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
@@ -432,5 +446,41 @@ final class ProviderTests: XCTestCase {
         } catch {
             XCTFail("Error was not a StarknetProviderError. Received error type: \(type(of: error))")
         }
+    }
+
+    func testGestMessagesStatus() throws {
+        let json = """
+        {
+            "id": 0,
+            "jsonrpc": "2.0",
+            "result": [
+                {
+                    "transaction_hash": "0x123",
+                    "finality_status": "ACCEPTED_ON_L2"
+                },
+                {
+                    "transaction_hash": "0x123",
+                    "finality_status": "ACCEPTED_ON_L2",
+                    "failure_reason": "Example failure reason"
+                }
+            ]
+        }
+        """.data(using: .utf8)!
+
+        let decoder = JSONDecoder()
+
+        let response = try decoder.decode(JsonRpcResponse<[MessageStatus]>.self, from: json)
+        print(response)
+        let result = response.result
+
+        XCTAssertEqual(result?.count, 2)
+
+        XCTAssertEqual(result?[0].transactionHash, Felt(0x123))
+        XCTAssertEqual(result?[0].finalityStatus, StarknetTransactionStatus.acceptedL2)
+        XCTAssertNil(result?[0].failureReason)
+
+        XCTAssertEqual(result?[1].transactionHash, Felt(0x123))
+        XCTAssertEqual(result?[1].finalityStatus, StarknetTransactionStatus.acceptedL2)
+        XCTAssertNotNil(result?[1].failureReason)
     }
 }
