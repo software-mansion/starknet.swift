@@ -312,7 +312,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
             try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
 
-// FIXME
+            // FIXME:
 //            let _ = try await deployAccount(name: "__default__")
 
             // // Initialize new accounts file

@@ -3,6 +3,7 @@ import Foundation
 public class StarknetTransactionHashCalculator {
     private static let l1GasPrefix = Felt.fromShortString("L1_GAS")!
     private static let l2GasPrefix = Felt.fromShortString("L2_GAS")!
+    private static let l1DataGasPrefix = Felt.fromShortString("L1_DATA_GAS")!
 
     private class func computeCommonDeprecatedTransactionHash(
         transactionType: StarknetTransactionType,
@@ -130,8 +131,11 @@ public class StarknetTransactionHashCalculator {
         let l2GasBound = l2GasPrefix.value << (64 + 128)
             + resourceBounds.l2Gas.maxAmount.value << 128
             + resourceBounds.l2Gas.maxPricePerUnit.value
+        let l1DataGasBound = l1DataGasPrefix.value << (64 + 128)
+            + resourceBounds.l1DataGas.maxAmount.value << 128
+            + resourceBounds.l1DataGas.maxPricePerUnit.value
 
-        return [l1GasBound.toFelt()!, l2GasBound.toFelt()!]
+        return [l1GasBound.toFelt()!, l2GasBound.toFelt()!, l1DataGasBound.toFelt()!]
     }
 
     private class func dataAvailabilityModes(
