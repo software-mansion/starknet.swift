@@ -4,12 +4,9 @@ import Foundation
 public extension StarknetFeeEstimate {
     /// Convert estimated fee to resource bounds with applied multipliers
     ///
-    /// Calculates `maxAmountL1 = overallFee / l1GasPrice`, unless `l1GasPrice` is 0, then `maxAmountL1` is 0.
-    /// Calculates `maxAmountL2 = overallFee / l2GasPrice`, unless `l2GasPrice` is 0, then `maxAmountL2` is 0.
-    /// Calculates `maxPricePerUnitL1 = gasPriceL1`.
-    /// Calculates `maxPricePerUnitL2 = gasPriceL2`.
-    /// Then multiplies `maxAmountL1` and `maxAmountL2` by **round((amountMultiplier) \* 100)** and `maxPricePerUnitL1` and `maxPricePerUnitL2` by **round((unitPriceMultiplier) \* 100)** and performs integer division by 100 on each.
-    ///
+    /// Calculates max amount of l1 gas as `l1GasConsumed` * `amountMultiplier` and max price per unit as `l1GasPrice` * `unitPriceMultiplier`.
+    /// Calculates max amount of l2 gas as `l2GasConsumed` * `amountMultiplier` and max price per unit as `l2GasPrice` * `unitPriceMultiplier`.
+    /// Calculates max amount of l1 data gas as `l1DataGasConsumed` * `amountMultiplier` and max price per unit as `l1DataGasPrice` * `unitPriceMultiplier`.
     ///
     /// - Parameters:
     ///  - amountMultiplier: multiplier for max amount, defaults to 1.5.
@@ -17,15 +14,19 @@ public extension StarknetFeeEstimate {
     ///
     /// - Returns: resource bounds with applied multipliers
     func toResourceBounds(amountMultiplier: Double = 1.5, unitPriceMultiplier: Double = 1.5) -> StarknetResourceBoundsMapping {
-        let maxAmountL1 = self.l1GasPrice == .zero ? UInt64AsHex.zero : (self.overallFee.value / self.l1GasPrice.value).applyMultiplier(amountMultiplier).toUInt64AsHexClamped()
-        let maxAmountL2 = self.l2GasPrice == .zero ? UInt64AsHex.zero : (self.overallFee.value / self.l2GasPrice.value).applyMultiplier(amountMultiplier).toUInt64AsHexClamped()
-
-        let maxUnitPriceL1 = self.l1GasPrice.value.applyMultiplier(unitPriceMultiplier).toUInt128AsHexClamped()
-        let maxUnitPriceL2 = self.l2GasPrice.value.applyMultiplier(unitPriceMultiplier).toUInt128AsHexClamped()
-
-        let l1Gas = StarknetResourceBounds(maxAmount: maxAmountL1, maxPricePerUnit: maxUnitPriceL1)
-        let l2Gas = StarknetResourceBounds(maxAmount: maxAmountL2, maxPricePerUnit: maxUnitPriceL2)
-        return StarknetResourceBoundsMapping(l1Gas: l1Gas, l2Gas: l2Gas)
+        let l1Gas = StarknetResourceBounds(
+            maxAmount: self.l1GasConsumed.value.applyMultiplier(amountMultiplier).toUInt64AsHexClamped(),
+            maxPricePerUnit: self.l1GasPrice.value.applyMultiplier(unitPriceMultiplier).toUInt128AsHexClamped()
+        )
+        let l2Gas = StarknetResourceBounds(
+            maxAmount: self.l2GasConsumed.value.applyMultiplier(amountMultiplier).toUInt64AsHexClamped(),
+            maxPricePerUnit: self.l2GasPrice.value.applyMultiplier(unitPriceMultiplier).toUInt128AsHexClamped()
+        )
+        let l1DataGas = StarknetResourceBounds(
+            maxAmount: self.l1DataGasConsumed.value.applyMultiplier(amountMultiplier).toUInt64AsHexClamped(),
+            maxPricePerUnit: self.l1DataGasPrice.value.applyMultiplier(unitPriceMultiplier).toUInt128AsHexClamped()
+        )
+        return StarknetResourceBoundsMapping(l1Gas: l1Gas, l2Gas: l2Gas, l1DataGas: l1DataGas)
     }
 
     /// Convert estimated fee to max fee with applied multiplier.
