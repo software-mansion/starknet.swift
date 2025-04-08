@@ -483,4 +483,72 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(result?[1].finalityStatus, StarknetTransactionStatus.acceptedL2)
         XCTAssertNotNil(result?[1].failureReason)
     }
+    
+    func testGetStorageProof() async throws {
+        let json = """
+        {
+            "id": 0,
+            "jsonrpc": "2.0",
+            "result": {
+                "classes_proof": [
+                    {"node": {"left": "0x123", "right": "0x123"}, "node_hash": "0x123"},
+                    {
+                        "node": {"child": "0x123", "length": 2, "path": "0x123"},
+                        "node_hash": "0x123"
+                    }
+                ],
+                "contracts_proof": {
+                    "contract_leaves_data": [
+                        {"class_hash": "0x123", "nonce": "0x0", "storage_root": "0x123"}
+                    ],
+                    "nodes": [
+                        {
+                            "node": {"left": "0x123", "right": "0x123"},
+                            "node_hash": "0x123"
+                        },
+                        {
+                            "node": {"child": "0x123", "length": 232, "path": "0x123"},
+                            "node_hash": "0x123"
+                        }
+                    ]
+                },
+                "contracts_storage_proofs": [
+                    [
+                        {
+                            "node": {"left": "0x123", "right": "0x123"},
+                            "node_hash": "0x123"
+                        },
+                        {
+                            "node": {"child": "0x123", "length": 123, "path": "0x123"},
+                            "node_hash": "0x123"
+                        },
+                        {
+                            "node": {"left": "0x123", "right": "0x123"},
+                            "node_hash": "0x123"
+                        }
+                    ]
+                ],
+                "global_roots": {
+                    "block_hash": "0x123",
+                    "classes_tree_root": "0x456",
+                    "contracts_tree_root": "0x789"
+                }
+            }
+        }
+        """.data(using: .utf8)!
+
+        let response = try decoder.decode(JsonRpcResponse<StarknetGetStorageProofResponse>.self, from: json)
+        let result = response.result
+
+        XCTAssert(result?.classesProof[0], BinaryNode)
+        XCTAssert(result?.classesProof[1], EdgeNode)
+        XCTAssert(result?.contractsProof.nodes[0], BinaryNode)
+        XCTAssert(result?.contractsStorageProofs[0][0], BinaryNode)
+        XCTAssertEqual(result?.classesProof.count, 2)
+        XCTAssertEqual(result?.contractsProof.nodes.count, 2)
+        XCTAssertEqual(result?.contractsStorageProofs.count, 1)
+        XCTAssertEqual(result?.globalRoots.blockHash, Felt(0x123))
+        XCTAssertEqual(result?.globalRoots.classesTreeRoot, Felt(0x456))
+        XCTAssertEqual(result?.globalRoots.contractsTreeRoot, Felt(0x789))
+    }
 }
