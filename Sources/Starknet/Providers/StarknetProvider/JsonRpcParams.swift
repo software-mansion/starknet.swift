@@ -111,7 +111,7 @@ struct GetStorageProofParams: Encodable {
     let blockId: StarknetBlockId
     let classHashes: [Felt]?
     let contractAddresses: [Felt]?
-    let contractsStorageKeys: [ContractStorageKeys]?
+    let contractsStorageKeys: [ContractsStorageKeys]?
 
     enum CodingKeys: String, CodingKey {
         case blockId = "block_id"

@@ -85,13 +85,13 @@ public struct StarknetGetEventsResponse: Decodable, Equatable {
 public struct StarknetGetStorageProofResponse: Decodable, Equatable {
     public let classesProof: NodeHashToNodeMapping
     public let contractsProof: ContractsProof
-    public let contractsStorageProof: [NodeHashToNodeMapping]
+    public let contractsStorageProofs: [NodeHashToNodeMapping]
     public let globalRoots: GlobalRoots
 
     enum CodingKeys: String, CodingKey {
         case classesProof = "classes_proof"
         case contractsProof = "contracts_proof"
-        case contractsStorageProof = "contracts_storage_proof"
+        case contractsStorageProofs = "contracts_storage_proofs"
         case globalRoots = "global_roots"
     }
 }
