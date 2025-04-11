@@ -495,7 +495,7 @@ final class ProviderTests: XCTestCase {
         XCTAssertEqual(result?[1].finalityStatus, StarknetTransactionStatus.acceptedL2)
         XCTAssertNotNil(result?[1].failureReason)
     }
-    
+
     func testGetStorageProof() async throws {
         let json = """
         {
@@ -548,7 +548,7 @@ final class ProviderTests: XCTestCase {
             }
         }
         """.data(using: .utf8)!
-        
+
         let decoder = JSONDecoder()
 
         let response = try decoder.decode(JsonRpcResponse<StarknetGetStorageProofResponse>.self, from: json)
