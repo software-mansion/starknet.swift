@@ -206,7 +206,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "starknet-devnet"
             scarbPath = ProcessInfo.processInfo.environment["SCARB_PATH"] ?? "scarb"
             snCastPath = ProcessInfo.processInfo.environment["SNCAST_PATH"] ?? "sncast"
-
             tmpPath = ProcessInfo.processInfo.environment["TMPDIR"] ?? "/tmp/starknet-swift"
             accountDirectory = URL(string: tmpPath)!
         }
@@ -239,6 +238,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "\(seed)",
                 "--state-archive-capacity",
                 "full",
+                "--initial-balance",
+                "1000000000000000000000000000000000000000000000000000000000000000000"
             ]
             devnetProcess.launchPath = devnetPath
             devnetProcess.standardInput = nil
@@ -439,7 +440,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 name,
                 "--url",
                 rpcUrl,
-            ] + createFeeArgs(resourceBounds: resourceBounds)
+            ]
             let response = try runSnCast(
                 command: "account",
                 args: params
@@ -465,7 +466,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try guardDevnetIsRunning()
 
             let declareResult = try await declareContract(contractName: contractName, resourceBounds: resourceBounds)
-
             let classHash = declareResult.classHash
             let deployResult = try await deployContract(
                 classHash: classHash,
@@ -490,7 +490,9 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let params = [
                 "--contract-name",
                 contractName,
-            ] + createFeeArgs(resourceBounds: resourceBounds)
+                "--url",
+                rpcUrl,
+            ]
             let response = try runSnCast(
                 command: "declare",
                 args: params
@@ -521,7 +523,9 @@ func makeDevnetClient() -> DevnetClientProtocol {
             var params = [
                 "--class-hash",
                 classHash.toHex(),
-            ] + createFeeArgs(resourceBounds: resourceBounds)
+                "--url",
+                rpcUrl,
+            ]
             if !constructorCalldata.isEmpty {
                 params.append("--constructor-calldata")
                 let hexCalldata = constructorCalldata.map { $0.toHex() }
@@ -563,7 +567,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 function,
                 "--url",
                 rpcUrl,
-            ] + createFeeArgs(resourceBounds: resourceBounds)
+            ]
 
             if !calldata.isEmpty {
                 params.append("--calldata")
@@ -595,7 +599,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let errorPipe = Pipe()
             process.standardOutput = outputPipe
             process.standardError = errorPipe
-
             // TODO: migrate to URLs everywhere - path fields are marked as deprecated
             process.launchPath = snCastPath
             process.currentDirectoryPath = contractsPath!
@@ -620,24 +623,25 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.standardInput = nil
             process.launch()
             process.waitUntilExit()
-
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let error = String(decoding: errorData, as: UTF8.self)
 
                 throw SnCastError.snCastError(error)
             }
-
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             var output = String(decoding: outputData, as: UTF8.self)
 
             // TODO: remove this - pending sncast update
             // As of sncast 0.40.0, "account create" currently outputs non-json data
-            if let range = output.range(of: "{") {
-                // Remove all characters before the first `{`
-                output.removeSubrange(output.startIndex ..< range.lowerBound)
-            } else {
-                throw SnCastError.invalidResponseJson
+//            if let range = output.range(of: "{") {
+//                // Remove all characters before the first `{`
+//                output.removeSubrange(output.startIndex ..< range.lowerBound)
+//            } else {
+//                throw SnCastError.invalidResponseJson
+//            }
+            if let range = output.lastIndex(of: "{") {
+                output.removeSubrange(output.startIndex..<range)
             }
 
             let outputDataTrimmed = output.data(using: .utf8)!
@@ -671,23 +675,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         private func sleep(seconds: UInt64) async throws {
             try await Task.sleep(nanoseconds: seconds * UInt64(Double(NSEC_PER_SEC)))
-        }
-
-        private func createFeeArgs(resourceBounds: StarknetResourceBoundsMapping) -> [String] {
-            [
-                "--l1-gas",
-                resourceBounds.l1Gas.maxAmount.value.description,
-                "--l1-gas-price",
-                resourceBounds.l1Gas.maxPricePerUnit.value.description,
-                "--l2-gas",
-                resourceBounds.l2Gas.maxAmount.value.description,
-                "--l2-gas-price",
-                resourceBounds.l2Gas.maxPricePerUnit.value.description,
-                "--l1-data-gas",
-                resourceBounds.l1DataGas.maxAmount.value.description,
-                "--l1-data-gas-price",
-                resourceBounds.l1DataGas.maxPricePerUnit.value.description,
-            ]
         }
 
         public func assertTransactionSucceeded(transactionHash: Felt) async throws {

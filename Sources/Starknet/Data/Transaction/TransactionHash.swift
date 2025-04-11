@@ -3,7 +3,7 @@ import Foundation
 public class StarknetTransactionHashCalculator {
     private static let l1GasPrefix = Felt.fromShortString("L1_GAS")!
     private static let l2GasPrefix = Felt.fromShortString("L2_GAS")!
-    private static let l1DataGasPrefix = Felt.fromShortString("L1_DATA_GAS")!
+    private static let l1DataGasPrefix = Felt.fromShortString("L1_DATA")!
 
     private class func computeCommonDeprecatedTransactionHash(
         transactionType: StarknetTransactionType,

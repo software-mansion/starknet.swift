@@ -187,7 +187,7 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetTransactionStatus() async throws {
-        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance")
+        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [Felt(123)])
         let status = try await provider.send(request: RequestBuilder.getTransactionStatusBy(hash: contract.declare.transactionHash))
         let status2 = try await provider.send(request: RequestBuilder.getTransactionStatusBy(hash: contract.deploy.transactionHash))
 
@@ -374,7 +374,8 @@ final class ProviderTests: XCTestCase {
 
         let call = StarknetCall(contractAddress: contract.deploy.contractAddress, entrypoint: starknetSelector(from: "increase_balance"), calldata: [1000])
 
-        try await Self.devnetClient.prefundAccount(address: account.address, amount: 5_000_000_000_000_000_000, unit: .fri)
+//        try await Self.devnetClient.prefundAccount(address: account.address, amount: 5_000_000_000_000_000_000, unit: .fri)
+//        try await Self.devnetClient.prefundAccount(address: account.address, amount: 5_000_000_000_000_000_000, unit: .fri)
 //        let invokeL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
 //        let invokResourceBounds = StarknetResourceBoundsMapping(l1Gas: invokeL1Gas, l2Gas: StarknetResourceBounds.zero)
         let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: resourceBounds)
@@ -389,9 +390,21 @@ final class ProviderTests: XCTestCase {
 
         try await Self.devnetClient.prefundAccount(address: newAccountAddress, amount: 5_000_000_000_000_000_000, unit: .fri)
 
-        let deployAccountL1Gas = StarknetResourceBounds(maxAmount: 500_000, maxPricePerUnit: 100_000_000_000)
-        let deployAccountResourceBounds = StarknetResourceBoundsMapping.zero
-        let newAccountParams = StarknetDeployAccountParamsV3(nonce: 0, resourceBounds: deployAccountResourceBounds)
+        let resourceBounds: StarknetResourceBoundsMapping = .init(
+            l1Gas: StarknetResourceBounds(
+                maxAmount: UInt64AsHex(100_000_000),
+                maxPricePerUnit: UInt128AsHex(10_000_000_000_000)
+            ),
+            l2Gas: StarknetResourceBounds(
+                maxAmount: UInt64AsHex(100_000_000),
+                maxPricePerUnit: UInt128AsHex(1_000_000_000_000)
+            ),
+            l1DataGas: StarknetResourceBounds(
+                maxAmount: UInt64AsHex(100_000_000),
+                maxPricePerUnit: UInt128AsHex(10_000_000_000_000)
+            )
+        )
+        let newAccountParams = StarknetDeployAccountParamsV3(nonce: 0, resourceBounds: resourceBounds)
         let deployAccountTx = try newAccount.signDeployAccountV3(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
         let simulations = try await provider.send(request: RequestBuilder.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: []))
@@ -470,7 +483,6 @@ final class ProviderTests: XCTestCase {
         let decoder = JSONDecoder()
 
         let response = try decoder.decode(JsonRpcResponse<[MessageStatus]>.self, from: json)
-        print(response)
         let result = response.result
 
         XCTAssertEqual(result?.count, 2)
@@ -536,14 +548,12 @@ final class ProviderTests: XCTestCase {
             }
         }
         """.data(using: .utf8)!
+        
+        let decoder = JSONDecoder()
 
         let response = try decoder.decode(JsonRpcResponse<StarknetGetStorageProofResponse>.self, from: json)
         let result = response.result
 
-        XCTAssert(result?.classesProof[0], BinaryNode)
-        XCTAssert(result?.classesProof[1], EdgeNode)
-        XCTAssert(result?.contractsProof.nodes[0], BinaryNode)
-        XCTAssert(result?.contractsStorageProofs[0][0], BinaryNode)
         XCTAssertEqual(result?.classesProof.count, 2)
         XCTAssertEqual(result?.contractsProof.nodes.count, 2)
         XCTAssertEqual(result?.contractsStorageProofs.count, 1)
