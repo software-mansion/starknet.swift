@@ -30,7 +30,7 @@ final class DevnetClientTests: XCTestCase {
             )
         )
 
-        let account = try await client.createDeployAccount(name: "Account1", resourceBounds: resourceBounds)
+        let account = try await client.createDeployAccount(name: "Account1")
         try await client.assertTransactionSucceeded(transactionHash: account.transactionHash)
 
         let account2 = try await client.createDeployAccount()

@@ -2,21 +2,6 @@ import BigInt
 import Foundation
 @testable import Starknet
 
-let defaultResourceBounds = StarknetResourceBoundsMapping(
-    l1Gas: StarknetResourceBounds(
-        maxAmount: 100_000,
-        maxPricePerUnit: 10_000_000_000_000
-    ),
-    l2Gas: StarknetResourceBounds(
-        maxAmount: 1_000_000_000,
-        maxPricePerUnit: 100_000_000_000_000_000
-    ),
-    l1DataGas: StarknetResourceBounds(
-        maxAmount: 100_000,
-        maxPricePerUnit: 10_000_000_000_000
-    )
-)
-
 protocol DevnetClientProtocol {
     var rpcUrl: String { get }
     var mintUrl: String { get }
@@ -56,14 +41,12 @@ extension DevnetClientProtocol {
     func createDeployAccount(
         name: String,
         classHash: Felt = DevnetClientConstants.accountContractClassHash,
-        salt: Felt? = .zero,
-        resourceBounds: StarknetResourceBoundsMapping
+        salt: Felt? = .zero
     ) async throws -> DeployAccountResult {
         try await createDeployAccount(
             name: name,
             classHash: classHash,
-            salt: salt,
-            resourceBounds: resourceBounds
+            salt: salt
         )
     }
 
@@ -71,8 +54,7 @@ extension DevnetClientProtocol {
         try await createDeployAccount(
             name: UUID().uuidString,
             classHash: DevnetClientConstants.accountContractClassHash,
-            salt: .zero,
-            resourceBounds: defaultResourceBounds
+            salt: .zero
         )
     }
 
@@ -101,26 +83,24 @@ extension DevnetClientProtocol {
         classHash: Felt = DevnetClientConstants.accountContractClassHash,
         prefund: Bool = true
     ) async throws -> DeployAccountResult {
-        try await deployAccount(name: name, classHash: classHash, resourceBounds: resourceBounds, prefund: prefund)
+        try await deployAccount(name: name, classHash: classHash, prefund: prefund)
     }
 
-    func declareContract(contractName: String = defaultResourceBounds) async throws -> DeclareContractResult {
-        try await declareContract(contractName: contractName, resourceBounds: resourceBounds)
+    func declareContract(contractName: String) async throws -> DeclareContractResult {
+        try await declareContract(contractName: contractName)
     }
 
     func declareDeployContract(
         contractName: String,
         constructorCalldata: [Felt] = [],
         salt: Felt? = .zero,
-        unique: Bool = false,
-        resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
+        unique: Bool = false
     ) async throws -> DeclareDeployContractResult {
         try await declareDeployContract(
             contractName: contractName,
             constructorCalldata: constructorCalldata,
             salt: salt,
-            unique: unique,
-            resourceBounds: resourceBounds
+            unique: unique
         )
     }
 
@@ -128,29 +108,25 @@ extension DevnetClientProtocol {
         classHash: Felt,
         constructorCalldata: [Felt] = [],
         salt: Felt? = .zero,
-        unique: Bool = false,
-        resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
+        unique: Bool = false
     ) async throws -> DeployContractResult {
         try await deployContract(
             classHash: classHash,
             constructorCalldata: constructorCalldata,
             salt: salt,
-            unique: unique,
-            resourceBounds: resourceBounds
+            unique: unique
         )
     }
 
     func invokeContract(
         contractAddress: Felt,
         function: String,
-        calldata: [Felt] = [],
-        resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
+        calldata: [Felt] = []
     ) async throws -> InvokeContractResult {
         try await invokeContract(
             contractAddress: contractAddress,
             function: function,
-            calldata: calldata,
-            resourceBounds: resourceBounds
+            calldata: calldata
         )
     }
 }
@@ -364,15 +340,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
         public func createDeployAccount(
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
-            salt: Felt? = nil,
-            resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
+            salt: Felt? = nil
         ) async throws -> DeployAccountResult {
             try guardDevnetIsRunning()
 
             let createResult = try await createAccount(name: name, salt: salt)
             let details = createResult.details
             try await prefundAccount(address: details.address)
-            let deployResult = try await deployAccount(name: name, classHash: classHash, resourceBounds: resourceBounds)
+            let deployResult = try await deployAccount(name: name, classHash: classHash)
 
             return DeployAccountResult(
                 details: details,
@@ -412,8 +387,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             return CreateAccountResult(
                 name: name,
-                details: details,
-                resourceBounds: defaultResourceBounds
+                details: details
             )
         }
 
@@ -458,19 +432,17 @@ func makeDevnetClient() -> DevnetClientProtocol {
             contractName: String,
             constructorCalldata: [Felt] = [],
             salt: Felt? = nil,
-            unique: Bool = false,
-            resourceBounds: StarknetResourceBoundsMapping = defaultResourceBounds
+            unique: Bool = false
         ) async throws -> DeclareDeployContractResult {
             try guardDevnetIsRunning()
 
-            let declareResult = try await declareContract(contractName: contractName, resourceBounds: resourceBounds)
+            let declareResult = try await declareContract(contractName: contractName)
             let classHash = declareResult.classHash
             let deployResult = try await deployContract(
                 classHash: classHash,
                 constructorCalldata: constructorCalldata,
                 salt: salt,
-                unique: unique,
-                resourceBounds: resourceBounds
+                unique: unique
             )
             return DeclareDeployContractResult(
                 declare: declareResult,
@@ -637,7 +609,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 //                throw SnCastError.invalidResponseJson
 //            }
             if let range = output.lastIndex(of: "{") {
-                output.removeSubrange(output.startIndex.. < range)
+                output.removeSubrange(output.startIndex ..< range)
             }
 
             let outputDataTrimmed = output.data(using: .utf8)!

@@ -54,7 +54,6 @@ struct DeployAccountResult {
 struct CreateAccountResult {
     let name: String
     let details: AccountDetails
-    let resourceBounds: StarknetResourceBoundsMapping
 }
 
 struct DeclareContractResult {
