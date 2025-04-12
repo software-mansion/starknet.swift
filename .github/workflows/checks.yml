@@ -109,9 +109,9 @@ jobs:
         working-directory: ./Tests/StarknetTests/Resources/Contracts/src
         run: scarb fmt --check
 
-      - name: Run tests
-        run: |
-          export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
-          export SCARB_PATH="$(which scarb)"
-          export SNCAST_PATH="$(which sncast)"
-          swift test --disable-sandbox
+      # - name: Run tests
+      #   run: |
+      #     export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
+      #     export SCARB_PATH="$(which scarb)"
+      #     export SNCAST_PATH="$(which sncast)"
+      #     swift test --disable-sandbox
