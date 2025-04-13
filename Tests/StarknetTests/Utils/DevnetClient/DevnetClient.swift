@@ -357,15 +357,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
             salt: Felt? = nil
         ) async throws -> DeployAccountResult {
             try guardDevnetIsRunning()
-            print("AAA")
 
-            let createResult = try await createAccount(name: name, classHash: classHash, salt: salt)
-            print("createresult", createResult)
+            let createResult = try await createAccount(name: name, salt: salt)
             let details = createResult.details
             try await prefundAccount(address: details.address)
-            print("prefunded")
             let deployResult = try await deployAccount(name: name, classHash: classHash)
-            print("deployed", deployResult)
 
             return DeployAccountResult(
                 details: details,
