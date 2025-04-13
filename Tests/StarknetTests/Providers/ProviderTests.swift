@@ -390,20 +390,20 @@ final class ProviderTests: XCTestCase {
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
         let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
 
-        try await Self.devnetClient.prefundAccount(address: newAccountAddress, amount: 5_000_000_000_000_000_000_000_000, unit: .fri)
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress, amount: 10_000_000_000_000_000_000, unit: .fri)
 
         let resourceBounds: StarknetResourceBoundsMapping = .init(
             l1Gas: StarknetResourceBounds(
-                maxAmount: UInt64AsHex(100_000_000),
-                maxPricePerUnit: UInt128AsHex(10_000_000_000_000)
+                maxAmount: UInt64AsHex(1000),
+                maxPricePerUnit: UInt128AsHex(100_000_000_000)
             ),
             l2Gas: StarknetResourceBounds(
-                maxAmount: UInt64AsHex(100_000_000),
-                maxPricePerUnit: UInt128AsHex(1_000_000_000_000)
+                maxAmount: UInt64AsHex(10_000_000),
+                maxPricePerUnit: UInt128AsHex(100_000_000_000)
             ),
             l1DataGas: StarknetResourceBounds(
-                maxAmount: UInt64AsHex(100_000_000),
-                maxPricePerUnit: UInt128AsHex(10_000_000_000_000)
+                maxAmount: UInt64AsHex(1000),
+                maxPricePerUnit: UInt128AsHex(100_000_000_000)
             )
         )
         let newAccountParams = StarknetDeployAccountParamsV3(nonce: 0, resourceBounds: resourceBounds)
