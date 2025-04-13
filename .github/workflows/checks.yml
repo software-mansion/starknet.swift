@@ -111,7 +111,6 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "$(which universal-sierra-compiler)"
           export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
           export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
