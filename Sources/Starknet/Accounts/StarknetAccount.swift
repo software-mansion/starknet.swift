@@ -26,16 +26,13 @@ public class StarknetAccount: StarknetAccountProtocol {
         self.cairoVersion = cairoVersion
     }
 
-
     private func makeInvokeTransactionV3(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetInvokeParamsV3, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV3 {
         StarknetInvokeTransactionV3(senderAddress: address, calldata: calldata, signature: signature, resourceBounds: params.resourceBounds, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
     }
 
-
     private func makeDeployAccountTransactionV3(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) -> StarknetDeployAccountTransactionV3 {
         StarknetDeployAccountTransactionV3(signature: signature, resourceBounds: params.resourceBounds, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation)
     }
-
 
     public func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3 {
         let calldata = starknetCallsToExecuteCalldata(calls: calls, cairoVersion: cairoVersion)
@@ -58,7 +55,6 @@ public class StarknetAccount: StarknetAccountProtocol {
 
         return makeDeployAccountTransactionV3(classHash: classHash, salt: salt, calldata: calldata, signature: signature, params: params, forFeeEstimation: forFeeEstimation)
     }
-
 
     public func executeV3(calls: [StarknetCall], params: StarknetOptionalInvokeParamsV3) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
         var nonce: Felt
@@ -83,7 +79,6 @@ public class StarknetAccount: StarknetAccountProtocol {
         return RequestBuilder.addInvokeTransaction(signedTransaction)
     }
 
-
     public func executeV3(calls: [StarknetCall], estimateAmountMultiplier: Double, estimateUnitPriceMultiplier: Double) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
         let nonce = try await provider.send(request: getNonce())
         let feeEstimate = try await provider.send(request: estimateFeeV3(calls: calls, nonce: nonce))[0]
@@ -94,8 +89,6 @@ public class StarknetAccount: StarknetAccountProtocol {
 
         return RequestBuilder.addInvokeTransaction(signedTransaction)
     }
-
-
 
     public func estimateFeeV3(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
         let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: StarknetResourceBoundsMapping.zero)

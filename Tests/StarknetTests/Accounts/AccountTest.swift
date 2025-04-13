@@ -45,7 +45,6 @@ final class AccountTests: XCTestCase {
         let _ = try await account.getNonce()
     }
 
-
     func testExecuteV3() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
@@ -61,7 +60,6 @@ final class AccountTests: XCTestCase {
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
-
 
     func testExecuteV3FeeMultipliers() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address

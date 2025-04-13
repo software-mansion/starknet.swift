@@ -224,7 +224,6 @@ final class ProviderTests: XCTestCase {
         XCTAssertTrue(result.transactionReceipt.isSuccessful)
     }
 
-
     func testEstimateInvokeV3Fee() async throws {
         let contractAddress = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000]).deploy.contractAddress
         let nonce = try await provider.send(request: account.getNonce())
@@ -245,7 +244,6 @@ final class ProviderTests: XCTestCase {
 
         let _ = try await provider.send(request: RequestBuilder.estimateFee(for: [tx1WithoutSignature, tx2WithoutSignature], simulationFlags: [.skipValidate]))
     }
-
 
     func testEstimateDeployAccountV3Fee() async throws {
         let newSigner = StarkCurveSigner(privateKey: 3333)!
@@ -293,7 +291,6 @@ final class ProviderTests: XCTestCase {
         XCTAssertNotEqual(Felt.zero, feeEstimate.overallFee)
         XCTAssertEqual(feeEstimate.l1GasPrice.value * feeEstimate.l1GasConsumed.value + feeEstimate.l2GasPrice.value * feeEstimate.l2GasConsumed.value + feeEstimate.l1DataGasPrice.value * feeEstimate.l1DataGasConsumed.value, feeEstimate.overallFee.value)
     }
-
 
 //    func testSimulateTransactionsV3() async throws {
 //        let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
