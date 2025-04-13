@@ -3,48 +3,204 @@ import XCTest
 @testable import Starknet
 
 let invokeTransactionV3 = """
-{"sender_address":"0x123","calldata":["0x1","0x2"],"max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0xD","type":"INVOKE","version":"0x3","transaction_hash":"0x111","resource_bounds":{"l1_gas":{"max_amount":"0x300","max_price_per_unit":"0x2137"},"l2_gas":{"max_amount":"0x0","max_price_per_unit":"0x0"}},"tip":"0x0","paymaster_data":[],"account_deployment_data":[],"nonce_data_availability_mode":"L1","fee_data_availability_mode":"L1"}
+{
+  "sender_address": "0x123",
+  "calldata": ["0x1", "0x2"],
+  "max_fee": "0x859",
+  "signature": ["0x1", "0x2"],
+  "nonce": "0xD",
+  "type": "INVOKE",
+  "version": "0x3",
+  "transaction_hash": "0x111",
+  "resource_bounds": {
+    "l1_gas": {
+      "max_amount": "0x300",
+      "max_price_per_unit": "0x2137"
+    },
+    "l2_gas": {
+      "max_amount": "0x0",
+      "max_price_per_unit": "0x0"
+    },
+    "l1_data_gas": {
+      "max_amount": "0x300",
+      "max_price_per_unit": "0x2137"
+    },
+  },
+  "tip": "0x0",
+  "paymaster_data": [],
+  "account_deployment_data": [],
+  "nonce_data_availability_mode": "L1",
+  "fee_data_availability_mode": "L1"
+}
 """
 
 let invokeTransactionV1 = """
-{"sender_address":"0x123","calldata":["0x1","0x2"],"max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"INVOKE","version":"0x1","transaction_hash":"0x111"}
+{
+  "sender_address": "0x123",
+  "calldata": ["0x1", "0x2"],
+  "max_fee": "0x859",
+  "signature": ["0x1", "0x2"],
+  "nonce": "0x0",
+  "type": "INVOKE",
+  "version": "0x1",
+  "transaction_hash": "0x111"
+}
 """
 
 let invokeTransactionV0 = """
-{"contract_address":"0x123","calldata":["0x1","0x2"],"entry_point_selector":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"type":"INVOKE","version":"0x0","transaction_hash":"0x111"}
+{
+  "contract_address": "0x123",
+  "calldata": ["0x1", "0x2"],
+  "entry_point_selector": "0x123",
+  "max_fee": "0x859",
+  "signature": ["0x1", "0x2"],
+  "type": "INVOKE",
+  "version": "0x0",
+  "transaction_hash": "0x111"
+}
 """
 
 let declareTransactinoV0 = """
-{"class_hash":"0x123","sender_address":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"type":"DECLARE","version":"0x0","transaction_hash":"0x111"}
+{
+  "class_hash": "0x123",
+  "sender_address": "0x123",
+  "max_fee": "0x859",
+  "signature": ["0x1", "0x2"],
+  "type": "DECLARE",
+  "version": "0x0",
+  "transaction_hash": "0x111"
+}
 """
 
 let declareTransactionV1 = """
-{"class_hash":"0x123","sender_address":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"DECLARE","version":"0x1","transaction_hash":"0x111"}
+{
+  "class_hash": "0x123",
+  "sender_address": "0x123",
+  "max_fee": "0x859",
+  "signature": ["0x1", "0x2"],
+  "nonce": "0x0",
+  "type": "DECLARE",
+  "version": "0x1",
+  "transaction_hash": "0x111"
+}
 """
 
 let declareTransactionV2 = """
-{"class_hash":"0x123","compiled_class_hash":"0x123","sender_address":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"DECLARE","version":"0x2","transaction_hash":"0x111"}
+{
+  "class_hash": "0x123",
+  "compiled_class_hash": "0x123",
+  "sender_address": "0x123",
+  "max_fee": "0x859",
+  "signature": ["0x1", "0x2"],
+  "nonce": "0x0",
+  "type": "DECLARE",
+  "version": "0x2",
+  "transaction_hash": "0x111"
+}
 """
 
 let declareTransactionV3 = """
-{"class_hash":"0x123","compiled_class_hash":"0x123","sender_address":"0x123","max_fee":"0x859","signature":["0x1","0x2"],"nonce":"0x0","type":"DECLARE","version":"0x3","transaction_hash":"0x111","resource_bounds":{"l1_gas":{"max_amount":"0x300","max_price_per_unit":"0x2137"},"l2_gas":{"max_amount":"0x0","max_price_per_unit":"0x0"}},"tip":"0x0","paymaster_data":[],"account_deployment_data":[],"nonce_data_availability_mode":"L1","fee_data_availability_mode":"L1"}
+{
+  "class_hash": "0x123",
+  "compiled_class_hash": "0x123",
+  "sender_address": "0x123",
+  "max_fee": "0x859",
+  "signature": ["0x1", "0x2"],
+  "nonce": "0x0",
+  "type": "DECLARE",
+  "version": "0x3",
+  "transaction_hash": "0x111",
+  "resource_bounds": {
+    "l1_gas": {
+      "max_amount": "0x300",
+      "max_price_per_unit": "0x2137"
+    },
+    "l2_gas": {
+      "max_amount": "0x0",
+      "max_price_per_unit": "0x0"
+    },
+    "l1_data_gas": {
+      "max_amount": "0x300",
+      "max_price_per_unit": "0x2137"
+    }
+  },
+  "tip": "0x0",
+  "paymaster_data": [],
+  "account_deployment_data": [],
+  "nonce_data_availability_mode": "L1",
+  "fee_data_availability_mode": "L1"
+}
 """
 
 let deployTransaction = """
-{"class_hash":"0x123","constructor_calldata":["0x1","0x2"],"contract_address_salt":"0x123","type":"DEPLOY","version":"0x0","transaction_hash":"0x111"}
+{
+  "class_hash": "0x123",
+  "constructor_calldata": ["0x1", "0x2"],
+  "contract_address_salt": "0x123",
+  "type": "DEPLOY",
+  "version": "0x0",
+  "transaction_hash": "0x111"
+}
 """
 
 let deployAccountTransactionV3 = """
-{"class_hash":"0x123","constructor_calldata":["0x1","0x2"],"contract_address_salt":"0x123","type":"DEPLOY_ACCOUNT","version":"0x3","max_fee":"0x123","nonce":"0x0","signature":["0x1","0x2"],"transaction_hash":"0x111", "resource_bounds":{"l1_gas":{"max_amount":"0x300","max_price_per_unit":"0x2137"},"l2_gas":{"max_amount":"0x0","max_price_per_unit":"0x0"}},"tip":"0x0","paymaster_data":[],"nonce_data_availability_mode":"L1","fee_data_availability_mode":"L1"}
+{
+  "class_hash": "0x123",
+  "constructor_calldata": ["0x1", "0x2"],
+  "contract_address_salt": "0x123",
+  "type": "DEPLOY_ACCOUNT",
+  "version": "0x3",
+  "max_fee": "0x123",
+  "nonce": "0x0",
+  "signature": ["0x1", "0x2"],
+  "transaction_hash": "0x111",
+  "resource_bounds": {
+    "l1_gas": {
+      "max_amount": "0x300",
+      "max_price_per_unit": "0x2137"
+    },
+    "l2_gas": {
+      "max_amount": "0x0",
+      "max_price_per_unit": "0x0"
+    },
+    "l1_data_gas": {
+      "max_amount": "0x300",
+      "max_price_per_unit": "0x2137"
+    },
+  },
+  "tip": "0x0",
+  "paymaster_data": [],
+  "nonce_data_availability_mode": "L1",
+  "fee_data_availability_mode": "L1"
+}
 """
 
 let deployAccountTransactionV1 = """
-{"class_hash":"0x123","constructor_calldata":["0x1","0x2"],"contract_address_salt":"0x123","type":"DEPLOY_ACCOUNT","version":"0x1","max_fee":"0x123","nonce":"0x0","signature":["0x1","0x2"],"transaction_hash":"0x111"}
+{
+  "class_hash": "0x123",
+  "constructor_calldata": ["0x1", "0x2"],
+  "contract_address_salt": "0x123",
+  "type": "DEPLOY_ACCOUNT",
+  "version": "0x1",
+  "max_fee": "0x123",
+  "nonce": "0x0",
+  "signature": ["0x1", "0x2"],
+  "transaction_hash": "0x111"
+}
 """
 
 let l1HandlerTransaction = """
-{"contract_address":"0x123","calldata":["0x1","0x2"],"entry_point_selector":"0x123","nonce":"0x123","type":"L1_HANDLER","version":"0x0","transaction_hash":"0x111"}
+{
+  "contract_address": "0x123",
+  "calldata": ["0x1", "0x2"],
+  "entry_point_selector": "0x123",
+  "nonce": "0x123",
+  "type": "L1_HANDLER",
+  "version": "0x0",
+  "transaction_hash": "0x111"
+}
 """
+
 
 final class TransactionTests: XCTestCase {
     func testInvokeTransactionEncoding() throws {
