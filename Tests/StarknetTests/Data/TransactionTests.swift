@@ -201,7 +201,6 @@ let l1HandlerTransaction = """
 }
 """
 
-
 final class TransactionTests: XCTestCase {
     func testInvokeTransactionEncoding() throws {
         let invoke = StarknetInvokeTransactionV1(senderAddress: "0x123", calldata: [1, 2], signature: [1, 2], maxFee: "0x859", nonce: 0)
