@@ -75,10 +75,9 @@ struct InvokeContractResult {
     let transactionHash: Felt
 }
 
-@available(macOS 15.0, *)
 struct PrefundPayload: Codable {
     let address: Felt
-    let amount: UInt128
+    let amount: UInt64
     let unit: StarknetPriceUnit
 }
 
