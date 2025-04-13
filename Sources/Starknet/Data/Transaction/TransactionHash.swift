@@ -55,19 +55,6 @@ public class StarknetTransactionHashCalculator {
         ]
     }
 
-    public class func computeHash(of transaction: StarknetInvokeTransactionV1, chainId: StarknetChainId) -> Felt {
-        computeCommonDeprecatedTransactionHash(
-            transactionType: transaction.type,
-            version: transaction.version,
-            contractAddress: transaction.senderAddress,
-            entryPointSelector: .zero,
-            calldata: transaction.calldata,
-            maxFee: transaction.maxFee,
-            chainId: chainId,
-            nonce: transaction.nonce
-        )
-    }
-
     public class func computeHash(of transaction: StarknetInvokeTransactionV3, chainId: StarknetChainId) -> Felt {
         let commonFields = StarknetTransactionHashCalculator.prepareCommonTransactionV3Fields(
             of: transaction,
@@ -79,27 +66,6 @@ public class StarknetTransactionHashCalculator {
                 StarknetPoseidon.poseidonHash(transaction.accountDeploymentData),
                 StarknetPoseidon.poseidonHash(transaction.calldata),
             ]
-        )
-    }
-
-    public class func computeHash(of transaction: StarknetDeployAccountTransactionV1, chainId: StarknetChainId) -> Felt {
-        let contractAddress = StarknetContractAddressCalculator.calculateFrom(
-            classHash: transaction.classHash,
-            calldata: transaction.constructorCalldata,
-            salt: transaction.contractAddressSalt
-        )
-
-        let calldata = [transaction.classHash, transaction.contractAddressSalt] + transaction.constructorCalldata
-
-        return computeCommonDeprecatedTransactionHash(
-            transactionType: transaction.type,
-            version: transaction.version,
-            contractAddress: contractAddress,
-            entryPointSelector: .zero,
-            calldata: calldata,
-            maxFee: transaction.maxFee,
-            chainId: chainId,
-            nonce: .zero
         )
     }
 

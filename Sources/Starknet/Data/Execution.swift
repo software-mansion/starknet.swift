@@ -85,40 +85,6 @@ public struct StarknetDeployAccountParamsV3 {
     }
 }
 
-public struct StarknetInvokeParamsV1 {
-    public let nonce: Felt
-    public let maxFee: Felt
-
-    public init(nonce: Felt, maxFee: Felt) {
-        self.nonce = nonce
-        self.maxFee = maxFee
-    }
-}
-
-public struct StarknetOptionalInvokeParamsV1 {
-    public let nonce: Felt?
-    public let maxFee: Felt?
-
-    public init(nonce: Felt? = nil, maxFee: Felt? = nil) {
-        self.nonce = nonce
-        self.maxFee = maxFee
-    }
-}
-
-public struct StarknetDeployAccountParamsV1 {
-    public let nonce: Felt
-    public let maxFee: Felt
-
-    public init(nonce: Felt, maxFee: Felt) {
-        self.nonce = nonce
-        self.maxFee = maxFee
-    }
-
-    public init(maxFee: Felt) {
-        self.init(nonce: .zero, maxFee: maxFee)
-    }
-}
-
 public func starknetCallsToExecuteCalldata(calls: [StarknetCall], cairoVersion: CairoVersion) -> [Felt] {
     switch cairoVersion {
     case .zero:
