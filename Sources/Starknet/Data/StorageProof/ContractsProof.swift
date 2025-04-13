@@ -20,10 +20,12 @@ public struct ContractsProof: Decodable, Equatable {
     public struct ContractLeafData: Decodable, Equatable {
         public let nonce: Felt
         public let classHash: Felt
+        public let storageRoot: Felt?
 
         enum CodingKeys: String, CodingKey {
             case nonce
             case classHash = "class_hash"
+            case storageRoot = "storage_root"
         }
     }
 }

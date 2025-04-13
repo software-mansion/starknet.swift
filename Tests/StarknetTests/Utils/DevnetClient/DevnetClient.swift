@@ -34,7 +34,7 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
+    func prefundAccount(address: Felt, amount: UInt64 = 10_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
@@ -290,12 +290,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let accountsResourcePath = URL(fileURLWithPath: accountsPath)
             let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
             try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
-
-            // FIXME:
-//            let _ = try await deployAccount(name: "__default__")
-
-            // // Initialize new accounts file
-            // let _ = try await createDeployAccount(name: "__default__")
         }
 
         public func close() {
@@ -396,7 +390,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func deployAccount(
             name: String,
-            classHash _: Felt = DevnetClientConstants.accountContractClassHash,
+            classHash: Felt = DevnetClientConstants.accountContractClassHash,
             prefund: Bool = true
         ) async throws -> DeployAccountResult {
             let details = try readAccountDetails(accountName: name)
@@ -529,7 +523,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             contractAddress: Felt,
             function: String,
             calldata: [Felt] = []
-//            accountName: String = "__default__"
         ) async throws -> InvokeContractResult {
             var params = [
                 "--contract-address",
@@ -549,7 +542,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let response = try runSnCast(
                 command: "invoke",
                 args: params
-//                accountName: accountName
             ) as! InvokeSnCastResponse
 
             return InvokeContractResult(transactionHash: response.transactionHash)
@@ -584,9 +576,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 command,
             ] + args
 
-            print("args")
-            print(process.arguments?.joined(separator: " "))
-
             var environment = ProcessInfo.processInfo.environment
             let existingPath = environment["PATH"] ?? ""
 
@@ -609,14 +598,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             var output = String(decoding: outputData, as: UTF8.self)
 
-            // TODO: remove this - pending sncast update
-            // As of sncast 0.40.0, "account create" currently outputs non-json data
-//            if let range = output.range(of: "{") {
-//                // Remove all characters before the first `{`
-//                output.removeSubrange(output.startIndex ..< range.lowerBound)
-//            } else {
-//                throw SnCastError.invalidResponseJson
-//            }
+            // Output from sncast sometimes include a few json objects
+            // Below adjustment ensures that we're retrieving only the last object
             if let range = output.lastIndex(of: "{") {
                 output.removeSubrange(output.startIndex ..< range)
             }
