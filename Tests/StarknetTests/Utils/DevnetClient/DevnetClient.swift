@@ -18,9 +18,9 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws
+    func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?) async throws -> DeployAccountResult
-    func createAccount(name: String, classHash: Felt, salt: Felt?) async throws -> CreateAccountResult
+    func createAccount(name: String, classHash: Felt, salt: Felt?, type: String) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, prefund: Bool) async throws -> DeployAccountResult
     func declareDeployContract(contractName: String, constructorCalldata: [Felt], salt: Felt?, unique: Bool) async throws -> DeclareDeployContractResult
     func declareContract(contractName: String) async throws -> DeclareContractResult
@@ -61,12 +61,14 @@ extension DevnetClientProtocol {
     func createAccount(
         name: String,
         classHash: Felt = DevnetClientConstants.accountContractClassHash,
-        salt: Felt? = .zero
+        salt: Felt? = .zero,
+        type: String? = "oz"
     ) async throws -> CreateAccountResult {
         try await createAccount(
             name: name,
             classHash: classHash,
-            salt: salt
+            salt: salt,
+            type: type
         )
     }
 
@@ -74,7 +76,8 @@ extension DevnetClientProtocol {
         try await createAccount(
             name: UUID().uuidString,
             classHash: DevnetClientConstants.accountContractClassHash,
-            salt: .zero
+            salt: .zero,
+            type: "oz"
         )
     }
 
@@ -359,7 +362,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
             salt: Felt? = nil,
-            type: String
+            type: String  = "oz"
         ) async throws -> CreateAccountResult {
             var params = [
                 "create",
@@ -525,8 +528,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
         public func invokeContract(
             contractAddress: Felt,
             function: String,
-            calldata: [Felt] = [],
-            accountName: String = "__default__"
+            calldata: [Felt] = []
+//            accountName: String = "__default__"
         ) async throws -> InvokeContractResult {
             var params = [
                 "--contract-address",
@@ -545,8 +548,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             let response = try runSnCast(
                 command: "invoke",
-                args: params,
-                accountName: accountName
+                args: params
+//                accountName: accountName
             ) as! InvokeSnCastResponse
 
             return InvokeContractResult(transactionHash: response.transactionHash)
@@ -581,6 +584,9 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 command,
             ] + args
 
+            print("args")
+            print(process.arguments?.joined(separator: " "))
+            
             var environment = ProcessInfo.processInfo.environment
             let existingPath = environment["PATH"] ?? ""
 
@@ -605,15 +611,15 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             // TODO: remove this - pending sncast update
             // As of sncast 0.40.0, "account create" currently outputs non-json data
-            if let range = output.range(of: "{") {
-                // Remove all characters before the first `{`
-                output.removeSubrange(output.startIndex ..< range.lowerBound)
-            } else {
-                throw SnCastError.invalidResponseJson
-            }
-//            if let range = output.lastIndex(of: "{") {
-//                output.removeSubrange(output.startIndex ..< range)
+//            if let range = output.range(of: "{") {
+//                // Remove all characters before the first `{`
+//                output.removeSubrange(output.startIndex ..< range.lowerBound)
+//            } else {
+//                throw SnCastError.invalidResponseJson
 //            }
+            if let range = output.lastIndex(of: "{") {
+                output.removeSubrange(output.startIndex ..< range)
+            }
 
             let outputDataTrimmed = output.data(using: .utf8)!
             let result = try JSONDecoder().decode(SnCastResponseWrapper.self, from: outputDataTrimmed)
