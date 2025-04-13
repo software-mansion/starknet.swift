@@ -442,14 +442,17 @@ final class ProviderTests: XCTestCase {
     }
 
     func testBatchGetTransactionByHash() async throws {
-        let previousResult = try await provider.send(request: RequestBuilder.getTransactionBy(blockId: .tag(.latest), index: 0))
+        let contract = try await Self.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+        let transactionHash = try await Self.devnetClient.invokeContract(contractAddress: contract.deploy.contractAddress, function: "increase_balance", calldata: [2137]).transactionHash
+
+        let invokeTx = try await provider.send(request: RequestBuilder.getTransactionBy(hash: transactionHash))
 
         let transactionsResponse = try await provider.send(requests:
-            RequestBuilder.getTransactionBy(hash: previousResult.transaction.hash!),
+            RequestBuilder.getTransactionBy(hash: invokeTx.transaction.hash!),
             RequestBuilder.getTransactionBy(hash: "0x123"))
 
         XCTAssertEqual(transactionsResponse.count, 2)
-        XCTAssertEqual(try transactionsResponse[0].get().transaction.hash, previousResult.transaction.hash)
+        XCTAssertEqual(try transactionsResponse[0].get().transaction.hash, invokeTx.transaction.hash!)
 
         do {
             let _ = try transactionsResponse[1].get().transaction.hash
