@@ -45,21 +45,6 @@ final class AccountTests: XCTestCase {
         let _ = try await account.getNonce()
     }
 
-    func testExecuteV1() async throws {
-        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
-
-        let calldata: [Felt] = [
-            recipientAddress,
-            1000,
-            0,
-        ]
-
-        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
-
-        let result = try await provider.send(request: account.executeV1(call: call))
-
-        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
-    }
 
     func testExecuteV3() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
@@ -77,18 +62,6 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
-    func testExecuteV1FeeMultiplier() async throws {
-        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
-
-        let calldata: [Felt] = [recipientAddress, 1000, 0]
-        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
-
-        let result = try await provider.send(request: account.executeV1(call: call, estimateFeeMultiplier: 1.8))
-        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
-
-        let result2 = try await provider.send(request: account.executeV1(call: call, estimateFeeMultiplier: 0.9))
-        try await Self.devnetClient.assertTransactionFailed(transactionHash: result2.transactionHash)
-    }
 
     func testExecuteV3FeeMultipliers() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
@@ -101,28 +74,6 @@ final class AccountTests: XCTestCase {
 
         let result2 = try await provider.send(request: account.executeV3(call: call, estimateAmountMultiplier: 0.9, estimateUnitPriceMultiplier: 1.0))
         try await Self.devnetClient.assertTransactionFailed(transactionHash: result2.transactionHash)
-    }
-
-    func testExecuteV1CustomParams() async throws {
-        let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
-
-        let calldata: [Felt] = [
-            recipientAddress,
-            1000,
-            0,
-        ]
-
-        let call = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata)
-
-        let nonce = try await provider.send(request: account.getNonce())
-        let feeEstimate = try await provider.send(request: account.estimateFeeV1(call: call, nonce: nonce))[0]
-        let maxFee = feeEstimate.toMaxFee()
-
-        let params = StarknetOptionalInvokeParamsV1(nonce: nonce, maxFee: maxFee)
-
-        let result = try await provider.send(request: account.executeV1(call: call, params: params))
-
-        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
     func testExecuteV3CustomParams() async throws {
@@ -147,7 +98,7 @@ final class AccountTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
     }
 
-    func testExecuteV1MultipleCalls() async throws {
+    func testExecuteV3MultipleCalls() async throws {
         let recipientAddress = AccountTests.devnetClient.constants.predeployedAccount2.address
 
         let calldata1: [Felt] = [
@@ -165,35 +116,9 @@ final class AccountTests: XCTestCase {
         let call1 = StarknetCall(contractAddress: ethContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata1)
         let call2 = StarknetCall(contractAddress: AccountTests.devnetClient.constants.ethErc20ContractAddress, entrypoint: starknetSelector(from: "transfer"), calldata: calldata2)
 
-        let result = try await provider.send(request: account.executeV1(calls: [call1, call2]))
+        let result = try await provider.send(request: account.executeV3(calls: [call1, call2]))
 
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: result.transactionHash)
-    }
-
-    func testDeployAccountV1() async throws {
-        let newSigner = StarkCurveSigner(privateKey: 1234)!
-        let newPublicKey = newSigner.publicKey
-        let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
-        let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
-
-        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
-
-        let nonce = await (try? provider.send(request: newAccount.getNonce())) ?? .zero
-
-        let feeEstimate = try await provider.send(request: newAccount.estimateDeployAccountFeeV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, nonce: nonce, skipValidate: false))[0]
-        let maxFee = feeEstimate.toMaxFee()
-
-        let params = StarknetDeployAccountParamsV1(nonce: nonce, maxFee: maxFee)
-
-        let deployAccountTransaction = try newAccount.signDeployAccountV1(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero, params: params, forFeeEstimation: false)
-
-        let response = try await provider.send(request: RequestBuilder.addDeployAccountTransaction(deployAccountTransaction))
-
-        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: response.transactionHash)
-
-        let newNonce = try await provider.send(request: newAccount.getNonce())
-
-        XCTAssertEqual(newNonce.value - nonce.value, Felt.one.value)
     }
 
     func testDeployAccountV3() async throws {
