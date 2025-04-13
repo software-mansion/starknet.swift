@@ -140,7 +140,13 @@ final class ProviderTests: XCTestCase {
 
         try await ProviderTests.devnetClient.assertTransactionSucceeded(transactionHash: invokeResult.transactionHash)
 
-        let filter = StarknetGetEventsFilter(address: contract.deploy.contractAddress, keys: [["0x477e157efde59c5531277ede78acb3e03ef69508c6c35fde3495aa0671d227"]])
+        let filter = StarknetGetEventsFilter(
+            fromBlockId: StarknetBlockId.number(0),
+            toBlockId: StarknetBlockId.tag(.latest),
+            address: contract.deploy.contractAddress,
+            keys: [["0x477e157efde59c5531277ede78acb3e03ef69508c6c35fde3495aa0671d227"]],
+            chunkSize: 10
+        )
         let result = try await provider.send(request: RequestBuilder.getEvents(filter: filter))
 
         XCTAssertFalse(result.events.isEmpty)
