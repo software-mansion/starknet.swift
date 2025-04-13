@@ -2,6 +2,7 @@ import BigInt
 import Foundation
 @testable import Starknet
 
+@available(macOS 15.0, *)
 protocol DevnetClientProtocol {
     var rpcUrl: String { get }
     var mintUrl: String { get }
@@ -18,7 +19,7 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws
+    func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?, type: String) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, prefund: Bool) async throws -> DeployAccountResult
@@ -33,8 +34,9 @@ protocol DevnetClientProtocol {
     func isTransactionSuccessful(transactionHash: Felt) async throws -> Bool
 }
 
+@available(macOS 15.0, *)
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt64 = 5_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
+    func prefundAccount(address: Felt, amount: UInt128 = 9_000_000_000_000_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
@@ -136,6 +138,7 @@ extension DevnetClientProtocol {
 
 // Due to DevnetClient being albe to run only on a macos, this
 // factory method will throw, when ran on any other platform.
+@available(macOS 15.0, *)
 func makeDevnetClient() -> DevnetClientProtocol {
     #if os(macOS)
         return DevnetClient()
@@ -146,6 +149,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
 #if os(macOS)
 
+    @available(macOS 15.0, *)
     class DevnetClient: DevnetClientProtocol {
         private var devnetProcess: Process?
 
@@ -291,7 +295,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
             try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
 
-            // FIXME:
 //            let _ = try await deployAccount(name: "__default__")
 
             // // Initialize new accounts file
@@ -313,7 +316,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws {
+        public func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!
@@ -321,14 +324,22 @@ func makeDevnetClient() -> DevnetClientProtocol {
             request.httpMethod = "POST"
 
             let payload = PrefundPayload(address: address, amount: amount, unit: unit)
+            print(payload)
             request.httpBody = try JSONEncoder().encode(payload)
 
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
 
             var response: URLResponse?
+            var data: Data?
             do {
-                (_, response) = try await URLSession.shared.data(for: request)
+                (data, response) = try await URLSession.shared.data(for: request)
+                if let data, let content = String(data: data, encoding: .utf8) {
+                    print("📦 Body content:\n\(content)")
+                } else {
+                    print("⚠️ Could not decode response data")
+                }
+
             } catch {
                 throw DevnetClientError.prefundError
             }
@@ -346,11 +357,15 @@ func makeDevnetClient() -> DevnetClientProtocol {
             salt: Felt? = nil
         ) async throws -> DeployAccountResult {
             try guardDevnetIsRunning()
+            print("AAA")
 
-            let createResult = try await createAccount(name: name, salt: salt)
+            let createResult = try await createAccount(name: name, classHash: classHash, salt: salt)
+            print("createresult", createResult)
             let details = createResult.details
             try await prefundAccount(address: details.address)
+            print("prefunded")
             let deployResult = try await deployAccount(name: name, classHash: classHash)
+            print("deployed", deployResult)
 
             return DeployAccountResult(
                 details: details,
@@ -609,14 +624,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             var output = String(decoding: outputData, as: UTF8.self)
 
-            // TODO: remove this - pending sncast update
-            // As of sncast 0.40.0, "account create" currently outputs non-json data
-//            if let range = output.range(of: "{") {
-//                // Remove all characters before the first `{`
-//                output.removeSubrange(output.startIndex ..< range.lowerBound)
-//            } else {
-//                throw SnCastError.invalidResponseJson
-//            }
+            // Output from sncast sometimes include a few json objects
+            // Below adjustment ensures that we're retrieving only the last object
             if let range = output.lastIndex(of: "{") {
                 output.removeSubrange(output.startIndex ..< range)
             }
