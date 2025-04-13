@@ -34,7 +34,7 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt64 = 9_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
+    func prefundAccount(address: Felt, amount: UInt64 = 10_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
@@ -216,8 +216,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "\(seed)",
                 "--state-archive-capacity",
                 "full",
-                "--initial-balance",
-                "1000000000000000000000000000000000000000000000000000000000000000000",
             ]
             devnetProcess.launchPath = devnetPath
             devnetProcess.standardInput = nil
@@ -290,11 +288,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let accountsResourcePath = URL(fileURLWithPath: accountsPath)
             let newAccountsPath = URL(fileURLWithPath: "\(self.tmpPath)/starknet_open_zeppelin_accounts.json")
             try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
-
-//            let _ = try await deployAccount(name: "__default__")
-
-            // // Initialize new accounts file
-            // let _ = try await createDeployAccount(name: "__default__")
         }
 
         public func close() {
@@ -320,22 +313,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             request.httpMethod = "POST"
 
             let payload = PrefundPayload(address: address, amount: amount, unit: unit)
-            print(payload)
             request.httpBody = try JSONEncoder().encode(payload)
 
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
 
             var response: URLResponse?
-            var data: Data?
             do {
-                (data, response) = try await URLSession.shared.data(for: request)
-                if let data, let content = String(data: data, encoding: .utf8) {
-                    print("📦 Body content:\n\(content)")
-                } else {
-                    print("⚠️ Could not decode response data")
-                }
-
+                (_, response) = try await URLSession.shared.data(for: request)
             } catch {
                 throw DevnetClientError.prefundError
             }
@@ -536,7 +521,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             contractAddress: Felt,
             function: String,
             calldata: [Felt] = []
-//            accountName: String = "__default__"
         ) async throws -> InvokeContractResult {
             var params = [
                 "--contract-address",
@@ -556,7 +540,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let response = try runSnCast(
                 command: "invoke",
                 args: params
-//                accountName: accountName
             ) as! InvokeSnCastResponse
 
             return InvokeContractResult(transactionHash: response.transactionHash)
@@ -590,9 +573,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 accountName,
                 command,
             ] + args
-
-            print("args")
-            print(process.arguments?.joined(separator: " "))
 
             var environment = ProcessInfo.processInfo.environment
             let existingPath = environment["PATH"] ?? ""
