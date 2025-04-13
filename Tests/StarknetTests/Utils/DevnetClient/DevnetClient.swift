@@ -216,6 +216,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "\(seed)",
                 "--state-archive-capacity",
                 "full",
+                "--initial-balance",
+                "1000000000000000000000000000000000000000000000000000000000000000000",
             ]
             devnetProcess.launchPath = devnetPath
             devnetProcess.standardInput = nil
