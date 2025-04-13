@@ -48,7 +48,7 @@ final class MerkleNodeTests: XCTestCase {
 
         let node = try decoder.decode(MerkleNode.self, from: json)
         if case let .edgeNode(edgeNode) = node {
-            XCTAssertEqual(edgeNode.path, 123)
+            XCTAssertEqual(edgeNode.path, 291)
             XCTAssertEqual(edgeNode.length, 456)
             XCTAssertEqual(edgeNode.child, Felt("0x789"))
         } else {
