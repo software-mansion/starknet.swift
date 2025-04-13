@@ -362,7 +362,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
             salt: Felt? = nil,
-            type: String  = "oz"
+            type: String = "oz"
         ) async throws -> CreateAccountResult {
             var params = [
                 "create",
@@ -570,7 +570,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let errorPipe = Pipe()
             process.standardOutput = outputPipe
             process.standardError = errorPipe
-            
+
             // TODO: migrate to URLs everywhere - path fields are marked as deprecated
             process.launchPath = snCastPath
             process.currentDirectoryPath = contractsPath!
@@ -586,7 +586,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             print("args")
             print(process.arguments?.joined(separator: " "))
-            
+
             var environment = ProcessInfo.processInfo.environment
             let existingPath = environment["PATH"] ?? ""
 
@@ -598,14 +598,14 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.standardInput = nil
             process.launch()
             process.waitUntilExit()
-            
+
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let error = String(decoding: errorData, as: UTF8.self)
 
                 throw SnCastError.snCastError(error)
             }
-            
+
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             var output = String(decoding: outputData, as: UTF8.self)
 
