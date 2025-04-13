@@ -18,7 +18,7 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws
+    func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?, type: String) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, prefund: Bool) async throws -> DeployAccountResult
