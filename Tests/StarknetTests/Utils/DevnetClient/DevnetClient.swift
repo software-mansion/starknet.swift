@@ -390,7 +390,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         public func deployAccount(
             name: String,
-            classHash: Felt = DevnetClientConstants.accountContractClassHash,
+            classHash _: Felt = DevnetClientConstants.accountContractClassHash,
             prefund: Bool = true
         ) async throws -> DeployAccountResult {
             let details = try readAccountDetails(accountName: name)
