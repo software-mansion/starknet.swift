@@ -567,6 +567,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let errorPipe = Pipe()
             process.standardOutput = outputPipe
             process.standardError = errorPipe
+            
             // TODO: migrate to URLs everywhere - path fields are marked as deprecated
             process.launchPath = snCastPath
             process.currentDirectoryPath = contractsPath!
@@ -591,26 +592,28 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.standardInput = nil
             process.launch()
             process.waitUntilExit()
+            
             guard process.terminationStatus == 0 else {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let error = String(decoding: errorData, as: UTF8.self)
 
                 throw SnCastError.snCastError(error)
             }
+            
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             var output = String(decoding: outputData, as: UTF8.self)
 
             // TODO: remove this - pending sncast update
             // As of sncast 0.40.0, "account create" currently outputs non-json data
-//            if let range = output.range(of: "{") {
-//                // Remove all characters before the first `{`
-//                output.removeSubrange(output.startIndex ..< range.lowerBound)
-//            } else {
-//                throw SnCastError.invalidResponseJson
-//            }
-            if let range = output.lastIndex(of: "{") {
-                output.removeSubrange(output.startIndex ..< range)
+            if let range = output.range(of: "{") {
+                // Remove all characters before the first `{`
+                output.removeSubrange(output.startIndex ..< range.lowerBound)
+            } else {
+                throw SnCastError.invalidResponseJson
             }
+//            if let range = output.lastIndex(of: "{") {
+//                output.removeSubrange(output.startIndex ..< range)
+//            }
 
             let outputDataTrimmed = output.data(using: .utf8)!
             let result = try JSONDecoder().decode(SnCastResponseWrapper.self, from: outputDataTrimmed)
