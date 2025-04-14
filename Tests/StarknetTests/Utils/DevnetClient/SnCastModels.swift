@@ -6,11 +6,9 @@ struct AccountDeploySnCastResponse: SnCastResponse {
     let command: SnCastCommand = .accountDeploy
     let error: String? = nil
     let transactionHash: Felt
-    let contractAddress: Felt
 
     enum CodingKeys: String, CodingKey {
         case transactionHash = "transaction_hash"
-        case contractAddress = "contract_address"
     }
 }
 

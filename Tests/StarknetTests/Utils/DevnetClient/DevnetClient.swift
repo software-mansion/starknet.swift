@@ -2,6 +2,7 @@ import BigInt
 import Foundation
 @testable import Starknet
 
+@available(macOS 15.0, *)
 protocol DevnetClientProtocol {
     var rpcUrl: String { get }
     var mintUrl: String { get }
@@ -18,7 +19,7 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws
+    func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?, type: String) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, prefund: Bool) async throws -> DeployAccountResult
@@ -33,8 +34,9 @@ protocol DevnetClientProtocol {
     func isTransactionSuccessful(transactionHash: Felt) async throws -> Bool
 }
 
+@available(macOS 15.0, *)
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt64 = 10_000_000_000_000_000_000, unit: StarknetPriceUnit = .wei) async throws {
+    func prefundAccount(address: Felt, amount: UInt128 = 10_000_000_000_000_000_000_000_000, unit: StarknetPriceUnit = .fri) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
@@ -55,20 +57,6 @@ extension DevnetClientProtocol {
             name: UUID().uuidString,
             classHash: DevnetClientConstants.accountContractClassHash,
             salt: .zero
-        )
-    }
-
-    func createAccount(
-        name: String,
-        classHash: Felt = DevnetClientConstants.accountContractClassHash,
-        salt: Felt? = .zero,
-        type: String? = "oz"
-    ) async throws -> CreateAccountResult {
-        try await createAccount(
-            name: name,
-            classHash: classHash,
-            salt: salt,
-            type: type
         )
     }
 
@@ -136,6 +124,7 @@ extension DevnetClientProtocol {
 
 // Due to DevnetClient being albe to run only on a macos, this
 // factory method will throw, when ran on any other platform.
+@available(macOS 15.0, *)
 func makeDevnetClient() -> DevnetClientProtocol {
     #if os(macOS)
         return DevnetClient()
@@ -146,6 +135,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
 #if os(macOS)
 
+    @available(macOS 15.0, *)
     class DevnetClient: DevnetClientProtocol {
         private var devnetProcess: Process?
 
@@ -307,7 +297,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt, amount: UInt64, unit: StarknetPriceUnit) async throws {
+        public func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!
