@@ -77,7 +77,7 @@ jobs:
         with:
           scarb-version: "0.7.0"
 
-      # TODO(#539)
+      # TODO(#226)
       - name: Fetch latest asdf version from GitHub releases
         id: asdf_version
         run: |

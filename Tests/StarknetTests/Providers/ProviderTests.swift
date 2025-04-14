@@ -2,6 +2,7 @@ import XCTest
 
 @testable import Starknet
 
+@available(macOS 15.0, *)
 final class ProviderTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
@@ -178,12 +179,12 @@ final class ProviderTests: XCTestCase {
         XCTAssertTrue(result.transaction.type == .invoke)
     }
 
-//    func testGetDeployAccountTransactionByHash() async throws {
-//        let account = try await ProviderTests.devnetClient.deployAccount(name: "provider_test")
-//
-//        let result = try await provider.send(request: RequestBuilder.getTransactionBy(hash: account.transactionHash))
-//        XCTAssertTrue(result.transaction.type == .deployAccount)
-//    }
+    func testGetDeployAccountTransactionByHash() async throws {
+        let account = try await ProviderTests.devnetClient.createDeployAccount()
+
+        let result = try await provider.send(request: RequestBuilder.getTransactionBy(hash: account.transactionHash))
+        XCTAssertTrue(result.transaction.type == .deployAccount)
+    }
 
     func testGetDeclareTransactionByHash() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
@@ -209,12 +210,12 @@ final class ProviderTests: XCTestCase {
         XCTAssertTrue(result.transactionReceipt.isSuccessful)
     }
 
-//    func testGetDeployAccountTransactionReceipt() async throws {
-//        let account = try await ProviderTests.devnetClient.deployAccount(name: "provider_test")
-//
-//        let result = try await provider.send(request: RequestBuilder.getTransactionReceiptBy(hash: account.transactionHash))
-//        XCTAssertTrue(result.transactionReceipt.isSuccessful)
-//    }
+    func testGetDeployAccountTransactionReceipt() async throws {
+        let account = try await ProviderTests.devnetClient.createDeployAccount()
+
+        let result = try await provider.send(request: RequestBuilder.getTransactionReceiptBy(hash: account.transactionHash))
+        XCTAssertTrue(result.transactionReceipt.isSuccessful)
+    }
 
     func testGetDeclareTransactionReceipt() async throws {
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
