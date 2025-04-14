@@ -16,21 +16,6 @@ final class DevnetClientTests: XCTestCase {
 
     // TODO: (#130) re-enable once creating accounts is supported again
     func disabledTestCreateDeployAccount() async throws {
-        let resourceBounds = StarknetResourceBoundsMapping(
-            l1Gas: StarknetResourceBounds(
-                maxAmount: 100_000,
-                maxPricePerUnit: 10_000_000_000_000
-            ),
-            l2Gas: StarknetResourceBounds(
-                maxAmount: 1_000_000_000,
-                maxPricePerUnit: 100_000_000_000_000_000
-            ),
-            l1DataGas: StarknetResourceBounds(
-                maxAmount: 100_000,
-                maxPricePerUnit: 10_000_000_000_000
-            )
-        )
-
         let account = try await client.createDeployAccount(name: "Account1")
         try await client.assertTransactionSucceeded(transactionHash: account.transactionHash)
 
