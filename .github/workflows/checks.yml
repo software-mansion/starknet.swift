@@ -13,10 +13,10 @@ jobs:
       DEVNET_SHA: fc5a2753a2eedcc27eed7a4fae3ecac08c2ca1b4
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Xcode 15.3
+      - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
         with:
-          xcode-version: 15.3
+          xcode-version: '16.2.0'
       - name: Cache/Restore Mint packages
         id: mint-cache
         uses: actions/cache@v4
