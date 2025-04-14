@@ -8,7 +8,7 @@ env:
 
 jobs:
   test_and_lint:
-    runs-on: macos-14
+    runs-on: macos-15
     env:
       DEVNET_SHA: fc5a2753a2eedcc27eed7a4fae3ecac08c2ca1b4
     steps:
