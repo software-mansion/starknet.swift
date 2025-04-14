@@ -177,7 +177,7 @@ final class AccountTests: XCTestCase {
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountContractClassHash, calldata: [newPublicKey], salt: .zero)
         let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
 
-        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress, unit: .wei)
 
         let nonce = await (try? provider.send(request: newAccount.getNonce())) ?? .zero
 
