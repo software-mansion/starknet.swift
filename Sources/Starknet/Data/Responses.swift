@@ -9,13 +9,13 @@ public struct StarknetInvokeTransactionResponse: Decodable, Equatable {
 }
 
 public struct StarknetFeeEstimate: Decodable, Equatable {
-    public let l1GasConsumed: Felt
-    public let l1GasPrice: Felt
-    public let l2GasConsumed: Felt
-    public let l2GasPrice: Felt
-    public let l1DataGasConsumed: Felt
-    public let l1DataGasPrice: Felt
-    public let overallFee: Felt
+    public let l1GasConsumed: UInt64AsHex
+    public let l1GasPrice: UInt128AsHex
+    public let l2GasConsumed: UInt64AsHex
+    public let l2GasPrice: UInt128AsHex
+    public let l1DataGasConsumed: UInt64AsHex
+    public let l1DataGasPrice: UInt128AsHex
+    public let overallFee: UInt128AsHex
     public let feeUnit: StarknetPriceUnit
 
     enum CodingKeys: String, CodingKey {
@@ -29,7 +29,7 @@ public struct StarknetFeeEstimate: Decodable, Equatable {
         case feeUnit = "unit"
     }
 
-    public init(l1GasConsumed: Felt, l1GasPrice: Felt, l2GasConsumed: Felt, l2GasPrice: Felt, l1DataGasConsumed: Felt, l1DataGasPrice: Felt, overallFee: Felt, feeUnit: StarknetPriceUnit) {
+    public init(l1GasConsumed: UInt64AsHex, l1GasPrice: UInt128AsHex, l2GasConsumed: UInt64AsHex, l2GasPrice: UInt128AsHex, l1DataGasConsumed: UInt64AsHex, l1DataGasPrice: UInt128AsHex, overallFee: UInt128AsHex, feeUnit: StarknetPriceUnit) {
         self.l1GasConsumed = l1GasConsumed
         self.l1GasPrice = l1GasPrice
         self.l2GasConsumed = l2GasConsumed
@@ -40,14 +40,14 @@ public struct StarknetFeeEstimate: Decodable, Equatable {
         self.feeUnit = feeUnit
     }
 
-    public init?(l1GasConsumed: Felt, l1GasPrice: Felt, l2GasConsumed: Felt, l2GasPrice: Felt, l1DataGasConsumed: Felt, l1DataGasPrice: Felt, feeUnit: StarknetPriceUnit) {
+    public init?(l1GasConsumed: UInt64AsHex, l1GasPrice: UInt128AsHex, l2GasConsumed: UInt64AsHex, l2GasPrice: UInt128AsHex, l1DataGasConsumed: UInt64AsHex, l1DataGasPrice: UInt128AsHex, feeUnit: StarknetPriceUnit) {
         self.l1GasConsumed = l1GasConsumed
         self.l1GasPrice = l1GasPrice
         self.l2GasConsumed = l2GasConsumed
         self.l2GasPrice = l2GasPrice
         self.l1DataGasConsumed = l1DataGasConsumed
         self.l1DataGasPrice = l1DataGasPrice
-        self.overallFee = Felt(l1GasPrice.value * l1GasConsumed.value + l2GasPrice.value * l2GasConsumed.value + l1DataGasPrice.value * l1DataGasConsumed.value)!
+        self.overallFee = UInt128AsHex(l1GasPrice.value * l1GasConsumed.value + l2GasPrice.value * l2GasConsumed.value + l1DataGasPrice.value * l1DataGasConsumed.value)!
         self.feeUnit = feeUnit
     }
 }
