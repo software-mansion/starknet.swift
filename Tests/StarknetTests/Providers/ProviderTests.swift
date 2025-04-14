@@ -327,11 +327,11 @@ final class ProviderTests: XCTestCase {
             message,
             at: StarknetBlockId.tag(.pending)
         ))
-        XCTAssertNotEqual(Felt.zero, feeEstimate.l1GasPrice)
-        XCTAssertNotEqual(Felt.zero, feeEstimate.l2GasPrice)
-        XCTAssertNotEqual(Felt.zero, feeEstimate.l1DataGasPrice)
-        XCTAssertNotEqual(Felt.zero.value, feeEstimate.l1GasConsumed.value + feeEstimate.l2GasConsumed.value + feeEstimate.l1DataGasConsumed.value)
-        XCTAssertNotEqual(Felt.zero, feeEstimate.overallFee)
+        XCTAssertNotEqual(UInt128AsHex.zero, feeEstimate.l1GasPrice)
+        XCTAssertNotEqual(UInt128AsHex.zero, feeEstimate.l2GasPrice)
+        XCTAssertNotEqual(UInt128AsHex.zero, feeEstimate.l1DataGasPrice)
+        XCTAssertNotEqual(UInt64AsHex.zero.value, feeEstimate.l1GasConsumed.value + feeEstimate.l2GasConsumed.value + feeEstimate.l1DataGasConsumed.value)
+        XCTAssertNotEqual(UInt128AsHex.zero, feeEstimate.overallFee)
         XCTAssertEqual(feeEstimate.l1GasPrice.value * feeEstimate.l1GasConsumed.value + feeEstimate.l2GasPrice.value * feeEstimate.l2GasConsumed.value + feeEstimate.l1DataGasPrice.value * feeEstimate.l1DataGasConsumed.value, feeEstimate.overallFee.value)
     }
 
