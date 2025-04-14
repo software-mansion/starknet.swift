@@ -351,7 +351,7 @@ final class ProviderTests: XCTestCase {
         let newAccountAddress = StarknetContractAddressCalculator.calculateFrom(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero)
         let newAccount = StarknetAccount(address: newAccountAddress, signer: newSigner, provider: provider, chainId: chainId, cairoVersion: .zero)
 
-        try await Self.devnetClient.prefundAccount(address: newAccountAddress)
+        try await Self.devnetClient.prefundAccount(address: newAccountAddress, unit: .wei)
 
         let newAccountParams = StarknetDeployAccountParamsV1(nonce: .zero, maxFee: 500_000_000_000_000)
         let deployAccountTx = try newAccount.signDeployAccountV1(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
