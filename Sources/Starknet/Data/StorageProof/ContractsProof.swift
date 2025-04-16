@@ -1,4 +1,4 @@
-public struct ContractsProof: Decodable, Equatable {
+public struct StarknetContractsProof: Decodable, Equatable {
     public let nodes: NodeHashToNodeMapping
     public let contractLeavesData: [ContractLeafData]
 
@@ -7,7 +7,7 @@ public struct ContractsProof: Decodable, Equatable {
         case contractLeavesData = "contract_leaves_data"
     }
 
-    public struct ContractLeafData: Decodable, Equatable {
+    public struct StarknetContractLeafData: Decodable, Equatable {
         public let nonce: Felt
         public let classHash: Felt
         public let storageRoot: Felt?

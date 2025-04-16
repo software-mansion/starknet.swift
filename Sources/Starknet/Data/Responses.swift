@@ -84,9 +84,9 @@ public struct StarknetGetEventsResponse: Decodable, Equatable {
 
 public struct StarknetGetStorageProofResponse: Decodable, Equatable {
     public let classesProof: NodeHashToNodeMapping
-    public let contractsProof: ContractsProof
+    public let contractsProof: StarknetContractsProof
     public let contractsStorageProofs: [NodeHashToNodeMapping]
-    public let globalRoots: GlobalRoots
+    public let globalRoots: StarknetGlobalRoots
 
     enum CodingKeys: String, CodingKey {
         case classesProof = "classes_proof"

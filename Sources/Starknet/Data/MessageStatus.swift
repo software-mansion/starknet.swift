@@ -1,4 +1,4 @@
-public struct MessageStatus: Decodable, Equatable {
+public struct StarknetMessageStatus: Decodable, Equatable {
     public let transactionHash: Felt
     public let finalityStatus: StarknetTransactionStatus
     public let failureReason: String?

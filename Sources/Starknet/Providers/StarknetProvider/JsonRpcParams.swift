@@ -111,7 +111,7 @@ struct GetStorageProofParams: Encodable {
     let blockId: StarknetBlockId
     let classHashes: [Felt]?
     let contractAddresses: [Felt]?
-    let contractsStorageKeys: [ContractsStorageKeys]?
+    let contractsStorageKeys: [StarknetContractsStorageKeys]?
 
     enum CodingKeys: String, CodingKey {
         case blockId = "block_id"
@@ -156,10 +156,10 @@ struct GetTransactionStatusPayload: Encodable {
 }
 
 struct GetMessagesStatusPayload: Encodable {
-    let l1TransactionHash: NumAsHex
+    let transactionHash: NumAsHex
 
     enum CodingKeys: String, CodingKey {
-        case l1TransactionHash = "l1_transaction_hash"
+        case transactionHash = "transaction_hash"
     }
 }
 

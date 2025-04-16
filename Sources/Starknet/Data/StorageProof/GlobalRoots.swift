@@ -1,4 +1,4 @@
-public struct GlobalRoots: Decodable, Equatable {
+public struct StarknetGlobalRoots: Decodable, Equatable {
     public let contractsTreeRoot: Felt
     public let classesTreeRoot: Felt
     public let blockHash: Felt
