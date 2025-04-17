@@ -1,5 +1,5 @@
 public struct StarknetContractsProof: Decodable, Equatable {
-    public let nodes: NodeHashToNodeMapping
+    public let nodes: StarknetNodeHashToNodeMapping
     public let contractLeavesData: [StarknetContractLeafData]
 
     enum CodingKeys: String, CodingKey {
