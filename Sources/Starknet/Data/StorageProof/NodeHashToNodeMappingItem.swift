@@ -1,6 +1,6 @@
-public typealias NodeHashToNodeMapping = [Starknet NodeHashToNodeMappingItem]
+public typealias NodeHashToNodeMapping = [StarknetNodeHashToNodeMappingItem]
 
-public struct Starknet NodeHashToNodeMappingItem: Decodable, Equatable {
+public struct StarknetNodeHashToNodeMappingItem: Decodable, Equatable {
     public let nodeHash: Felt
     public let node: StarknetMerkleNode
 

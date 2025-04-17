@@ -1,6 +1,6 @@
 public struct StarknetContractsProof: Decodable, Equatable {
     public let nodes: NodeHashToNodeMapping
-    public let contractLeavesData: [ContractLeafData]
+    public let contractLeavesData: [StarknetContractLeafData]
 
     enum CodingKeys: String, CodingKey {
         case nodes

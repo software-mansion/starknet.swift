@@ -139,7 +139,7 @@ struct GetTransactionByBlockIdAndIndex: Encodable {
     }
 }
 
-struct GetTransactionReceiptPayload: Encodable {
+struct GetTransactionReceiptParams: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -147,7 +147,7 @@ struct GetTransactionReceiptPayload: Encodable {
     }
 }
 
-struct GetTransactionStatusPayload: Encodable {
+struct GetTransactionStatusParams: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -155,7 +155,7 @@ struct GetTransactionStatusPayload: Encodable {
     }
 }
 
-struct GetMessagesStatusPayload: Encodable {
+struct GetMessagesStatusParams: Encodable {
     let transactionHash: NumAsHex
 
     enum CodingKeys: String, CodingKey {
@@ -199,9 +199,9 @@ enum JsonRpcParams {
     case getStorageProof(GetStorageProofParams)
     case getTransactionByHash(GetTransactionByHashParams)
     case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
-    case getTransactionReceipt(GetTransactionReceiptPayload)
-    case getTransactionStatus(GetTransactionStatusPayload)
-    case getMessagesStatus(GetMessagesStatusPayload)
+    case getTransactionReceipt(GetTransactionReceiptParams)
+    case getTransactionStatus(GetTransactionStatusParams)
+    case getMessagesStatus(GetMessagesStatusParams)
     case simulateTransactions(SimulateTransactionsParams)
 }
 

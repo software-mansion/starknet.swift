@@ -488,7 +488,7 @@ final class ProviderTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        let response = try decoder.decode(JsonRpcResponse<[MessageStatus]>.self, from: json)
+        let response = try decoder.decode(JsonRpcResponse<[StarknetMessageStatus]>.self, from: json)
         let result = response.result
 
         XCTAssertEqual(result?.count, 2)
