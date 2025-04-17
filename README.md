@@ -60,14 +60,12 @@ You will need to set some environment variables:
 - `DEVNET_PATH` - points to `starknet-devnet-rs` cli
 - `SCARB_PATH` - points to `scarb` cli. 
 - `SNCAST_PATH` - points to `sncast` cli.
-- `UNIVERSAL_SIERRA_COMPILER` - points to `universal-sierra-compiler` cli.
 
 You can set them in XCode scheme or by running these commands:
 ```bash
 export DEVNET_PATH="$(which starknet-devnet)"
 export SCARB_PATH="$(which scarb)"
 export SNCAST_PATH="$(which sncast)"
-export UNIVERSAL_SIERRA_COMPILER="$(which universal-sierra-compiler)"
 ```
 This assumes you already have the following tools installed:
 - [`starknet-devnet-rs`](https://github.com/0xSpaceShard/starknet-devnet) 
