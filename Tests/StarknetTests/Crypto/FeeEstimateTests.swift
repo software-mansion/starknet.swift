@@ -60,7 +60,7 @@ final class FeeEstimateTests: XCTestCase {
     }
 
     func testEstimateFeeToResourceBoundsWithNeutralMultiplier() {
-        let resourceBounds = feeEstimate?.toResourceBounds(amountMultiplier: -1, unitPriceMultiplier: -1)
+        let resourceBounds = feeEstimate?.toResourceBounds(amountMultiplier: 1, unitPriceMultiplier: 1)
 
         let expected = StarknetResourceBoundsMapping(
             l1Gas: StarknetResourceBounds(maxAmount: 10, maxPricePerUnit: 200),
