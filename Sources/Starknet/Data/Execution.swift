@@ -33,6 +33,7 @@ public struct StarknetInvokeParamsV3 {
     public let feeDataAvailabilityMode: StarknetDAMode
 
     public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping) {
+        // As of Starknet 0.13, most of v3 fields have hardcoded values.
         self.nonce = nonce
         self.resourceBounds = resourceBounds
         self.tip = .zero

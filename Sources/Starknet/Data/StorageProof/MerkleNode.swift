@@ -1,16 +1,16 @@
 import Foundation
 
-public enum MerkleNode: Codable, Equatable {
-    case binaryNode(BinaryNode)
-    case edgeNode(EdgeNode)
+public enum StarknetMerkleNode: Codable, Equatable {
+    case binaryNode(StarknetBinaryNode)
+    case edgeNode(StarknetEdgeNode)
 
     public init(from decoder: Decoder) throws {
-        if let binaryNode = try? BinaryNode(from: decoder) {
+        if let binaryNode = try? StarknetBinaryNode(from: decoder) {
             self = .binaryNode(binaryNode)
-        } else if let edgeNode = try? EdgeNode(from: decoder) {
+        } else if let edgeNode = try? StarknetEdgeNode(from: decoder) {
             self = .edgeNode(edgeNode)
         } else {
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Failed to decode MerkleNode."))
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Failed to decode StarknetMerkleNode."))
         }
     }
 
@@ -26,7 +26,7 @@ public enum MerkleNode: Codable, Equatable {
     }
 }
 
-public struct BinaryNode: Codable, Equatable {
+public struct StarknetBinaryNode: Codable, Equatable {
     let left: Felt
     let right: Felt
 
@@ -36,7 +36,7 @@ public struct BinaryNode: Codable, Equatable {
     }
 }
 
-public struct EdgeNode: Codable, Equatable {
+public struct StarknetEdgeNode: Codable, Equatable {
     let path: NumAsHex
     let length: Int
     let child: Felt

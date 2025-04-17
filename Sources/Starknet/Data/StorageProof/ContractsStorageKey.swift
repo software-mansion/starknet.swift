@@ -1,4 +1,4 @@
-public struct ContractsStorageKeys: Encodable {
+public struct StarknetContractsStorageKeys: Encodable {
     let contractAddress: Felt
     let storageKeys: [Felt]
 

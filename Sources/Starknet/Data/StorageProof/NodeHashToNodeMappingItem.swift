@@ -1,15 +1,11 @@
-public typealias NodeHashToNodeMapping = [NodeHashToNodeMappingItem]
+public typealias NodeHashToNodeMapping = [StarknetNodeHashToNodeMappingItem]
 
-public struct NodeHashToNodeMappingItem: Decodable, Equatable {
+public struct StarknetNodeHashToNodeMappingItem: Decodable, Equatable {
     public let nodeHash: Felt
-    public let node: MerkleNode
+    public let node: StarknetMerkleNode
 
     enum CodingKeys: String, CodingKey {
         case nodeHash = "node_hash"
         case node
-    }
-
-    public static func == (lhs: NodeHashToNodeMappingItem, rhs: NodeHashToNodeMappingItem) -> Bool {
-        lhs.nodeHash == rhs.nodeHash && lhs.node == rhs.node
     }
 }

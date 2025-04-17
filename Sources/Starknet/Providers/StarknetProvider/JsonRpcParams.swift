@@ -111,12 +111,12 @@ struct GetStorageProofParams: Encodable {
     let blockId: StarknetBlockId
     let classHashes: [Felt]?
     let contractAddresses: [Felt]?
-    let contractsStorageKeys: [ContractsStorageKeys]?
+    let contractsStorageKeys: [StarknetContractsStorageKeys]?
 
     enum CodingKeys: String, CodingKey {
-        case blockId = "block_id"
-        case classHashes = "class_hashes"
         case contractAddresses = "contract_addresses"
+        case classHashes = "class_hashes"
+        case blockId = "block_id"
         case contractsStorageKeys = "contracts_storage_keys"
     }
 }
@@ -139,7 +139,7 @@ struct GetTransactionByBlockIdAndIndex: Encodable {
     }
 }
 
-struct GetTransactionReceiptPayload: Encodable {
+struct GetTransactionReceiptParams: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -147,7 +147,7 @@ struct GetTransactionReceiptPayload: Encodable {
     }
 }
 
-struct GetTransactionStatusPayload: Encodable {
+struct GetTransactionStatusParams: Encodable {
     let transactionHash: Felt
 
     enum CodingKeys: String, CodingKey {
@@ -155,11 +155,11 @@ struct GetTransactionStatusPayload: Encodable {
     }
 }
 
-struct GetMessagesStatusPayload: Encodable {
-    let l1TransactionHash: NumAsHex
+struct GetMessagesStatusParams: Encodable {
+    let transactionHash: NumAsHex
 
     enum CodingKeys: String, CodingKey {
-        case l1TransactionHash = "l1_transaction_hash"
+        case transactionHash = "transaction_hash"
     }
 }
 
@@ -199,9 +199,9 @@ enum JsonRpcParams {
     case getStorageProof(GetStorageProofParams)
     case getTransactionByHash(GetTransactionByHashParams)
     case getTransactionByBlockIdAndIndex(GetTransactionByBlockIdAndIndex)
-    case getTransactionReceipt(GetTransactionReceiptPayload)
-    case getTransactionStatus(GetTransactionStatusPayload)
-    case getMessagesStatus(GetMessagesStatusPayload)
+    case getTransactionReceipt(GetTransactionReceiptParams)
+    case getTransactionStatus(GetTransactionStatusParams)
+    case getMessagesStatus(GetMessagesStatusParams)
     case simulateTransactions(SimulateTransactionsParams)
 }
 

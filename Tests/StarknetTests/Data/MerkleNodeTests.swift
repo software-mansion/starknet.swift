@@ -2,8 +2,8 @@ import XCTest
 
 @testable import Starknet
 
-final class MerkleNodeTests: XCTestCase {
-    func testBinaryNode() throws {
+final class StarknetMerkleNodeTests: XCTestCase {
+    func testStarknetBinaryNode() throws {
         let json = """
         {
             "left": "0x123",
@@ -13,7 +13,7 @@ final class MerkleNodeTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        let node = try decoder.decode(MerkleNode.self, from: json)
+        let node = try decoder.decode(StarknetMerkleNode.self, from: json)
 
         if case let .binaryNode(binaryNode) = node {
             XCTAssertEqual(binaryNode.left, Felt(0x123))
@@ -23,7 +23,7 @@ final class MerkleNodeTests: XCTestCase {
         }
     }
 
-    func testInvalidBinaryNode() throws {
+    func testInvalidStarknetBinaryNode() throws {
         let json = """
         {
             "left": "0x123"
@@ -32,10 +32,10 @@ final class MerkleNodeTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        XCTAssertThrowsError(try decoder.decode(MerkleNode.self, from: json))
+        XCTAssertThrowsError(try decoder.decode(StarknetMerkleNode.self, from: json))
     }
 
-    func testEdgeNode() throws {
+    func testStarknetEdgeNode() throws {
         let json = """
         {
             "path": "0x123",
@@ -46,7 +46,7 @@ final class MerkleNodeTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        let node = try decoder.decode(MerkleNode.self, from: json)
+        let node = try decoder.decode(StarknetMerkleNode.self, from: json)
         if case let .edgeNode(edgeNode) = node {
             XCTAssertEqual(edgeNode.path, 291)
             XCTAssertEqual(edgeNode.length, 456)
@@ -56,7 +56,7 @@ final class MerkleNodeTests: XCTestCase {
         }
     }
 
-    func testInvalidEdgeNode() throws {
+    func testInvalidStarknetEdgeNode() throws {
         let json = """
         {
             "path": "0x123",
@@ -66,7 +66,7 @@ final class MerkleNodeTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        XCTAssertThrowsError(try decoder.decode(MerkleNode.self, from: json))
+        XCTAssertThrowsError(try decoder.decode(StarknetMerkleNode.self, from: json))
     }
 
     func testInvalidNodeWithMixedKeys() throws {
@@ -80,6 +80,6 @@ final class MerkleNodeTests: XCTestCase {
 
         let decoder = JSONDecoder()
 
-        XCTAssertThrowsError(try decoder.decode(MerkleNode.self, from: json))
+        XCTAssertThrowsError(try decoder.decode(StarknetMerkleNode.self, from: json))
     }
 }

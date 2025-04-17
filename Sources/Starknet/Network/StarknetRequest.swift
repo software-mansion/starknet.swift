@@ -140,7 +140,7 @@ public enum RequestBuilder {
         return StarknetRequest(method: .getEvents, params: .getEvents(params))
     }
 
-    public static func getStorageProof(blockId: StarknetBlockId, classHashes: [Felt]?, contractAddresses: [Felt]?, contractsStorageKeys: [ContractsStorageKeys]?) -> StarknetRequest<StarknetGetStorageProofResponse> {
+    public static func getStorageProof(blockId: StarknetBlockId, classHashes: [Felt]?, contractAddresses: [Felt]?, contractsStorageKeys: [StarknetContractsStorageKeys]?) -> StarknetRequest<StarknetGetStorageProofResponse> {
         let params = GetStorageProofParams(blockId: blockId, classHashes: classHashes, contractAddresses: contractAddresses, contractsStorageKeys: contractsStorageKeys)
 
         return StarknetRequest(method: .getStorageProof, params: .getStorageProof(params))
@@ -178,7 +178,7 @@ public enum RequestBuilder {
     ///
     /// - Returns: receipt of a transaction identified by given hash
     public static func getTransactionReceiptBy(hash: Felt) -> StarknetRequest<TransactionReceiptWrapper> {
-        let params = GetTransactionReceiptPayload(transactionHash: hash)
+        let params = GetTransactionReceiptParams(transactionHash: hash)
 
         return StarknetRequest(method: .getTransactionReceipt, params: .getTransactionReceipt(params))
     }
@@ -190,7 +190,7 @@ public enum RequestBuilder {
     ///
     /// - Returns: The status(es) of a transaction
     public static func getTransactionStatusBy(hash: Felt) -> StarknetRequest<StarknetGetTransactionStatusResponse> {
-        let params = GetTransactionStatusPayload(transactionHash: hash)
+        let params = GetTransactionStatusParams(transactionHash: hash)
 
         return StarknetRequest(method: .getTransactionStatus, params: .getTransactionStatus(params))
     }
@@ -198,11 +198,11 @@ public enum RequestBuilder {
     /// Get L1 handler transaction data for all L1 → L2 messages sent by the given L1 transaction.
     ///
     /// - Parameters:
-    ///  - l1TransactionHash: The hash of the L1 transaction
+    ///  - transactionHash: The hash of the L1 transaction
     ///
     /// - Returns: The status of the messages
-    public static func getMessagesStatus(l1TransactionHash: NumAsHex) -> StarknetRequest<[MessageStatus]> {
-        let params = GetMessagesStatusPayload(l1TransactionHash: l1TransactionHash)
+    public static func getMessagesStatus(transactionHash: NumAsHex) -> StarknetRequest<[StarknetMessageStatus]> {
+        let params = GetMessagesStatusParams(transactionHash: transactionHash)
 
         return StarknetRequest(method: .getMessagesStatus, params: .getMessagesStatus(params))
     }

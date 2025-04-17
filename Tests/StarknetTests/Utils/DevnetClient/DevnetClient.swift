@@ -588,7 +588,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             var output = String(decoding: outputData, as: UTF8.self)
 
-            // Output from sncast sometimes include a few json objects
+            // Output from sncast sometimes includes a few json objects
             // Below adjustment ensures that we're retrieving only the last object
             if let range = output.lastIndex(of: "{") {
                 output.removeSubrange(output.startIndex ..< range)

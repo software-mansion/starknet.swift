@@ -114,5 +114,4 @@ jobs:
           export DEVNET_PATH=${{ github.workspace }}/starknet-devnet-rs/target/release/starknet-devnet
           export SCARB_PATH="$(which scarb)"
           export SNCAST_PATH="$(which sncast)"
-          export UNIVERSAL_SIERRA_COMPILER="$(which universal-sierra-compiler)"
           swift test --disable-sandbox
