@@ -71,7 +71,6 @@ This assumes you already have the following tools installed:
 - [`starknet-devnet-rs`](https://github.com/0xSpaceShard/starknet-devnet) 
 - [`scarb`](https://github.com/software-mansion/scarb)
 - [`starknet-foundry`](https://github.com/foundry-rs/starknet-foundry) - provides `sncast` cli
-- [`universal-sierra-compiler`](https://github.com/software-mansion/universal-sierra-compiler) - provides `universal-sierra-compiler` cli
 
 ---
 
