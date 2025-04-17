@@ -47,14 +47,14 @@ final class TypedDataTests: XCTestCase {
     static let exampleDomainV0 = """
     {
         "name": "DomainV0",
-        "version": 1,
+        "version": "1",
         "chainId": 2137,
     }
     """
     static let exampleDomainV1 = """
     {
         "name": "DomainV1",
-        "version": 2,
+        "version": "2",
         "chainId": "2137",
         "revision": 1
     }

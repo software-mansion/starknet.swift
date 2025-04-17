@@ -395,7 +395,7 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 public extension StarknetTypedData {
     struct Domain: Codable, Equatable, Hashable {
         public let name: Element
-        public let version: Element
+        public let version: String
         public let chainId: Element
         public let revision: Revision
 
@@ -409,7 +409,7 @@ public extension StarknetTypedData {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             self.name = try container.decode(Element.self, forKey: .name)
-            self.version = try container.decode(Element.self, forKey: .version)
+            self.version = try container.decode(String.self, forKey: .version)
             self.chainId = try container.decode(Element.self, forKey: .chainId)
             self.revision = try container.decodeIfPresent(Revision.self, forKey: .revision) ?? .v0
         }
@@ -478,6 +478,28 @@ public extension StarknetTypedData {
         }
 
         public func encode(to encoder: Encoder) throws {
+            if let currentKey = encoder.codingPath.last?.stringValue,
+               currentKey == "version"
+            {
+                print("XXX", currentKey)
+                switch self {
+                case let .string(s):
+                    print("aa")
+                    try s.encode(to: encoder)
+                case let .felt(felt), let .signedFelt(felt):
+                    let hexString: String = "\(felt.toShortString())"
+                    print("hex string", type(of: hexString))
+                    var container = encoder.singleValueContainer()
+                    try container.encode(hexString)
+                default:
+                    print("dd")
+
+                    let s = "\(self)"
+                    try s.encode(to: encoder)
+                }
+                return
+            }
+
             switch self {
             case let .string(string):
                 try string.encode(to: encoder)
