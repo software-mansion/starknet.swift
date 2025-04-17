@@ -478,28 +478,6 @@ public extension StarknetTypedData {
         }
 
         public func encode(to encoder: Encoder) throws {
-            if let currentKey = encoder.codingPath.last?.stringValue,
-               currentKey == "version"
-            {
-                print("XXX", currentKey)
-                switch self {
-                case let .string(s):
-                    print("aa")
-                    try s.encode(to: encoder)
-                case let .felt(felt), let .signedFelt(felt):
-                    let hexString: String = "\(felt.toShortString())"
-                    print("hex string", type(of: hexString))
-                    var container = encoder.singleValueContainer()
-                    try container.encode(hexString)
-                default:
-                    print("dd")
-
-                    let s = "\(self)"
-                    try s.encode(to: encoder)
-                }
-                return
-            }
-
             switch self {
             case let .string(string):
                 try string.encode(to: encoder)
