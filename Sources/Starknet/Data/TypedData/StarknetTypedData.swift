@@ -518,21 +518,6 @@ public extension StarknetTypedData {
     }
 }
 
-extension StarknetTypedData.Element {
-    func toString() throws -> String {
-        switch self {
-        case let .string(s): return s
-        case let .decimal(n): return String(n)
-        case let .signedDecimal(n): return String(n)
-        case let .felt(f): return f.toHex()
-        case let .signedFelt(f): return f.toHex()
-        case let .bool(b): return String(b)
-        default:
-            throw StarknetTypedDataError.encodingError
-        }
-    }
-}
-
 extension StarknetTypedData {
     struct Context: Equatable {
         let parent: String
