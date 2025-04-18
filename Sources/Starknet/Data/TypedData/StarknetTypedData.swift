@@ -737,6 +737,29 @@ extension StarknetTypedData {
     }
 }
 
+extension StarknetTypedData.Element: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case let .string(s):
+            s
+        case let .decimal(n):
+            String(n)
+        case let .signedDecimal(n):
+            String(n)
+        case let .felt(f):
+            f.toHex()
+        case let .signedFelt(f):
+            f.toHex()
+        case let .bool(b):
+            String(b)
+        case .object:
+            String(describing: self)
+        case .array:
+            String(describing: self)
+        }
+    }
+}
+
 private extension String {
     func strippingPointer() -> String {
         if self.isArray() {
