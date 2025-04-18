@@ -305,7 +305,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             // TODO(#209): Once we can use UInt128, we can simply set
             // body as `request.httpBody = try JSONEncoder().encode(payload)`
-            // Below adjustment is needed to remove quotes from the amount field
+            // Following adjustment is needed to remove quotes from the amount field
             // in the JSON body, because ATM we can't use UInt128 in the payload.
 
             let data = try JSONEncoder().encode(payload)
