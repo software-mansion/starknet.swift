@@ -741,17 +741,17 @@ extension StarknetTypedData.Element: CustomStringConvertible {
     public var description: String {
         switch self {
         case let .string(s):
-            s
+            String(describing: self)
         case let .decimal(n):
-            String(n)
+            String(describing: self)
         case let .signedDecimal(n):
-            String(n)
+            String(describing: self)
         case let .felt(f):
             f.toHex()
         case let .signedFelt(f):
             f.toHex()
         case let .bool(b):
-            String(b)
+            String(describing: self)
         case .object:
             String(describing: self)
         case .array:
