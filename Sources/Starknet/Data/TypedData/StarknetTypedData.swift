@@ -424,10 +424,7 @@ public extension StarknetTypedData {
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(name, forKey: .name)
-
-            let versionString = try version.toString()
-            try container.encode(versionString, forKey: .version)
-
+            try container.encode(String(describing: version), forKey: .version)
             try container.encode(chainId, forKey: .chainId)
             try container.encode(revision, forKey: .revision)
         }
