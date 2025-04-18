@@ -4,29 +4,6 @@ public class StarknetTransactionHashCalculator {
     private static let l1GasPrefix = Felt.fromShortString("L1_GAS")!
     private static let l2GasPrefix = Felt.fromShortString("L2_GAS")!
     private static let l1DataGasPrefix = Felt.fromShortString("L1_DATA")!
-
-    private class func computeCommonDeprecatedTransactionHash(
-        transactionType: StarknetTransactionType,
-        version: StarknetTransactionVersion,
-        contractAddress: Felt,
-        entryPointSelector: Felt,
-        calldata: StarknetCalldata,
-        maxFee: Felt,
-        chainId: StarknetChainId,
-        nonce: Felt
-    ) -> Felt {
-        StarknetCurve.pedersenOn(
-            transactionType.encodedValue,
-            version.value,
-            contractAddress,
-            entryPointSelector,
-            StarknetCurve.pedersenOn(calldata),
-            maxFee,
-            chainId.value,
-            nonce
-        )
-    }
-
     private class func prepareCommonTransactionV3Fields(of transaction: any StarknetTransactionV3, address: Felt, chainId: StarknetChainId) -> [Felt] {
         let transactionType = transaction.type
         let version = transaction.version
