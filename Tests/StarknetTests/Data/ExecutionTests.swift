@@ -2,7 +2,6 @@ import XCTest
 
 @testable import Starknet
 
-@available(macOS 15.0, *)
 final class ExecutionTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 

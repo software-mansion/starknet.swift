@@ -2,7 +2,6 @@ import BigInt
 import Foundation
 @testable import Starknet
 
-@available(macOS 15.0, *)
 protocol DevnetClientProtocol {
     var rpcUrl: String { get }
     var mintUrl: String { get }
@@ -19,7 +18,7 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws
+    func prefundAccount(address: Felt, amount: UInt128AsHex, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?, type: String) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, prefund: Bool) async throws -> DeployAccountResult
@@ -34,9 +33,8 @@ protocol DevnetClientProtocol {
     func isTransactionSuccessful(transactionHash: Felt) async throws -> Bool
 }
 
-@available(macOS 15.0, *)
 extension DevnetClientProtocol {
-    func prefundAccount(address: Felt, amount: UInt128 = 10_000_000_000_000_000_000_000_000, unit: StarknetPriceUnit = .fri) async throws {
+    func prefundAccount(address: Felt, amount: UInt128AsHex = UInt128AsHex(fromHex: "0x84595161401484A000000")!, unit: StarknetPriceUnit = .fri) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
@@ -124,7 +122,6 @@ extension DevnetClientProtocol {
 
 // Due to DevnetClient being albe to run only on a macos, this
 // factory method will throw, when ran on any other platform.
-@available(macOS 15.0, *)
 func makeDevnetClient() -> DevnetClientProtocol {
     #if os(macOS)
         return DevnetClient()
@@ -135,7 +132,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
 #if os(macOS)
 
-    @available(macOS 15.0, *)
     class DevnetClient: DevnetClientProtocol {
         private var devnetProcess: Process?
 
@@ -297,7 +293,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt, amount: UInt128, unit: StarknetPriceUnit) async throws {
+        public func prefundAccount(address: Felt, amount: UInt128AsHex, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!
@@ -305,7 +301,25 @@ func makeDevnetClient() -> DevnetClientProtocol {
             request.httpMethod = "POST"
 
             let payload = PrefundPayload(address: address, amount: amount, unit: unit)
-            request.httpBody = try JSONEncoder().encode(payload)
+
+            // TODO(#209): Once we can use UInt128, we can simply set
+            // body as `request.httpBody = try JSONEncoder().encode(payload)`
+            // Below adjustment is needed to remove quotes from the amount field
+            // in the JSON body, because ATM we can't use UInt128 in the payload.
+
+            let data = try JSONEncoder().encode(payload)
+
+            guard var json = String(data: data, encoding: .utf8) else {
+                throw DevnetClientError.prefundError
+            }
+
+            json = json.replacingOccurrences(
+                of: #"("amount"\s*:\s*)"([^"]*)""#,
+                with: "$1$2",
+                options: .regularExpression
+            )
+
+            request.httpBody = Data(json.utf8)
 
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
