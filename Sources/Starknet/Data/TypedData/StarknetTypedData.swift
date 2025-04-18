@@ -395,9 +395,16 @@ public struct StarknetTypedData: Codable, Equatable, Hashable {
 public extension StarknetTypedData {
     struct Domain: Codable, Equatable, Hashable {
         public let name: Element
-        public let version: String
+        public let version: Element
         public let chainId: Element
         public let revision: Revision
+
+        fileprivate enum CodingKeys: CodingKey {
+            case name
+            case version
+            case chainId
+            case revision
+        }
 
         public var separatorName: String {
             switch revision {
@@ -409,9 +416,20 @@ public extension StarknetTypedData {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             self.name = try container.decode(Element.self, forKey: .name)
-            self.version = try container.decode(String.self, forKey: .version)
+            self.version = try container.decode(Element.self, forKey: .version)
             self.chainId = try container.decode(Element.self, forKey: .chainId)
             self.revision = try container.decodeIfPresent(Revision.self, forKey: .revision) ?? .v0
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(name, forKey: .name)
+
+            let versionString = try version.toString()
+            try container.encode(versionString, forKey: .version)
+
+            try container.encode(chainId, forKey: .chainId)
+            try container.encode(revision, forKey: .revision)
         }
     }
 
@@ -496,6 +514,21 @@ public extension StarknetTypedData {
             case let .bool(bool):
                 try bool.encode(to: encoder)
             }
+        }
+    }
+}
+
+extension StarknetTypedData.Element {
+    func toString() throws -> String {
+        switch self {
+        case let .string(s): return s
+        case let .decimal(n): return String(n)
+        case let .signedDecimal(n): return String(n)
+        case let .felt(f): return f.toHex()
+        case let .signedFelt(f): return f.toHex()
+        case let .bool(b): return String(b)
+        default:
+            throw StarknetTypedDataError.encodingError
         }
     }
 }
