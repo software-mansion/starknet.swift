@@ -34,6 +34,7 @@ protocol DevnetClientProtocol {
 }
 
 extension DevnetClientProtocol {
+    // 0x84595161401484A000000 = 10_000_000_000_000_000_000_000_000
     func prefundAccount(address: Felt, amount: UInt128AsHex = UInt128AsHex(fromHex: "0x84595161401484A000000")!, unit: StarknetPriceUnit = .fri) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
