@@ -12,8 +12,8 @@ enum DevnetClientConstants {
     static let udcContractAddress: Felt = "0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf"
     // Source: starknet-devnet-rs cli
     // Only for seed 1_053_545_547
-    static let predeployedAccount1: AccountDetails = .init(privateKey: "0xa2ed22bb0cb0b49c69f6d6a8d24bc5ea", publicKey: "0x198e98e771ebb5da7f4f05658a80a3d6be2213dc5096d055cbbefa62901ab06", address: "0x1323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b", salt: 20)
-    static let predeployedAccount2: AccountDetails = .init(privateKey: "0xc1c7db92d22ef773de96f8bde8e56c85", publicKey: "0x26df62f8e61920575f9c9391ed5f08397cfcfd2ade02d47781a4a8836c091fd", address: "0x34864aab9f693157f88f2213ffdaa7303a46bbea92b702416a648c3d0e42f35", salt: 20)
+    static let predeployedAccount1: AccountDetails = .init(privateKey: "0x0000000000000000000000000000000069bbdd410db5a6f817e5fae1bf3191b3", publicKey: "0x00d576e1ba0ffd7963507ddfd08b5fd967046fd5eafca4a668d73c60b17ebb6d", address: "0x00a97c3906ca442b26b68f9b510ee15c4a6994764de828a1b5dc04fe7f717063", salt: 20)
+    static let predeployedAccount2: AccountDetails = .init(privateKey: "0x0000000000000000000000000000000088ca21b05b8765f9654c171f65b2327c", publicKey: "0x07693c6c6672c19d2d3a20dbec30758d40ac1ea3e536defedc68764ba8234ed0", address: "0x051ff12b24abce0508e5dfde92be06aade5c59fcae29dd11c6076a6cced3c434", salt: 20)
 }
 
 struct AccountDetails: Codable {
@@ -54,7 +54,6 @@ struct DeployAccountResult {
 struct CreateAccountResult {
     let name: String
     let details: AccountDetails
-    let maxFee: Felt
 }
 
 struct DeclareContractResult {
@@ -76,9 +75,10 @@ struct InvokeContractResult {
     let transactionHash: Felt
 }
 
+@available(macOS 15.0, *)
 struct PrefundPayload: Codable {
     let address: Felt
-    let amount: UInt64
+    let amount: UInt128
     let unit: StarknetPriceUnit
 }
 

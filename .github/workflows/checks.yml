@@ -3,20 +3,23 @@ name: Checks
 on:
   pull_request:
 
+env:
+  GH_TOKEN: ${{ github.token }}
+
 jobs:
   test_and_lint:
-    runs-on: macos-14
+    runs-on: macos-15
     env:
-      DEVNET_SHA: 47ee2a73c227ee356f344ce94e5f61871299be80
+      DEVNET_SHA: fc5a2753a2eedcc27eed7a4fae3ecac08c2ca1b4
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Xcode 15.3
+      - uses: actions/checkout@v4
+      - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
         with:
-          xcode-version: 15.3
+          xcode-version: '16.2.0'
       - name: Cache/Restore Mint packages
         id: mint-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/mint
           key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
@@ -53,7 +56,7 @@ jobs:
           popd
 
       - name: Cache devnet build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: starknet-devnet-rs/target/release
           key: ${{ runner.os }}-starknet-devnet-rs-target-release-${{ env.DEVNET_SHA }}
@@ -74,14 +77,33 @@ jobs:
         with:
           scarb-version: "0.7.0"
 
-      - name: Setup asdf
-        uses: asdf-vm/actions/setup@v2
+      # TODO(#226)
+      - name: Fetch latest asdf version from GitHub releases
+        id: asdf_version
+        run: |
+          latest_version=$(curl -sS --fail -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/asdf-vm/asdf/releases/latest | grep \"tag_name\": | awk '{print $2}' | tr -d 'v",')
+          echo "Latest asdf version found is $latest_version"
+          echo "LATEST=$latest_version" >> $GITHUB_ENV
 
-      - name: Install sncast 0.6.0
+      - name: Setup asdf
+        run: |
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            ASDF_PLATFORM="linux-amd64"
+          else
+            ASDF_PLATFORM="darwin-arm64"
+          fi
+          mkdir -p "$HOME/.local/bin"
+          DOWNLOAD_URL="https://github.com/asdf-vm/asdf/releases/download/v${LATEST}/asdf-v${LATEST}-${ASDF_PLATFORM}.tar.gz"
+          echo "Downloading asdf from $DOWNLOAD_URL"
+          curl -fsSL "$DOWNLOAD_URL" | tar xzf - -C "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "${ASDF_DATA_DIR:-$HOME/.asdf}/shims" >> $GITHUB_PATH
+
+      - name: Install starknet-foundry
         run: |
           asdf plugin add starknet-foundry
-          asdf install starknet-foundry 0.6.0
-          asdf global starknet-foundry 0.6.0
+          asdf install starknet-foundry 0.40.0
+          asdf set starknet-foundry 0.40.0 --home
 
       - name: Check Cairo contracts formatting
         working-directory: ./Tests/StarknetTests/Resources/Contracts/src

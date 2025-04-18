@@ -32,10 +32,10 @@ public struct StarknetInvokeParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt, l1ResourceBounds: StarknetResourceBounds) {
-        self.nonce = nonce
+    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping) {
         // As of Starknet 0.13, most of v3 fields have hardcoded values.
-        self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
+        self.nonce = nonce
+        self.resourceBounds = resourceBounds
         self.tip = .zero
         self.paymasterData = []
         self.accountDeploymentData = []
@@ -53,10 +53,9 @@ public struct StarknetOptionalInvokeParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt? = nil, l1ResourceBounds: StarknetResourceBounds? = nil) {
+    public init(nonce: Felt? = nil, resourceBounds: StarknetResourceBoundsMapping? = nil) {
         self.nonce = nonce
-        // As of Starknet 0.13, most of v3 fields have hardcoded values.
-        self.resourceBounds = l1ResourceBounds.map(StarknetResourceBoundsMapping.init)
+        self.resourceBounds = resourceBounds
         self.tip = .zero
         self.paymasterData = []
         self.accountDeploymentData = []
@@ -73,18 +72,17 @@ public struct StarknetDeployAccountParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt, l1ResourceBounds: StarknetResourceBounds) {
+    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping) {
         self.nonce = nonce
-        // As of Starknet 0.13, most of v3 fields have hardcoded values.
-        self.resourceBounds = StarknetResourceBoundsMapping(l1Gas: l1ResourceBounds)
+        self.resourceBounds = resourceBounds
         self.tip = .zero
         self.paymasterData = []
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
     }
 
-    public init(l1ResourceBounds: StarknetResourceBounds) {
-        self.init(nonce: .zero, l1ResourceBounds: l1ResourceBounds)
+    public init(resourceBounds: StarknetResourceBoundsMapping) {
+        self.init(nonce: .zero, resourceBounds: resourceBounds)
     }
 }
 

@@ -48,8 +48,6 @@ enum SnCastResponseWrapper: Decodable {
             self = try .deploy(DeploySnCastResponse(from: decoder))
         case .invoke:
             self = try .invoke(InvokeSnCastResponse(from: decoder))
-        default:
-            throw SnCastError.invalidCommandType
         }
     }
 }

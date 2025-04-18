@@ -36,7 +36,7 @@ To install starknet devnet, please run:
 cargo install \
 --locked \
 --git https://github.com/0xSpaceShard/starknet-devnet-rs.git \
---rev fa1238e
+--rev fc5a275
 ```
 Run the demo app on ios simulator, to be able to access the local devnet instance.
 
@@ -68,9 +68,9 @@ export SCARB_PATH="$(which scarb)"
 export SNCAST_PATH="$(which sncast)"
 ```
 This assumes you already have the following tools installed:
-- [`starknet-devnet-rs`](https://github.com/0xSpaceShard/starknet-devnet-rs) 
+- [`starknet-devnet-rs`](https://github.com/0xSpaceShard/starknet-devnet) 
 - [`scarb`](https://github.com/software-mansion/scarb)
-- [`starknet-foundry`](https://github.com/foundry-rs/starknet-foundry) - provides `sncast` module
+- [`starknet-foundry`](https://github.com/foundry-rs/starknet-foundry) - provides `sncast` cli
 
 ---
 

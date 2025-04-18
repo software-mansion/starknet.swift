@@ -33,7 +33,8 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
     public let calls: [StarknetFunctionInvocation]
     public let events: [StarknetOrderedEvent]
     public let messages: [StarknetOrderedMessageToL1]
-    public let computationResources: StarknetComputationResources
+    public let executionResources: StarknetInnerCallExecutionResources
+    public let isReverted: Bool
 
     private enum CodingKeys: String, CodingKey {
         case contractAddress = "contract_address"
@@ -47,7 +48,8 @@ public struct StarknetFunctionInvocation: Decodable, Equatable {
         case calls
         case events
         case messages
-        case computationResources = "execution_resources"
+        case executionResources = "execution_resources"
+        case isReverted = "is_reverted"
     }
 }
 

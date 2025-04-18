@@ -216,11 +216,11 @@ public extension StarknetAccountProtocol {
     ///  - classHash: class hash of account to be deployed
     ///  - calldata: constructor calldata
     ///  - salt: contract salt
-    ///  - l1ResourceBounds: max acceptable l1 resource bounds
+    ///  - resourceBounds: max acceptable l1 and l2 resource bounds
     ///
     /// - Returns: Signed deploy account transaction v3
-    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, l1ResourceBounds: StarknetResourceBounds) throws -> StarknetDeployAccountTransactionV3 {
-        try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV3(nonce: .zero, l1ResourceBounds: l1ResourceBounds), forFeeEstimation: false)
+    func signDeployAccountV3(classHash: Felt, calldata: StarknetCalldata, salt: Felt, resourceBounds: StarknetResourceBoundsMapping) throws -> StarknetDeployAccountTransactionV3 {
+        try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV3(nonce: .zero, resourceBounds: resourceBounds), forFeeEstimation: false)
     }
 
     /// Sign a call as invoke transaction v1

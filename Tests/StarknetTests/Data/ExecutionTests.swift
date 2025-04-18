@@ -2,6 +2,7 @@ import XCTest
 
 @testable import Starknet
 
+@available(macOS 15.0, *)
 final class ExecutionTests: XCTestCase {
     static var devnetClient: DevnetClientProtocol!
 
@@ -22,7 +23,7 @@ final class ExecutionTests: XCTestCase {
         signer = StarkCurveSigner(privateKey: accountDetails.privateKey)!
         let chainId = try await provider.send(request: RequestBuilder.getChainId())
         account = StarknetAccount(address: accountDetails.address, signer: signer, provider: provider, chainId: chainId, cairoVersion: .one)
-        balanceContractAddress = try await Self.devnetClient.declareDeployContract(contractName: "Balance").deploy.contractAddress
+        balanceContractAddress = try await Self.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [100]).deploy.contractAddress
     }
 
     override class func setUp() {
