@@ -6,16 +6,6 @@ public protocol StarknetAccountProtocol {
     /// Chain id of the Starknet provider.
     var chainId: StarknetChainId { get }
 
-    /// Sign list of calls as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls to be signed
-    ///  - params: additional params for a given transaction
-    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
-    ///
-    /// - Returns: Signed invoke v1 transaction
-    func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV1
-
     /// Sign list of calls as invoke transaction v3
     ///
     /// - Parameters:
@@ -25,18 +15,6 @@ public protocol StarknetAccountProtocol {
     ///
     /// - Returns: Signed invoke v3 transaction
     func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3
-
-    /// Create and sign deploy account transaction v1
-    ///
-    /// - Parameters:
-    ///  - classHash: class hash of account to be deployed
-    ///  - calldata: constructor calldata
-    ///  - salt: contract salt
-    ///  - params: additional params for a given transaction
-    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
-    ///
-    /// - Returns: Signed deploy account transaction v1
-    func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, params: StarknetDeployAccountParamsV1, forFeeEstimation: Bool) throws -> StarknetDeployAccountTransactionV1
 
     /// Create and sign deploy account transaction v3
     ///
@@ -67,15 +45,6 @@ public protocol StarknetAccountProtocol {
     /// - Returns: Boolean indicating whether the signature is valid.
     func verify(signature: StarknetSignature, for typedData: StarknetTypedData) async throws -> Bool
 
-    /// Execute list of calls as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls to be executed.
-    ///  - params: additional params for a given transaction.
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV1(calls: [StarknetCall], params: StarknetOptionalInvokeParamsV1) async throws -> StarknetRequest<StarknetInvokeTransactionResponse>
-
     /// Execute list of calls as invoke transaction v3
     ///
     /// - Parameters:
@@ -84,15 +53,6 @@ public protocol StarknetAccountProtocol {
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(calls: [StarknetCall], params: StarknetOptionalInvokeParamsV3) async throws -> StarknetRequest<StarknetInvokeTransactionResponse>
-
-    /// Execute list of calls as invoke transaction v1 with automatically estimated fee that will be multiplied by the specified multiplier when max fee is calculated.
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls to be executed.
-    ///  - estimateFeeMultiplier: multiplier for the estimated fee.
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV1(calls: [StarknetCall], estimateFeeMultiplier: Double) async throws -> StarknetRequest<StarknetInvokeTransactionResponse>
 
     /// Execute list of calls as invoke transaction v3 with automatically estimated fee that will be multiplied by the specified multipliers when resource bounds are calculated.
     ///
@@ -104,14 +64,6 @@ public protocol StarknetAccountProtocol {
     ///  - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(calls: [StarknetCall], estimateAmountMultiplier: Double, estimateUnitPriceMultiplier: Double) async throws -> StarknetRequest<StarknetInvokeTransactionResponse>
 
-    /// Execute list of calls as invoke transaction v1 with automatically estimated fee
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls to be executed.
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV1(calls: [StarknetCall]) async throws -> StarknetRequest<StarknetInvokeTransactionResponse>
-
     /// Execute list of calls as invoke transaction v3 with automatically estimated fee
     ///
     /// - Parameters:
@@ -119,16 +71,6 @@ public protocol StarknetAccountProtocol {
     ///
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(calls: [StarknetCall]) async throws -> StarknetRequest<StarknetInvokeTransactionResponse>
-
-    /// Estimate fee for a list of calls as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls, for which the fee should be estimated.
-    ///  - nonce: nonce of the account.
-    ///  - skipValidate: Flag indicating whether validation of the transaction should be skipped.
-    ///
-    /// - Returns: struct containing fee estimate
-    func estimateFeeV1(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetRequest<[StarknetFeeEstimate]>
 
     /// Estimate fee for a list of calls as invoke transaction v3
     ///
@@ -139,18 +81,6 @@ public protocol StarknetAccountProtocol {
 
     /// - Returns: struct containing fee estimate
     func estimateFeeV3(calls: [StarknetCall], nonce: Felt, skipValidate: Bool) async throws -> StarknetRequest<[StarknetFeeEstimate]>
-
-    /// Estimate fee for a deploy account transaction v1
-    ///
-    /// - Parameters:
-    ///  - classHash: class hash of account to be deployed
-    ///  - calldata: constructor calldata
-    ///  - salt: contract salt
-    ///  - nonce: nonce of the account to be deployed
-    ///  - skipValidate: flag indicating whether validation of the transaction should be skipped
-    ///
-    /// - Returns: struct containing fee estimate
-    func estimateDeployAccountFeeV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt, skipValidate: Bool) async throws -> StarknetRequest<[StarknetFeeEstimate]>
 
     /// Estimate fee for a deploy account transaction v3
     ///
@@ -171,18 +101,6 @@ public protocol StarknetAccountProtocol {
 }
 
 public extension StarknetAccountProtocol {
-    /// Sign list of calls for exectution as invoke transaction v1.
-    /// Avoid using this method to sign calls for fee estimation.
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls to be signed.
-    ///  - params: additional params for a given transaction
-    ///
-    /// - Returns: Signed invoke transaction v1
-    func signV1(calls: [StarknetCall], params: StarknetInvokeParamsV1) throws -> StarknetInvokeTransactionV1 {
-        try signV1(calls: calls, params: params, forFeeEstimation: false)
-    }
-
     /// Sign list of calls for execution as invoke transaction v3.
     /// Avoid using this method to sign calls for fee estimation.
     ///
@@ -193,20 +111,6 @@ public extension StarknetAccountProtocol {
     /// - Returns: Signed invoke transaction v3
     func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3) throws -> StarknetInvokeTransactionV3 {
         try signV3(calls: calls, params: params, forFeeEstimation: false)
-    }
-
-    /// Create and sign deploy account transaction v1
-    /// Avoid using this method to sign transaction for fee estimation.
-    ///
-    /// - Parameters:
-    ///  - classHash: class hash of account to be deployed
-    ///  - calldata: constructor calldata
-    ///  - salt: contract salt
-    ///  - maxFee: max acceptable fee for the transaction
-    ///
-    /// - Returns: Signed deploy account transaction v1
-    func signDeployAccountV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, maxFee: Felt) throws -> StarknetDeployAccountTransactionV1 {
-        try signDeployAccountV1(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV1(nonce: .zero, maxFee: maxFee), forFeeEstimation: false)
     }
 
     /// Create and sign deploy account transaction v3
@@ -223,18 +127,6 @@ public extension StarknetAccountProtocol {
         try signDeployAccountV3(classHash: classHash, calldata: calldata, salt: salt, params: StarknetDeployAccountParamsV3(nonce: .zero, resourceBounds: resourceBounds), forFeeEstimation: false)
     }
 
-    /// Sign a call as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - call: a call to be signed.
-    ///  - params: additional params for a given transaction
-    ///  - forFeeEstimation: Flag indicating whether the different version of transaction should be used; such transaction can only be used for fee estimation
-    ///
-    /// - Returns: Signed invoke transaction v1
-    func signV1(call: StarknetCall, params: StarknetInvokeParamsV1, forFeeEstimation: Bool = false) async throws -> StarknetInvokeTransactionV1 {
-        try signV1(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
-    }
-
     /// Sign a call as invoke transaction v3
     /// - Parameters:
     ///  - call: a call to be signed.
@@ -244,16 +136,6 @@ public extension StarknetAccountProtocol {
     /// - Returns: Signed invoke transaction v3
     func signV3(call: StarknetCall, params: StarknetInvokeParamsV3, forFeeEstimation: Bool = false) throws -> StarknetInvokeTransactionV3 {
         try signV3(calls: [call], params: params, forFeeEstimation: forFeeEstimation)
-    }
-
-    /// Execute list of calls as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls to be executed.
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV1(calls: [StarknetCall]) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
-        try await executeV1(calls: calls, params: StarknetOptionalInvokeParamsV1())
     }
 
     /// Execute list of calls using invoke transaction v3
@@ -266,17 +148,6 @@ public extension StarknetAccountProtocol {
         try await executeV3(calls: calls, params: StarknetOptionalInvokeParamsV3())
     }
 
-    /// Execute a call as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - call: a call to be executed.
-    ///  - params: additional params for a given transaction
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV1(call: StarknetCall, params: StarknetOptionalInvokeParamsV1) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
-        try await executeV1(calls: [call], params: params)
-    }
-
     /// Execute a call as invoke transaction v3
     ///
     /// - Parameters:
@@ -286,17 +157,6 @@ public extension StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(call: StarknetCall, params: StarknetOptionalInvokeParamsV3) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
         try await executeV3(calls: [call], params: params)
-    }
-
-    /// Execute a call as invoke transaction v1 with automatically estimated fee that will be multiplied by the specified multiplier when max fee is calculated.
-    ///
-    /// - Parameters:
-    ///  - call: a call to be executed.
-    ///  - estimateFeeMultiplier: multiplier for the estimated fee.
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV1(call: StarknetCall, estimateFeeMultiplier: Double) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
-        try await executeV1(calls: [call], estimateFeeMultiplier: estimateFeeMultiplier)
     }
 
     /// Execute a call as invoke transaction v3 with automatically estimated fee that will be multiplied by the specified multipliers when resource bounds are calculated.
@@ -311,16 +171,6 @@ public extension StarknetAccountProtocol {
         try await executeV3(calls: [call], estimateAmountMultiplier: estimateAmountMultiplier, estimateUnitPriceMultiplier: estimateUnitPriceMultiplier)
     }
 
-    /// Execute a call as invoke transaction v1 with automatically estimated fee
-    ///
-    /// - Parameters:
-    ///  - call: a call to be executed.
-    ///
-    /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
-    func executeV1(call: StarknetCall) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
-        try await executeV1(calls: [call])
-    }
-
     /// Execute a call as invoke transaction v3 with automatically estimated fee
     ///
     /// - Parameters:
@@ -329,17 +179,6 @@ public extension StarknetAccountProtocol {
     /// - Returns: InvokeTransactionResponse, containing transaction hash of submitted transaction.
     func executeV3(call: StarknetCall) async throws -> StarknetRequest<StarknetInvokeTransactionResponse> {
         try await executeV3(calls: [call])
-    }
-
-    /// Estimate fee for a list of calls as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls, for which the fee should be estimated.
-    ///  - nonce: nonce of the account.
-
-    /// - Returns: struct containing fee estimate
-    func estimateFeeV1(calls: [StarknetCall], nonce: Felt) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        try await estimateFeeV1(calls: calls, nonce: nonce, skipValidate: false)
     }
 
     /// Estimate fee for a list of calls as invoke transaction v3
@@ -351,18 +190,6 @@ public extension StarknetAccountProtocol {
     /// - Returns: struct containing fee estimate
     func estimateFeeV3(calls: [StarknetCall], nonce: Felt) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
         try await estimateFeeV3(calls: calls, nonce: nonce, skipValidate: false)
-    }
-
-    /// Estimate fee for a list of calls as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - calls: list of calls, for which the fee should be estimated.
-    ///  - skipValidate: flag indicating whether validation of the transaction should be skipped.
-
-    /// - Returns: struct containing fee estimate
-    func estimateFeeV1(calls: [StarknetCall], provider: StarknetProviderProtocol, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        let nonce = try await provider.send(request: getNonce())
-        return try await estimateFeeV1(calls: calls, nonce: nonce, skipValidate: skipValidate)
     }
 
     /// Estimate fee for a list of calls as invoke transaction v3
@@ -377,18 +204,6 @@ public extension StarknetAccountProtocol {
         return try await estimateFeeV3(calls: calls, nonce: nonce, skipValidate: skipValidate)
     }
 
-    /// Estimate fee for a call as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - call: a call for which the fee should be estimated.
-    ///  - nonce: a nonce to be used in a transaction.
-    ///  - skipValidate: flag indicating whether validation of the transaction should be skipped.
-    ///
-    /// - Returns: struct containing fee estimate
-    func estimateFeeV1(call: StarknetCall, nonce: Felt, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        try await estimateFeeV1(calls: [call], nonce: nonce, skipValidate: skipValidate)
-    }
-
     /// Estimate fee for a call as invoke transaction v3
     ///
     /// - Parameters:
@@ -401,17 +216,6 @@ public extension StarknetAccountProtocol {
         try await estimateFeeV3(calls: [call], nonce: nonce, skipValidate: skipValidate)
     }
 
-    /// Estimate fee for a call as invoke transaction v1
-    ///
-    /// - Parameters:
-    ///  - call: a call for which the fee should be estimated.
-    ///  - skipValidate: flag indicating whether validation of the transaction should be skipped.
-    ///
-    /// - Returns: struct containing fee estimate
-    func estimateFeeV1(call: StarknetCall, provider: StarknetProviderProtocol, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        try await estimateFeeV1(calls: [call], provider: provider, skipValidate: skipValidate)
-    }
-
     /// Estimate fee for a call as invoke transaction v3
     ///
     /// - Parameters:
@@ -421,19 +225,6 @@ public extension StarknetAccountProtocol {
     /// - Returns: struct containing fee estimate
     func estimateFeeV3(call: StarknetCall, provider: StarknetProviderProtocol, skipValidate: Bool = false) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
         try await estimateFeeV3(calls: [call], provider: provider, skipValidate: skipValidate)
-    }
-
-    /// Estimate fee for a deploy account transaction v1
-    ///
-    /// - Parameters:
-    ///  - classHash: class hash of account to be deployed
-    ///  - calldata: constructor calldata
-    ///  - salt: contract salt
-    ///  - nonce: nonce of the account to be deployed
-    ///
-    /// - Returns: struct containing fee estimate
-    func estimateDeployAccountFeeV1(classHash: Felt, calldata: StarknetCalldata, salt: Felt, nonce: Felt = .zero) async throws -> StarknetRequest<[StarknetFeeEstimate]> {
-        try await estimateDeployAccountFeeV1(classHash: classHash, calldata: calldata, salt: salt, nonce: nonce, skipValidate: false)
     }
 
     /// Estimate fee for a deploy account transaction v3

@@ -57,9 +57,23 @@ final class ExecutionTests: XCTestCase {
             entrypoint: starknetSelector(from: "another_method"),
             calldata: [Felt(100), Felt(200)]
         )
-        let params = StarknetInvokeParamsV1(nonce: .zero, maxFee: .zero)
+        let resourceBounds = StarknetResourceBoundsMapping(
+            l1Gas: StarknetResourceBounds(
+                maxAmount: 100_000,
+                maxPricePerUnit: 10_000_000_000_000
+            ),
+            l2Gas: StarknetResourceBounds(
+                maxAmount: 1_000_000_000,
+                maxPricePerUnit: 100_000_000_000_000_000
+            ),
+            l1DataGas: StarknetResourceBounds(
+                maxAmount: 100_000,
+                maxPricePerUnit: 10_000_000_000_000
+            )
+        )
+        let params = StarknetInvokeParamsV3(nonce: .zero, resourceBounds: resourceBounds)
 
-        let signedTx = try account.signV1(calls: [call1, call2, call3], params: params)
+        let signedTx = try account.signV3(calls: [call1, call2, call3], params: params)
         let expectedCalldata = [
             Felt(3),
             balanceContractAddress,
@@ -80,7 +94,7 @@ final class ExecutionTests: XCTestCase {
 
         XCTAssertEqual(expectedCalldata, signedTx.calldata)
 
-        let signedEmptyTx = try account.signV1(calls: [], params: params)
+        let signedEmptyTx = try account.signV3(calls: [], params: params)
 
         XCTAssertEqual([.zero], signedEmptyTx.calldata)
     }
