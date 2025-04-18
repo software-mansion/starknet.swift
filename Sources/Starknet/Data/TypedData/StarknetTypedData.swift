@@ -740,22 +740,12 @@ extension StarknetTypedData {
 extension StarknetTypedData.Element: CustomStringConvertible {
     public var description: String {
         switch self {
-        case let .string(s):
-            String(describing: self)
-        case let .decimal(n):
-            String(describing: self)
-        case let .signedDecimal(n):
+        case .string(_), .decimal(_), .signedDecimal(_), .bool(_), .object(_), .array:
             String(describing: self)
         case let .felt(f):
             f.toHex()
         case let .signedFelt(f):
             f.toHex()
-        case let .bool(b):
-            String(describing: self)
-        case .object:
-            String(describing: self)
-        case .array:
-            String(describing: self)
         }
     }
 }
