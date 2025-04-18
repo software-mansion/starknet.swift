@@ -399,6 +399,13 @@ public extension StarknetTypedData {
         public let chainId: Element
         public let revision: Revision
 
+        fileprivate enum CodingKeys: CodingKey {
+            case name
+            case version
+            case chainId
+            case revision
+        }
+
         public var separatorName: String {
             switch revision {
             case .v0: "StarkNetDomain"
@@ -412,6 +419,14 @@ public extension StarknetTypedData {
             self.version = try container.decode(Element.self, forKey: .version)
             self.chainId = try container.decode(Element.self, forKey: .chainId)
             self.revision = try container.decodeIfPresent(Revision.self, forKey: .revision) ?? .v0
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(name, forKey: .name)
+            try container.encode(String(describing: version), forKey: .version)
+            try container.encode(chainId, forKey: .chainId)
+            try container.encode(revision, forKey: .revision)
         }
     }
 
@@ -701,6 +716,29 @@ extension StarknetTypedData {
         }
 
         return targetType
+    }
+}
+
+extension StarknetTypedData.Element: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case let .string(s):
+            s
+        case let .decimal(n):
+            String(n)
+        case let .signedDecimal(n):
+            String(n)
+        case let .felt(f):
+            f.toHex()
+        case let .signedFelt(f):
+            f.toHex()
+        case let .bool(b):
+            String(b)
+        case .object:
+            String(describing: self)
+        case .array:
+            String(describing: self)
+        }
     }
 }
 
