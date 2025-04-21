@@ -18,7 +18,7 @@ protocol DevnetClientProtocol {
 
     func isRunning() -> Bool
 
-    func prefundAccount(address: Felt, amount: UInt128AsHex, unit: StarknetPriceUnit) async throws
+    func prefundAccount(address: Felt, amount: BigUInt, unit: StarknetPriceUnit) async throws
     func createDeployAccount(name: String, classHash: Felt, salt: Felt?) async throws -> DeployAccountResult
     func createAccount(name: String, classHash: Felt, salt: Felt?, type: String) async throws -> CreateAccountResult
     func deployAccount(name: String, classHash: Felt, prefund: Bool) async throws -> DeployAccountResult
@@ -35,7 +35,7 @@ protocol DevnetClientProtocol {
 
 extension DevnetClientProtocol {
     // 0x84595161401484A000000 = 10_000_000_000_000_000_000_000_000
-    func prefundAccount(address: Felt, amount: UInt128AsHex = UInt128AsHex(fromHex: "0x84595161401484A000000")!, unit: StarknetPriceUnit = .fri) async throws {
+    func prefundAccount(address: Felt, amount: BigUInt = BigUInt(stringLiteral: "10000000000000000000000000"), unit: StarknetPriceUnit = .fri) async throws {
         try await prefundAccount(address: address, amount: amount, unit: unit)
     }
 
@@ -294,7 +294,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt, amount: UInt128AsHex, unit: StarknetPriceUnit) async throws {
+        public func prefundAccount(address: Felt, amount: BigUInt, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!

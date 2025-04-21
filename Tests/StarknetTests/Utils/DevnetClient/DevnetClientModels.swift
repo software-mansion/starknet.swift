@@ -80,7 +80,7 @@ struct InvokeContractResult {
 
 struct PrefundPayload: Codable {
     let address: Felt
-    let amount: UInt128AsHex
+    let amount: BigUInt
     let unit: StarknetPriceUnit
 
     enum CodingKeys: String, CodingKey {
@@ -92,7 +92,7 @@ struct PrefundPayload: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(address, forKey: .address)
-        try container.encode(amount.value.description, forKey: .amount)
+        try container.encode(amount.description, forKey: .amount)
         try container.encode(unit, forKey: .unit)
     }
 }
