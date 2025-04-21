@@ -75,7 +75,7 @@ struct InvokeContractResult {
     let transactionHash: Felt
 }
 
-// TODO(#209): Once we can use UInt128, we should change type of `amount`` to UInt128
+// TODO(#209): Once we can use UInt128, we should change type of `amount` to UInt128
 // and remove coding keys and `encode` method (they won't be needed).
 
 struct PrefundPayload: Codable {
