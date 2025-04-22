@@ -75,11 +75,26 @@ struct InvokeContractResult {
     let transactionHash: Felt
 }
 
-@available(macOS 15.0, *)
+// TODO(#209): Once we can use UInt128, we should change type of `amount` to UInt128
+// and remove coding keys and `encode` method (they won't be needed).
+
 struct PrefundPayload: Codable {
     let address: Felt
-    let amount: UInt128
+    let amount: BigUInt
     let unit: StarknetPriceUnit
+
+    enum CodingKeys: String, CodingKey {
+        case address
+        case amount
+        case unit
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(address, forKey: .address)
+        try container.encode(amount.description, forKey: .amount)
+        try container.encode(unit, forKey: .unit)
+    }
 }
 
 // Simplified receipt that is intended to support any JSON-RPC version starting 0.3,
