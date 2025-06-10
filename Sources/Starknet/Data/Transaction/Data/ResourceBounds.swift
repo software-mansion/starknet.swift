@@ -30,7 +30,7 @@ public struct StarknetResourceBoundsMapping: Codable, Equatable, Hashable {
         l2Gas: StarknetResourceBounds.zero,
         l1DataGas: StarknetResourceBounds.zero
     )
-    
+
     public init(l1Gas: StarknetResourceBounds, l2Gas: StarknetResourceBounds, l1DataGas: StarknetResourceBounds) {
         self.l1Gas = l1Gas
         self.l2Gas = l2Gas
