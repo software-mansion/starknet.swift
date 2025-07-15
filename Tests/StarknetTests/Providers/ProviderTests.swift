@@ -349,7 +349,7 @@ final class ProviderTests: XCTestCase {
             classHash: deployAccountTx.classHash
         )
 
-        let simulations2 = try await provider.send(request: RequestBuilder.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.preConfirmed), simulationFlags: [.skipValidate]))
+        let simulations2 = try await provider.send(request: RequestBuilder.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.latest), simulationFlags: [.skipValidate]))
 
         XCTAssertEqual(simulations2.count, 2)
         XCTAssertTrue(simulations2[0].transactionTrace is StarknetInvokeTransactionTrace)
