@@ -28,7 +28,7 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
 
     public let hash: Felt?
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil, tip: UInt64AsHex = .zero) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
@@ -36,7 +36,7 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         self.version = forFeeEstimation ? .v3Query : .v3
         self.hash = hash
         self.resourceBounds = resourceBounds
-        self.tip = .zero
+        self.tip = tip
         self.paymasterData = []
         self.accountDeploymentData = []
         self.nonceDataAvailabilityMode = .l1
@@ -208,7 +208,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
 
     public let hash: Felt?
 
-    public init(signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil) {
+    public init(signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, contractAddressSalt: Felt, constructorCalldata: StarknetCalldata, classHash: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil, tip: UInt64AsHex = .zero) {
         self.signature = signature
         self.nonce = nonce
         self.contractAddressSalt = contractAddressSalt
@@ -217,7 +217,7 @@ public struct StarknetDeployAccountTransactionV3: StarknetDeployAccountTransacti
         self.version = forFeeEstimation ? .v3Query : .v3
         self.hash = hash
         self.resourceBounds = resourceBounds
-        self.tip = .zero
+        self.tip = tip
         self.paymasterData = []
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
@@ -390,7 +390,7 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
 
     public let hash: Felt?
 
-    public init(signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, classHash: Felt, compiledClassHash: Felt, senderAddress: Felt, hash: Felt? = nil) {
+    public init(signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, classHash: Felt, compiledClassHash: Felt, senderAddress: Felt, hash: Felt? = nil, tip: UInt64AsHex = .zero) {
         self.signature = signature
         self.nonce = nonce
         self.classHash = classHash
@@ -398,7 +398,7 @@ public struct StarknetDeclareTransactionV3: StarknetDeclareTransaction, Starknet
         self.senderAddress = senderAddress
         self.hash = hash
         self.resourceBounds = resourceBounds
-        self.tip = .zero
+        self.tip = tip
         self.paymasterData = []
         self.accountDeploymentData = []
         self.nonceDataAvailabilityMode = .l1

@@ -27,11 +27,11 @@ public class StarknetAccount: StarknetAccountProtocol {
     }
 
     private func makeInvokeTransactionV3(calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetInvokeParamsV3, forFeeEstimation: Bool = false) -> StarknetInvokeTransactionV3 {
-        StarknetInvokeTransactionV3(senderAddress: address, calldata: calldata, signature: signature, resourceBounds: params.resourceBounds, nonce: params.nonce, forFeeEstimation: forFeeEstimation)
+        StarknetInvokeTransactionV3(senderAddress: address, calldata: calldata, signature: signature, resourceBounds: params.resourceBounds, nonce: params.nonce, forFeeEstimation: forFeeEstimation, tip: params.tip)
     }
 
     private func makeDeployAccountTransactionV3(classHash: Felt, salt: Felt, calldata: StarknetCalldata, signature: StarknetSignature, params: StarknetDeployAccountParamsV3, forFeeEstimation: Bool) -> StarknetDeployAccountTransactionV3 {
-        StarknetDeployAccountTransactionV3(signature: signature, resourceBounds: params.resourceBounds, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation)
+        StarknetDeployAccountTransactionV3(signature: signature, resourceBounds: params.resourceBounds, nonce: params.nonce, contractAddressSalt: salt, constructorCalldata: calldata, classHash: classHash, forFeeEstimation: forFeeEstimation, tip: params.tip)
     }
 
     public func signV3(calls: [StarknetCall], params: StarknetInvokeParamsV3, forFeeEstimation: Bool) throws -> StarknetInvokeTransactionV3 {
@@ -65,7 +65,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         } else {
             nonce = try await provider.send(request: getNonce())
         }
-
+        print("NONCE", nonce)
         if let paramsResourceBounds = params.resourceBounds {
             resourceBounds = paramsResourceBounds
         } else {
@@ -73,7 +73,7 @@ public class StarknetAccount: StarknetAccountProtocol {
             resourceBounds = feeEstimate.toResourceBounds()
         }
 
-        let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: resourceBounds)
+        let params = StarknetInvokeParamsV3(nonce: nonce, resourceBounds: resourceBounds, tip: params.tip)
         let signedTransaction = try signV3(calls: calls, params: params, forFeeEstimation: false)
 
         return RequestBuilder.addInvokeTransaction(signedTransaction)
