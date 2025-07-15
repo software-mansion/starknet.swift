@@ -54,17 +54,8 @@ public struct StarknetFeeEstimate: Decodable, Equatable, EstimateFeeCommon {
     }
 
     public init?(l1GasConsumed: UInt64AsHex, l1GasPrice: UInt128AsHex, l2GasConsumed: UInt64AsHex, l2GasPrice: UInt128AsHex, l1DataGasConsumed: UInt64AsHex, l1DataGasPrice: UInt128AsHex, feeUnit: StarknetPriceUnit) {
-        precondition(feeUnit == .fri,
-                     "`feeUnit` for `StarknetFeeEstimate` can only be .fri")
-
-        self.l1GasConsumed = l1GasConsumed
-        self.l1GasPrice = l1GasPrice
-        self.l2GasConsumed = l2GasConsumed
-        self.l2GasPrice = l2GasPrice
-        self.l1DataGasConsumed = l1DataGasConsumed
-        self.l1DataGasPrice = l1DataGasPrice
-        self.overallFee = UInt128AsHex(l1GasPrice.value * l1GasConsumed.value + l2GasPrice.value * l2GasConsumed.value + l1DataGasPrice.value * l1DataGasConsumed.value)!
-        self.feeUnit = feeUnit
+        let overallFee = UInt128AsHex(l1GasPrice.value * l1GasConsumed.value + l2GasPrice.value * l2GasConsumed.value + l1DataGasPrice.value * l1DataGasConsumed.value)!
+        self.init(l1GasConsumed: l1GasConsumed, l1GasPrice: l1GasPrice, l2GasConsumed: l2GasConsumed, l2GasPrice: l2GasPrice, l1DataGasConsumed: l1DataGasConsumed, l1DataGasPrice: l1DataGasPrice, overallFee: overallFee, feeUnit: feeUnit)
     }
 }
 
@@ -104,17 +95,8 @@ public struct StarknetMessageFeeEstimate: Decodable, Equatable, EstimateFeeCommo
     }
 
     public init?(l1GasConsumed: UInt64AsHex, l1GasPrice: UInt128AsHex, l2GasConsumed: UInt64AsHex, l2GasPrice: UInt128AsHex, l1DataGasConsumed: UInt64AsHex, l1DataGasPrice: UInt128AsHex, feeUnit: StarknetPriceUnit) {
-        precondition(feeUnit == .wei,
-                     "`feeUnit` for `StarknetFeeEstimate` can only be .wei")
-
-        self.l1GasConsumed = l1GasConsumed
-        self.l1GasPrice = l1GasPrice
-        self.l2GasConsumed = l2GasConsumed
-        self.l2GasPrice = l2GasPrice
-        self.l1DataGasConsumed = l1DataGasConsumed
-        self.l1DataGasPrice = l1DataGasPrice
-        self.overallFee = UInt128AsHex(l1GasPrice.value * l1GasConsumed.value + l2GasPrice.value * l2GasConsumed.value + l1DataGasPrice.value * l1DataGasConsumed.value)!
-        self.feeUnit = feeUnit
+        let overallFee = UInt128AsHex(l1GasPrice.value * l1GasConsumed.value + l2GasPrice.value * l2GasConsumed.value + l1DataGasPrice.value * l1DataGasConsumed.value)!
+        self.init(l1GasConsumed: l1GasConsumed, l1GasPrice: l1GasPrice, l2GasConsumed: l2GasConsumed, l2GasPrice: l2GasPrice, l1DataGasConsumed: l1DataGasConsumed, l1DataGasPrice: l1DataGasPrice, overallFee: overallFee, feeUnit: feeUnit)
     }
 }
 
