@@ -5,6 +5,7 @@ import Starknet
 enum DevnetClientConstants {
     // Source: https://github.com/0xSpaceShard/starknet-devnet/blob/430b3370e60b28b8de430143b26e52bf36380b9a/crates/starknet-devnet-core/src/constants.rs#L25
     static let accountContractClassHash: Felt = "0x05b4b537eaa2399e3aa99c4e2e0208ebd6c71bc1467938cd52c798c601e43564"
+    static let ethErc20ContractAddress: Felt = "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
     // Source: starknet-devnet-rs cli
     // Only for seed 1_053_545_547
     static let predeployedAccount1: AccountDetails = .init(privateKey: "0x00000000000000000000000000000000a2ed22bb0cb0b49c69f6d6a8d24bc5ea", publicKey: "0x0198e98e771ebb5da7f4f05658a80a3d6be2213dc5096d055cbbefa62901ab06", address: "0x01323cacbc02b4aaed9bb6b24d121fb712d8946376040990f2f2fa0dcf17bb5b", salt: 20)
