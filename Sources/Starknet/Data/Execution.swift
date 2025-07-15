@@ -76,10 +76,10 @@ public struct StarknetDeployAccountParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping, tip _: UInt64AsHex) {
+    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping, tip : UInt64AsHex) {
         self.nonce = nonce
         self.resourceBounds = resourceBounds
-        self.tip = .zero
+        self.tip = tip
         self.paymasterData = []
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
