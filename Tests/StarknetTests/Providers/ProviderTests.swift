@@ -281,7 +281,7 @@ final class ProviderTests: XCTestCase {
 
         let feeEstimate = try await provider.send(request: RequestBuilder.estimateMessageFee(
             message,
-            at: StarknetBlockId.tag(.pending)
+            at: StarknetBlockId.tag(.latest)
         ))
         XCTAssertNotEqual(UInt128AsHex.zero, feeEstimate.l1GasPrice)
         XCTAssertNotEqual(UInt128AsHex.zero, feeEstimate.l2GasPrice)
@@ -327,7 +327,7 @@ final class ProviderTests: XCTestCase {
         let newAccountParams = StarknetDeployAccountParamsV3(nonce: 0, resourceBounds: resourceBounds)
         let deployAccountTx = try newAccount.signDeployAccountV3(classHash: accountClassHash, calldata: [newPublicKey], salt: .zero, params: newAccountParams, forFeeEstimation: false)
 
-        let simulations = try await provider.send(request: RequestBuilder.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.pending), simulationFlags: []))
+        let simulations = try await provider.send(request: RequestBuilder.simulateTransactions([invokeTx, deployAccountTx], at: .tag(.latest), simulationFlags: []))
 
         XCTAssertEqual(simulations.count, 2)
         XCTAssertTrue(simulations[0].transactionTrace is StarknetInvokeTransactionTrace)
@@ -349,7 +349,7 @@ final class ProviderTests: XCTestCase {
             classHash: deployAccountTx.classHash
         )
 
-        let simulations2 = try await provider.send(request: RequestBuilder.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.pending), simulationFlags: [.skipValidate]))
+        let simulations2 = try await provider.send(request: RequestBuilder.simulateTransactions([invokeWithoutSignature, deployAccountWithoutSignature], at: .tag(.preConfirmed), simulationFlags: [.skipValidate]))
 
         XCTAssertEqual(simulations2.count, 2)
         XCTAssertTrue(simulations2[0].transactionTrace is StarknetInvokeTransactionTrace)

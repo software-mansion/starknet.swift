@@ -3,7 +3,7 @@ public struct StarknetRequest<U: Decodable> {
     let params: JsonRpcParams
 }
 
-let defaultBlockId = StarknetBlockId.tag(.pending)
+let defaultBlockId = StarknetBlockId.tag(.latest)
 let defaultSimulationFlagsForEstimateFee: Set<StarknetSimulationFlagForEstimateFee> = []
 
 public enum RequestBuilder {
@@ -36,7 +36,7 @@ public enum RequestBuilder {
     ///  - blockId: hash, numer, or tag of a block for which the estimation should be made.
     ///
     /// - Returns: the fee estimation
-    public static func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetFeeEstimate> {
+    public static func estimateMessageFee(_ message: StarknetMessageFromL1, at blockId: StarknetBlockId) -> StarknetRequest<StarknetMessageFeeEstimate> {
         let params = EstimateMessageFeeParams(message: message, blockId: blockId)
 
         return StarknetRequest(method: .estimateMessageFee, params: .estimateMessageFee(params))
@@ -141,6 +141,9 @@ public enum RequestBuilder {
     }
 
     public static func getStorageProof(blockId: StarknetBlockId, classHashes: [Felt]?, contractAddresses: [Felt]?, contractsStorageKeys: [StarknetContractsStorageKeys]?) -> StarknetRequest<StarknetGetStorageProofResponse> {
+        precondition(blockId != StarknetBlockId.tag(.preConfirmed),
+                     ".preConfirmed block tag is not allowed for `getStorageProof`")
+
         let params = GetStorageProofParams(blockId: blockId, classHashes: classHashes, contractAddresses: contractAddresses, contractsStorageKeys: contractsStorageKeys)
 
         return StarknetRequest(method: .getStorageProof, params: .getStorageProof(params))
@@ -310,7 +313,7 @@ public enum RequestBuilder {
     ///  - message: the message's parameters
     ///
     /// - Returns: Fee estimate
-    public static func estimateMessageFee(_ message: StarknetMessageFromL1) -> StarknetRequest<StarknetFeeEstimate> {
+    public static func estimateMessageFee(_ message: StarknetMessageFromL1) -> StarknetRequest<StarknetMessageFeeEstimate> {
         estimateMessageFee(message, at: defaultBlockId)
     }
 

@@ -1,14 +1,19 @@
 import Foundation
 
-public enum StarknetBlockId {
+public enum StarknetBlockId: Equatable {
     public enum BlockTag: String {
         case latest
-        case pending
+        case preConfirmed
     }
 
     case hash(Felt)
     case number(Int)
     case tag(BlockTag)
+
+    enum CodingKeys: String, CodingKey {
+        case latest
+        case preConfirmed = "pre_confirmed"
+    }
 }
 
 extension StarknetBlockId: Encodable {

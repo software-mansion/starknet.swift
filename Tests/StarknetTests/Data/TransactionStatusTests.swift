@@ -5,7 +5,7 @@ import XCTest
 final class TransactionStatusTests: XCTestCase {
     func testGetTransactionStatusResponse() async throws {
         let json = """
-        {"finality_status":"REJECTED"}
+        {"finality_status":"PRE_CONFIRMED"}
         """.data(using: .utf8)!
         let json2 = """
         {"finality_status":"ACCEPTED_ON_L2","execution_status":"SUCCEEDED"}

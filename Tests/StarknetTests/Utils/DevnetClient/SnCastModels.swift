@@ -16,11 +16,9 @@ struct AccountCreateSnCastResponse: SnCastResponse {
     let command: SnCastCommand = .accountCreate
     let error: String? = nil
     let accountAddress: Felt
-    let maxFee: Felt
 
     enum CodingKeys: String, CodingKey {
         case accountAddress = "address"
-        case maxFee = "max_fee"
     }
 }
 

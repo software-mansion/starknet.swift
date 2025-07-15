@@ -1,14 +1,14 @@
 import Foundation
 
 public protocol StarknetResources: Decodable, Equatable {
-    var l1Gas: Int { get }
-    var l2Gas: Int { get }
+    var l1Gas: UInt { get }
+    var l2Gas: UInt { get }
 }
 
 public struct StarknetExecutionResources: StarknetResources {
-    public let l1Gas: Int
-    public let l1DataGas: Int
-    public let l2Gas: Int
+    public let l1Gas: UInt
+    public let l1DataGas: UInt
+    public let l2Gas: UInt
 
     enum CodingKeys: String, CodingKey {
         case l1Gas = "l1_gas"
@@ -18,8 +18,8 @@ public struct StarknetExecutionResources: StarknetResources {
 }
 
 public struct StarknetInnerCallExecutionResources: StarknetResources {
-    public let l1Gas: Int
-    public let l2Gas: Int
+    public let l1Gas: UInt
+    public let l2Gas: UInt
 
     enum CodingKeys: String, CodingKey {
         case l1Gas = "l1_gas"
