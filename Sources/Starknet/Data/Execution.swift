@@ -44,7 +44,7 @@ public struct StarknetInvokeParamsV3 {
     }
 
     public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping) {
-        self.init(nonce: .zero, resourceBounds: resourceBounds, tip: .zero)
+        self.init(nonce: nonce, resourceBounds: resourceBounds, tip: .zero)
     }
 }
 
@@ -76,7 +76,7 @@ public struct StarknetDeployAccountParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping, tip: UInt64AsHex) {
+    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping, tip _: UInt64AsHex) {
         self.nonce = nonce
         self.resourceBounds = resourceBounds
         self.tip = .zero

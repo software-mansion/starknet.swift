@@ -65,7 +65,7 @@ public class StarknetAccount: StarknetAccountProtocol {
         } else {
             nonce = try await provider.send(request: getNonce())
         }
-        print("NONCE", nonce)
+
         if let paramsResourceBounds = params.resourceBounds {
             resourceBounds = paramsResourceBounds
         } else {
