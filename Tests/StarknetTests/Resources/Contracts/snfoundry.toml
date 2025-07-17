@@ -1,3 +1,3 @@
 [sncast.default]
+# We don't want to show links to the explorer in the output.
 show-explorer-links = false
-
