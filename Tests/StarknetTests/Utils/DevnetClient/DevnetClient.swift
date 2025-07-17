@@ -140,6 +140,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private let scarbPath: String
         private let snCastPath: String
         private var scarbTomlPath: String!
+        private var snfoundryTomlPath: String!
         private var toolVersionsPath: String!
         private var contractsPath: String!
         private let tmpPath: String
@@ -240,11 +241,16 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 throw DevnetClientError.missingResourceFile
             }
 
+            guard let snfoundryTomlPath = Bundle.module.path(forResource: "snfoundry", ofType: "toml") else {
+                throw DevnetClientError.missingResourceFile
+            }
+
             guard let toolVersionsPath = Bundle.module.path(forResource: "tool-versions", ofType: nil) else {
                 throw DevnetClientError.missingResourceFile
             }
 
             let scarbTomlResourcePath = URL(fileURLWithPath: scarbTomlPath)
+            let snfoundryTomlResourcePath = URL(fileURLWithPath: snfoundryTomlPath)
             let toolVersionsResourcePath = URL(fileURLWithPath: toolVersionsPath)
             guard let contractResourcePaths = Bundle.module.urls(forResourcesWithExtension: "cairo", subdirectory: nil) else {
                 throw DevnetClientError.missingResourceFile
@@ -252,6 +258,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             let newContractsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts")
             let newScarbTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/Scarb.toml")
+            let newSnfoundryTomlPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/snfoundry.toml")
             let newToolVersionsPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/.tool-versions")
             let newContractsSrcPath = URL(fileURLWithPath: "\(self.tmpPath)/Contracts/src")
 
@@ -259,6 +266,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try fileManager.createDirectory(at: newContractsSrcPath, withIntermediateDirectories: true, attributes: nil)
 
             try fileManager.copyItem(at: scarbTomlResourcePath, to: newScarbTomlPath)
+            try fileManager.copyItem(at: snfoundryTomlResourcePath, to: newSnfoundryTomlPath)
             try fileManager.copyItem(at: toolVersionsResourcePath, to: newToolVersionsPath)
             for contractPath in contractResourcePaths {
                 let newContractPath = URL(fileURLWithPath: "\(newContractsSrcPath.path)/\(contractPath.lastPathComponent)")
@@ -266,6 +274,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
 
             self.scarbTomlPath = newScarbTomlPath.path
+            self.snfoundryTomlPath = newSnfoundryTomlPath.path
             self.toolVersionsPath = newToolVersionsPath.path
             self.contractsPath = newContractsPath.path
 
@@ -370,7 +379,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 classHash.toHex(),
                 "--type",
                 type,
-                "--silent",
                 "--url",
                 rpcUrl,
             ]
@@ -571,7 +579,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
             process.launchPath = snCastPath
             process.currentDirectoryPath = contractsPath!
             process.arguments = [
-                "--hex-format",
                 "--json",
                 "--accounts-file",
                 "\(accountDirectory)/starknet_open_zeppelin_accounts.json",
@@ -604,8 +611,11 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             // Output from sncast sometimes includes a few json objects
             // Below adjustment ensures that we're retrieving only the last object
-            if let range = output.lastIndex(of: "{") {
-                output.removeSubrange(output.startIndex ..< range)
+            let lines = output.split(separator: "\n")
+            if let lastLine = lines.last {
+                output = String(lastLine)
+            } else {
+                throw SnCastError.snCastError("No output from sncast")
             }
 
             let outputDataTrimmed = output.data(using: .utf8)!

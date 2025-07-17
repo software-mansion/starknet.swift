@@ -38,7 +38,7 @@ public struct StarknetBinaryNode: Codable, Equatable {
 
 public struct StarknetEdgeNode: Codable, Equatable {
     let path: NumAsHex
-    let length: Int
+    let length: UInt
     let child: Felt
 
     enum CodingKeys: String, CodingKey, CaseIterable {

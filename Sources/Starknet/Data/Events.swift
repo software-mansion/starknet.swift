@@ -8,7 +8,7 @@ public struct StarknetGetEventsFilter: Encodable {
     public let chunkSize: UInt64
     public let continuationToken: String?
 
-    public init(fromBlockId: StarknetBlockId? = StarknetBlockId.tag(.pending), toBlockId: StarknetBlockId? = StarknetBlockId.tag(.pending), address: Felt? = nil, keys: [[Felt]]? = nil, chunkSize: UInt64 = 50, continuationToken: String? = nil) {
+    public init(fromBlockId: StarknetBlockId? = StarknetBlockId.tag(.preConfirmed), toBlockId: StarknetBlockId? = StarknetBlockId.tag(.preConfirmed), address: Felt? = nil, keys: [[Felt]]? = nil, chunkSize: UInt64 = 50, continuationToken: String? = nil) {
         self.fromBlockId = fromBlockId
         self.toBlockId = toBlockId
         self.address = address

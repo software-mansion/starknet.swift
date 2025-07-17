@@ -10,6 +10,7 @@ public enum StarknetTransactionExecutionStatus: String, Codable {
 }
 
 public enum StarknetTransactionFinalityStatus: String, Codable {
+    case preConfirmed = "PRE_CONFIRMED"
     case acceptedL1 = "ACCEPTED_ON_L1"
     case acceptedL2 = "ACCEPTED_ON_L2"
 
@@ -19,9 +20,9 @@ public enum StarknetTransactionFinalityStatus: String, Codable {
 }
 
 public enum StarknetTransactionStatus: String, Codable {
-    case pending = "PENDING"
     case received = "RECEIVED"
-    case rejected = "REJECTED"
+    case candidate = "CANDIDATE"
+    case preConfirmed = "PRE_CONFIRMED"
     case acceptedL1 = "ACCEPTED_ON_L1"
     case acceptedL2 = "ACCEPTED_ON_L2"
 
