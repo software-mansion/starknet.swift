@@ -8,7 +8,7 @@ public struct StarknetInvokeTransactionResponse: Decodable, Equatable {
     }
 }
 
-protocol EstimateFeeCommon {
+protocol EstimateFeeBase {
     var l1GasConsumed: UInt64AsHex { get }
     var l1GasPrice: UInt128AsHex { get }
     var l2GasConsumed: UInt64AsHex { get }
@@ -18,7 +18,7 @@ protocol EstimateFeeCommon {
     var overallFee: UInt128AsHex { get }
 }
 
-public struct StarknetFeeEstimate: Decodable, Equatable, EstimateFeeCommon {
+public struct StarknetFeeEstimate: Decodable, Equatable, EstimateFeeBase {
     public let l1GasConsumed: UInt64AsHex
     public let l1GasPrice: UInt128AsHex
     public let l2GasConsumed: UInt64AsHex
@@ -59,7 +59,7 @@ public struct StarknetFeeEstimate: Decodable, Equatable, EstimateFeeCommon {
     }
 }
 
-public struct StarknetMessageFeeEstimate: Decodable, Equatable, EstimateFeeCommon {
+public struct StarknetMessageFeeEstimate: Decodable, Equatable, EstimateFeeBase {
     public let l1GasConsumed: UInt64AsHex
     public let l1GasPrice: UInt128AsHex
     public let l2GasConsumed: UInt64AsHex
