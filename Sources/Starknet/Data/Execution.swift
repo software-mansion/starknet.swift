@@ -32,11 +32,11 @@ public struct StarknetInvokeParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping) {
+    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping, tip: UInt64AsHex = .zero) {
         // As of Starknet 0.13, most of v3 fields have hardcoded values.
         self.nonce = nonce
         self.resourceBounds = resourceBounds
-        self.tip = .zero
+        self.tip = tip
         self.paymasterData = []
         self.accountDeploymentData = []
         self.nonceDataAvailabilityMode = .l1
@@ -53,10 +53,10 @@ public struct StarknetOptionalInvokeParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt? = nil, resourceBounds: StarknetResourceBoundsMapping? = nil) {
+    public init(nonce: Felt? = nil, resourceBounds: StarknetResourceBoundsMapping? = nil, tip: UInt64AsHex = .zero) {
         self.nonce = nonce
         self.resourceBounds = resourceBounds
-        self.tip = .zero
+        self.tip = tip
         self.paymasterData = []
         self.accountDeploymentData = []
         self.nonceDataAvailabilityMode = .l1
@@ -72,10 +72,10 @@ public struct StarknetDeployAccountParamsV3 {
     public let nonceDataAvailabilityMode: StarknetDAMode
     public let feeDataAvailabilityMode: StarknetDAMode
 
-    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping) {
+    public init(nonce: Felt, resourceBounds: StarknetResourceBoundsMapping, tip: UInt64AsHex = .zero) {
         self.nonce = nonce
         self.resourceBounds = resourceBounds
-        self.tip = .zero
+        self.tip = tip
         self.paymasterData = []
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
