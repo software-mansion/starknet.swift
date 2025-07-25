@@ -22,7 +22,7 @@ public class StarknetContractAddressCalculator {
         let hex = address.toHex().dropFirst(2)
         let stringAddress = String(String(hex.reversed()).padding(toLength: 64, withPad: "0", startingAt: 0).reversed())
         var chars = Array(stringAddress)
-        let hashed = keccak(on: BigUInt(hex, radix: 16)!.serialize().bytes)
+        let hashed = keccak(on: BigUInt(hex, radix: 16)!.serialize().byteArray)
 
         for i in 0 ... chars.count - 1 {
             let bit = BigUInt(2).power(256 - 4 * i - 1)
