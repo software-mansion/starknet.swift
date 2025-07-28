@@ -43,7 +43,7 @@ let package = Package(
         ),
         .testTarget(
             name: "NetworkTests",
-            dependencies: ["Starknet"],
-        ),
+            dependencies: ["Starknet"]
+        )
     ]
 )
