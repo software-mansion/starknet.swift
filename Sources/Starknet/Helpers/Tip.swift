@@ -54,33 +54,17 @@ private func estimateTip(provider: StarknetProviderProtocol, blockId: StarknetBl
     let request = RequestBuilder.getBlockWithTxs(blockId)
     let blockWithTxs = try await provider.send(request: request)
 
-    let tips: [BigUInt] = switch blockWithTxs {
-    case let .processed(processedBlockWithTxs):
-        processedBlockWithTxs.transactions.compactMap { transactionWrapper in
-            switch transactionWrapper {
-            case let .invokeV3(invokeV3):
-                invokeV3.tip.value
-            case let .deployAccountV3(deployAccountV3):
-                deployAccountV3.tip.value
-            case let .declareV3(declareV3):
-                declareV3.tip.value
-            default:
-                nil
-            }
-        }
+    let transactions: [TransactionWrapper] = switch blockWithTxs {
+    case let .processed(block): block.transactions
+    case let .preConfirmed(block): block.transactions
+    }
 
-    case let .preConfirmed(preConfirmedBlockWithTxs):
-        preConfirmedBlockWithTxs.transactions.compactMap { transactionWrapper in
-            switch transactionWrapper {
-            case let .invokeV3(invokeV3):
-                invokeV3.tip.value
-            case let .deployAccountV3(deployAccountV3):
-                deployAccountV3.tip.value
-            case let .declareV3(declareV3):
-                declareV3.tip.value
-            default:
-                nil
-            }
+    let tips = transactions.compactMap { transactionWrapper in
+        switch transactionWrapper {
+        case let .invokeV3(invokeV3): invokeV3.tip.value
+        case let .deployAccountV3(deployAccountV3): deployAccountV3.tip.value
+        case let .declareV3(declareV3): declareV3.tip.value
+        default: nil
         }
     }
 
