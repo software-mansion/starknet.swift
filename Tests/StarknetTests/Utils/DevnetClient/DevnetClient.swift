@@ -145,7 +145,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private var contractsPath: String!
         private let tmpPath: String
         // TODO: Uncomment once github env can be changed
-//        private let testnetRpcUrl: String
+        // private let testnetRpcUrl: String
 
         // Cache declared and deployed contracts by name and classHash respectively
         private var declaredContractsAtName: [String: DeclareContractResult] = [:]
