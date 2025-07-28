@@ -347,4 +347,46 @@ public enum RequestBuilder {
     public static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
         simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
+
+    /// Get a block with transactions.
+    ///
+    /// - Parameters:
+    /// - blockId: hash, number, or tag of the requested block.
+    ///
+    /// - Returns: Block information with full transactions.
+    public static func getBlockWithTxs(_ blockId: StarknetBlockId) -> StarknetRequest<StarknetBlockWithTxsWrapper> {
+        let params = GetBlockWithTxsParams(blockId: blockId)
+
+        return StarknetRequest(method: .getBlockWithTxs, params: .getBlockWithTxs(params))
+    }
+
+    /// Get a block with transactions by block hash.
+    ///
+    /// - Parameters:
+    /// - blockHash: hash of the requested block.
+    ///
+    /// - Returns: Block information with full transactions.
+    public static func getBlockWithTxs(_ blockHash: Felt) -> StarknetRequest<StarknetBlockWithTxsWrapper> {
+        getBlockWithTxs(StarknetBlockId.hash(blockHash))
+    }
+
+    /// Get a block with transactions by block number.
+    ///
+    /// - Parameters:
+    /// - blockNumber: number of the requested block.
+    ///
+    /// - Returns: Block information with full transactions.
+    public static func getBlockWithTxs(_ blockNumber: Int) -> StarknetRequest<StarknetBlockWithTxsWrapper> {
+        getBlockWithTxs(StarknetBlockId.number(blockNumber))
+    }
+
+    /// Get a block with transactions by block tag.
+    ///
+    /// - Parameters:
+    /// - blockTag: tag of the requested block.
+    ///
+    /// - Returns: Block information with full transactions.
+    public static func getBlockWithTxs(_ blockTag: StarknetBlockId.BlockTag) -> StarknetRequest<StarknetBlockWithTxsWrapper> {
+        getBlockWithTxs(StarknetBlockId.tag(blockTag))
+    }
 }

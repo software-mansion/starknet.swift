@@ -185,6 +185,14 @@ struct SimulateTransactionsParams: Encodable {
     }
 }
 
+struct GetBlockWithTxsParams: Encodable {
+    let blockId: StarknetBlockId
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+    }
+}
+
 enum JsonRpcParams {
     case getNonce(GetNonceParams)
     case addInvokeTransaction(AddInvokeTransactionParams)
@@ -194,6 +202,7 @@ enum JsonRpcParams {
     case estimateFee(EstimateFeeParams)
     case estimateMessageFee(EstimateMessageFeeParams)
     case addDeployAccountTransaction(AddDeployAccountTransactionParams)
+    case getBlockWithTxs(GetBlockWithTxsParams)
     case getClassHashAt(GetClassHashAtParams)
     case getEvents(GetEventsPayload)
     case getStorageProof(GetStorageProofParams)
@@ -223,6 +232,8 @@ extension JsonRpcParams: Encodable {
         case let .estimateMessageFee(params):
             try params.encode(to: encoder)
         case let .addDeployAccountTransaction(params):
+            try params.encode(to: encoder)
+        case let .getBlockWithTxs(params):
             try params.encode(to: encoder)
         case let .getClassHashAt(params):
             try params.encode(to: encoder)

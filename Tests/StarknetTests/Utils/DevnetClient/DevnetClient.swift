@@ -144,6 +144,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
         private var toolVersionsPath: String!
         private var contractsPath: String!
         private let tmpPath: String
+        // TODO: Uncomment once github env can be changed
+//        private let testnetRpcUrl: String
 
         // Cache declared and deployed contracts by name and classHash respectively
         private var declaredContractsAtName: [String: DeclareContractResult] = [:]
@@ -172,6 +174,8 @@ func makeDevnetClient() -> DevnetClientProtocol {
             scarbPath = ProcessInfo.processInfo.environment["SCARB_PATH"] ?? "scarb"
             snCastPath = ProcessInfo.processInfo.environment["SNCAST_PATH"] ?? "sncast"
             tmpPath = ProcessInfo.processInfo.environment["TMPDIR"] ?? "/tmp/starknet-swift"
+            // TODO: Uncomment once github env can be changed
+            // testnetRpcUrl = ProcessInfo.processInfo.environment["TESTNET_RPC_URL"]!
             accountDirectory = URL(string: tmpPath)!
         }
 
@@ -205,6 +209,10 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 "full",
                 "--initial-balance",
                 "1000000000000000000000000000000000000000000000000000000000000000000",
+                "--fork-network",
+                // TODO: Use testnetRpcUrl once github env can be changed
+                // testnetRpcUrl,
+                "https://rpc.pathfinder.equilibrium.co/integration-sepolia/rpc/v0_9",
             ]
             devnetProcess.launchPath = devnetPath
             devnetProcess.standardInput = nil

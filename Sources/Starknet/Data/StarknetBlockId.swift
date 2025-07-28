@@ -1,19 +1,25 @@
 import Foundation
 
 public enum StarknetBlockId: Equatable {
-    public enum BlockTag: String {
+    public enum BlockTag: String, Codable {
         case latest
         case preConfirmed
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+
+            switch self {
+            case .latest:
+                try container.encode("latest")
+            case .preConfirmed:
+                try container.encode("pre_confirmed")
+            }
+        }
     }
 
     case hash(Felt)
     case number(Int)
     case tag(BlockTag)
-
-    enum CodingKeys: String, CodingKey {
-        case latest
-        case preConfirmed = "pre_confirmed"
-    }
 }
 
 extension StarknetBlockId: Encodable {
@@ -30,7 +36,7 @@ extension StarknetBlockId: Encodable {
             ]
             try dict.encode(to: encoder)
         case let .tag(blockTag):
-            try blockTag.rawValue.encode(to: encoder)
+            try blockTag.encode(to: encoder)
         }
     }
 }
