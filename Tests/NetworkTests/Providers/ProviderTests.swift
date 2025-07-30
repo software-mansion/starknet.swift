@@ -15,19 +15,36 @@ final class ProviderTests: XCTestCase {
         provider = StarknetProvider(url: "https://rpc.pathfinder.equilibrium.co/testnet-sepolia/rpc/v0_9")
     }
 
+    func testGetBlockWithTxsWithL1AcceptedBlockTag() async throws {
+        let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.latest))
+        switch result {
+        case .processed:
+            // Expected
+            break
+        default:
+            XCTFail("Expected result to be of type .l1Accepted block tag")
+        }
+    }
+
     func testGetBlockWithTxsWithLatestBlockTag() async throws {
         let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.latest))
-
-        if case .preConfirmed = result {
-            XCTFail("Expected .processed")
+        switch result {
+        case .processed:
+            // Expected
+            break
+        default:
+            XCTFail("Expected result to be of type .processed block tag")
         }
     }
 
     func testGetBlockWithTxsWithPreConfirmedBlockTag() async throws {
         let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.preConfirmed))
-
-        if case .processed = result {
-            XCTFail("Expected .preConfirmed")
+        switch result {
+        case .preConfirmed:
+            // Expected
+            break
+        default:
+            XCTFail("Expected result to be of type .preConfirmed block tag")
         }
     }
 

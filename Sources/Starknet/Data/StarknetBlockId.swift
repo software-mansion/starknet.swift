@@ -2,6 +2,7 @@ import Foundation
 
 public enum StarknetBlockId: Equatable {
     public enum BlockTag: String, Codable {
+        case l1Accepted
         case latest
         case preConfirmed
 
@@ -9,6 +10,8 @@ public enum StarknetBlockId: Equatable {
             var container = encoder.singleValueContainer()
 
             switch self {
+            case .l1Accepted:
+                try container.encode("l1_accepted")
             case .latest:
                 try container.encode("latest")
             case .preConfirmed:
