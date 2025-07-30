@@ -2,22 +2,9 @@ import Foundation
 
 public enum StarknetBlockId: Equatable {
     public enum BlockTag: String, Codable {
-        case l1Accepted
+        case l1Accepted = "l1_accepted"
         case latest
-        case preConfirmed
-
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.singleValueContainer()
-
-            switch self {
-            case .l1Accepted:
-                try container.encode("l1_accepted")
-            case .latest:
-                try container.encode("latest")
-            case .preConfirmed:
-                try container.encode("pre_confirmed")
-            }
-        }
+        case preConfirmed = "pre_confirmed"
     }
 
     case hash(Felt)
