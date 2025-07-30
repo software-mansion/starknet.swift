@@ -12,7 +12,7 @@ final class ProviderTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
 
-        // TODO: Change this to internal node
+        // TODO(#245): Change this to internal node
         provider = StarknetProvider(url: "https://rpc.pathfinder.equilibrium.co/testnet-sepolia/rpc/v0_9")
     }
 
