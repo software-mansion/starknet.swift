@@ -37,7 +37,7 @@ final class ProviderTests: XCTestCase {
     func testGetBlockWithTxsWithPreConfirmedBlockTag() async throws {
         let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.preConfirmed))
 
-        guard case .processed = result else {
+        guard case .preConfirmed = result else {
             XCTFail("Expected result to be of type .preConfirmed")
             return
         }
