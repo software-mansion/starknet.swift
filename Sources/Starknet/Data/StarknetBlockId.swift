@@ -2,6 +2,7 @@ import Foundation
 
 public enum StarknetBlockId: Equatable {
     public enum BlockTag: String, Codable {
+        case l1Accepted = "l1_accepted"
         case latest
         case preConfirmed = "pre_confirmed"
     }

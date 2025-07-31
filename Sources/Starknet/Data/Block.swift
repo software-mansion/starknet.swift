@@ -2,7 +2,6 @@ public enum BlockStatus: String, Codable {
     case preConfirmed = "PRE_CONFIRMED"
     case acceptedOnL1 = "ACCEPTED_ON_L1"
     case acceptedOnL2 = "ACCEPTED_ON_L2"
-    case rejected = "REJECTED"
 }
 
 public protocol StarknetBlock: Codable {
