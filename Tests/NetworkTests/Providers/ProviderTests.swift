@@ -17,35 +17,29 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetBlockWithTxsWithL1AcceptedBlockTag() async throws {
-        let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.latest))
-        switch result {
-        case .processed:
-            // Expected
-            break
-        default:
-            XCTFail("Expected result to be of type .l1Accepted block tag")
+        let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.l1Accepted))
+
+        guard case .processed = result else {
+            XCTFail("Expected result to be of type .processed")
+            return
         }
     }
 
     func testGetBlockWithTxsWithLatestBlockTag() async throws {
         let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.latest))
-        switch result {
-        case .processed:
-            // Expected
-            break
-        default:
-            XCTFail("Expected result to be of type .processed block tag")
+
+        guard case .processed = result else {
+            XCTFail("Expected result to be of type .processed")
+            return
         }
     }
 
     func testGetBlockWithTxsWithPreConfirmedBlockTag() async throws {
         let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.preConfirmed))
-        switch result {
-        case .preConfirmed:
-            // Expected
-            break
-        default:
-            XCTFail("Expected result to be of type .preConfirmed block tag")
+
+        guard case .processed = result else {
+            XCTFail("Expected result to be of type .preConfirmed")
+            return
         }
     }
 
