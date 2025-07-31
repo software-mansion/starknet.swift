@@ -3,7 +3,7 @@ public struct StarknetRequest<U: Decodable> {
     let params: JsonRpcParams
 }
 
-let defaultBlockId = StarknetBlockId.tag(.latest)
+let defaultBlockId = StarknetBlockId.tag(.preConfirmed)
 let defaultSimulationFlagsForEstimateFee: Set<StarknetSimulationFlagForEstimateFee> = []
 
 public enum RequestBuilder {
