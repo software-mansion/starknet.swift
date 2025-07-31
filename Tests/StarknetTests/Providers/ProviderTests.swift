@@ -383,4 +383,20 @@ final class ProviderTests: XCTestCase {
             XCTFail("Error was not a StarknetProviderError. Received error type: \(type(of: error))")
         }
     }
+
+    func testGetBlockWithTxsWithLatestBlockTag() async throws {
+        let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.latest))
+
+        if case .preConfirmed = result {
+            XCTFail("Expected .processed")
+        }
+    }
+
+    func testGetBlockWithTxsWithPreConfirmedBlockTag() async throws {
+        let result = try await provider.send(request: RequestBuilder.getBlockWithTxs(StarknetBlockId.BlockTag.preConfirmed))
+
+        if case .processed = result {
+            XCTFail("Expected .preConfirmed")
+        }
+    }
 }

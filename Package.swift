@@ -41,5 +41,9 @@ let package = Package(
                 .process("Resources"),
             ]
         ),
+        .testTarget(
+            name: "NetworkTests",
+            dependencies: ["Starknet"]
+        ),
     ]
 )
