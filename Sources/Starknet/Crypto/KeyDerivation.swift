@@ -1,6 +1,6 @@
-import Foundation
-import CryptoKit
 import BigInt
+import CryptoKit
+import Foundation
 
 // MARK: - Debug logging
 
@@ -59,7 +59,6 @@ public enum StarkKeygen {
         GrindLog.log("curveOrder(n)=\(STARK_EC_ORDER.hexPreview())")
         GrindLog.log("limit=mask - (mask % n) = \(limit.hexPreview())")
 
-
         var i: UInt64 = 0
         while i <= UInt64(maxIters) {
             let iBytes = varIntBE(i)
@@ -68,7 +67,6 @@ public enum StarkKeygen {
             input.append(iBytes)
 
             GrindLog.log("iter \(i): iBytes=\(iBytes.hexPreview()) inputLen=\(input.count)")
-
 
             let digest = SHA256.hash(data: input)
             let digestData = Data(digest)
@@ -79,7 +77,7 @@ public enum StarkKeygen {
             GrindLog.log("iter \(i): sha256=\(digestData.hexPreview()) x=\(x.hexPreview()) x<limit=\(cmp)")
 
             if x < limit {
-                let sk = x % STARK_EC_ORDER 
+                let sk = x % STARK_EC_ORDER
                 GrindLog.log("iter \(i): ACCEPT -> sk = x % n = \(sk.hexPreview())")
                 return x % STARK_EC_ORDER // in [0, n)
             }
@@ -91,7 +89,7 @@ public enum StarkKeygen {
     }
 
     /// Generates a random Starknet private key.
-    /// 
+    ///
     /// - Returns: a valid Starknet private key.
     public static func randomPrivateKeyHex() throws -> String {
         var seed = Data(count: 32)
@@ -119,7 +117,7 @@ private func varIntBE(_ x: UInt64) -> Data {
     return Data(bytes.reversed())
 }
 
-fileprivate extension String {
+private extension String {
     func leftPadding(width: Int) -> String {
         if count >= width { return self }
         return String(repeating: "0", count: width - count) + self

@@ -1,12 +1,12 @@
-import XCTest
 import BigInt
 @testable import Starknet
+import XCTest
 
 final class KeyDerivationTests: XCTestCase {
     private let curveOrder = StarknetCurve.curveOrder
 
     func testGrindKeyIsDeterministicAndInRange() throws {
-        let seed = Data([0xde, 0xad, 0xbe, 0xef])
+        let seed = Data([0xDE, 0xAD, 0xBE, 0xEF])
         let k1 = try StarkKeygen.grindKey(seed: seed)
         let k2 = try StarkKeygen.grindKey(seed: seed)
         XCTAssertEqual(k1, k2)
@@ -24,10 +24,9 @@ final class KeyDerivationTests: XCTestCase {
         let hex2 = try StarkKeygen.randomPrivateKeyHex()
         XCTAssertNotEqual(hex, hex2)
     }
-
 }
 
-fileprivate extension String {
+private extension String {
     func leftPadding(width: Int) -> String {
         if count >= width { return self }
         return String(repeating: "0", count: width - count) + self

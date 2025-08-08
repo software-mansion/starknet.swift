@@ -175,7 +175,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             accountDirectory = URL(string: tmpPath)!
         }
 
-        public func start() async throws {
+        func start() async throws {
             guard !self.devnetPath.isEmpty, !self.scarbPath.isEmpty, !self.snCastPath.isEmpty else {
                 throw DevnetClientError.environmentVariablesNotSet
             }
@@ -287,7 +287,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try fileManager.copyItem(at: accountsResourcePath, to: newAccountsPath)
         }
 
-        public func close() {
+        func close() {
             guard devnetProcess != nil else {
                 return
             }
@@ -302,7 +302,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             self.devnetProcess = nil
         }
 
-        public func prefundAccount(address: Felt, amount: BigUInt, unit: StarknetPriceUnit) async throws {
+        func prefundAccount(address: Felt, amount: BigUInt, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
             let url = URL(string: mintUrl)!
@@ -347,7 +347,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             }
         }
 
-        public func createDeployAccount(
+        func createDeployAccount(
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
             salt: Felt? = nil
@@ -365,7 +365,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        public func createAccount(
+        func createAccount(
             name: String,
             classHash: Felt = DevnetClientConstants.accountContractClassHash,
             salt: Felt? = nil,
@@ -400,7 +400,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        public func deployAccount(
+        func deployAccount(
             name: String,
             classHash _: Felt = DevnetClientConstants.accountContractClassHash,
             prefund: Bool = true
@@ -437,7 +437,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return result
         }
 
-        public func declareDeployContract(
+        func declareDeployContract(
             contractName: String,
             constructorCalldata: [Felt] = [],
             salt: Felt? = nil,
@@ -459,7 +459,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             )
         }
 
-        public func declareContract(contractName: String) async throws -> DeclareContractResult {
+        func declareContract(contractName: String) async throws -> DeclareContractResult {
             try guardDevnetIsRunning()
 
             if let result = declaredContractsAtName[contractName] {
@@ -486,7 +486,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return result
         }
 
-        public func deployContract(
+        func deployContract(
             classHash: Felt,
             constructorCalldata: [Felt] = [],
             salt: Felt? = nil,
@@ -531,7 +531,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return result
         }
 
-        public func invokeContract(
+        func invokeContract(
             contractAddress: Felt,
             function: String,
             calldata: [Felt] = []
@@ -559,7 +559,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
             return InvokeContractResult(transactionHash: response.transactionHash)
         }
 
-        public func isRunning() -> Bool {
+        func isRunning() -> Bool {
             if let devnetProcess, devnetProcess.isRunning {
                 return true
             }
@@ -626,7 +626,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
         typealias AccountDetailsResponse = [String: [String: AccountDetails]]
 
-        public func readAccountDetails(accountName: String) throws -> AccountDetails {
+        func readAccountDetails(accountName: String) throws -> AccountDetails {
             let filename = "\(accountDirectory)/starknet_open_zeppelin_accounts.json"
 
             let contents = try String(contentsOfFile: filename)
@@ -651,19 +651,19 @@ func makeDevnetClient() -> DevnetClientProtocol {
             try await Task.sleep(nanoseconds: seconds * UInt64(Double(NSEC_PER_SEC)))
         }
 
-        public func assertTransactionSucceeded(transactionHash: Felt) async throws {
+        func assertTransactionSucceeded(transactionHash: Felt) async throws {
             guard try await isTransactionSuccessful(transactionHash: transactionHash) == true else {
                 throw DevnetClientError.transactionFailed
             }
         }
 
-        public func assertTransactionFailed(transactionHash: Felt) async throws {
+        func assertTransactionFailed(transactionHash: Felt) async throws {
             guard try await isTransactionSuccessful(transactionHash: transactionHash) == false else {
                 throw DevnetClientError.transactionSucceeded
             }
         }
 
-        public func isTransactionSuccessful(transactionHash: Felt) async throws -> Bool {
+        func isTransactionSuccessful(transactionHash: Felt) async throws -> Bool {
             let params = GetTransactionByHashParams(hash: transactionHash)
             let rpcPayload = JsonRpcPayload(method: .getTransactionReceipt, params: .getTransactionByHash(params))
 
