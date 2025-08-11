@@ -42,7 +42,7 @@ final class AccountTests: XCTestCase {
     }
 
     func testGetNonce() async throws {
-        let _ = await (try? provider.send(request: account.getNonce()))
+        _ = await (try? provider.send(request: account.getNonce()))
     }
 
     func testExecuteV3() async throws {
