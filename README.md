@@ -20,6 +20,15 @@ dependencies: [
 Then add `starknet.swift` to the dependencies array of every target you want to use the package in.
 ```
 
+### Choosing the Right Product
+
+The package offers two library products:
+
+- `Starknet` – statically linked variant. Prefer this when you control the final app binary and want to avoid extra runtime bundles.
+- `StarknetDynamic` – dynamically linked variant. Use this for SwiftUI previews or any build pipeline that performs aggressive dead-symbol stripping.
+
+If you rely on SwiftUI previews or hit missing native symbol errors (`_generate_k`, `_Sign`, etc.), switch the dependency in your target to `StarknetDynamic`.
+
 ## Documentation
 You can find the documentation of the project [here](https://docs.swmansion.com/starknet.swift/documentation/starknet/).
 
