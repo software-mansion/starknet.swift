@@ -3,10 +3,10 @@
 
 #ifdef __OBJC__
 
-#import <libcrypto_c_exports/pedersen_hash.h>
-#import <libcrypto_c_exports/ecdsa.h>
+#import "pedersen_hash.h"
+#import "ecdsa.h"
 
-#import <libposeidon/poseidon.h>
+#import "poseidon.h"
 
 #import "crypto-rs.h"
 
