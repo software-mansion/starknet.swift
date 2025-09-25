@@ -149,7 +149,7 @@ enum StarknetTransactionTraceWrapper: Decodable {
     case deployAccount(StarknetDeployAccountTransactionTrace)
     case l1Handler(StarknetL1HandlerTransactionTrace)
 
-    public var transactionTrace: any StarknetTransactionTrace {
+    var transactionTrace: any StarknetTransactionTrace {
         switch self {
         case let .invoke(txTrace):
             txTrace
@@ -162,7 +162,7 @@ enum StarknetTransactionTraceWrapper: Decodable {
         }
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
 
         let type = try container.decode(StarknetTransactionType.self, forKey: Keys.type)
