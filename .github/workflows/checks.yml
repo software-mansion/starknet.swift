@@ -10,7 +10,7 @@ concurrency:
 env:
   GH_TOKEN: ${{ github.token }}
   # TODO: Remove below env once stable release of starknet foundry is available
-  SNFOUNDRY_SHA: 3d227d0aa6bf896f912144088f3c7bf0424f4c13
+  SNFOUNDRY_SHA: 208348df1ef1bfa4e332af0d3997d5e5fc4c57d4
 
 jobs:
   test_and_lint:
