@@ -16,7 +16,7 @@ jobs:
   test_and_lint:
     runs-on: macos-15
     env:
-      DEVNET_SHA: aafa74e4297734bacba72d0faa7c711eacecfc7a # v0.5.0-rc.1
+      DEVNET_SHA: b4460c7b5d0679632d471bf72b9713805d38c0f0 # v0.6.0
     steps:
       - uses: actions/checkout@v4
       - name: Setup Xcode

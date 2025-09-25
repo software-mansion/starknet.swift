@@ -93,6 +93,21 @@ struct PrefundPayload: Codable {
     }
 }
 
+struct DevnetMintRequest: Codable {
+    let jsonrpc: String
+    let method: String
+    let params: PrefundPayload
+    let id: Int
+
+    init(params: PrefundPayload, id: Int = 0) {
+        self.jsonrpc = "2.0"
+        self.method = "devnet_mint"
+        self.params = params
+        self.id = id
+    }
+}
+
+
 // Simplified receipt that is intended to support any JSON-RPC version starting 0.3,
 // to avoid DevnetClient relying on StarknetTransactionReceipt.
 // Only use it for checking whether a transaction was successful.

@@ -4,7 +4,6 @@ import Foundation
 
 protocol DevnetClientProtocol {
     var rpcUrl: String { get }
-    var mintUrl: String { get }
 
     var host: String { get }
     var port: Int { get }
@@ -155,7 +154,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
         let seed: Int
         let baseUrl: String
         let rpcUrl: String
-        let mintUrl: String
 
         let constants: DevnetClientConstants.Type = DevnetClientConstants.self
 
@@ -166,7 +164,6 @@ func makeDevnetClient() -> DevnetClientProtocol {
 
             baseUrl = "http://\(host):\(port)"
             rpcUrl = "\(baseUrl)/rpc"
-            mintUrl = "\(baseUrl)/mint"
 
             devnetPath = ProcessInfo.processInfo.environment["DEVNET_PATH"] ?? "starknet-devnet"
             scarbPath = ProcessInfo.processInfo.environment["SCARB_PATH"] ?? "scarb"
@@ -305,18 +302,18 @@ func makeDevnetClient() -> DevnetClientProtocol {
         public func prefundAccount(address: Felt, amount: BigUInt, unit: StarknetPriceUnit) async throws {
             try guardDevnetIsRunning()
 
-            let url = URL(string: mintUrl)!
+            let url = URL(string: rpcUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
 
-            let payload = PrefundPayload(address: address, amount: amount, unit: unit)
-
+            let mintPayload = PrefundPayload(address: address, amount: amount, unit: unit)
+            let requestPayload = DevnetMintRequest(params: mintPayload)
             // TODO(#209): Once we can use UInt128, we can simply set
-            // body as `request.httpBody = try JSONEncoder().encode(payload)`
+            // body as `request.httpBody = try JSONEncoder().encode(requestPayload)`
             // Following adjustment is needed to remove quotes from the amount field
             // in the JSON body, because ATM we can't use UInt128 in the payload.
 
-            let data = try JSONEncoder().encode(payload)
+            let data = try JSONEncoder().encode(requestPayload)
 
             guard var json = String(data: data, encoding: .utf8) else {
                 throw DevnetClientError.prefundError
