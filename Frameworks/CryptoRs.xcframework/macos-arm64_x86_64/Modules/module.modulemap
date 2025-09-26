@@ -1,0 +1,4 @@
+module CryptoRs {
+  header "../Headers/crypto-rs.h"
+  export *
+}
