@@ -59,3 +59,13 @@ public struct StarknetNonceUpdateItem: Decodable, Equatable {
         case nonce
     }
 }
+
+public struct StarknetMigratedCompiledClassessItem: Decodable, Equatable {
+    public let classHash: Felt
+    public let compiledClassHash: Felt
+    
+    enum CodingKeys: String, CodingKey {
+        case classHash = "class_hash"
+        case compiledClassHash = "compiled_class_hash"
+    }
+}

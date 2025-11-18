@@ -90,8 +90,9 @@ final class StorageProofTests: XCTestCase {
         let classHashes = [Felt(0x12), Felt(0x34)]
         let contractAddresses = [Felt(0x56), Felt(0x78)]
         let contractsStorageKeys = [
-            StarknetContractsStorageKeys(contractAddress: Felt(0x11), storageKeys: [Felt(0x22), Felt(0x33)]),
-            StarknetContractsStorageKeys(contractAddress: Felt(0x44), storageKeys: [Felt(0x55), Felt(0x66)]),
+            // Test different possible StorageKey initializers
+            StarknetContractsStorageKeys(contractAddress: Felt(0x11), storageKeys: [StarknetStorageKey(fromFelt: Felt(0x22))!, StarknetStorageKey(fromFelt: Felt(0x33))!]),
+            StarknetContractsStorageKeys(contractAddress: Felt(0x44), storageKeys: [StarknetStorageKey("0x55")!, StarknetStorageKey("0x66")!]),
         ]
 
         let params = GetStorageProofParams(blockId: blockId, classHashes: classHashes, contractAddresses: contractAddresses, contractsStorageKeys: contractsStorageKeys)
