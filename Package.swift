@@ -7,7 +7,7 @@ let package = Package(
     name: "Starknet",
     platforms: [
         .iOS(SupportedPlatform.IOSVersion.v13),
-        .macOS(SupportedPlatform.MacOSVersion.v12),
+        .macOS(SupportedPlatform.MacOSVersion.v13),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
