@@ -60,7 +60,7 @@ public struct StarknetNonceUpdateItem: Decodable, Equatable {
     }
 }
 
-public struct StarknetMigratedCompiledClassessItem: Decodable, Equatable {
+public struct StarknetMigratedCompiledClassesItem: Decodable, Equatable {
     public let classHash: Felt
     public let compiledClassHash: Felt
 
