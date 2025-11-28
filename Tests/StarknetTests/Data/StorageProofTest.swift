@@ -103,4 +103,20 @@ final class StorageProofTests: XCTestCase {
 
         XCTAssertEqualJSON(json, expected)
     }
+    
+    func testStorageKeyHappyCase() {
+        let case1 = StarknetStorageKey("0x0")!
+        XCTAssertEqual(case1.value, "0x0")
+        
+        let case2 = StarknetStorageKey("0x7abcdef")!
+        XCTAssertEqual(case2.value, "0x7abcdef")
+        
+        let case3 = StarknetStorageKey("0x7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")!
+        XCTAssertEqual(case3.value, "0x7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+    }
+    
+    func testStorageKeyValueExceedsLimit() {
+        XCTAssertNil(StarknetStorageKey("0x8ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"))
+        XCTAssertNil(StarknetStorageKey("0x7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffaa"))
+    }
 }
