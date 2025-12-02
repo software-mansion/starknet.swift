@@ -13,7 +13,7 @@ public struct StarknetStorageKey: Encodable {
     static let regex = #/^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)/#
 
     public init?(_ value: String) {
-        guard value.wholeMatch(of: regex) != nil else {
+        guard value.wholeMatch(of: StarknetStorageKey.regex) != nil else {
             return nil
         }
 

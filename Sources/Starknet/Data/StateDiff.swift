@@ -15,7 +15,7 @@ public struct StarknetStateDiff: Decodable, Equatable {
         case declaredClasses = "declared_classes"
         case deployedContracts = "deployed_contracts"
         case replacedClasses = "replaced_classes"
-        case migratedCompiledClassess = "migrated_compiled_classes"
+        case migratedCompiledClasses = "migrated_compiled_classes"
         case nonces
     }
 }
