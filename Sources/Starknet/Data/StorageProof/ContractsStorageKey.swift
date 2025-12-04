@@ -8,6 +8,8 @@ public struct StarknetContractsStorageKeys: Encodable {
     }
 }
 
+/// A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
+/// Storage keys must be a hexidecimal string, starting with `0x`, conforming to the regex `#/^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)/#`
 public struct StarknetStorageKey: Encodable {
     let value: String
     static let regex = #/^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)/#
