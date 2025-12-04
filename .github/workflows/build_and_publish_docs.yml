@@ -18,8 +18,6 @@ jobs:
       - uses: swift-actions/setup-swift@v3
         with:
           swift-version: "6.1"
-      - name: Get swift version
-        run: swift --version
 
       - name: Build docs
         run: |
