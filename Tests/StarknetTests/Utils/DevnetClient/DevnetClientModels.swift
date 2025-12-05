@@ -32,7 +32,7 @@ struct AccountDetails: Codable {
         self.salt = salt
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.privateKey = try container.decode(Felt.self, forKey: .privateKey)
@@ -85,7 +85,7 @@ struct PrefundPayload: Codable {
         case unit
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(address, forKey: .address)
         try container.encode(amount.description, forKey: .amount)
@@ -121,7 +121,7 @@ struct DevnetReceipt: Decodable {
         case finalityStatus = "finality_status"
     }
 
-    public var isSuccessful: Bool {
+    var isSuccessful: Bool {
         switch status {
         case nil:
             executionStatus == .succeeded && (finalityStatus == .acceptedL1 || finalityStatus == .acceptedL2)
@@ -130,7 +130,7 @@ struct DevnetReceipt: Decodable {
         }
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.status = try container.decodeIfPresent(StarknetTransactionStatus.self, forKey: .status)

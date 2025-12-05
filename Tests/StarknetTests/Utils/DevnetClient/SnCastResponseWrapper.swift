@@ -14,7 +14,7 @@ enum SnCastResponseWrapper: Decodable {
     case deploy(DeploySnCastResponse)
     case invoke(InvokeSnCastResponse)
 
-    public var response: any SnCastResponse {
+    var response: any SnCastResponse {
         switch self {
         case let .accountCreate(res):
             res
@@ -29,7 +29,7 @@ enum SnCastResponseWrapper: Decodable {
         }
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
         let command = try container.decode(SnCastCommand.self, forKey: .command)
         let error = try container.decodeIfPresent(String.self, forKey: .error)
