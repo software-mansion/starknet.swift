@@ -13,7 +13,7 @@ final class ProviderTests: XCTestCase {
         try await super.setUp()
 
         // TODO(#245): Change this to internal node
-        provider = StarknetProvider(url: "https://rpc.pathfinder.equilibrium.co/testnet-sepolia/rpc/v0_9")
+        provider = StarknetProvider(url: "https://rpc.pathfinder.equilibrium.co/testnet-sepolia/rpc/v0_10")
     }
 
     func testGetBlockWithTxsWithL1AcceptedBlockTag() async throws {
