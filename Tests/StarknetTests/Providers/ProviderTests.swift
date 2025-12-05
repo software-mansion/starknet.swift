@@ -135,8 +135,6 @@ final class ProviderTests: XCTestCase {
     }
 
     func testGetEvents() async throws {
-        throw XCTSkip("TODO(#260)")
-
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Events")
         let invokeResult = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract.deploy.contractAddress, function: "emit_event", calldata: [1])
 
@@ -294,8 +292,6 @@ final class ProviderTests: XCTestCase {
     }
 
     func testSimulateTransactionsV3() async throws {
-        throw XCTSkip("TODO(#260)")
-
         let contract = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
 
         let nonce = try await provider.send(request: account.getNonce())

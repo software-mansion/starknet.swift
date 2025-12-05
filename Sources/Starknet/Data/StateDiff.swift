@@ -6,7 +6,7 @@ public struct StarknetStateDiff: Decodable, Equatable {
     public let declaredClasses: [StarknetDeclaredClassItem]
     public let deployedContracts: [StarknetDeployedContractItem]
     public let replacedClasses: [StarknetReplacedClassItem]
-    public let migratedCompiledClasses: [StarknetMigratedCompiledClassesItem]
+    public let migratedCompiledClasses: [StarknetMigratedCompiledClassesItem]?
     public let nonces: [StarknetNonceUpdateItem]
 
     enum CodingKeys: String, CodingKey {
