@@ -20,6 +20,13 @@ public protocol StarknetProcessedBlock: StarknetBlock {
     var blockHash: Felt { get }
     var parentHash: Felt { get }
     var newRoot: Felt { get }
+    var eventCommitment: Felt { get }
+    var transactionCommitment: Felt { get }
+    var receiptCommitment: Felt { get }
+    var stateDiffCommitment: Felt { get }
+    var eventCount: Int { get }
+    var transactionCount: Int { get }
+    var stateDiffLength: Int { get }
 }
 
 public protocol StarknetPreConfirmedBlock: StarknetBlock {}
@@ -42,6 +49,13 @@ public struct StarknetProcessedBlockWithTxs: StarknetProcessedBlock, StarknetBlo
     public let l1DataGasPrice: StarknetResourcePrice
     public let l1DataAvailabilityMode: StarknetL1DAMode
     public let starknetVersion: String
+    public let eventCommitment: Felt
+    public let transactionCommitment: Felt
+    public let receiptCommitment: Felt
+    public let stateDiffCommitment: Felt
+    public let eventCount: Int
+    public let transactionCount: Int
+    public let stateDiffLength: Int
 
     enum CodingKeys: String, CodingKey {
         case status
@@ -57,6 +71,13 @@ public struct StarknetProcessedBlockWithTxs: StarknetProcessedBlock, StarknetBlo
         case l1DataGasPrice = "l1_data_gas_price"
         case l1DataAvailabilityMode = "l1_da_mode"
         case starknetVersion = "starknet_version"
+        case eventCommitment = "event_commitment"
+        case transactionCommitment = "transaction_commitment"
+        case receiptCommitment = "receipt_commitment"
+        case stateDiffCommitment = "state_diff_commitment"
+        case eventCount = "event_count"
+        case transactionCount = "transaction_count"
+        case stateDiffLength = "state_diff_length"
     }
 }
 
