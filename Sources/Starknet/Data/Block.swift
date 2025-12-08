@@ -24,9 +24,9 @@ public protocol StarknetProcessedBlock: StarknetBlock {
     var transactionCommitment: Felt { get }
     var receiptCommitment: Felt { get }
     var stateDiffCommitment: Felt { get }
-    var eventCount: Int { get }
-    var transactionCount: Int { get }
-    var stateDiffLength: Int { get }
+    var eventCount: UInt { get }
+    var transactionCount: UInt { get }
+    var stateDiffLength: UInt { get }
 }
 
 public protocol StarknetPreConfirmedBlock: StarknetBlock {}
@@ -53,9 +53,9 @@ public struct StarknetProcessedBlockWithTxs: StarknetProcessedBlock, StarknetBlo
     public let transactionCommitment: Felt
     public let receiptCommitment: Felt
     public let stateDiffCommitment: Felt
-    public let eventCount: Int
-    public let transactionCount: Int
-    public let stateDiffLength: Int
+    public let eventCount: UInt
+    public let transactionCount: UInt
+    public let stateDiffLength: UInt
 
     enum CodingKeys: String, CodingKey {
         case status
