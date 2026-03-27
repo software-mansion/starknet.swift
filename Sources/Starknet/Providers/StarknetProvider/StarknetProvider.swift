@@ -1,5 +1,9 @@
 import Foundation
 
+public enum StarknetRpcErrorCode {
+    public static let invalidProof = 69
+}
+
 public enum StarknetProviderError: Error {
     case networkProviderError
     case unknownError

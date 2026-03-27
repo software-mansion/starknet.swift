@@ -15,10 +15,23 @@ public enum StarknetCallType: String, Decodable {
 public enum StarknetSimulationFlag: String, Codable {
     case skipValidate = "SKIP_VALIDATE"
     case skipFeeCharge = "SKIP_FEE_CHARGE"
+    case returnInitialReads = "RETURN_INITIAL_READS"
 }
 
 public enum StarknetSimulationFlagForEstimateFee: String, Codable {
     case skipValidate = "SKIP_VALIDATE"
+}
+
+public enum StarknetTraceFlag: String, Codable {
+    case returnInitialReads = "RETURN_INITIAL_READS"
+}
+
+public enum StarknetTxnResponseFlag: String, Codable {
+    case includeProofFacts = "INCLUDE_PROOF_FACTS"
+}
+
+public enum StarknetStorageResponseFlag: String, Codable {
+    case includeLastUpdateBlock = "INCLUDE_LAST_UPDATE_BLOCK"
 }
 
 public struct StarknetFunctionInvocation: Decodable, Equatable {
@@ -198,5 +211,127 @@ public struct StarknetSimulatedTransaction: Decodable {
 
         transactionTrace = try container.decode(StarknetTransactionTraceWrapper.self, forKey: .transactionTrace).transactionTrace
         feeEstimation = try container.decode(StarknetFeeEstimate.self, forKey: .feeEstimation)
+    }
+}
+
+public struct StarknetStorageEntry: Decodable, Equatable {
+    public let contractAddress: Felt
+    public let key: Felt
+    public let value: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case contractAddress = "contract_address"
+        case key
+        case value
+    }
+}
+
+public struct StarknetNonceEntry: Decodable, Equatable {
+    public let contractAddress: Felt
+    public let nonce: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case contractAddress = "contract_address"
+        case nonce
+    }
+}
+
+public struct StarknetClassHashEntry: Decodable, Equatable {
+    public let contractAddress: Felt
+    public let classHash: Felt
+
+    enum CodingKeys: String, CodingKey {
+        case contractAddress = "contract_address"
+        case classHash = "class_hash"
+    }
+}
+
+public struct StarknetDeclaredContractEntry: Decodable, Equatable {
+    public let classHash: Felt
+    public let isDeclared: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case classHash = "class_hash"
+        case isDeclared = "is_declared"
+    }
+}
+
+public struct StarknetInitialReads: Decodable, Equatable {
+    public let storage: [StarknetStorageEntry]
+    public let nonces: [StarknetNonceEntry]
+    public let classHashes: [StarknetClassHashEntry]
+    public let declaredContracts: [StarknetDeclaredContractEntry]
+
+    enum CodingKeys: String, CodingKey {
+        case storage
+        case nonces
+        case classHashes = "class_hashes"
+        case declaredContracts = "declared_contracts"
+    }
+}
+
+public enum StarknetSimulateTransactionsResult: Decodable {
+    case transactions([StarknetSimulatedTransaction])
+    case withInitialReads(simulatedTransactions: [StarknetSimulatedTransaction], initialReads: StarknetInitialReads)
+
+    enum CodingKeys: String, CodingKey {
+        case simulatedTransactions = "simulated_transactions"
+        case initialReads = "initial_reads"
+    }
+
+    public init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self),
+           container.contains(.simulatedTransactions)
+        {
+            let txs = try container.decode([StarknetSimulatedTransaction].self, forKey: .simulatedTransactions)
+            let reads = try container.decode(StarknetInitialReads.self, forKey: .initialReads)
+            self = .withInitialReads(simulatedTransactions: txs, initialReads: reads)
+        } else {
+            let txs = try [StarknetSimulatedTransaction](from: decoder)
+            self = .transactions(txs)
+        }
+    }
+}
+
+public struct StarknetBlockTransactionTrace: Decodable, Equatable {
+    public let transactionHash: Felt
+    public let traceRoot: any StarknetTransactionTrace
+
+    enum CodingKeys: String, CodingKey {
+        case transactionHash = "transaction_hash"
+        case traceRoot = "trace_root"
+    }
+
+    public static func == (lhs: StarknetBlockTransactionTrace, rhs: StarknetBlockTransactionTrace) -> Bool {
+        lhs.transactionHash == rhs.transactionHash
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        transactionHash = try container.decode(Felt.self, forKey: .transactionHash)
+        traceRoot = try container.decode(StarknetTransactionTraceWrapper.self, forKey: .traceRoot).transactionTrace
+    }
+}
+
+public enum StarknetTraceBlockTransactionsResult: Decodable {
+    case traces([StarknetBlockTransactionTrace])
+    case withInitialReads(traces: [StarknetBlockTransactionTrace], initialReads: StarknetInitialReads)
+
+    enum CodingKeys: String, CodingKey {
+        case traces
+        case initialReads = "initial_reads"
+    }
+
+    public init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self),
+           container.contains(.traces)
+        {
+            let traces = try container.decode([StarknetBlockTransactionTrace].self, forKey: .traces)
+            let reads = try container.decode(StarknetInitialReads.self, forKey: .initialReads)
+            self = .withInitialReads(traces: traces, initialReads: reads)
+        } else {
+            let traces = try [StarknetBlockTransactionTrace](from: decoder)
+            self = .traces(traces)
+        }
     }
 }

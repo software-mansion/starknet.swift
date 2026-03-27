@@ -144,6 +144,44 @@ public struct StarknetGetStorageProofResponse: Decodable, Equatable {
     }
 }
 
+public struct StarknetStateUpdate: Decodable, Equatable {
+    public let blockHash: Felt
+    public let newRoot: Felt
+    public let oldRoot: Felt
+    public let stateDiff: StarknetStateDiff
+
+    enum CodingKeys: String, CodingKey {
+        case blockHash = "block_hash"
+        case newRoot = "new_root"
+        case oldRoot = "old_root"
+        case stateDiff = "state_diff"
+    }
+}
+
+public struct StarknetStorageResult: Decodable, Equatable {
+    public let value: Felt
+    public let lastUpdateBlock: UInt64
+
+    enum CodingKeys: String, CodingKey {
+        case value
+        case lastUpdateBlock = "last_update_block"
+    }
+}
+
+public enum StarknetStorageAtResult: Decodable, Equatable {
+    case value(Felt)
+    case withLastUpdateBlock(StarknetStorageResult)
+
+    public init(from decoder: Decoder) throws {
+        if let result = try? StarknetStorageResult(from: decoder) {
+            self = .withLastUpdateBlock(result)
+        } else {
+            let felt = try Felt(from: decoder)
+            self = .value(felt)
+        }
+    }
+}
+
 public struct StarknetGetTransactionStatusResponse: Decodable, Equatable {
     public let finalityStatus: StarknetTransactionStatus
     public let executionStatus: StarknetTransactionExecutionStatus?

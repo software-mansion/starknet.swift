@@ -123,19 +123,23 @@ struct GetStorageProofParams: Encodable {
 
 struct GetTransactionByHashParams: Encodable {
     let hash: Felt
+    let responseFlags: [StarknetTxnResponseFlag]
 
     enum CodingKeys: String, CodingKey {
         case hash = "transaction_hash"
+        case responseFlags = "response_flags"
     }
 }
 
 struct GetTransactionByBlockIdAndIndex: Encodable {
     let blockId: StarknetBlockId
     let index: UInt64
+    let responseFlags: [StarknetTxnResponseFlag]
 
     enum CodingKeys: String, CodingKey {
         case blockId = "block_id"
         case index
+        case responseFlags = "response_flags"
     }
 }
 
@@ -187,9 +191,55 @@ struct SimulateTransactionsParams: Encodable {
 
 struct GetBlockWithTxsParams: Encodable {
     let blockId: StarknetBlockId
+    let responseFlags: [StarknetTxnResponseFlag]
 
     enum CodingKeys: String, CodingKey {
         case blockId = "block_id"
+        case responseFlags = "response_flags"
+    }
+}
+
+struct TraceBlockTransactionsParams: Encodable {
+    let blockId: StarknetBlockId
+    let traceFlags: Set<StarknetTraceFlag>
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+        case traceFlags = "trace_flags"
+    }
+}
+
+struct GetStorageAtParams: Encodable {
+    let contractAddress: Felt
+    let key: Felt
+    let blockId: StarknetBlockId
+    let responseFlags: [StarknetStorageResponseFlag]
+
+    enum CodingKeys: String, CodingKey {
+        case contractAddress = "contract_address"
+        case key
+        case blockId = "block_id"
+        case responseFlags = "response_flags"
+    }
+}
+
+struct GetBlockWithTxHashesParams: Encodable {
+    let blockId: StarknetBlockId
+    let responseFlags: [StarknetTxnResponseFlag]
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+        case responseFlags = "response_flags"
+    }
+}
+
+struct GetStateUpdateParams: Encodable {
+    let blockId: StarknetBlockId
+    let contractAddresses: [Felt]?
+
+    enum CodingKeys: String, CodingKey {
+        case blockId = "block_id"
+        case contractAddresses = "contract_addresses"
     }
 }
 
@@ -212,6 +262,10 @@ enum JsonRpcParams {
     case getTransactionStatus(GetTransactionStatusParams)
     case getMessagesStatus(GetMessagesStatusParams)
     case simulateTransactions(SimulateTransactionsParams)
+    case traceBlockTransactions(TraceBlockTransactionsParams)
+    case getStorageAt(GetStorageAtParams)
+    case getStateUpdate(GetStateUpdateParams)
+    case getBlockWithTxHashes(GetBlockWithTxHashesParams)
 }
 
 extension JsonRpcParams: Encodable {
@@ -252,6 +306,14 @@ extension JsonRpcParams: Encodable {
         case let .getMessagesStatus(params):
             try params.encode(to: encoder)
         case let .simulateTransactions(params):
+            try params.encode(to: encoder)
+        case let .traceBlockTransactions(params):
+            try params.encode(to: encoder)
+        case let .getStorageAt(params):
+            try params.encode(to: encoder)
+        case let .getStateUpdate(params):
+            try params.encode(to: encoder)
+        case let .getBlockWithTxHashes(params):
             try params.encode(to: encoder)
         }
     }

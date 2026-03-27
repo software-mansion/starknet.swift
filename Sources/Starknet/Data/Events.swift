@@ -1,9 +1,24 @@
 import Foundation
 
+public enum StarknetEventAddressFilter: Encodable, Equatable {
+    case single(Felt)
+    case multiple([Felt])
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case let .single(address):
+            try container.encode(address)
+        case let .multiple(addresses):
+            try container.encode(addresses)
+        }
+    }
+}
+
 public struct StarknetGetEventsFilter: Encodable {
     public let fromBlockId: StarknetBlockId?
     public let toBlockId: StarknetBlockId?
-    public let address: Felt?
+    public let address: StarknetEventAddressFilter?
     public let keys: [[Felt]]?
     public let chunkSize: UInt64
     public let continuationToken: String?
@@ -11,7 +26,16 @@ public struct StarknetGetEventsFilter: Encodable {
     public init(fromBlockId: StarknetBlockId? = StarknetBlockId.tag(.preConfirmed), toBlockId: StarknetBlockId? = StarknetBlockId.tag(.preConfirmed), address: Felt? = nil, keys: [[Felt]]? = nil, chunkSize: UInt64 = 50, continuationToken: String? = nil) {
         self.fromBlockId = fromBlockId
         self.toBlockId = toBlockId
-        self.address = address
+        self.address = address.map { .single($0) }
+        self.keys = keys
+        self.chunkSize = chunkSize
+        self.continuationToken = continuationToken
+    }
+
+    public init(fromBlockId: StarknetBlockId? = StarknetBlockId.tag(.preConfirmed), toBlockId: StarknetBlockId? = StarknetBlockId.tag(.preConfirmed), addresses: [Felt], keys: [[Felt]]? = nil, chunkSize: UInt64 = 50, continuationToken: String? = nil) {
+        self.fromBlockId = fromBlockId
+        self.toBlockId = toBlockId
+        self.address = .multiple(addresses)
         self.keys = keys
         self.chunkSize = chunkSize
         self.continuationToken = continuationToken

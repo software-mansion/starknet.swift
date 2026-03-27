@@ -28,7 +28,12 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
 
     public let hash: Felt?
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil, tip: UInt64AsHex = .zero) {
+    public let proofFacts: [Felt]
+
+    /// Optional base64-encoded proof, included when broadcasting a transaction with proof mode.
+    public let proof: String?
+
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil, tip: UInt64AsHex = .zero, proofFacts: [Felt] = [], proof: String? = nil) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
@@ -41,6 +46,8 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         self.accountDeploymentData = []
         self.nonceDataAvailabilityMode = .l1
         self.feeDataAvailabilityMode = .l1
+        self.proofFacts = proofFacts
+        self.proof = proof
     }
 
     enum CodingKeys: String, CodingKey {
@@ -57,6 +64,8 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         case nonceDataAvailabilityMode = "nonce_data_availability_mode"
         case feeDataAvailabilityMode = "fee_data_availability_mode"
         case hash = "transaction_hash"
+        case proofFacts = "proof_facts"
+        case proof
     }
 
     public init(from decoder: Decoder) throws {
@@ -73,8 +82,31 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         self.nonceDataAvailabilityMode = try container.decode(StarknetDAMode.self, forKey: .nonceDataAvailabilityMode)
         self.feeDataAvailabilityMode = try container.decode(StarknetDAMode.self, forKey: .feeDataAvailabilityMode)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
+        self.proofFacts = try container.decodeIfPresent([Felt].self, forKey: .proofFacts) ?? []
+        self.proof = try container.decodeIfPresent(String.self, forKey: .proof)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
+        try container.encode(version, forKey: .version)
+        try container.encode(senderAddress, forKey: .senderAddress)
+        try container.encode(calldata, forKey: .calldata)
+        try container.encode(signature, forKey: .signature)
+        try container.encode(nonce, forKey: .nonce)
+        try container.encode(resourceBounds, forKey: .resourceBounds)
+        try container.encode(tip, forKey: .tip)
+        try container.encode(paymasterData, forKey: .paymasterData)
+        try container.encode(accountDeploymentData, forKey: .accountDeploymentData)
+        try container.encode(nonceDataAvailabilityMode, forKey: .nonceDataAvailabilityMode)
+        try container.encode(feeDataAvailabilityMode, forKey: .feeDataAvailabilityMode)
+        try container.encodeIfPresent(hash, forKey: .hash)
+        if !proofFacts.isEmpty {
+            try container.encode(proofFacts, forKey: .proofFacts)
+        }
+        try container.encodeIfPresent(proof, forKey: .proof)
     }
 }
 

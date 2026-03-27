@@ -38,12 +38,14 @@ public class StarknetTransactionHashCalculator {
             address: transaction.senderAddress,
             chainId: chainId
         )
-        return StarknetPoseidon.poseidonHash(
-            commonFields + [
-                StarknetPoseidon.poseidonHash(transaction.accountDeploymentData),
-                StarknetPoseidon.poseidonHash(transaction.calldata),
-            ]
-        )
+        var fields = commonFields + [
+            StarknetPoseidon.poseidonHash(transaction.accountDeploymentData),
+            StarknetPoseidon.poseidonHash(transaction.calldata),
+        ]
+        if !transaction.proofFacts.isEmpty {
+            fields.append(StarknetPoseidon.poseidonHash(transaction.proofFacts))
+        }
+        return StarknetPoseidon.poseidonHash(fields)
     }
 
     public class func computeHash(of transaction: StarknetDeployAccountTransactionV3, chainId: StarknetChainId) -> Felt {

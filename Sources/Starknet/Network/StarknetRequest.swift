@@ -155,8 +155,8 @@ public enum RequestBuilder {
     ///  - hash: The hash of the requested transaction
     ///
     /// - Returns: Transaction found with provided hash
-    public static func getTransactionBy(hash: Felt) -> StarknetRequest<TransactionWrapper> {
-        let params = GetTransactionByHashParams(hash: hash)
+    public static func getTransactionBy(hash: Felt, responseFlags: [StarknetTxnResponseFlag] = []) -> StarknetRequest<TransactionWrapper> {
+        let params = GetTransactionByHashParams(hash: hash, responseFlags: responseFlags)
 
         return StarknetRequest(method: .getTransactionByHash, params: .getTransactionByHash(params))
     }
@@ -166,10 +166,11 @@ public enum RequestBuilder {
     /// - Parameters:
     ///  - blockId: id of block from which the transaction should be returned.
     ///  - index: index of transaction in the block
+    ///  - responseFlags: optional flags controlling which additional fields are included
     ///
     /// - Returns: Transaction found with provided blockId and index.
-    public static func getTransactionBy(blockId: StarknetBlockId, index: UInt64) -> StarknetRequest<TransactionWrapper> {
-        let params = GetTransactionByBlockIdAndIndex(blockId: blockId, index: index)
+    public static func getTransactionBy(blockId: StarknetBlockId, index: UInt64, responseFlags: [StarknetTxnResponseFlag] = []) -> StarknetRequest<TransactionWrapper> {
+        let params = GetTransactionByBlockIdAndIndex(blockId: blockId, index: index, responseFlags: responseFlags)
 
         return StarknetRequest(method: .getTransactionByBlockIdAndIndex, params: .getTransactionByBlockIdAndIndex(params))
     }
@@ -226,11 +227,95 @@ public enum RequestBuilder {
     ///  - blockId: block used to run the simulation
     ///  - simulationFlags: a set of simulation flags
     ///
-    ///  - Returns: array of simulated transactions
-    public static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
+    ///  - Returns: simulated transactions result (array, or with initial reads if RETURN_INITIAL_READS flag is set)
+    public static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], at blockId: StarknetBlockId, simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<StarknetSimulateTransactionsResult> {
         let params = SimulateTransactionsParams(transactions: transactions, blockId: blockId, simulationFlags: simulationFlags)
 
         return StarknetRequest(method: .simulateTransactions, params: .simulateTransactions(params))
+    }
+
+    /// Get the trace of transactions in a block.
+    ///
+    /// - Parameters:
+    ///  - blockId: hash, number, or tag of the requested block
+    ///  - traceFlags: optional set of trace flags
+    ///
+    ///  - Returns: traces result (array, or with initial reads if RETURN_INITIAL_READS flag is set)
+    public static func traceBlockTransactions(at blockId: StarknetBlockId, traceFlags: Set<StarknetTraceFlag> = []) -> StarknetRequest<StarknetTraceBlockTransactionsResult> {
+        let params = TraceBlockTransactionsParams(blockId: blockId, traceFlags: traceFlags)
+
+        return StarknetRequest(method: .traceBlockTransactions, params: .traceBlockTransactions(params))
+    }
+
+    /// Get the storage value of a contract at the given key.
+    ///
+    /// - Parameters:
+    ///  - contractAddress: address of the contract
+    ///  - key: storage key
+    ///  - blockId: hash, number, or tag of the requested block
+    ///
+    ///  - Returns: storage value as Felt
+    public static func getStorageAt(contractAddress: Felt, key: Felt, at blockId: StarknetBlockId) -> StarknetRequest<Felt> {
+        let params = GetStorageAtParams(contractAddress: contractAddress, key: key, blockId: blockId, responseFlags: [])
+
+        return StarknetRequest(method: .getStorageAt, params: .getStorageAt(params))
+    }
+
+    public static func getStorageAt(contractAddress: Felt, key: Felt) -> StarknetRequest<Felt> {
+        getStorageAt(contractAddress: contractAddress, key: key, at: defaultBlockId)
+    }
+
+    /// Get the storage value at the given key, including last-update-block metadata.
+    ///
+    /// - Parameters:
+    ///  - contractAddress: address of the contract
+    ///  - key: storage key
+    ///  - blockId: hash, number, or tag of the requested block
+    ///  - responseFlags: flags controlling which additional fields are included
+    ///
+    ///  - Returns: storage value as Felt, or with last update block if INCLUDE_LAST_UPDATE_BLOCK flag is set
+    public static func getStorageAt(contractAddress: Felt, key: Felt, at blockId: StarknetBlockId, responseFlags: [StarknetStorageResponseFlag]) -> StarknetRequest<StarknetStorageAtResult> {
+        let params = GetStorageAtParams(contractAddress: contractAddress, key: key, blockId: blockId, responseFlags: responseFlags)
+
+        return StarknetRequest(method: .getStorageAt, params: .getStorageAt(params))
+    }
+
+    /// Get a block with transaction hashes.
+    ///
+    /// - Parameters:
+    /// - blockId: hash, number, or tag of the requested block.
+    /// - responseFlags: optional flags controlling which additional fields are included
+    ///
+    /// - Returns: Block information with transaction hashes.
+    public static func getBlockWithTxHashes(_ blockId: StarknetBlockId, responseFlags: [StarknetTxnResponseFlag] = []) -> StarknetRequest<StarknetBlockWithTxHashesWrapper> {
+        let params = GetBlockWithTxHashesParams(blockId: blockId, responseFlags: responseFlags)
+
+        return StarknetRequest(method: .getBlockWithTxHashes, params: .getBlockWithTxHashes(params))
+    }
+
+    public static func getBlockWithTxHashes(_ blockHash: Felt) -> StarknetRequest<StarknetBlockWithTxHashesWrapper> {
+        getBlockWithTxHashes(StarknetBlockId.hash(blockHash))
+    }
+
+    public static func getBlockWithTxHashes(_ blockNumber: Int) -> StarknetRequest<StarknetBlockWithTxHashesWrapper> {
+        getBlockWithTxHashes(StarknetBlockId.number(blockNumber))
+    }
+
+    public static func getBlockWithTxHashes(_ blockTag: StarknetBlockId.BlockTag) -> StarknetRequest<StarknetBlockWithTxHashesWrapper> {
+        getBlockWithTxHashes(StarknetBlockId.tag(blockTag))
+    }
+
+    /// Get the state update for a block.
+    ///
+    /// - Parameters:
+    ///  - blockId: hash, number, or tag of the requested block
+    ///  - contractAddresses: optional filter — only include state diff for these contract addresses
+    ///
+    ///  - Returns: state update for the block
+    public static func getStateUpdate(at blockId: StarknetBlockId, contractAddresses: [Felt]? = nil) -> StarknetRequest<StarknetStateUpdate> {
+        let params = GetStateUpdateParams(blockId: blockId, contractAddresses: contractAddresses)
+
+        return StarknetRequest(method: .getStateUpdate, params: .getStateUpdate(params))
     }
 
     /// Call starknet contract in the pending block.
@@ -343,8 +428,8 @@ public enum RequestBuilder {
     ///  - transactions: list of transactions to simulate
     ///  - simulationFlags: a set of simulation flags
     ///
-    /// - Returns : array of simulated transactions
-    public static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<[StarknetSimulatedTransaction]> {
+    /// - Returns: simulated transactions result
+    public static func simulateTransactions(_ transactions: [any StarknetExecutableTransaction], simulationFlags: Set<StarknetSimulationFlag>) -> StarknetRequest<StarknetSimulateTransactionsResult> {
         simulateTransactions(transactions, at: defaultBlockId, simulationFlags: simulationFlags)
     }
 
@@ -354,8 +439,8 @@ public enum RequestBuilder {
     /// - blockId: hash, number, or tag of the requested block.
     ///
     /// - Returns: Block information with full transactions.
-    public static func getBlockWithTxs(_ blockId: StarknetBlockId) -> StarknetRequest<StarknetBlockWithTxsWrapper> {
-        let params = GetBlockWithTxsParams(blockId: blockId)
+    public static func getBlockWithTxs(_ blockId: StarknetBlockId, responseFlags: [StarknetTxnResponseFlag] = []) -> StarknetRequest<StarknetBlockWithTxsWrapper> {
+        let params = GetBlockWithTxsParams(blockId: blockId, responseFlags: responseFlags)
 
         return StarknetRequest(method: .getBlockWithTxs, params: .getBlockWithTxs(params))
     }
