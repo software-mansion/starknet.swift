@@ -464,7 +464,7 @@ final class ProviderTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: txHash)
 
         let txReceipt = try await provider.send(request: RequestBuilder.getTransactionReceiptBy(hash: txHash))
-        let blockNumber = txReceipt.transactionReceipt.blockNumber!
+        let blockNumber = try XCTUnwrap(txReceipt.transactionReceipt.blockNumber)
 
         let blockResult = try await provider.send(request: RequestBuilder.getBlockWithTxHashes(.number(Int(blockNumber)), responseFlags: [.includeProofFacts]))
 
@@ -519,7 +519,7 @@ final class ProviderTests: XCTestCase {
         try await Self.devnetClient.assertTransactionSucceeded(transactionHash: txHash)
 
         let txReceipt = try await provider.send(request: RequestBuilder.getTransactionReceiptBy(hash: txHash))
-        let blockNumber = txReceipt.transactionReceipt.blockNumber!
+        let blockNumber = try XCTUnwrap(txReceipt.transactionReceipt.blockNumber)
 
         let blockResult = try await provider.send(request: RequestBuilder.getBlockWithTxs(.number(Int(blockNumber)), responseFlags: [.includeProofFacts]))
 

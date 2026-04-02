@@ -228,45 +228,45 @@ final class TransactionTests: XCTestCase {
     func testInvokeV3HashWithProofFacts() throws {
         // Transaction submitted on Sepolia integration network.
         // Expected hash: 0x7C173B8A109AB589694C89431E2C6070EA8662087B012F62081FAB6BACA4F6E
-        let tx = StarknetInvokeTransactionV3(
-            senderAddress: Felt(fromHex: "0x7BFCD6BD5B220A1D46921D92924DDEC46BB7E49D05354C76A8714B41269B2F8")!,
+        let tx = try StarknetInvokeTransactionV3(
+            senderAddress: XCTUnwrap(Felt(fromHex: "0x7BFCD6BD5B220A1D46921D92924DDEC46BB7E49D05354C76A8714B41269B2F8")),
             calldata: [
-                Felt(fromHex: "0x1")!,
-                Felt(fromHex: "0x70A5DA4F557B77A9C54546E4BCC900806E28793D8E3EAAA207428D2387249B7")!,
-                Felt(fromHex: "0x31341177714D81AD9CCD0C903211BC056A60E8AF988D0FD918CC43874549653")!,
-                Felt(fromHex: "0x0")!,
+                XCTUnwrap(Felt(fromHex: "0x1")),
+                XCTUnwrap(Felt(fromHex: "0x70A5DA4F557B77A9C54546E4BCC900806E28793D8E3EAAA207428D2387249B7")),
+                XCTUnwrap(Felt(fromHex: "0x31341177714D81AD9CCD0C903211BC056A60E8AF988D0FD918CC43874549653")),
+                XCTUnwrap(Felt(fromHex: "0x0")),
             ],
             signature: [],
             resourceBounds: StarknetResourceBoundsMapping(
                 l1Gas: StarknetResourceBounds(
-                    maxAmount: UInt64AsHex(fromHex: "0x0")!,
-                    maxPricePerUnit: UInt128AsHex(fromHex: "0x15D3EF79800")!
+                    maxAmount: XCTUnwrap(UInt64AsHex(fromHex: "0x0")),
+                    maxPricePerUnit: XCTUnwrap(UInt128AsHex(fromHex: "0x15D3EF79800"))
                 ),
                 l2Gas: StarknetResourceBounds(
-                    maxAmount: UInt64AsHex(fromHex: "0x7757FAC")!,
-                    maxPricePerUnit: UInt128AsHex(fromHex: "0x2CB417800")!
+                    maxAmount: XCTUnwrap(UInt64AsHex(fromHex: "0x7757FAC")),
+                    maxPricePerUnit: XCTUnwrap(UInt128AsHex(fromHex: "0x2CB417800"))
                 ),
                 l1DataGas: StarknetResourceBounds(
-                    maxAmount: UInt64AsHex(fromHex: "0xC0")!,
-                    maxPricePerUnit: UInt128AsHex(fromHex: "0x5DC")!
+                    maxAmount: XCTUnwrap(UInt64AsHex(fromHex: "0xC0")),
+                    maxPricePerUnit: XCTUnwrap(UInt128AsHex(fromHex: "0x5DC"))
                 )
             ),
-            nonce: Felt(fromHex: "0x25")!,
+            nonce: XCTUnwrap(Felt(fromHex: "0x25")),
             proofFacts: [
-                Felt(fromHex: "0x50524F4F4630")!,
-                Felt(fromHex: "0x5649525455414C5F534E4F53")!,
-                Felt(fromHex: "0x3E98C2D7703B03A7EDB73ED7F075F97F1DCBAA8F717CDF6E1A57BF058265473")!,
-                Felt(fromHex: "0x5649525455414C5F534E4F5330")!,
-                Felt(fromHex: "0x2256B2")!,
-                Felt(fromHex: "0x4272EA7D22D1B1E91D4D6EB1C55FCB5769B676DF746CF2FE77AF8FFFB86EEF2")!,
-                Felt(fromHex: "0x6989A681C469D769F3A706C56550A63741A4B2D32BEF4B1209A26DAAD1DBB6")!,
-                Felt(fromHex: "0x0")!,
+                XCTUnwrap(Felt(fromHex: "0x50524F4F4630")),
+                XCTUnwrap(Felt(fromHex: "0x5649525455414C5F534E4F53")),
+                XCTUnwrap(Felt(fromHex: "0x3E98C2D7703B03A7EDB73ED7F075F97F1DCBAA8F717CDF6E1A57BF058265473")),
+                XCTUnwrap(Felt(fromHex: "0x5649525455414C5F534E4F5330")),
+                XCTUnwrap(Felt(fromHex: "0x2256B2")),
+                XCTUnwrap(Felt(fromHex: "0x4272EA7D22D1B1E91D4D6EB1C55FCB5769B676DF746CF2FE77AF8FFFB86EEF2")),
+                XCTUnwrap(Felt(fromHex: "0x6989A681C469D769F3A706C56550A63741A4B2D32BEF4B1209A26DAAD1DBB6")),
+                XCTUnwrap(Felt(fromHex: "0x0")),
             ]
         )
 
         let hash = StarknetTransactionHashCalculator.computeHash(of: tx, chainId: .integration_sepolia)
 
-        XCTAssertEqual(hash, Felt(fromHex: "0x7C173B8A109AB589694C89431E2C6070EA8662087B012F62081FAB6BACA4F6E")!)
+        XCTAssertEqual(hash, Felt(fromHex: "0x7C173B8A109AB589694C89431E2C6070EA8662087B012F62081FAB6BACA4F6E"))
     }
 
     func testTransactionWrapperDecoding() throws {
