@@ -145,9 +145,11 @@ public struct StarknetGetStorageProofResponse: Decodable, Equatable {
 }
 
 public struct StarknetStateUpdate: Decodable, Equatable {
-    public let blockHash: Felt
-    public let newRoot: Felt
-    public let oldRoot: Felt
+    /// Block hash — absent for pre-confirmed state updates.
+    public let blockHash: Felt?
+    /// New global state root — absent for pre-confirmed state updates.
+    public let newRoot: Felt?
+    public let oldRoot: Felt?
     public let stateDiff: StarknetStateDiff
 
     enum CodingKeys: String, CodingKey {
@@ -173,11 +175,13 @@ public enum StarknetStorageAtResult: Decodable, Equatable {
     case withLastUpdateBlock(StarknetStorageResult)
 
     public init(from decoder: Decoder) throws {
-        if let result = try? StarknetStorageResult(from: decoder) {
-            self = .withLastUpdateBlock(result)
+        // STORAGE_RESULT always contains "last_update_block"; a plain FELT response does not.
+        if let container = try? decoder.container(keyedBy: StarknetStorageResult.CodingKeys.self),
+           container.contains(.lastUpdateBlock)
+        {
+            self = try .withLastUpdateBlock(StarknetStorageResult(from: decoder))
         } else {
-            let felt = try Felt(from: decoder)
-            self = .value(felt)
+            self = try .value(Felt(from: decoder))
         }
     }
 }

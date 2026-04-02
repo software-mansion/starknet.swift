@@ -149,6 +149,12 @@ struct GetTransactionByBlockIdAndIndex: Encodable {
     let index: UInt64
     let responseFlags: [StarknetTxnResponseFlag]
 
+    init(blockId: StarknetBlockId, index: UInt64, responseFlags: [StarknetTxnResponseFlag] = []) {
+        self.blockId = blockId
+        self.index = index
+        self.responseFlags = responseFlags
+    }
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(blockId, forKey: .blockId)
@@ -233,6 +239,14 @@ struct TraceBlockTransactionsParams: Encodable {
     let blockId: StarknetBlockId
     let traceFlags: Set<StarknetTraceFlag>
 
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(blockId, forKey: .blockId)
+        if !traceFlags.isEmpty {
+            try container.encode(traceFlags, forKey: .traceFlags)
+        }
+    }
+
     enum CodingKeys: String, CodingKey {
         case blockId = "block_id"
         case traceFlags = "trace_flags"
@@ -292,6 +306,12 @@ struct GetBlockWithTxHashesParams: Encodable {
 struct GetStateUpdateParams: Encodable {
     let blockId: StarknetBlockId
     let contractAddresses: [Felt]?
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(blockId, forKey: .blockId)
+        try container.encodeIfPresent(contractAddresses, forKey: .contractAddresses)
+    }
 
     enum CodingKeys: String, CodingKey {
         case blockId = "block_id"

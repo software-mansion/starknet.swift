@@ -283,8 +283,7 @@ public enum RequestBuilder {
     /// Get a block with transaction hashes.
     ///
     /// - Parameters:
-    /// - blockId: hash, number, or tag of the requested block.
-    /// - responseFlags: optional flags controlling which additional fields are included
+    ///   - blockId: hash, number, or tag of the requested block.
     ///
     /// - Returns: Block information with transaction hashes.
     public static func getBlockWithTxHashes(_ blockId: StarknetBlockId) -> StarknetRequest<StarknetBlockWithTxHashesWrapper> {

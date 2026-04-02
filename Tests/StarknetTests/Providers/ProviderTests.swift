@@ -497,7 +497,7 @@ final class ProviderTests: XCTestCase {
         }
     }
 
-    func testGetBlockWithTxHashesWithProofFacts() async throws {
+    func testGetBlockWithTxHashesByBlockNumber() async throws {
         let contract = try await Self.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
         let txHash = try await Self.devnetClient.invokeContract(
             contractAddress: contract.deploy.contractAddress,
