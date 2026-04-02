@@ -39,6 +39,11 @@ public protocol StarknetBlockWithTxHashes: StarknetBlock {
     var transactions: [Felt] { get }
 }
 
+public struct StarknetTransactionWithReceipt: Decodable {
+    public let transaction: TransactionWrapper
+    public let receipt: TransactionReceiptWrapper
+}
+
 public struct StarknetProcessedBlockWithTxs: StarknetProcessedBlock, StarknetBlockWithTxs, Encodable {
     public let status: BlockStatus
     public let transactions: [TransactionWrapper]
@@ -176,6 +181,94 @@ public struct StarknetPreConfirmedBlockWithTxHashes: StarknetPreConfirmedBlock, 
         case l1DataGasPrice = "l1_data_gas_price"
         case l1DataAvailabilityMode = "l1_da_mode"
         case starknetVersion = "starknet_version"
+    }
+}
+
+public struct StarknetProcessedBlockWithReceipts: Decodable {
+    public let status: BlockStatus
+    public let transactions: [StarknetTransactionWithReceipt]
+    public let blockHash: Felt
+    public let parentHash: Felt
+    public let blockNumber: Int
+    public let newRoot: Felt
+    public let timestamp: Int
+    public let sequencerAddress: Felt
+    public let l1GasPrice: StarknetResourcePrice
+    public let l2GasPrice: StarknetResourcePrice
+    public let l1DataGasPrice: StarknetResourcePrice
+    public let l1DataAvailabilityMode: StarknetL1DAMode
+    public let starknetVersion: String
+    public let eventCommitment: Felt
+    public let transactionCommitment: Felt
+    public let receiptCommitment: Felt
+    public let stateDiffCommitment: Felt
+    public let eventCount: UInt
+    public let transactionCount: UInt
+    public let stateDiffLength: UInt
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case transactions
+        case blockHash = "block_hash"
+        case parentHash = "parent_hash"
+        case blockNumber = "block_number"
+        case newRoot = "new_root"
+        case timestamp
+        case sequencerAddress = "sequencer_address"
+        case l1GasPrice = "l1_gas_price"
+        case l2GasPrice = "l2_gas_price"
+        case l1DataGasPrice = "l1_data_gas_price"
+        case l1DataAvailabilityMode = "l1_da_mode"
+        case starknetVersion = "starknet_version"
+        case eventCommitment = "event_commitment"
+        case transactionCommitment = "transaction_commitment"
+        case receiptCommitment = "receipt_commitment"
+        case stateDiffCommitment = "state_diff_commitment"
+        case eventCount = "event_count"
+        case transactionCount = "transaction_count"
+        case stateDiffLength = "state_diff_length"
+    }
+}
+
+public struct StarknetPreConfirmedBlockWithReceipts: Decodable {
+    public let transactions: [StarknetTransactionWithReceipt]
+    public let blockNumber: Int
+    public let timestamp: Int
+    public let sequencerAddress: Felt
+    public let l1GasPrice: StarknetResourcePrice
+    public let l2GasPrice: StarknetResourcePrice
+    public let l1DataGasPrice: StarknetResourcePrice
+    public let l1DataAvailabilityMode: StarknetL1DAMode
+    public let starknetVersion: String
+
+    enum CodingKeys: String, CodingKey {
+        case transactions
+        case blockNumber = "block_number"
+        case timestamp
+        case sequencerAddress = "sequencer_address"
+        case l1GasPrice = "l1_gas_price"
+        case l2GasPrice = "l2_gas_price"
+        case l1DataGasPrice = "l1_data_gas_price"
+        case l1DataAvailabilityMode = "l1_da_mode"
+        case starknetVersion = "starknet_version"
+    }
+}
+
+public enum StarknetBlockWithReceiptsWrapper: Decodable {
+    case processed(StarknetProcessedBlockWithReceipts)
+    case preConfirmed(StarknetPreConfirmedBlockWithReceipts)
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.parentHash) {
+            self = try .processed(StarknetProcessedBlockWithReceipts(from: decoder))
+        } else {
+            self = try .preConfirmed(StarknetPreConfirmedBlockWithReceipts(from: decoder))
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case parentHash = "parent_hash"
     }
 }
 

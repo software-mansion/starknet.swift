@@ -287,8 +287,8 @@ public enum RequestBuilder {
     /// - responseFlags: optional flags controlling which additional fields are included
     ///
     /// - Returns: Block information with transaction hashes.
-    public static func getBlockWithTxHashes(_ blockId: StarknetBlockId, responseFlags: [StarknetTxnResponseFlag] = []) -> StarknetRequest<StarknetBlockWithTxHashesWrapper> {
-        let params = GetBlockWithTxHashesParams(blockId: blockId, responseFlags: responseFlags)
+    public static func getBlockWithTxHashes(_ blockId: StarknetBlockId) -> StarknetRequest<StarknetBlockWithTxHashesWrapper> {
+        let params = GetBlockWithTxHashesParams(blockId: blockId)
 
         return StarknetRequest(method: .getBlockWithTxHashes, params: .getBlockWithTxHashes(params))
     }
@@ -473,5 +473,30 @@ public enum RequestBuilder {
     /// - Returns: Block information with full transactions.
     public static func getBlockWithTxs(_ blockTag: StarknetBlockId.BlockTag) -> StarknetRequest<StarknetBlockWithTxsWrapper> {
         getBlockWithTxs(StarknetBlockId.tag(blockTag))
+    }
+
+    /// Get a block with full transactions and receipts.
+    ///
+    /// - Parameters:
+    /// - blockId: hash, number, or tag of the requested block.
+    /// - responseFlags: optional flags controlling which additional fields are included in transaction responses.
+    ///
+    /// - Returns: Block information with full transactions and receipts.
+    public static func getBlockWithReceipts(_ blockId: StarknetBlockId, responseFlags: [StarknetTxnResponseFlag] = []) -> StarknetRequest<StarknetBlockWithReceiptsWrapper> {
+        let params = GetBlockWithReceiptsParams(blockId: blockId, responseFlags: responseFlags)
+
+        return StarknetRequest(method: .getBlockWithReceipts, params: .getBlockWithReceipts(params))
+    }
+
+    public static func getBlockWithReceipts(_ blockHash: Felt) -> StarknetRequest<StarknetBlockWithReceiptsWrapper> {
+        getBlockWithReceipts(StarknetBlockId.hash(blockHash))
+    }
+
+    public static func getBlockWithReceipts(_ blockNumber: Int) -> StarknetRequest<StarknetBlockWithReceiptsWrapper> {
+        getBlockWithReceipts(StarknetBlockId.number(blockNumber))
+    }
+
+    public static func getBlockWithReceipts(_ blockTag: StarknetBlockId.BlockTag) -> StarknetRequest<StarknetBlockWithReceiptsWrapper> {
+        getBlockWithReceipts(StarknetBlockId.tag(blockTag))
     }
 }

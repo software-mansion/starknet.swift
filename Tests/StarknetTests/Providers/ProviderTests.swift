@@ -379,16 +379,58 @@ final class ProviderTests: XCTestCase {
         do {
             _ = try transactionsResponse[1].get().transaction.hash
             XCTFail("Fetching transaction with nonexistent hash should fail")
-        } catch let error as StarknetProviderError {
-            switch error {
-            case let .jsonRpcError(_, message, _):
-                XCTAssertEqual(message, "Transaction hash not found", "Unexpected error message received")
-            default:
-                XCTFail("Expected JsonRpcError but received \(error)")
-            }
+        } catch let StarknetProviderError.jsonRpcError(_, message, _) {
+            XCTAssertEqual(message, "Transaction hash not found", "Unexpected error message received")
         } catch {
-            XCTFail("Error was not a StarknetProviderError. Received error type: \(type(of: error))")
+            XCTFail("Expected jsonRpcError but received \(error)")
         }
+    }
+
+    func testGetBlockWithReceiptsWithLatestBlockTag() async throws {
+        let result = try await provider.send(request: RequestBuilder.getBlockWithReceipts(StarknetBlockId.BlockTag.latest))
+
+        if case .preConfirmed = result {
+            XCTFail("Expected .processed")
+        }
+    }
+
+    func testGetBlockWithReceiptsWithPreConfirmedBlockTag() async throws {
+        let result = try await provider.send(request: RequestBuilder.getBlockWithReceipts(StarknetBlockId.BlockTag.preConfirmed))
+
+        if case .processed = result {
+            XCTFail("Expected .preConfirmed")
+        }
+    }
+
+    func testGetBlockWithReceiptsWithProofFacts() async throws {
+        let contract = try await Self.devnetClient.declareDeployContract(contractName: "Balance", constructorCalldata: [1000])
+        let txHash = try await Self.devnetClient.invokeContract(
+            contractAddress: contract.deploy.contractAddress,
+            function: "increase_balance",
+            calldata: [100]
+        ).transactionHash
+
+        try await Self.devnetClient.assertTransactionSucceeded(transactionHash: txHash)
+
+        let txReceipt = try await provider.send(request: RequestBuilder.getTransactionReceiptBy(hash: txHash))
+        let blockNumber = try XCTUnwrap(txReceipt.transactionReceipt.blockNumber)
+
+        let blockResult = try await provider.send(request: RequestBuilder.getBlockWithReceipts(.number(Int(blockNumber)), responseFlags: [.includeProofFacts]))
+
+        guard case let .processed(block) = blockResult else {
+            XCTFail("Expected .processed block")
+            return
+        }
+
+        XCTAssertFalse(block.transactions.isEmpty)
+        XCTAssertTrue(block.transactions.contains { $0.receipt.transactionReceipt.transactionHash == txHash })
+
+        let invoke = block.transactions.compactMap { txWithReceipt -> StarknetInvokeTransactionV3? in
+            if case let .invokeV3(tx) = txWithReceipt.transaction { return tx }
+            return nil
+        }.first
+        XCTAssertNotNil(invoke)
+        XCTAssertNotNil(invoke?.proofFacts)
     }
 
     func testGetBlockWithTxsWithLatestBlockTag() async throws {
@@ -434,7 +476,9 @@ final class ProviderTests: XCTestCase {
 
         let result = try await provider.send(request: RequestBuilder.getTransactionBy(blockId: .tag(.latest), index: 0, responseFlags: [.includeProofFacts]))
 
-        XCTAssertNotNil(result.transaction)
+        let invoke = result.transaction as? StarknetInvokeTransactionV3
+        XCTAssertNotNil(invoke)
+        XCTAssertNotNil(invoke?.proofFacts)
     }
 
     func testGetBlockWithTxHashesWithLatestBlockTag() async throws {
@@ -466,7 +510,7 @@ final class ProviderTests: XCTestCase {
         let txReceipt = try await provider.send(request: RequestBuilder.getTransactionReceiptBy(hash: txHash))
         let blockNumber = try XCTUnwrap(txReceipt.transactionReceipt.blockNumber)
 
-        let blockResult = try await provider.send(request: RequestBuilder.getBlockWithTxHashes(.number(Int(blockNumber)), responseFlags: [.includeProofFacts]))
+        let blockResult = try await provider.send(request: RequestBuilder.getBlockWithTxHashes(.number(Int(blockNumber))))
 
         guard case let .processed(block) = blockResult else {
             XCTFail("Expected .processed block")
@@ -505,7 +549,9 @@ final class ProviderTests: XCTestCase {
         }
 
         XCTAssertEqual(storageResult.value, Self.devnetClient.constants.predeployedAccount1.publicKey)
-        XCTAssertGreaterThanOrEqual(storageResult.lastUpdateBlock, 0)
+        if let lastUpdateBlock = storageResult.lastUpdateBlock {
+            XCTAssertGreaterThanOrEqual(lastUpdateBlock, 0)
+        }
     }
 
     func testGetBlockWithTxsWithProofFacts() async throws {
@@ -528,7 +574,10 @@ final class ProviderTests: XCTestCase {
             return
         }
 
-        let invoke = block.transactions.first { $0.type == .invoke } as? StarknetInvokeTransactionV3
+        let invoke = block.transactions.compactMap { wrapper -> StarknetInvokeTransactionV3? in
+            if case let .invokeV3(tx) = wrapper { return tx }
+            return nil
+        }.first
         XCTAssertNotNil(invoke)
         XCTAssertNotNil(invoke?.proofFacts)
     }

@@ -384,7 +384,7 @@ func makeDevnetClient() -> DevnetClientProtocol {
                 params.append(salt!.toHex())
             }
 
-            let response = try runSnCast(
+            _ = try runSnCast(
                 command: "account",
                 args: params
             ) as! AccountCreateSnCastResponse
