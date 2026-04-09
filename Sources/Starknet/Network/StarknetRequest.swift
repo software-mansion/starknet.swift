@@ -242,6 +242,9 @@ public enum RequestBuilder {
     ///
     ///  - Returns: traces result (array, or with initial reads if RETURN_INITIAL_READS flag is set)
     public static func traceBlockTransactions(at blockId: StarknetBlockId, traceFlags: Set<StarknetTraceFlag> = []) -> StarknetRequest<StarknetTraceBlockTransactionsResult> {
+        precondition(blockId != StarknetBlockId.tag(.preConfirmed),
+                     ".preConfirmed block tag is not allowed for `traceBlockTransactions`")
+
         let params = TraceBlockTransactionsParams(blockId: blockId, traceFlags: traceFlags)
 
         return StarknetRequest(method: .traceBlockTransactions, params: .traceBlockTransactions(params))

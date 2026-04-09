@@ -162,7 +162,7 @@ public struct StarknetStateUpdate: Decodable, Equatable {
 
 public struct StarknetStorageResult: Decodable, Equatable {
     public let value: Felt
-    public let lastUpdateBlock: UInt64?
+    public let lastUpdateBlock: UInt64
 
     enum CodingKeys: String, CodingKey {
         case value
