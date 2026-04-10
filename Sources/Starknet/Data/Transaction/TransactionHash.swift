@@ -42,8 +42,8 @@ public class StarknetTransactionHashCalculator {
             StarknetPoseidon.poseidonHash(transaction.accountDeploymentData),
             StarknetPoseidon.poseidonHash(transaction.calldata),
         ]
-        if !transaction.proofFacts.isEmpty {
-            fields.append(StarknetPoseidon.poseidonHash(transaction.proofFacts))
+        if let proofFacts = transaction.proofFacts, !proofFacts.isEmpty {
+            fields.append(StarknetPoseidon.poseidonHash(proofFacts))
         }
         return StarknetPoseidon.poseidonHash(fields)
     }

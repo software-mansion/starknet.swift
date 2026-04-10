@@ -152,6 +152,29 @@ final class ProviderTests: XCTestCase {
         print(result)
     }
 
+    func testGetEventsWithMultipleAddresses() async throws {
+        let contract1 = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Events")
+        let contract2 = try await ProviderTests.devnetClient.declareDeployContract(contractName: "Events")
+        let invokeResult1 = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract1.deploy.contractAddress, function: "emit_event", calldata: [1])
+        let invokeResult2 = try await ProviderTests.devnetClient.invokeContract(contractAddress: contract2.deploy.contractAddress, function: "emit_event", calldata: [1])
+
+        try await ProviderTests.devnetClient.assertTransactionSucceeded(transactionHash: invokeResult1.transactionHash)
+        try await ProviderTests.devnetClient.assertTransactionSucceeded(transactionHash: invokeResult2.transactionHash)
+
+        let filter = StarknetGetEventsFilter(
+            fromBlockId: StarknetBlockId.number(0),
+            toBlockId: StarknetBlockId.tag(.latest),
+            addresses: [contract1.deploy.contractAddress, contract2.deploy.contractAddress],
+            keys: [["0x477e157efde59c5531277ede78acb3e03ef69508c6c35fde3495aa0671d227"]],
+            chunkSize: 10
+        )
+        let result = try await provider.send(request: RequestBuilder.getEvents(filter: filter))
+
+        let addresses = result.events.map(\.address)
+        XCTAssertTrue(addresses.contains(contract1.deploy.contractAddress))
+        XCTAssertTrue(addresses.contains(contract2.deploy.contractAddress))
+    }
+
     func testGetTransactionByBlockIdAndHash() async throws {
         let result = try await provider.send(request: RequestBuilder.getTransactionBy(blockId: .tag(.latest), index: 0))
 
@@ -549,9 +572,7 @@ final class ProviderTests: XCTestCase {
         }
 
         XCTAssertEqual(storageResult.value, Self.devnetClient.constants.predeployedAccount1.publicKey)
-        if let lastUpdateBlock = storageResult.lastUpdateBlock {
-            XCTAssertGreaterThanOrEqual(lastUpdateBlock, 0)
-        }
+        XCTAssertGreaterThanOrEqual(storageResult.lastUpdateBlock, 0)
     }
 
     func testGetBlockWithTxsWithProofFacts() async throws {

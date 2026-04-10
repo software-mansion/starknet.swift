@@ -28,12 +28,12 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
 
     public let hash: Felt?
 
-    public let proofFacts: [Felt]
+    public let proofFacts: [Felt]?
 
     /// Optional base64-encoded proof, included when broadcasting a transaction with proof mode.
     public let proof: String?
 
-    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil, tip: UInt64AsHex = .zero, proofFacts: [Felt] = [], proof: String? = nil) {
+    public init(senderAddress: Felt, calldata: StarknetCalldata, signature: StarknetSignature, resourceBounds: StarknetResourceBoundsMapping, nonce: Felt, forFeeEstimation: Bool = false, hash: Felt? = nil, tip: UInt64AsHex = .zero, proofFacts: [Felt]? = nil, proof: String? = nil) {
         self.senderAddress = senderAddress
         self.calldata = calldata
         self.signature = signature
@@ -82,7 +82,7 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         self.nonceDataAvailabilityMode = try container.decode(StarknetDAMode.self, forKey: .nonceDataAvailabilityMode)
         self.feeDataAvailabilityMode = try container.decode(StarknetDAMode.self, forKey: .feeDataAvailabilityMode)
         self.hash = try container.decodeIfPresent(Felt.self, forKey: .hash)
-        self.proofFacts = try container.decodeIfPresent([Felt].self, forKey: .proofFacts) ?? []
+        self.proofFacts = try container.decodeIfPresent([Felt].self, forKey: .proofFacts)
         self.proof = try container.decodeIfPresent(String.self, forKey: .proof)
 
         try verifyTransactionType(container: container, codingKeysType: CodingKeys.self)
@@ -103,9 +103,7 @@ public struct StarknetInvokeTransactionV3: StarknetInvokeTransaction, StarknetTr
         try container.encode(nonceDataAvailabilityMode, forKey: .nonceDataAvailabilityMode)
         try container.encode(feeDataAvailabilityMode, forKey: .feeDataAvailabilityMode)
         try container.encodeIfPresent(hash, forKey: .hash)
-        if !proofFacts.isEmpty {
-            try container.encode(proofFacts, forKey: .proofFacts)
-        }
+        try container.encodeIfPresent(proofFacts, forKey: .proofFacts)
         try container.encodeIfPresent(proof, forKey: .proof)
     }
 }
