@@ -1,3 +1,5 @@
+import Foundation
+
 public struct StarknetContractsStorageKeys: Encodable {
     let contractAddress: Felt
     let storageKeys: [StarknetStorageKey]
@@ -9,13 +11,14 @@ public struct StarknetContractsStorageKeys: Encodable {
 }
 
 /// A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
-/// Storage keys must be a hexidecimal string, starting with `0x`, conforming to the regex `#/^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)/#`
+/// Storage keys must be a hexidecimal string, starting with `0x`, conforming to the regex `^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)`
 public struct StarknetStorageKey: Encodable {
     let value: String
-    static let regex = #/^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)/#
+    private static let regex = try! NSRegularExpression(pattern: "^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)")
 
     public init?(_ value: String) {
-        guard value.wholeMatch(of: StarknetStorageKey.regex) != nil else {
+        let range = NSRange(value.startIndex..., in: value)
+        guard StarknetStorageKey.regex.firstMatch(in: value, range: range) != nil else {
             return nil
         }
 

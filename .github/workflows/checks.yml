@@ -18,7 +18,7 @@ jobs:
 
       - uses: swift-actions/setup-swift@v3
         with:
-          swift-version: "6.1"
+          swift-version: "6.1.3"
 
       - name: Cache/Restore Mint packages
         id: mint-cache
