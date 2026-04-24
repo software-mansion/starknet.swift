@@ -608,7 +608,15 @@ extension StarknetTypedData {
     }
 
     func unwrapLongString(from element: Element) throws -> [Felt] {
-        guard case let .string(string) = element else {
+        let string: String
+        
+        switch element {
+        case let .string(stringValue):
+            string = stringValue
+        case let .felt(feltValue):
+            // Handle case where hex string was incorrectly parsed as felt during JSON decoding
+            string = feltValue.toHex()
+        default:
             throw StarknetTypedDataError.decodingError
         }
 
