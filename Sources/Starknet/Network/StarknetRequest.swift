@@ -314,7 +314,7 @@ public enum RequestBuilder {
     ///  - contractAddresses: optional filter — only include state diff for these contract addresses
     ///
     ///  - Returns: state update for the block
-    public static func getStateUpdate(at blockId: StarknetBlockId, contractAddresses: [Felt]? = nil) -> StarknetRequest<StarknetStateUpdate> {
+    public static func getStateUpdate(at blockId: StarknetBlockId, contractAddresses: [Felt]? = nil) -> StarknetRequest<StarknetStateUpdateWrapper> {
         let params = GetStateUpdateParams(blockId: blockId, contractAddresses: contractAddresses)
 
         return StarknetRequest(method: .getStateUpdate, params: .getStateUpdate(params))

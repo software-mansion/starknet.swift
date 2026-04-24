@@ -145,11 +145,9 @@ public struct StarknetGetStorageProofResponse: Decodable, Equatable {
 }
 
 public struct StarknetStateUpdate: Decodable, Equatable {
-    /// Block hash — absent for pre-confirmed state updates.
-    public let blockHash: Felt?
-    /// New global state root — absent for pre-confirmed state updates.
-    public let newRoot: Felt?
-    public let oldRoot: Felt?
+    public let blockHash: Felt
+    public let newRoot: Felt
+    public let oldRoot: Felt
     public let stateDiff: StarknetStateDiff
 
     enum CodingKeys: String, CodingKey {
@@ -157,6 +155,34 @@ public struct StarknetStateUpdate: Decodable, Equatable {
         case newRoot = "new_root"
         case oldRoot = "old_root"
         case stateDiff = "state_diff"
+    }
+}
+
+public struct StarknetPreConfirmedStateUpdate: Decodable, Equatable {
+    public let oldRoot: Felt
+    public let stateDiff: StarknetStateDiff
+
+    enum CodingKeys: String, CodingKey {
+        case oldRoot = "old_root"
+        case stateDiff = "state_diff"
+    }
+}
+
+public enum StarknetStateUpdateWrapper: Decodable {
+    case processed(StarknetStateUpdate)
+    case preConfirmed(StarknetPreConfirmedStateUpdate)
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.blockHash) {
+            self = try .processed(StarknetStateUpdate(from: decoder))
+        } else {
+            self = try .preConfirmed(StarknetPreConfirmedStateUpdate(from: decoder))
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case blockHash = "block_hash"
     }
 }
 
