@@ -293,17 +293,13 @@ public enum StarknetSimulateTransactionsResult: Decodable {
     }
 }
 
-public struct StarknetBlockTransactionTrace: Decodable, Equatable {
+public struct StarknetBlockTransactionTrace: Decodable {
     public let transactionHash: Felt
     public let traceRoot: any StarknetTransactionTrace
 
     enum CodingKeys: String, CodingKey {
         case transactionHash = "transaction_hash"
         case traceRoot = "trace_root"
-    }
-
-    public static func == (lhs: StarknetBlockTransactionTrace, rhs: StarknetBlockTransactionTrace) -> Bool {
-        lhs.transactionHash == rhs.transactionHash
     }
 
     public init(from decoder: Decoder) throws {
