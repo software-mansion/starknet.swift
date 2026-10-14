@@ -11,8 +11,14 @@ final class ProviderTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
 
-        // TODO(#245): Change this to internal node
-        provider = StarknetProvider(url: "https://rpc.pathfinder.equilibrium.co/testnet-sepolia/rpc/v0_10")
+        let environment = ProcessInfo.processInfo.environment
+        guard let rpcURL = environment["SEPOLIA_RPC_URL"],
+              let configuredProvider = StarknetProvider(url: rpcURL)
+        else {
+            throw XCTSkip("Set SEPOLIA_RPC_URL to run network integration tests")
+        }
+
+        provider = configuredProvider
     }
 
     func testGetBlockWithTxsWithL1AcceptedBlockTag() async throws {
