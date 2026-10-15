@@ -1,6 +1,7 @@
 name: Build and publish docs
 
 on:
+  pull_request:
   push:
     tags:
       - "*"
@@ -33,6 +34,7 @@ jobs:
           echo "<script>window.location.href += \"/documentation/starknet\"</script>" > docs/index.html;
 
       - name: Deploy
+        if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6
         with:
           folder: docs
