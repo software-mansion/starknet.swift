@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       - uses: swift-actions/setup-swift@v3
         with:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Deploy
         if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           folder: docs
           branch: gh-pages
